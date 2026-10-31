@@ -8,8 +8,6 @@
 #include "evt/evt_eff.h"
 #include "battle/battle_database_common.h"
 
-#pragma force_active on
-
 USER_FUNC(btlevtcmd_AnimeChangePose);
 USER_FUNC(btlevtcmd_AnimeChangePoseFromTable);
 USER_FUNC(btlevtcmd_CheckStatus);
@@ -30,20 +28,6 @@ USER_FUNC(btlevtcmd_check_battleflag);
 USER_FUNC(evt_btl_camera_set_mode);
 USER_FUNC(evt_sub_random);
 
-f32 fd_gundan_zako_elite_negone_one_374[2] __attribute__((aligned(8)));
-f32 fd_gundan_zako_elite_neg_one_382;
-f32 fd_gundan_zako_elite___local_PI_383;
-f32 fd_gundan_zako_elite___local_3PIO2_385;
-f32 fd_gundan_zako_elite_one_negone_373[2] __attribute__((aligned(8)));
-f32 fd_gundan_zako_elite___local_PIO2_384;
-f32 fd_gundan_zako_elite_one_381;
-f32 fd_gundan_zako_elite_negone_one_360[2] __attribute__((aligned(8)));
-f32 fd_gundan_zako_elite_neg_one_365;
-f32 fd_gundan_zako_elite___local_PI_366;
-f32 fd_gundan_zako_elite___local_3PIO2_368;
-f32 fd_gundan_zako_elite_one_negone_359[2] __attribute__((aligned(8)));
-f32 fd_gundan_zako_elite___local_PIO2_367;
-f32 fd_gundan_zako_elite_one_364;
 BattleUnitKind unit_gundan_zako_elite;
 static BattleUnitDefense defence;
 static BattleUnitDefenseAttr defence_attr;
@@ -57,40 +41,10 @@ static BattleWeapon weapon_gundan_zako_dekadeka_bottle;
 static EvtWord init_event[42];
 static EvtWord damage_event[10];
 static EvtWord attack_event[98];
-static EvtWord attack_common_event1[182];
-static EvtWord attack_common_event2[33];
 static EvtWord normal_attack_event[307];
 static EvtWord jump_attack_event[324];
 static EvtWord dekadeka_event[125];
 static EvtWord wait_event[6];
-
-f32 fd_gundan_zako_elite_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
-
-f32 fd_gundan_zako_elite_neg_one_382 = -1.0f;
-
-f32 fd_gundan_zako_elite___local_PI_383 = 3.1415927f;
-
-f32 fd_gundan_zako_elite___local_3PIO2_385 = 4.712389f;
-
-f32 fd_gundan_zako_elite_one_negone_373[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
-
-f32 fd_gundan_zako_elite___local_PIO2_384 = 1.5707964f;
-
-f32 fd_gundan_zako_elite_one_381 = 1.0f;
-
-f32 fd_gundan_zako_elite_negone_one_360[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
-
-f32 fd_gundan_zako_elite_neg_one_365 = -1.0f;
-
-f32 fd_gundan_zako_elite___local_PI_366 = 3.1415927f;
-
-f32 fd_gundan_zako_elite___local_3PIO2_368 = 4.712389f;
-
-f32 fd_gundan_zako_elite_one_negone_359[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
-
-f32 fd_gundan_zako_elite___local_PIO2_367 = 1.5707964f;
-
-f32 fd_gundan_zako_elite_one_364 = 1.0f;
 
 BattleUnitKind unit_gundan_zako_elite = {
     120,
@@ -626,7 +580,7 @@ static EVT_BEGIN(dekadeka_event)
     WAIT_FRAMES(120)
     BEGIN_INLINE_EVENT
         WAIT_FRAMES(5)
-        CALL(btlevtcmd_snd_se, -2, STRING("SFX_ENM_3RD1_BOTTLE5\0\0\0"), -250000000, 0, -250000000)
+        CALL(btlevtcmd_snd_se, -2, STRING("SFX_ENM_3RD1_BOTTLE5"), -250000000, 0, -250000000)
         WAIT_FRAMES(55)
         CALL(evt_btl_camera_set_mode, 0, 0)
     END_INLINE_EVENT

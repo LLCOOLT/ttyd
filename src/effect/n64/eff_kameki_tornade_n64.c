@@ -60,7 +60,7 @@ EffectEntry* effKamekiTornadeN64Entry(s32 type, s32 life, f32 x, f32 y, f32 z, f
     s32 k;
 
     effect = effEntry();
-    effect->type = "KamekiTornadeN64\0\0\0";
+    effect->type = "KamekiTornadeN64";
     effect->count = 1;
     work = __memAlloc(HEAP_EFFECT, sizeof(EffKamekiTornadeN64Work));
     effect->userdata = work;
@@ -180,7 +180,6 @@ void effKamekiTornadeDisp(CameraId cameraId, EffectEntry* effect) {
     CameraEntry* camera;
     s32 a;
     f32 s;
-    f32* new_var;
     f32 r;
     f32 ang;
     Mtx mtx;
@@ -191,7 +190,6 @@ void effKamekiTornadeDisp(CameraId cameraId, EffectEntry* effect) {
     Vec axis;
     Vec v1;
     Vec v2;
-    f32 new_var2;
 
     camera = camGetPtr(cameraId);
     work = effect->userdata;
@@ -238,8 +236,7 @@ void effKamekiTornadeDisp(CameraId cameraId, EffectEntry* effect) {
         q->x = 100.0f * (f32)cos(r);
         q->y = 0.0f;
         q->z = 100.0f * (f32)sin(r);
-        // FAKE: (u32)(i * 128) * 4 == i * 512 for i in 0..15; the unsigned multiply leaves this IV to the back-end loop pass, so its init copies the i*360 IV (target mr r20,r27)
-        q->s = (u32)(i * 128) * 4;
+        q->s = (i * 128) << 2;
         q->t = 1024;
     }
     PSMTXRotRad(rot, 'z', 0.017453292f * work->rotZ);
@@ -263,9 +260,8 @@ void effKamekiTornadeDisp(CameraId cameraId, EffectEntry* effect) {
         ang = 10.0f * work->radius[i];
         s = 6.2831855f * work->ang[i] / 360.0f;
         r = (f32)sin(s);
-        // FAKE: cos(s) through a temp (same call order: sin, then cos, then PSMTXTrans)
-        new_var2 = (f32)cos(s);
-        PSMTXTrans(tex, ang * r, 0, ang * new_var2);
+        s = (f32)cos(s);
+        PSMTXTrans(tex, ang * r, 0, ang * s);
         PSMTXConcat(mtx, tex, mtx);
         PSMTXConcat(base, mtx, mtx);
         for (j = 0; j < 16; j++) {
@@ -280,13 +276,11 @@ void effKamekiTornadeDisp(CameraId cameraId, EffectEntry* effect) {
         }
         PSMTXTrans(mtx, 10.0f * work->px[i + 1], 10.0f * work->py[i + 1], 10.0f * work->pz[i + 1]);
         PSMTXRotRad(rot, 'z', 0.017453292f * work->rot[i + 1]);
-        // FAKE: alias of the work->sc array (address only, no load) used for the second scale argument
-        new_var = work->sc;
         PSMTXConcat(mtx, rot, mtx);
         axis = (Vec){0.03f, 1.0f, 0.0f};
         PSMTXRotAxisRad(rot, &axis, 0.017453292f * (work->twist + (f32)(i * i)));
         PSMTXConcat(mtx, rot, mtx);
-        PSMTXScale(tex, work->sc[i + 1] * scale, scale, new_var[i + 1] * scale);
+        PSMTXScale(tex, work->sc[i + 1] * scale, scale, scale * work->sc[i + 1]);
         PSMTXConcat(mtx, tex, mtx);
         r = 10.0f * work->radius[i];
         s = (f32)sin(6.2831855f * work->ang[i] / 360.0f);

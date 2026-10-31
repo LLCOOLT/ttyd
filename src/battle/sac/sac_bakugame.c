@@ -25,6 +25,7 @@
 #include "party/party_motion.h"
 #include "battle/sac/sac_bakugame.h"
 #include "battle/battle_database_common.h"
+#include "pmario_sound.h"
 
 EffectEntry* effStarStoneEntry(s32 type, f32 x, f32 y, f32 z, f32 size);
 EffectEntry* effSandarsEntry(s32 type, f32 x, f32 y, f32 z, f32 w);
@@ -41,7 +42,6 @@ void BtlUnit_SetBodyAnimType(BattleUnit* unit, s32 type);
 s32 BtlUnit_snd_se_pos(BattleUnit* unit, const char* name, s32 vol, s32 pan, Vec* pos);
 void psndSFX_pit(s32 id, s32 pitch);
 s32 psndSFXChk(s32 id);
-s32 psndSFXOn(const char* name);
 void psndSFXOff(s32 id);
 void animPoseRelease(s32 poseId);
 void animPoseMain(s32 poseId);
@@ -66,14 +66,14 @@ typedef struct BakuWork {
     s32 state;          // 0x4
     s32 timer;          // 0x8
     BakuBtn btn[3];     // 0xC
-    s32 unk78;          // 0x78
+    s32 subState;       // 0x78, never used
     s32 s7c;            // 0x7C
     s32 s80;            // 0x80
     s32 s84;            // 0x84
     Vec pos;            // 0x88
     Vec from;           // 0x94
     Vec to;             // 0xA0
-    f32 unkac;          // 0xAC
+    f32 vx;             // 0xAC, never used (jump uses vy only)
     f32 vy;             // 0xB0
     u8 padb4[0xC];      // 0xB4
     f32 c0;             // 0xC0
@@ -103,9 +103,9 @@ typedef struct BakuWork {
     Vec hpos;           // 0x1D0
     Vec hfrom;          // 0x1DC
     Vec hto;            // 0x1E8
-    f32 unk1f4;         // 0x1F4
+    f32 hvx;            // 0x1F4, never used (jump uses hvy only)
     f32 hvy;            // 0x1F8
-    f32 unk1fc;         // 0x1FC
+    f32 hacc;           // 0x1FC, never used
     s32 texIdx;         // 0x200
     s32 starState;      // 0x204
     s32 starTimer;      // 0x208
@@ -358,10 +358,10 @@ s32 bakuGameDecideWeapon(EventEntry *event, BOOL isFirstCall)
 
 USER_FUNC(bakuGameBombEntry) {
     BakuWork* w = GetBakuGamePtr();
-    if (!animGroupBaseAsync("c_star_bom\0", 2, NULL)) {
+    if (!animGroupBaseAsync("c_star_bom", 2, NULL)) {
         return 0;
     }
-    w->poseId = animPoseEntry("c_star_bom\0", 2);
+    w->poseId = animPoseEntry("c_star_bom", 2);
     animPoseSetAnim(w->poseId, "Z_1", 1);
     return 2;
 }

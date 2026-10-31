@@ -376,7 +376,7 @@ void psndSFX_pit(s32 id, s32 pitch);
 void BattleAudienceSoundCallKind(s32 kind);
 void BattleAudienceSoundWhistleKind(s32 kind);
 void btl_camera_shake_h(s32 a, f32 b, f32 c, s32 d, s32 e);
-#define SFXON(s) ((s32 (*)(const char*))psndSFXOn)(s)
+#define SFXON(s) psndSFXOn(s)
 
 USER_FUNC(zubastar_main) {
 	ZubaStarWork* w = GetZubaStarPtr();
@@ -695,7 +695,7 @@ USER_FUNC(zubastar_main) {
 			if (psndSFXChk(w->sfx) == 0) psndSFXOff(w->sfx);
 		}
 		if (w->gauge > 0.0f) {
-			if (psndSFXChk(w->sfx) == -1) w->sfx = SFXON("SFX_BTL_SAC_ZUBA_STAR1\0");
+			if (psndSFXChk(w->sfx) == -1) w->sfx = SFXON("SFX_BTL_SAC_ZUBA_STAR1");
 		}
 		if (psndSFXChk(w->sfx) == 0) {
 			psndSFX_pit(w->sfx, 683.0f * w->level + 4096.0f * w->gauge / 100.0f);

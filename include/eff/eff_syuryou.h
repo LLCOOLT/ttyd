@@ -12,7 +12,7 @@ typedef struct EffSyuryouWork {
     s32 poseId;   // 0x14
     s32 alpha;    // 0x18
     s32 timer;    // 0x1C, counts down while fading out
-    s32 field_0x20; // 0x20
+    s32 reserved_20; // 0x20, never read or written
 } EffSyuryouWork;
 
 EffectEntry* effSyuryouEntry(s32 type, s32 duration, f32 x, f32 y, f32 z);

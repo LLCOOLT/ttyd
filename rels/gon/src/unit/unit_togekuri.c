@@ -1,7 +1,6 @@
 #include "battle/battle_unit.h"
 #include "evt/evt_cmd.h"
 
-#pragma force_active on
 #include "battle/battle.h"
 #include "system.h"
 #include "manager/evtmgr_cmd.h"
@@ -37,20 +36,6 @@ static u16 krb_comp_dir(f32 x, f32 z);
 f32 hypotf(f32 x, f32 y);
 static USER_FUNC(krb_get_dir);
 
-f32 fd_togekuri_negone_one_374[2] __attribute__((aligned(8)));
-f32 fd_togekuri_neg_one_382;
-f32 fd_togekuri___local_PI_383;
-f32 fd_togekuri___local_3PIO2_385;
-f32 fd_togekuri_one_negone_373[2] __attribute__((aligned(8)));
-f32 fd_togekuri___local_PIO2_384;
-f32 fd_togekuri_one_381;
-f32 fd_togekuri_negone_one_360[2] __attribute__((aligned(8)));
-f32 fd_togekuri_neg_one_365;
-f32 fd_togekuri___local_PI_366;
-f32 fd_togekuri___local_3PIO2_368;
-f32 fd_togekuri_one_negone_359[2] __attribute__((aligned(8)));
-f32 fd_togekuri___local_PIO2_367;
-f32 fd_togekuri_one_364;
 BattleUnitKind unit_togekuri;
 static BattleUnitDefense defence;
 static BattleUnitDefenseAttr defence_attr;
@@ -80,34 +65,6 @@ static USER_FUNC(get_attacker) {
     }
     return EVT_RETURN_DONE;
 }
-
-f32 fd_togekuri_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
-
-f32 fd_togekuri_neg_one_382 = -1.0f;
-
-f32 fd_togekuri___local_PI_383 = 3.1415927f;
-
-f32 fd_togekuri___local_3PIO2_385 = 4.712389f;
-
-f32 fd_togekuri_one_negone_373[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
-
-f32 fd_togekuri___local_PIO2_384 = 1.5707964f;
-
-f32 fd_togekuri_one_381 = 1.0f;
-
-f32 fd_togekuri_negone_one_360[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
-
-f32 fd_togekuri_neg_one_365 = -1.0f;
-
-f32 fd_togekuri___local_PI_366 = 3.1415927f;
-
-f32 fd_togekuri___local_3PIO2_368 = 4.712389f;
-
-f32 fd_togekuri_one_negone_359[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
-
-f32 fd_togekuri___local_PIO2_367 = 1.5707964f;
-
-f32 fd_togekuri_one_364 = 1.0f;
 
 BattleUnitKind unit_togekuri = {
     3,
@@ -532,7 +489,7 @@ static EVT_BEGIN(attack_event)
     GOTO(95)
     LABEL(95)
     CALL(evt_btl_camera_set_mode, 0, 0)
-    CALL(btlevtcmd_SetMoveSoundDataWork, -2, STRING("SFX_ENM_KURI_MOVE1"), STRING("SFX_ENM_KURI_MOVE2\0"), 0, 3, 3, 0, 0)
+    CALL(btlevtcmd_SetMoveSoundDataWork, -2, STRING("SFX_ENM_KURI_MOVE1"), STRING("SFX_ENM_KURI_MOVE2"), 0, 3, 3, 0, 0)
     CALL(btlevtcmd_AnimeChangePoseType, -2, 1, 41)
     CALL(btlevtcmd_SetMoveSpeed, -2, FLOAT(5.0f))
     CALL(btlevtcmd_GetHomePos, -2, LW(0), LW(1), LW(2))

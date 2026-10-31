@@ -1,7 +1,6 @@
 #include "battle/battle_unit.h"
 #include "evt/evt_cmd.h"
 
-#pragma force_active on
 #include "battle/battle.h"
 #include "battle/battle_stage_object.h"
 #include "system.h"
@@ -19,7 +18,7 @@
 #include "party/party_motion.h"
 #include "battle/battle_database_common.h"
 
-EffectEntry* effFallEntry(s32 type, f32 x, f32 y, f32 z, f32 arg4, f32 arg5, f32 arg6, s32 arg7, s32 arg8);
+EffectEntry* effFallEntry(s32 type, f32 x, f32 y, f32 z, f32 width, f32 drop, f32 dir, s32 num, s32 duration);
 BOOL effFallCheckHit(EffectEntry* effect);
 
 USER_FUNC(btlevtcmd_AnimeChangePose);
@@ -64,20 +63,6 @@ USER_FUNC(eff_fall_entry);
 static USER_FUNC(down_ceil);
 USER_FUNC(ceil_exist);
 
-f32 fd_boss_champion_negone_one_374[2] __attribute__((aligned(8)));
-f32 fd_boss_champion_neg_one_382;
-f32 fd_boss_champion___local_PI_383;
-f32 fd_boss_champion___local_3PIO2_385;
-f32 fd_boss_champion_one_negone_373[2] __attribute__((aligned(8)));
-f32 fd_boss_champion___local_PIO2_384;
-f32 fd_boss_champion_one_381;
-f32 fd_boss_champion_negone_one_360[2] __attribute__((aligned(8)));
-f32 fd_boss_champion_neg_one_365;
-f32 fd_boss_champion___local_PI_366;
-f32 fd_boss_champion___local_3PIO2_368;
-f32 fd_boss_champion_one_negone_359[2] __attribute__((aligned(8)));
-f32 fd_boss_champion___local_PIO2_367;
-f32 fd_boss_champion_one_364;
 BattleUnitKind unit_boss_champion;
 static BattleUnitDefense defence;
 static BattleUnitDefenseAttr defence_attr;
@@ -93,21 +78,20 @@ BattleWeapon weapon_champion_foot_stamp_attack;
 BattleWeapon weapon_champion_healing;
 BattleWeapon weapon_champion_roof_shake_attack;
 BattleWeapon weapon_champion_roof_shake_last_attack;
-EvtWord to_ceiling[103];
-EvtWord to_floor[95];
+extern EvtWord to_ceiling[];
+extern EvtWord to_floor[];
 static EvtWord init_event[52];
 static EvtWord entry_event[354];
 static EvtWord damage_event[75];
-static EvtWord ceil_fall_ready_event[8];
 static EvtWord dead_event[90];
 static EvtWord phase_event[450];
 static EvtWord attack_event[221];
-EvtWord drop_kick_attack_event[299];
-EvtWord screw_attack_event[295];
-EvtWord flying_chop_attack_event[326];
-EvtWord foot_stamp_attack_event[467];
-EvtWord healing_event[209];
-EvtWord roof_shake_attack_event[386];
+extern EvtWord drop_kick_attack_event[];
+extern EvtWord screw_attack_event[];
+extern EvtWord flying_chop_attack_event[];
+extern EvtWord foot_stamp_attack_event[];
+extern EvtWord healing_event[];
+extern EvtWord roof_shake_attack_event[];
 static EvtWord wait_event[6];
 
 USER_FUNC(ceil_exist) {
@@ -120,34 +104,6 @@ USER_FUNC(ceil_exist) {
     }
     return EVT_RETURN_DONE;
 }
-
-f32 fd_boss_champion_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
-
-f32 fd_boss_champion_neg_one_382 = -1.0f;
-
-f32 fd_boss_champion___local_PI_383 = 3.1415927f;
-
-f32 fd_boss_champion___local_3PIO2_385 = 4.712389f;
-
-f32 fd_boss_champion_one_negone_373[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
-
-f32 fd_boss_champion___local_PIO2_384 = 1.5707964f;
-
-f32 fd_boss_champion_one_381 = 1.0f;
-
-f32 fd_boss_champion_negone_one_360[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
-
-f32 fd_boss_champion_neg_one_365 = -1.0f;
-
-f32 fd_boss_champion___local_PI_366 = 3.1415927f;
-
-f32 fd_boss_champion___local_3PIO2_368 = 4.712389f;
-
-f32 fd_boss_champion_one_negone_359[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
-
-f32 fd_boss_champion___local_PIO2_367 = 1.5707964f;
-
-f32 fd_boss_champion_one_364 = 1.0f;
 
 BattleUnitKind unit_boss_champion = {
     64,

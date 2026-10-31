@@ -1,8 +1,8 @@
-#define MATH_NO_SQRTF 1
 #include "musyx/assert.h"
 #include "musyx/musyx.h"
 #include "musyx/hardware.h"
 #include "musyx/platform.h"
+#include "musyx/sal.h"
 
 typedef struct STREAM_BUFFER {
   // total size: 0x10

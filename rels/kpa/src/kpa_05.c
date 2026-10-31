@@ -5,8 +5,6 @@
 #include "evt/evt_npc.h"
 #include "kpa_stage_data.h"
 
-#pragma force_active on
-
 USER_FUNC(evt_bero_mapchange);
 USER_FUNC(evt_cam_road_reset);
 USER_FUNC(evt_eff);
@@ -23,54 +21,11 @@ USER_FUNC(evt_npc_setup);
 static USER_FUNC(kpa_get_level);
 USER_FUNC(kpa_status_init);
 
-f32 fd_kpa_05_negone_one_374[2] __attribute__((aligned(8)));
-f32 fd_kpa_05_neg_one_382;
-f32 fd_kpa_05___local_PI_383;
-f32 fd_kpa_05___local_3PIO2_385;
-f32 fd_kpa_05_one_negone_373[2] __attribute__((aligned(8)));
-f32 fd_kpa_05___local_PIO2_384;
-f32 fd_kpa_05_one_381;
-f32 fd_kpa_05_negone_one_360[2] __attribute__((aligned(8)));
-f32 fd_kpa_05_neg_one_365;
-f32 fd_kpa_05___local_PI_366;
-f32 fd_kpa_05___local_3PIO2_368;
-f32 fd_kpa_05_one_negone_359[2] __attribute__((aligned(8)));
-f32 fd_kpa_05___local_PIO2_367;
-f32 fd_kpa_05_one_364;
 static EvtWord kpa_act_stg3_mobj[118];
 EvtWord kpa_act_stg3_item[79];
-static EvtWord kpa_fall[92];
 static EvtWord jumpstand_evt[60];
 static NpcSetupInfo npcEnt[1];
-EvtWord kpa_05_init_evt[44];
-
-f32 fd_kpa_05_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
-
-f32 fd_kpa_05_neg_one_382 = -1.0f;
-
-f32 fd_kpa_05___local_PI_383 = 3.1415927f;
-
-f32 fd_kpa_05___local_3PIO2_385 = 4.712389f;
-
-f32 fd_kpa_05_one_negone_373[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
-
-f32 fd_kpa_05___local_PIO2_384 = 1.5707964f;
-
-f32 fd_kpa_05_one_381 = 1.0f;
-
-f32 fd_kpa_05_negone_one_360[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
-
-f32 fd_kpa_05_neg_one_365 = -1.0f;
-
-f32 fd_kpa_05___local_PI_366 = 3.1415927f;
-
-f32 fd_kpa_05___local_3PIO2_368 = 4.712389f;
-
-f32 fd_kpa_05_one_negone_359[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
-
-f32 fd_kpa_05___local_PIO2_367 = 1.5707964f;
-
-f32 fd_kpa_05_one_364 = 1.0f;
+extern EvtWord kpa_05_init_evt[];
 
 static EvtWord kpa_act_stg3_mobj[] = {
     KPA_OBJ_FIREBAR_DODAI_0(-1062.5f, 100.0f, 3, -229998976),
@@ -174,7 +129,7 @@ EVT_BEGIN(kpa_05_init_evt)
     CALL_CHILD(PTR(kpa_read_mobj))
     SET_VALUE(LW(0), PTR(kpa_act_stg3_item))
     CALL_CHILD(PTR(kpa_read_item))
-    CALL(evt_map_playanim, STRING("anm_magu\0\0\0"), 1, 0)
+    CALL(evt_map_playanim, STRING("anm_magu"), 1, 0)
     SPAWN_EVENT(PTR(kpa_fall))
     CALL(kpa_status_init, 3, GSW(1221), GSW(1222))
     SET_VALUE(LSW(1), 2)

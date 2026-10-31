@@ -5,8 +5,6 @@
 #include "mri.h"
 #include "data_tables.h"
 
-#pragma force_active on
-
 USER_FUNC(evt_bero_get_info);
 USER_FUNC(evt_cloud_ent);
 USER_FUNC(evt_cloud_init);
@@ -23,52 +21,9 @@ USER_FUNC(evt_snd_bgmoff);
 USER_FUNC(evt_snd_bgmon);
 USER_FUNC(evt_snd_envon);
 
-f32 fd_mri_19_negone_one_374[2] __attribute__((aligned(8)));
-f32 fd_mri_19_neg_one_382;
-f32 fd_mri_19___local_PI_383;
-f32 fd_mri_19___local_3PIO2_385;
-f32 fd_mri_19_one_negone_373[2] __attribute__((aligned(8)));
-f32 fd_mri_19___local_PIO2_384;
-f32 fd_mri_19_one_381;
-f32 fd_mri_19_negone_one_360[2] __attribute__((aligned(8)));
-f32 fd_mri_19_neg_one_365;
-f32 fd_mri_19___local_PI_366;
-f32 fd_mri_19___local_3PIO2_368;
-f32 fd_mri_19_one_negone_359[2] __attribute__((aligned(8)));
-f32 fd_mri_19___local_PIO2_367;
-f32 fd_mri_19_one_364;
 static BeroEntry bero_entry_data[5];
 static KusaAccess ueki_access_data[7];
-static EvtWord cloud_wind_event[39];
-EvtWord mri_19_init_evt[146];
-
-f32 fd_mri_19_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
-
-f32 fd_mri_19_neg_one_382 = -1.0f;
-
-f32 fd_mri_19___local_PI_383 = 3.1415927f;
-
-f32 fd_mri_19___local_3PIO2_385 = 4.712389f;
-
-f32 fd_mri_19_one_negone_373[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
-
-f32 fd_mri_19___local_PIO2_384 = 1.5707964f;
-
-f32 fd_mri_19_one_381 = 1.0f;
-
-f32 fd_mri_19_negone_one_360[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
-
-f32 fd_mri_19_neg_one_365 = -1.0f;
-
-f32 fd_mri_19___local_PI_366 = 3.1415927f;
-
-f32 fd_mri_19___local_3PIO2_368 = 4.712389f;
-
-f32 fd_mri_19_one_negone_359[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
-
-f32 fd_mri_19___local_PIO2_367 = 1.5707964f;
-
-f32 fd_mri_19_one_364 = 1.0f;
+extern EvtWord mri_19_init_evt[];
 
 static BeroEntry bero_entry_data[] = {
     {
@@ -196,11 +151,11 @@ EVT_BEGIN(mri_19_init_evt)
     CALL(evt_map_playanim, STRING("awa_02"), 1, 0)
     IF_INT_EQUAL(GSWF(2874), 0)
         CALL(evt_cloud_init)
-        CALL(evt_cloud_ent, 0, STRING("S_f2_isk"), STRING("A_f2_isk\0\0\0"), PTR(cloud_wind_event))
+        CALL(evt_cloud_ent, 0, STRING("S_f2_isk"), STRING("A_f2_isk"), PTR(cloud_wind_event))
         CALL(evt_hitobj_attr_onoff, 1, 0, STRING("a_hi"), 16)
         ELSE
         CALL(evt_mapobj_flag_onoff, 1, 1, STRING("S_f2_isk"), 1)
-        CALL(evt_hitobj_onoff, STRING("A_f2_isk\0\0\0"), 1, 0)
+        CALL(evt_hitobj_onoff, STRING("A_f2_isk"), 1, 0)
         CALL(evt_map_entry_airport_harbor, 0, STRING("hikou"), STRING("a_hi"))
         CALL(evt_map_entry_airport_harbor, 0, STRING("hikou1"), STRING("a_hi1"))
     END_IF

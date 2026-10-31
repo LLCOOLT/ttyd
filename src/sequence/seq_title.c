@@ -1,4 +1,3 @@
-#define MATH_NO_SQRTF 1 // FAKE: sound.h reaches math.h; keep its sqrtf inline statics out of this unit's .rodata (never calls sqrt)
 #include "seq/seq_title.h"
 #include "driver/animdrv.h"
 #include "driver/camdrv.h"
@@ -108,7 +107,7 @@ void L_titleInit(SequenceWork* work) {
 			}
 		}
 		else {
-			psndBGMOn(0x200, "BGM_TITLE1\0");
+			psndBGMOn(0x200, "BGM_TITLE1");
 			if ((u32)psbgm[0].streamId != 0xFFFFFFFFU) {
 				sound.streams[psbgm[0].streamId].flags |= 0x8000;
 			}
@@ -187,7 +186,7 @@ void titleMain(SequenceWork* work) {
 			wp2->counter++;
 			if (wp2->counter > TFR) {
 				titleLoadDemo();
-#ifdef VERSION_G8ME01
+#if defined(VERSION_G8ME01) && !defined(VERSION_G8MP01)
 				wp2->counter = 0;
 #endif
 				wp2->frame = 0;
@@ -249,7 +248,7 @@ void titleMain(SequenceWork* work) {
 			}
 			if (fadeIsFinish()) {
 				fadeReset(1);
-				if (((s32 (*)(void))pouchGetHP)() <= 0) {
+				if (pouchGetHP() <= 0) {
 					pouchSetHP(1);
 				}
 				gp->areaFadeInType = 10;
@@ -345,7 +344,9 @@ void disp2(CameraId cameraId, void* param) {
 	f32 vp[6];
 	s32 alpha;
 	f32 s;
-#ifdef VERSION_G8ME01
+#ifdef VERSION_G8MP01
+	s32 tbl[6] = { 19, 19, 20, 21, 22, 23 };
+#elif defined(VERSION_G8ME01)
 	s32 tbl[6] = { 21, 21, 22, 23, 24, 25 };
 #endif
 
@@ -359,7 +360,11 @@ void disp2(CameraId cameraId, void* param) {
 	winTexInit(*wp2->texture->data);
 #ifdef VERSION_G8ME01
 	winTexSetNearest(tbl[gp->language], (Vec){wp2->topPosX, wp2->topPosY - 20.0f, 0.0f}, (Vec){1.0f, 1.0f, 1.0f}, (GXColor){0xFF, 0xFF, 0xFF, 0xFF});
+#ifdef VERSION_G8MP01
+	winTexSet(gp->language + 7, (Vec){wp2->bottomPosX, wp2->bottomPosY, 0.0f}, (Vec){1.0f, 1.0f, 1.0f}, (GXColor){0xFF, 0xFF, 0xFF, 0xFF});
+#else
 	winTexSet(gp->language + 9, (Vec){wp2->bottomPosX, wp2->bottomPosY, 0.0f}, (Vec){1.0f, 1.0f, 1.0f}, (GXColor){0xFF, 0xFF, 0xFF, 0xFF});
+#endif
 #else
 	winTexSetNearest(5, (Vec){wp2->topPosX, wp2->topPosY, 0.0f}, (Vec){1.0f, 1.0f, 1.0f}, (GXColor){0xFF, 0xFF, 0xFF, 0xFF});
 	winTexSet(6, (Vec){wp2->bottomPosX, wp2->bottomPosY, 0.0f}, (Vec){1.0f, 1.0f, 1.0f}, (GXColor){0xFF, 0xFF, 0xFF, 0xFF});
@@ -397,7 +402,11 @@ PSTATIC void pressStartGX(s32 alpha, f32 x, f32 y) {
 	Mtx v17, v16;
 
 #ifdef VERSION_G8ME01
+#ifdef VERSION_G8MP01
+	TEXGetGXTexObjFromPalette(*wp2->texture->data, &startText, gp->language + 13);
+#else
 	TEXGetGXTexObjFromPalette(*wp2->texture->data, &startText, gp->language + 15);
+#endif
 	GXLoadTexObj(&startText, GX_TEXMAP0);
 	TEXGetGXTexObjFromPalette(*wp2->texture->data, &gradient, 6);
 #else

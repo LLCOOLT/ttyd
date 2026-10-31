@@ -2,7 +2,6 @@
 #include "battle/battle_unit.h"
 #include "evt/evt_cmd.h"
 
-#pragma force_active on
 #include "manager/evtmgr_cmd.h"
 #include "driver/camdrv.h"
 #include "driver/icondrv.h"
@@ -23,8 +22,8 @@ USER_FUNC(evt_sub_get_language);
 #endif
 
 void camShiftReset(void);
-typedef struct MonteSub { s32 unk0; Vec pos; f32 scale; u8 unk14[0x38 - 0x14]; } MonteSub;
-typedef struct Monte { u8 hidden; u8 unk1; s16 num; u8 state; u8 unk5[3]; MonteSub sub; MiniGameWork* wp; } Monte;
+typedef struct MonteSub { s32 flags; Vec pos; f32 scale; u8 iconData[0x38 - 0x14]; } MonteSub; /* mirrors IconEntry */
+typedef struct Monte { u8 hidden; u8 pad_1; s16 num; u8 state; u8 pad_5[3]; MonteSub sub; MiniGameWork* wp; } Monte;
 void yuu_03_icon_monte_disp(CameraId camera, void* param);
 void marioSlitForceCancel(void);
 void ext_yuunpc_minigame4_init_sub(void);
@@ -118,30 +117,16 @@ USER_FUNC(evt_slit_cancel);
 USER_FUNC(yuu_03_icon_monte_restart);
 void yuu_03_icon_monte_disp(CameraId camera, void* param);
 
-f32 fd_yuu_03_negone_one_374[2] __attribute__((aligned(8)));
-f32 fd_yuu_03_neg_one_382;
-f32 fd_yuu_03___local_PI_383;
-f32 fd_yuu_03___local_3PIO2_385;
-f32 fd_yuu_03_one_negone_373[2] __attribute__((aligned(8)));
-f32 fd_yuu_03___local_PIO2_384;
-f32 fd_yuu_03_one_381;
-f32 fd_yuu_03_negone_one_360[2] __attribute__((aligned(8)));
-f32 fd_yuu_03_neg_one_365;
-f32 fd_yuu_03___local_PI_366;
-f32 fd_yuu_03___local_3PIO2_368;
-f32 fd_yuu_03_one_negone_359[2] __attribute__((aligned(8)));
-f32 fd_yuu_03___local_PIO2_367;
-f32 fd_yuu_03_one_364;
-EvtWord yuu_03_icon_monte_entry_evt[4];
-EvtWord ryushi_event[25];
-EvtWord yuu_03_kaijo_init[12];
-EvtWord yuu_03_kaijo_init2[12];
-EvtWord minigame04_main[33];
-EvtWord minigame04_start_cam[40];
-EvtWord minigame04_start_cam_cancel[20];
-EvtWord minigame04_start[91];
-EvtWord minigame04_end[256];
-EvtWord yuu_03_init_evt[VERSION_PICK(26, 140)];
+extern EvtWord yuu_03_icon_monte_entry_evt[];
+extern EvtWord ryushi_event[];
+extern EvtWord yuu_03_kaijo_init[];
+extern EvtWord yuu_03_kaijo_init2[];
+extern EvtWord minigame04_main[];
+extern EvtWord minigame04_start_cam[];
+extern EvtWord minigame04_start_cam_cancel[];
+extern EvtWord minigame04_start[];
+extern EvtWord minigame04_end[];
+extern EvtWord yuu_03_init_evt[];
 
 USER_FUNC(yuu_03_cam_shift_reset) {
     camShiftReset();
@@ -552,34 +537,6 @@ USER_FUNC(evt_ryushi) {
     return EVT_RETURN_DONE;
 }
 
-f32 fd_yuu_03_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
-
-f32 fd_yuu_03_neg_one_382 = -1.0f;
-
-f32 fd_yuu_03___local_PI_383 = 3.1415927f;
-
-f32 fd_yuu_03___local_3PIO2_385 = 4.712389f;
-
-f32 fd_yuu_03_one_negone_373[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
-
-f32 fd_yuu_03___local_PIO2_384 = 1.5707964f;
-
-f32 fd_yuu_03_one_381 = 1.0f;
-
-f32 fd_yuu_03_negone_one_360[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
-
-f32 fd_yuu_03_neg_one_365 = -1.0f;
-
-f32 fd_yuu_03___local_PI_366 = 3.1415927f;
-
-f32 fd_yuu_03___local_3PIO2_368 = 4.712389f;
-
-f32 fd_yuu_03_one_negone_359[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
-
-f32 fd_yuu_03___local_PIO2_367 = 1.5707964f;
-
-f32 fd_yuu_03_one_364 = 1.0f;
-
 EVT_BEGIN(yuu_03_icon_monte_entry_evt)
     CALL(yuu_03_icon_monte_entry)
     RETURN
@@ -829,7 +786,6 @@ EVT_BEGIN(yuu_03_init_evt)
     RETURN
 EVT_END()
 #endif
-
 
 void yuuminigame_init_4slit(EventEntry* event, BOOL isFirstCall) {
     SlitWork* data = ((MiniGameWork*)event->lwData[0])->data;

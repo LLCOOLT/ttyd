@@ -156,7 +156,7 @@ void winPartyInit(WindowWork* wp) {
                             break;
                         case 6:
                         default:
-                            poseName = "EFF_m_yoshi7\0\0\0";
+                            poseName = "EFF_m_yoshi7";
                             break;
                     }
                     animName = "W_1";
@@ -190,7 +190,7 @@ void winPartyInit(WindowWork* wp) {
         }
     }
 
-    wp->party.field_0x1FC = wp->party.cursor;
+    wp->party.openCursor = wp->party.cursor;
     wp->party.angle = wp->party.angleTarget = 360.0f / wp->party.count * wp->party.cursor;
     wp->party.mode = 0;
     wp->party.wazaCount = pouchGetPartyAttackLv(winPartyDt[wp->party.dtIdx].partyId) + 2;
@@ -249,7 +249,7 @@ s32 winPartyMain(WindowWork* wp) {
     switch (wp->party.mode) {
         case 0:
             if (wp->buttonTrg & 0x100) {
-                wp->party.field_0x19C = 1;
+                wp->party.switchRequested = 1;
                 return -2;
             }
             if (wp->buttonTrg & 0x400) {
@@ -258,10 +258,10 @@ s32 winPartyMain(WindowWork* wp) {
                 psndSFXOn((const char*)0x20012);
             } else if (wp->buttonTrg & 0x200) {
                 psndSFXOn((const char*)0x20013);
-                wp->party.field_0x19C = 0;
+                wp->party.switchRequested = 0;
                 return -1;
             } else if (wp->buttonTrg & 0x1000) {
-                wp->party.field_0x19C = 0;
+                wp->party.switchRequested = 0;
                 return -2;
             } else if (wp->dirRep & 0x4000) {
                 prev = wp->party.cursor;
@@ -324,7 +324,7 @@ s32 winPartyMain(WindowWork* wp) {
                 wp->party.mode = 0;
                 psndSFXOn((const char*)0x20013);
             } else if (wp->buttonTrg & 0x1000) {
-                wp->party.field_0x19C = 0;
+                wp->party.switchRequested = 0;
                 return -2;
             }
             wp->helpTgtX = -10.0f;

@@ -21,3 +21,8 @@ extern EvtWord kpa_stage_start[];
 extern EvtWord kpa_time[];
 
 extern EvtWord kpa_status_main_evt[];
+
+#ifdef VERSION_G8MP01
+#include "evt/evt_cmd.h"
+USER_FUNC(kpa_cancel_attack_mode); // kpa_01, called by kpa_03's jumpstand_evt
+#endif

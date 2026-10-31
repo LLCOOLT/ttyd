@@ -30,7 +30,7 @@ typedef struct MotShipWork {
 	f32 swirlY;                   // 0x28: whirlpool push (N_marioShipSwirl)
 	f32 swirlX;                   // 0x2C
 	s32 swirlTime;                // 0x30: frames of whirlpool push left
-	u8 field_0x34[0x38 - 0x34];   // 0x34
+	u8 pad_34[0x38 - 0x34];       // 0x34: never accessed
 	s32 sfxId;                    // 0x38: engine loop, -1 when off
 	Vec harborPos;                // 0x3C: docking target (checkHarbor)
 } MotShipWork;                    // size 0x48
@@ -96,8 +96,6 @@ f32 distABf(f32 x1, f32 y1, f32 x2, f32 y2);
 f32 angleABf(f32 x1, f32 y1, f32 x2, f32 y2);
 void movePos(float* ret_sin, float* ret_cos, f32 a3, f32 degree);
 double __fabs(double);
-void marioMakeJumpPara();
-void N_marioSetBottomlessRespawnPosOnBeroEntry();
 HitEntry* marioChkLandon(f32, f32*);
 
 #define SHIP_DIR (marioGetPtr()->motShip->flags & 1)
@@ -595,7 +593,6 @@ void mot_ship(void) {
 	case 40: {
 		f32 tt, qq;
 		s32 n;
-		MotShipWork* ms2;
 		marioGetPtr();
 		if (marioGetPtr()->motStruct != NULL) {
 			if ((u32)marioGetPtr()->motShip->sfxId != 0xFFFFFFFFU) {
@@ -608,10 +605,8 @@ void mot_ship(void) {
 		m->dispFlags &= ~0x1000;
 		marioGetPtr()->motShip->baseY = marioGetPtr()->motShip->harborPos.y;
 		m->baseSpeed = 2.8f;
-		ms2 = (MotShipWork*)((u8*)&marioGetPtr()->motShip->harborPos.z - offsetof(MotShipWork, harborPos.z)); // FAKE: same derive trick as case 10
-		n = (s32)((10.0f * (2.0f * distABf(m->position.x, m->position.z, marioGetPtr()->motShip->harborPos.x, ms2->harborPos.z) / m->baseSpeed) + 0.5f) / 10.0f);
-		ms2 = (MotShipWork*)((u8*)&marioGetPtr()->motShip->harborPos.z - offsetof(MotShipWork, harborPos.z)); // FAKE: same derive trick as case 10
-		m->directionView = angleABf(m->position.x, m->position.z, marioGetPtr()->motShip->harborPos.x, ms2->harborPos.z);
+		n = (s32)((10.0f * (2.0f * distABf(m->position.x, m->position.z, marioGetPtr()->motShip->harborPos.x, marioGetPtr()->motShip->harborPos.z) / m->baseSpeed) + 0.5f) / 10.0f);
+		m->directionView = angleABf(m->position.x, m->position.z, marioGetPtr()->motShip->harborPos.x, marioGetPtr()->motShip->harborPos.z);
 		m->moveDirection = m->directionView;
 		r29 = ((m->trigFlags >> 9) & 1) + 1;
 		marioGetPtr()->motShip->flags = r29;
@@ -909,7 +904,7 @@ void shipMove(void)
 {
   MarioWork *m = marioGetPtr();
   f32 len;
-  unsigned long long new_var;
+  unsigned long long rateIdx;
   f32 spd;
   f32 tz;
   f32 vx;
@@ -952,7 +947,7 @@ void shipMove(void)
   }
   vx = marioGetPtr()->motShip->dispX;
   vz = marioGetPtr()->motShip->dispY;
-  new_var = 3;
+  rateIdx = 3;
   if (m->controlStickSensitivity)
   {
     tx = spd * ((f32) sin((3.1415927f * (m->controlStickAngle)) / 180.0f));
@@ -968,7 +963,7 @@ void shipMove(void)
   {
     if (tx > vx)
     {
-      vx += ((1.0f + tx) - vx) * shipData[new_var];
+      vx += ((1.0f + tx) - vx) * shipData[rateIdx];
       if (vx >= max)
       {
         vx = max;
@@ -976,7 +971,7 @@ void shipMove(void)
     }
     else
     {
-      vx += ((tx - 1.0f) - vx) * shipData[new_var];
+      vx += ((tx - 1.0f) - vx) * shipData[rateIdx];
       if (vx <= (-max))
       {
         vx = -max;
@@ -984,7 +979,7 @@ void shipMove(void)
     }
     if (tz > vz)
     {
-      vz += ((1.0f + tz) - vz) * shipData[new_var];
+      vz += ((1.0f + tz) - vz) * shipData[rateIdx];
       if (vz >= max)
       {
         vz = max;
@@ -992,7 +987,7 @@ void shipMove(void)
     }
     else
     {
-      vz += ((tz - 1.0f) - vz) * shipData[new_var];
+      vz += ((tz - 1.0f) - vz) * shipData[rateIdx];
       if (vz <= (-max))
       {
         vz = -max;

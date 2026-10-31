@@ -1,4 +1,3 @@
-#pragma dollar_identifiers on
 #include "eff/eff_starstone.h"
 #include "eff/n64/eff_crystal_n64.h"
 #include "eff/n64/eff_pokopi_pcharge_n64.h"
@@ -10,7 +9,6 @@
 #include "battle/battle_unit.h"
 #include "evt/evt_cmd.h"
 
-#pragma force_active on
 #include "driver/effdrv.h"
 #include "driver/mapdrv.h"
 #include "dolphin/gx.h"
@@ -31,6 +29,8 @@
 #include "evt/evt_bero.h"
 #include "libc_decls.h"
 #include "evt/evt_npc.h"
+#include "mario/mario_cam.h"
+#include <math.h>
 
 double sin(double);
 double cos(double);
@@ -49,8 +49,6 @@ static KaitenParam* ckp1;
 static KaitenParam* ckpw;
 BrokenWork broken_work;
 s32 select;
-static inline s32 tb_fpclassifyf(f32 x) { switch (*(s32*)&x & 0x7F800000) { case 0x7F800000: if (*(s32*)&x & 0x007FFFFF) { return 1; } else { return 2; } break; case 0: if (*(s32*)&x & 0x007FFFFF) { return 5; } else { return 3; } break; default: return 4; } }
-static inline f32 tb_sqrtf(f32 x) { const f64 _half = .5; const f64 _three = 3.0; if (x > 0.0f) { f64 guess = __frsqrte(x); guess = _half * guess * (_three - guess * guess * x); guess = _half * guess * (_three - guess * guess * x); return x * (_half * guess * (_three - guess * guess * x)); } else if (x < 0.0) { return *(f32*)__float_nan; } else if (tb_fpclassifyf(x) == 1) { return *(f32*)__float_nan; } return x; }
 static inline f32 tb_sin(f32 x) { f32 a = 0.00761f; f32 b = 0.16605f; f32 c = 1.0f; f32 y; f32 x2; if (x <= 3.1415927f) { if (x <= 1.5707964f) { x2 = x * x; a = a * x2 - b; a = a * x2 + c; a = a * x; } else { y = 1.5707964f - (x - 1.5707964f); x2 = y * y; a = a * x2 - b; a = a * x2 + c; a = a * y; } } else if (x < 4.712389f) { y = x - 3.1415927f; x2 = y * y; a = a * x2 - b; a = a * x2 + c; a = a * y; a = -a; } else { y = 1.5707964f - (x - 4.712389f); x2 = y * y; a = a * x2 - b; a = a * x2 + c; a = a * y; a = -a; } return a; }
 static inline f32 tb_cos(f32 x) { f32 a = 0.03705f; f32 b = 0.4967f; f32 c = 1.0f; f32 y; f32 x2; if (x <= 3.1415927f) { if (x <= 1.5707964f) { x2 = x * x; a = a * x2 - b; a = a * x2 + c; } else { y = 1.5707964f - (x - 1.5707964f); x2 = y * y; a = a * x2 - b; a = a * x2 + c; a = -a; } } else if (x < 4.712389f) { y = x - 3.1415927f; x2 = y * y; a = a * x2 - b; a = a * x2 + c; a = -a; } else { y = 1.5707964f - (x - 4.712389f); x2 = y * y; a = a * x2 - b; a = a * x2 + c; } return a; }
 void tiz_broken_draw(CameraId cameraId, void* param);
@@ -190,96 +188,44 @@ void tiz_broken_draw(CameraId cameraId, void* param);
 static void alpha_tev(MapTevCallbackInfo* info);
 USER_FUNC(starstone_set_scale);
 
-f32 negone_one$374[2] __attribute__((aligned(8)));
-f32 neg_one$382;
-f32 __local_PI$383;
-f32 __local_3PIO2$385;
-u32 gap_04_0000B154_data[1];
-f32 one_negone$373[2] __attribute__((aligned(8)));
-f32 __local_PIO2$384;
-f32 one$381;
-f32 negone_one$360[2] __attribute__((aligned(8)));
-f32 neg_one$365;
-f32 __local_PI$366;
-f32 __local_3PIO2$368;
-u32 gap_04_0000B17C_data[1];
-f32 one_negone$359[2] __attribute__((aligned(8)));
-f32 __local_PIO2$367;
-f32 one$364;
-static EvtWord n_door_close[22];
-static EvtWord n_door_open[22];
 static BeroEntry bero_entry_data[4];
-static EvtWord kurihakase_init[27];
-static EvtWord kurihakase_talk[23];
 static NpcSetupInfo npcEnt[2];
-EvtWord mahojin_alpha[70];
-EvtWord mahojin_alpha_up[5];
-EvtWord mahojin_alpha_down[5];
-EvtWord large_door_stg0_init[17];
-EvtWord large_door_stg0[129];
-EvtWord look_large_door[25];
-EvtWord kaidan_event[69];
-EvtWord evt_mahojin_move[51];
-EvtWord evt_mahojin_move2[24];
-EvtWord evt_fogset[42];
-EvtWord evt_fogreset[82];
-EvtWord mahojin_se_event[6];
-EvtWord mahojin_se_event_end[2];
-EvtWord disp_lighteffect[20];
-EvtWord disp_treasure_map[21];
+extern EvtWord mahojin_alpha[];
+extern EvtWord mahojin_alpha_up[];
+extern EvtWord mahojin_alpha_down[];
+extern EvtWord large_door_stg0_init[];
+extern EvtWord large_door_stg0[];
+extern EvtWord look_large_door[];
+extern EvtWord kaidan_event[];
+extern EvtWord evt_mahojin_move[];
+extern EvtWord evt_mahojin_move2[];
+extern EvtWord evt_fogset[];
+extern EvtWord evt_fogreset[];
+extern EvtWord mahojin_se_event[];
+extern EvtWord mahojin_se_event_end[];
+extern EvtWord disp_lighteffect[];
+extern EvtWord disp_treasure_map[];
 BrokenWork* broken_wp;
 f32 param_tbl[5];
 f32 add_tbl[5];
 static const char* name_tbl[5];
-EvtWord evt_mapwrite[1351];
-EvtWord fake_fade[30];
-EvtWord evt_starstone_up[127];
-EvtWord evt_starstone_set[106];
-EvtWord mahojin_event[363];
-EvtWord mahojin_event1[110];
-EvtWord mahojin_event2[105];
-EvtWord mahojin_event3[102];
-EvtWord mahojin_event4[102];
-EvtWord mahojin_event5[102];
-EvtWord mahojin_event6[102];
-EvtWord starstone_circle_link[70];
-EvtWord lastdungeon_anim_init[52];
-EvtWord lastdungeon_init[36];
-EvtWord lastdungeon[103];
-EvtWord mahojin_event7[VERSION_PICK(2537, 2541)];
-EvtWord tik_05_init_evt[VERSION_PICK(289, 287)];
-
-f32 negone_one$374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
-
-f32 neg_one$382 = -1.0f;
-
-f32 __local_PI$383 = 3.1415927f;
-
-f32 __local_3PIO2$385 = 4.712389f;
-
-u32 gap_04_0000B154_data[1] = {0};
-
-f32 one_negone$373[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
-
-f32 __local_PIO2$384 = 1.5707964f;
-
-f32 one$381 = 1.0f;
-
-f32 negone_one$360[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
-
-f32 neg_one$365 = -1.0f;
-
-f32 __local_PI$366 = 3.1415927f;
-
-f32 __local_3PIO2$368 = 4.712389f;
-
-u32 gap_04_0000B17C_data[1] = {0};
-
-f32 one_negone$359[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
-
-f32 __local_PIO2$367 = 1.5707964f;
-
-f32 one$364 = 1.0f;
+extern EvtWord evt_mapwrite[];
+extern EvtWord fake_fade[];
+extern EvtWord evt_starstone_up[];
+extern EvtWord evt_starstone_set[];
+extern EvtWord mahojin_event[];
+extern EvtWord mahojin_event1[];
+extern EvtWord mahojin_event2[];
+extern EvtWord mahojin_event3[];
+extern EvtWord mahojin_event4[];
+extern EvtWord mahojin_event5[];
+extern EvtWord mahojin_event6[];
+extern EvtWord starstone_circle_link[];
+extern EvtWord lastdungeon_anim_init[];
+extern EvtWord lastdungeon_init[];
+extern EvtWord lastdungeon[];
+extern EvtWord mahojin_event7[];
+extern EvtWord tik_05_init_evt[];
 
 static EVT_BEGIN(n_door_close)
     MULTIPLY_FLOAT(LW(0), FLOAT(0.38867188f))
@@ -1077,7 +1023,7 @@ USER_FUNC(tiz_broken) {
 #endif
     s32 x;
     s32 y;
-    f32 inv;
+    f32 power;
     s32 done = 0;
     BrokenPiece* p;
     BrokenPiece* q;
@@ -1115,7 +1061,7 @@ USER_FUNC(tiz_broken) {
                 }
                 if (dx || dy) {
 #ifdef VERSION_G8ME01
-                    // FAKE: tb_sqrtf(dx * dx + dy * dy) expanded by hand with the
+                    // FAKE: sqrtf(dx * dx + dy * dy) expanded by hand with the
                     // value and Newton guess in function-scope locals (sq, guess);
                     // same instructions, but the temps of the inline colour differently in US.
                     sq = dx * dx + dy * dy;
@@ -1125,17 +1071,16 @@ USER_FUNC(tiz_broken) {
                         guess = .5 * guess * (3.0 - guess * guess * sq);
                         sq = sq * (.5 * guess * (3.0 - guess * guess * sq));
                     } else if (sq < 0.0) {
-                        sq = *(f32*)__float_nan;
-                    } else if (tb_fpclassifyf(sq) == 1) {
-                        sq = *(f32*)__float_nan;
+                        sq = NAN;
+                    } else if (isnan(sq)) {
+                        sq = NAN;
                     }
                     nx = dx / sq;
                     ny = dy / sq;
                     len = sq;
 #else
-                    len = tb_sqrtf(dx * dx + dy * dy);
-                    inv = dx / len; // FAKE: copy temp; plain nx = dx / len changes regalloc (+4 B)
-                    nx = inv;
+                    len = sqrtf(dx * dx + dy * dy);
+                    nx = dx / len;
                     ny = dy / len;
 #endif
                 } else {
@@ -1157,15 +1102,9 @@ USER_FUNC(tiz_broken) {
                 p->vel.z *= 60.0f / gp->framerate;
 #endif
                 angle = 6.2831855f * angleABf(0.0f, 0.0f, dx, dy) / 360.0f;
-#ifdef VERSION_G8ME01
-                inv = param_tbl[3];
-                p->gx = inv * tb_sin(angle);
-                p->gy = inv * -tb_cos(angle);
-#else
-                nx = param_tbl[3];
-                p->gx = nx * tb_sin(angle);
-                p->gy = nx * -tb_cos(angle);
-#endif
+                power = param_tbl[3];
+                p->gx = power * tb_sin(angle);
+                p->gy = power * -tb_cos(angle);
 #ifdef VERSION_G8ME01
                 p->gx *= 60.0f / gp->framerate;
                 p->gy *= 60.0f / gp->framerate;
@@ -1289,7 +1228,6 @@ USER_FUNC(map_disp_onoff) {
     }
     return EVT_RETURN_DONE;
 }
-
 
 USER_FUNC(crystal_bgmode) {
     EffectEntry* eff = effNameToPtr((const char*)evtGetValue(event, event->args[0]));
@@ -1720,10 +1658,17 @@ EVT_BEGIN(evt_mapwrite)
     CALL(tiz_stone, 0)
     WAIT_MS(500)
     CALL(evt_npc_entry, STRING("tiz_obj"), LW(8))
+#ifdef VERSION_G8MP01
+    CALL(evt_npc_pera_onoff, STRING("tiz_obj"), 0)
+    CALL(evt_npc_set_ry, STRING("tiz_obj"), 0)
+#endif
     ADD(LW(6), 10)
     CALL(evt_npc_set_position, STRING("tiz_obj"), LW(5), LW(6), LW(7))
     CALL(evt_npc_set_scale, STRING("tiz_obj"), FLOAT(1.5f), FLOAT(1.5f), FLOAT(1.5f))
     CALL(evt_npc_set_camid, STRING("tiz_obj"), 7)
+#ifdef VERSION_G8MP01
+    CALL(evt_npc_set_anim, STRING("tiz_obj"), STRING("A_1"))
+#else
     CALL(evt_sub_intpl_msec_init, 11, 0, 255, 1000)
     LOOP(0)
         CALL(evt_sub_intpl_msec_get_value)
@@ -1734,6 +1679,7 @@ EVT_BEGIN(evt_mapwrite)
             BREAK_LOOP
         END_IF
     END_LOOP
+#endif
     CALL(evt_snd_sfxon__, LW(9), 0)
     CALL(evt_npc_wait_anim, STRING("tiz_obj"), FLOAT(1.0f))
     ADD(LW(6), 10)
@@ -3871,7 +3817,3 @@ EVT_BEGIN(tik_05_init_evt)
 EVT_END()
 #endif
 
-
-#pragma force_active on
-static u32 gap_04_000116AC_data[1] = {0};
-#pragma force_active reset

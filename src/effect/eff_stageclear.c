@@ -80,9 +80,9 @@ static u32 niji_tbl[] = {0xAC, 0xB0};
 s32 shake_dt[] = {2, 6, 2, 0, -1};
 s32 shake_dt2[] = {12, 36, 12, 0, -1};
 #ifdef VERSION_G8ME01
-static u8 scale_dt[] = {0x00, 0x00, 0x16, 0x2E, 0x47, 0x5D, 0x6E, 0x78, 0x77, 0x6E, 0x66, 0x00}; /* US: trailing pad byte kept in the table */
+static u8 scale_dt[] = {0x00, 0x00, 0x16, 0x2E, 0x47, 0x5D, 0x6E, 0x78, 0x77, 0x6E, 0x66}; /* US: trailing pad byte kept in the table */
 #else
-static u8 scale_dt[] = {0x00, 0x00, 0x16, 0x2E, 0x47, 0x5D, 0x6E, 0x78, 0x77, 0x6E, 0x66, 0x00};
+static u8 scale_dt[] = {0x00, 0x00, 0x16, 0x2E, 0x47, 0x5D, 0x6E, 0x78, 0x77, 0x6E, 0x66};
 #endif
 
 EffectEntry* effStageClearEntry(s32 type, f32 x, f32 y, f32 z) {
@@ -121,7 +121,7 @@ EffectEntry* effStageClearEntry(s32 type, f32 x, f32 y, f32 z) {
         n = 7;
     }
 #endif
-    effect->type = "StageClear\0";
+    effect->type = "StageClear";
     effect->count = n;
     work = __memAlloc(HEAP_EFFECT, effect->count * sizeof(StageClearWork));
     effect->userdata = work;
@@ -406,14 +406,3 @@ s32 effStageClearEndChk(EffectEntry* effect) {
 }
 
 
-#pragma force_active on
-#pragma force_active on
-#ifdef VERSION_G8ME01
-__declspec(section ".data") u32 gap_05_803B114C_data[5] = {0, 0, 0, 0, 0};
-u8 gap_07_8041BCDB_sdata[4] = {0, 0, 0, 0};
-#else
-__declspec(section ".data") u32 gap_05_803ADD14_data[3] = {0, 0, 0};
-u32 gap_07_80415C34_sdata[3] = {0, 0, 0};
-#endif
-#pragma force_active reset
-#pragma force_active reset

@@ -13,7 +13,6 @@
 #include <string.h>
 #include "driver/camdrv.h"
 #include "driver/animdrv.h"
-#include "cam_road.h"
 #include "cam_shift.h"
 #include "eff/eff_magic1_n64.h"
 #include "libc_decls.h"
@@ -31,6 +30,9 @@ Vec BeroPT, BeroAT;
 BOOL BeroMarioGO;
 
 USER_FUNC(bero_get_position_normal);
+#ifdef VERSION_G8MP01
+USER_FUNC(evt_sub_get_mapname);
+#endif
 USER_FUNC(bero_get_position_pipe2);
 USER_FUNC(bero_get_position_pipe_pure);
 USER_FUNC(evt_bero_1stcheck);
@@ -526,7 +528,7 @@ USER_FUNC(evt_bero_read_mario_pera) {
 			}
 			break;
 		case 1:
-			if (animGroupBaseAsync("p_dokan_y\0\0", 0, NULL)) {
+			if (animGroupBaseAsync("p_dokan_y", 0, NULL)) {
 				event->userdata[0] = 100;
 			}
 			break;
@@ -584,14 +586,14 @@ s32 bero_get_position_normal(EventEntry *event, BOOL isFirstCall)
   EvtWord *args = event->args;
   MarioWork *wp = marioGetPtr();
   s32 dir = evtGetValue(event, args[0]);
-  float new_var3;
-  f32 new_var2;
+  float halfTurn;
+  f32 respawnZ;
   f32 len = evtGetFloat(event, args[1]);
   s32 *pos = (s32 *) event->lwData[6];
   const char *name = (const char *) event->lwData[3];
   s32 angle = event->lwData[5];
   Vec start;
-  f32 *new_var;
+  f32 *hxPtr;
   Vec end;
   start.x = pos[0];
   start.y = pos[1];
@@ -620,10 +622,10 @@ s32 bero_get_position_normal(EventEntry *event, BOOL isFirstCall)
     dist = 1000000.0f;
     deg = 0.125f;
     deg = (angle * 360.0f) * deg;
-    new_var3 = 180.0f;
+    halfTurn = 180.0f;
     if (dir == 1)
     {
-      deg += new_var3;
+      deg += halfTurn;
     }
     rad = (6.2831855f * deg) / 360.0f;
     tmp.x = start.x - (30.0f * ((f32) sin((6.2831855f * deg) / 360.0f)));
@@ -633,8 +635,8 @@ s32 bero_get_position_normal(EventEntry *event, BOOL isFirstCall)
       tmp.z = start.z - (30.0f * (-c0));
     }
     dist = 1000000.0f;
-    new_var = &hx;
-    if (hitCheckFilter((void *) 0, new_var, &hy, &hz, &dist, &nx, &ny, &nz, tmp.x, tmp.y, tmp.z, 0.0f, -1.0f, 0.0f))
+    hxPtr = &hx;
+    if (hitCheckFilter((void *) 0, hxPtr, &hy, &hz, &dist, &nx, &ny, &nz, tmp.x, tmp.y, tmp.z, 0.0f, -1.0f, 0.0f))
     {
       tmp.y = hy;
     }
@@ -648,10 +650,10 @@ s32 bero_get_position_normal(EventEntry *event, BOOL isFirstCall)
   BeroSY = start.y;
   BeroSZ = start.z;
   BeroEX = end.x;
-  new_var2 = end.z;
+  respawnZ = end.z;
   BeroEY = end.y;
   BeroEZ = end.z;
-  N_marioSetBottomlessRespawnPosOnBeroEntry(end.x, end.y, new_var2);
+  N_marioSetBottomlessRespawnPosOnBeroEntry(end.x, end.y, respawnZ);
   if (wp->currMotionId == 0x19)
   {
     N_marioReloadMapOnBottomlessOn();
@@ -733,7 +735,7 @@ USER_FUNC(bero_get_position_pipe2) {
 	s32 id = evtGetValue(event, args[0]);
 	s32 a = evtGetFloat(event, args[1]);
 	Vec start, end;
-	CamRoadOut out;
+	CameraParams out;
 	bero_get_position_pipe_sub(id, a, event->lwData[3], event->lwData[5], &start, &end);
 	end.y += 1.0f;
 	camRoadReset();
@@ -770,7 +772,7 @@ EVT_BEGIN(evt_bero_nonride_check)
         END_IF
         WAIT_FRAMES(1)
     END_LOOP
-    DEBUG_PUT_MSG(STRING("\223y\212\307\202\251\202\347\215~\202\350\202\275"))
+    DEBUG_PUT_MSG(STRING("土管から降りた"))
     SET_VALUE(LW(0), LW(3))
     CALL_CHILD(PTR(bero_case_switch_on))
     RETURN
@@ -1271,32 +1273,6 @@ USER_FUNC(evt_bero_1stcheck) {
 	return EVT_RETURN_DONE;
 }
 
-USER_FUNC(evt_camera_change_event_from_road) {
-	MarioWork* mario = marioGetPtr();
-	CameraEntry* cam = camGetPtr(4);
-	f32 bank;
-	CamRoadOut out;
-	camShiftMain(cam, mario, &bank);
-	camRoadMain(&out, mario->position.x, cam->marioPos.y, mario->position.z, mario->position.x, cam->marioPos.y, mario->position.z, bank);
-	{
-	Vec pt = {0.0f, 0.0f, 0.0f};
-	pt.x = out.pos.x; pt.y = out.pos.y; pt.z = out.pos.z;
-	{
-	Vec at = {0.0f, 0.0f, 0.0f};
-	at.x = out.at.x; at.y = out.at.y; at.z = out.at.z;
-	cam->presetPos = cam->cameraPos;
-	cam->presetAt = cam->cameraAt;
-	cam->storedPos = pt;
-	cam->storedAt = at;
-	cam->startTimeA = gp->renderTime;
-	cam->durationA = (u32)(500 * (OS_TIMER_CLOCK / 1000));
-	cam->stateA = 3;
-	cam->curveA = 11;
-	}
-	}
-	return EVT_RETURN_DONE;
-}
-
 EVT_BEGIN(bero_case_init_check)
     CALL(evt_bero_exec_onoff, 1, 65536)
     CALL(evt_bero_exec_get, LW(0))
@@ -1406,7 +1382,16 @@ EVT_BEGIN(bero_case_exec_door)
         CALL(evt_mario_set_force_dir, LW(0))
         CALL(evt_mario_wait_landon)
         CALL(evt_bero_mario_go_wait)
+#ifdef VERSION_G8MP01
+        CALL(evt_sub_get_mapname, LW(10))
+        IF_STR_EQUAL(LW(10), STRING("tou_04"))
+            CALL(bero_get_position_normal, 0, FLOAT(40.0f))
+        ELSE
+            CALL(bero_get_position_normal, 0, FLOAT(150.0f))
+        END_IF
+#else
         CALL(bero_get_position_normal, 0, FLOAT(150.0f))
+#endif
         PEEK_FLOAT(LW(10), PTR(&BeroEX))
         PEEK_FLOAT(LW(12), PTR(&BeroEZ))
         CALL(evt_mario_mov_pos2, LW(10), LW(12), FLOAT(150.0f))
@@ -1424,6 +1409,33 @@ EVT_BEGIN(bero_case_exec_door)
     CALL(evt_bero_mapchange, LW(13), LW(14))
     RETURN
 EVT_END()
+
+// Defined after bero_case_exec_door: its local Vec initializers come after that script's strings in .rodata.
+USER_FUNC(evt_camera_change_event_from_road) {
+	MarioWork* mario = marioGetPtr();
+	CameraEntry* cam = camGetPtr(4);
+	f32 bank;
+	CameraParams out;
+	camShiftMain(cam, mario, &bank);
+	camRoadMain(&out, mario->position.x, cam->marioPos.y, mario->position.z, mario->position.x, cam->marioPos.y, mario->position.z, bank);
+	{
+	Vec pt = {0.0f, 0.0f, 0.0f};
+	pt.x = out.pos.x; pt.y = out.pos.y; pt.z = out.pos.z;
+	{
+	Vec at = {0.0f, 0.0f, 0.0f};
+	at.x = out.at.x; at.y = out.at.y; at.z = out.at.z;
+	cam->presetPos = cam->cameraPos;
+	cam->presetAt = cam->cameraAt;
+	cam->storedPos = pt;
+	cam->storedAt = at;
+	cam->startTimeA = gp->renderTime;
+	cam->durationA = (u32)(500 * (OS_TIMER_CLOCK / 1000));
+	cam->stateA = 3;
+	cam->curveA = 11;
+	}
+	}
+	return EVT_RETURN_DONE;
+}
 
 EVT_BEGIN(bero_case_exec_pipe_sub)
     BEGIN_INLINE_EVENT
@@ -1699,10 +1711,10 @@ EVT_BEGIN(bero_case_switch_on)
     CALL(evt_bero_switch_on, LW(0))
     CALL(evt_bero_get_info_num, LW(1))
     IF_INT_EQUAL(LW(0), 0)
-        DEBUG_PUT_MSG(STRING("\203x\203\215\223o\230^"))
+        DEBUG_PUT_MSG(STRING("ベロ登録"))
         CALL_CHILD(PTR(bero_case_entry_sub))
         ELSE
-        DEBUG_PUT_MSG(STRING("\203x\203\215\202\314\217o\202\304\215s\202\255\203f\201[\203^\202\314\223\361\217d\223o\230^\226h\216~\202\360\202\265\202\304\202\242\202\334\202\267"))
+        DEBUG_PUT_MSG(STRING("ベロの出て行くデータの二重登録防止をしています"))
     END_IF
     RETURN
 EVT_END()
@@ -1711,7 +1723,7 @@ EVT_BEGIN(bero_case_switch_off)
     CALL(evt_bero_switch_off, LW(0))
     CALL(evt_bero_get_info_num, LW(1))
     IF_INT_EQUAL(LW(0), 0)
-        DEBUG_PUT_MSG(STRING("\203x\203\215\215\355\217\234\202\265\202\334\202\265\202\275"))
+        DEBUG_PUT_MSG(STRING("ベロ削除しました"))
         CALL(evt_bero_case_id_load, LW(1), LW(15))
         CALL(evt_del_case_evt, 0, LW(15))
         CALL(evt_hitobj_attr_onoff, 0, 0, LW(3), 8388608)
@@ -1803,7 +1815,7 @@ EVT_BEGIN(evt_bero_info_run)
     CALL(evt_bero_read_mario_pera)
     CALL(evt_sub_get_system_flag, LW(0))
     IF_BITS_SET(LW(0), 1)
-        DEBUG_PUT_MSG(STRING("\203Z\201[\203u\203u\203\215\203b\203N\202\251\202\347\202\314\203\215\201[\203h\216\236\202\314\217\210\227\235"))
+        DEBUG_PUT_MSG(STRING("セーブブロックからのロード時の処理"))
         CALL(evt_bero_exec_onoff, 0, 1)
         WAIT_FRAMES(1)
         CALL(evt_bero_exec_get, LW(0))
@@ -1831,13 +1843,13 @@ EVT_BEGIN(evt_bero_info_run)
     SET_VALUE(LW(0), LW(4))
     AND_RAW(LW(0), 4096)
     IF_INT_NOT_EQUAL(LW(0), 0)
-        DEBUG_PUT_MSG(STRING("\224w\214i\202\311\223\374\202\351\202\306\202\253\202\314\203}\203\212\203I\202\314\217\211\212\372\217\210\227\235"))
+        DEBUG_PUT_MSG(STRING("背景に入るときのマリオの初期処理"))
         CALL(evt_mario_bgmode_on)
         CALL(evt_mario_kill_party, 0)
         CALL(evt_mario_kill_party, 1)
         CALL(evt_mario_cam_y_off)
         ELSE
-        DEBUG_PUT_MSG(STRING("\225\201\222\312\202\311\223\374\202\351\202\306\202\253\202\314\203}\203\212\203I\202\314\217\211\212\372\217\210\227\235"))
+        DEBUG_PUT_MSG(STRING("普通に入るときのマリオの初期処理"))
         CALL(evt_mario_bgmode_off)
         SET_VALUE(LW(0), LW(4))
         AND_RAW(LW(0), 4095)
@@ -1884,7 +1896,7 @@ EVT_BEGIN(evt_bero_info_run)
             END_SWITCH
         END_IF
     END_IF
-    DEBUG_PUT_MSG(STRING("\202\331\202\251\202\314\217\211\212\372\220\335\222\350\212J\216n"))
+    DEBUG_PUT_MSG(STRING("ほかの初期設定開始"))
     SPAWN_EVENT(PTR(evt_bero_mario_enter))
     RETURN
 EVT_END()

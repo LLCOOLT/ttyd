@@ -42,8 +42,13 @@ static PointGetTex tex_lang3[3] = { { 0, 0x7C, 0x7D }, { -1, -1, -1 }, { 1, 0x7E
 static PointGetTex tex_shadow_lang3[3] = { { 0, 0x7C, 0x7D }, { -1, -1, -1 }, { 1, 0x80, 0x81 } };
 static PointGetTex tex_lang4[3] = { { 0, 0x7C, 0x7D }, { -1, -1, -1 }, { 1, 0x7E, 0x7F } };
 static PointGetTex tex_shadow_lang4[3] = { { 0, 0x7C, 0x7D }, { -1, -1, -1 }, { 1, 0x80, 0x81 } };
+#ifdef VERSION_G8MP01
+static PointGetTex tex_lang5[6] = { { 1, 0x7C, 0x7D }, { 0, 0x7E, 0x7F }, { -1, -1, -1 }, { 1, 0x80, 0x81 }, { -1, -1, -1 }, { 1, 0x84, 0x85 } };
+static PointGetTex tex_shadow_lang5[6] = { { 1, 0x7C, 0x7D }, { 0, 0x7E, 0x7F }, { -1, -1, -1 }, { 1, 0x82, 0x83 }, { -1, -1, -1 }, { 1, 0x84, 0x85 } };
+#else
 static PointGetTex tex_lang5[7] = { { 1, 0x7C, 0x7D }, { -1, -1, -1 }, { 0, 0x7E, 0x7F }, { -1, -1, -1 }, { 1, 0x80, 0x81 }, { -1, -1, -1 }, { 1, 0x84, 0x85 } };
 static PointGetTex tex_shadow_lang5[7] = { { 1, 0x7C, 0x7D }, { -1, -1, -1 }, { 0, 0x7E, 0x7F }, { -1, -1, -1 }, { 1, 0x82, 0x83 }, { -1, -1, -1 }, { 1, 0x84, 0x85 } };
+#endif
 static PointGetTex tex_lang6[2] = { { 0, 0x7E, 0x7F }, { 1, 0x7C, 0x7D } };
 static PointGetTex tex_shadow_lang6[2] = { { 0, 0x7E, 0x7F }, { 1, 0x80, 0x81 } };
 
@@ -52,7 +57,11 @@ static PointGetTexSet texid_tbl[6] = {
     { { tex_us, tex_shadow_us }, 5 },
     { { tex_lang3, tex_shadow_lang3 }, 3 },
     { { tex_lang4, tex_shadow_lang4 }, 3 },
+#ifdef VERSION_G8MP01
+    { { tex_lang5, tex_shadow_lang5 }, 6 },
+#else
     { { tex_lang5, tex_shadow_lang5 }, 7 },
+#endif
     { { tex_lang6, tex_shadow_lang6 }, 2 },
 };
 #else
@@ -64,7 +73,7 @@ EffectEntry* effPointGetEntry(s32 type, f32 x, f32 y, f32 z, s32 number, s32 dur
     EffPointGetWork* work;
 
     effect = effEntry();
-    effect->type = "PointGet\0\0\0";
+    effect->type = "PointGet";
     effect->count = 1;
     work = __memAlloc(HEAP_EFFECT, sizeof(EffPointGetWork) * effect->count);
     effect->userdata = work;

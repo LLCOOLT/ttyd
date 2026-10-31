@@ -1,7 +1,6 @@
 #include "battle/battle_unit.h"
 #include "evt/evt_cmd.h"
 
-#pragma force_active on
 #include "memory.h"
 #include "mario/mariost.h"
 #include "driver/mapdrv.h"
@@ -17,6 +16,7 @@
 #include "party/party_motion.h"
 #include "hom.h"
 #include "mario/mario_pouch.h"
+#include "manager/evtmgr_cmd.h"
 
 double sin(double x);
 static smartEntry* ind_lp;
@@ -86,78 +86,22 @@ static USER_FUNC(test_glare);
 USER_FUNC(tokei);
 static void sun_tev(MapTevCallbackInfo* info);
 
-f32 fd_hom_00_negone_one_374[2] __attribute__((aligned(8)));
-f32 fd_hom_00_neg_one_382;
-f32 fd_hom_00___local_PI_383;
-f32 fd_hom_00___local_3PIO2_385;
-f32 fd_hom_00_one_negone_373[2] __attribute__((aligned(8)));
-f32 fd_hom_00___local_PIO2_384;
-f32 fd_hom_00_one_381;
-f32 fd_hom_00_negone_one_360[2] __attribute__((aligned(8)));
-f32 fd_hom_00_neg_one_365;
-f32 fd_hom_00___local_PI_366;
-f32 fd_hom_00___local_3PIO2_368;
-f32 fd_hom_00_one_negone_359[2] __attribute__((aligned(8)));
-f32 fd_hom_00___local_PIO2_367;
-f32 fd_hom_00_one_364;
-static EvtWord n_2_door_open[22];
-static EvtWord n_2_door_close[22];
 static BeroEntry bero_data[3];
 BeroEntry bero_data_nidome[2];
-EvtWord evt_carry_up_bridge[92];
-EvtWord init_powan_toron_konari_papa_gurume[23];
-static EvtWord talk_powan[8];
-static EvtWord talk_toron[8];
-static EvtWord talk_gurume[8];
-static EvtWord talk_papa[8];
-static EvtWord talk_konari[8];
-EvtWord init_ekiin1[2];
-EvtWord talk_ekiin1[32];
-EvtWord init_ekiin2[13];
-EvtWord talk_ekiin2[28];
+extern EvtWord evt_carry_up_bridge[];
+extern EvtWord init_powan_toron_konari_papa_gurume[];
+extern EvtWord init_ekiin1[];
+extern EvtWord talk_ekiin1[];
+extern EvtWord init_ekiin2[];
+extern EvtWord talk_ekiin2[];
 static NpcSetupInfo npc_data[9];
-EvtWord evt_bridge_down[144];
+extern EvtWord evt_bridge_down[];
 static s32 key_tbl[2];
-static EvtWord evt_chk[23];
-static EvtWord evt_lock[10];
-EvtWord evt_train_door[13];
-static EvtWord evt_train[262];
-EvtWord evt_train_nidome[307];
-EvtWord evt_hom_touchaku[460];
-EvtWord evt_hom_touchaku_nidome[56];
-#ifdef VERSION_G8ME01
-EvtWord hom_00_init_evt[259];
-#else
-EvtWord hom_00_init_evt[247];
-#endif
-
-f32 fd_hom_00_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
-
-f32 fd_hom_00_neg_one_382 = -1.0f;
-
-f32 fd_hom_00___local_PI_383 = 3.1415927f;
-
-f32 fd_hom_00___local_3PIO2_385 = 4.712389f;
-
-f32 fd_hom_00_one_negone_373[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
-
-f32 fd_hom_00___local_PIO2_384 = 1.5707964f;
-
-f32 fd_hom_00_one_381 = 1.0f;
-
-f32 fd_hom_00_negone_one_360[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
-
-f32 fd_hom_00_neg_one_365 = -1.0f;
-
-f32 fd_hom_00___local_PI_366 = 3.1415927f;
-
-f32 fd_hom_00___local_3PIO2_368 = 4.712389f;
-
-f32 fd_hom_00_one_negone_359[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
-
-f32 fd_hom_00___local_PIO2_367 = 1.5707964f;
-
-f32 fd_hom_00_one_364 = 1.0f;
+extern EvtWord evt_train_door[];
+extern EvtWord evt_train_nidome[];
+extern EvtWord evt_hom_touchaku[];
+extern EvtWord evt_hom_touchaku_nidome[];
+extern EvtWord hom_00_init_evt[];
 
 static EVT_BEGIN(n_2_door_open)
     MULTIPLY_FLOAT(LW(0), FLOAT(0.38867188f))

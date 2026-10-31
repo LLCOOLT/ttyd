@@ -3,8 +3,6 @@
 #include "evt/evt_bero.h"
 #include "eki.h"
 
-#pragma force_active on
-
 USER_FUNC(evt_bero_get_info);
 USER_FUNC(evt_exit_case_evt);
 USER_FUNC(evt_item_delete);
@@ -32,64 +30,18 @@ USER_FUNC(lect_juyoitem_rel_set);
 #ifdef VERSION_G8ME01
 USER_FUNC(evt_mapobj_flag_onoff);
 #endif
-
-f32 fd_eki_05_negone_one_374[2] __attribute__((aligned(8)));
-f32 fd_eki_05_neg_one_382;
-f32 fd_eki_05___local_PI_383;
-f32 fd_eki_05___local_3PIO2_385;
-f32 fd_eki_05_one_negone_373[2] __attribute__((aligned(8)));
-f32 fd_eki_05___local_PIO2_384;
-f32 fd_eki_05_one_381;
-f32 fd_eki_05_negone_one_360[2] __attribute__((aligned(8)));
-f32 fd_eki_05_neg_one_365;
-f32 fd_eki_05___local_PI_366;
-f32 fd_eki_05___local_3PIO2_368;
-f32 fd_eki_05_one_negone_359[2] __attribute__((aligned(8)));
-f32 fd_eki_05___local_PIO2_367;
-f32 fd_eki_05_one_364;
-static EvtWord n_close[12];
-static EvtWord n_open[12];
-static EvtWord w_close[12];
-static EvtWord w_open[12];
-static BeroEntry bero_data[4];
-EvtWord grass_open_1[14];
-EvtWord grass_open_2[23];
-EvtWord evt_boots[42];
-EvtWord evt_elvkey[5];
-static EvtWord evt_head[38];
-#ifdef VERSION_G8ME01
-EvtWord eki_05_init_evt[112];
-#else
-EvtWord eki_05_init_evt[106];
+#ifdef VERSION_G8MP01
+USER_FUNC(evt_bero_exec_wait);
+USER_FUNC(evt_hitobj_attr_onoff);
+USER_FUNC(evt_seq_wait);
 #endif
 
-f32 fd_eki_05_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
-
-f32 fd_eki_05_neg_one_382 = -1.0f;
-
-f32 fd_eki_05___local_PI_383 = 3.1415927f;
-
-f32 fd_eki_05___local_3PIO2_385 = 4.712389f;
-
-f32 fd_eki_05_one_negone_373[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
-
-f32 fd_eki_05___local_PIO2_384 = 1.5707964f;
-
-f32 fd_eki_05_one_381 = 1.0f;
-
-f32 fd_eki_05_negone_one_360[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
-
-f32 fd_eki_05_neg_one_365 = -1.0f;
-
-f32 fd_eki_05___local_PI_366 = 3.1415927f;
-
-f32 fd_eki_05___local_3PIO2_368 = 4.712389f;
-
-f32 fd_eki_05_one_negone_359[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
-
-f32 fd_eki_05___local_PIO2_367 = 1.5707964f;
-
-f32 fd_eki_05_one_364 = 1.0f;
+static BeroEntry bero_data[4];
+extern EvtWord grass_open_1[];
+extern EvtWord grass_open_2[];
+extern EvtWord evt_boots[];
+extern EvtWord evt_elvkey[];
+extern EvtWord eki_05_init_evt[];
 
 static EVT_BEGIN(n_close)
     MULTIPLY_FLOAT(LW(0), FLOAT(0.44433594f))
@@ -250,6 +202,15 @@ EVT_BEGIN(eki_05_init_evt)
     END_INLINE_EVENT
 #ifdef VERSION_G8ME01
     CALL(evt_mapobj_flag_onoff, 1, 0, STRING("S"), 2)
+#endif
+#ifdef VERSION_G8MP01
+    BEGIN_INLINE_EVENT
+        CALL(evt_seq_wait, 2)
+        CALL(evt_bero_exec_wait, 65536)
+        SET_VALUE(LW(0), STRING("w_bero_1"))
+        CALL_CHILD(PTR(bero_case_switch_off))
+        CALL(evt_hitobj_attr_onoff, 0, 0, STRING("w_bero_1"), 8388612)
+    END_INLINE_EVENT
 #endif
     RETURN
 EVT_END()

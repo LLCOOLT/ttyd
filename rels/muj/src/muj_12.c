@@ -1,7 +1,6 @@
 #include "battle/battle_unit.h"
 #include "evt/evt_cmd.h"
 
-#pragma force_active on
 #include "driver/itemdrv.h"
 #include "mario/mariost.h"
 #include "manager/evtmgr_cmd.h"
@@ -82,72 +81,23 @@ static USER_FUNC(evtflash);
 USER_FUNC(muj_item_move_3d_position);
 static f32 accdec_type(s32 step, s32 total, f32 start, f32 end);
 
-f32 fd_muj_12_negone_one_374[2] __attribute__((aligned(8)));
-f32 fd_muj_12_neg_one_382;
-f32 fd_muj_12___local_PI_383;
-f32 fd_muj_12___local_3PIO2_385;
-f32 fd_muj_12_one_negone_373[2] __attribute__((aligned(8)));
-f32 fd_muj_12___local_PIO2_384;
-f32 fd_muj_12_one_381;
-f32 fd_muj_12_negone_one_360[2] __attribute__((aligned(8)));
-f32 fd_muj_12_neg_one_365;
-f32 fd_muj_12___local_PI_366;
-f32 fd_muj_12___local_3PIO2_368;
-f32 fd_muj_12_one_negone_359[2] __attribute__((aligned(8)));
-f32 fd_muj_12___local_PIO2_367;
-f32 fd_muj_12_one_364;
-static EvtWord back_dark[27];
-static EvtWord door_custom[53];
-static EvtWord bero_custom[135];
-static EvtWord w_close[12];
-static EvtWord w_open[12];
 static BeroEntry bero_entry_data[2];
-EvtWord korutesu_yure[86];
-EvtWord korutesu_flush[24];
-EvtWord korutesu_flush2[36];
-EvtWord korutesu_rotate[28];
-EvtWord korutesu_small[56];
-EvtWord korutesu_small2[56];
-EvtWord korutesu_rotate2[28];
-EvtWord korutesu_large[56];
-EvtWord korutesu_blur[43];
-static EvtWord starstone_fuwafuwa[53];
-static EvtWord korutesu_event[627];
-EvtWord korutesu_event_after[140];
-EvtWord kosho_event[517];
-EvtWord coin_effect[151];
-EvtWord muj_12_init_evt[60];
+extern EvtWord korutesu_yure[];
+extern EvtWord korutesu_flush[];
+extern EvtWord korutesu_flush2[];
+extern EvtWord korutesu_rotate[];
+extern EvtWord korutesu_small[];
+extern EvtWord korutesu_small2[];
+extern EvtWord korutesu_rotate2[];
+extern EvtWord korutesu_large[];
+extern EvtWord korutesu_blur[];
+extern EvtWord korutesu_event_after[];
+extern EvtWord kosho_event[];
+extern EvtWord coin_effect[];
+extern EvtWord muj_12_init_evt[];
 
 static const GXColor evtflash_col1 = {0xFF, 0xFF, 0xFF, 0xFF};
 static const GXColor evtflash_col2 = {0xFF, 0xFF, 0xFF, 0xFF};
-
-f32 fd_muj_12_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
-
-f32 fd_muj_12_neg_one_382 = -1.0f;
-
-f32 fd_muj_12___local_PI_383 = 3.1415927f;
-
-f32 fd_muj_12___local_3PIO2_385 = 4.712389f;
-
-f32 fd_muj_12_one_negone_373[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
-
-f32 fd_muj_12___local_PIO2_384 = 1.5707964f;
-
-f32 fd_muj_12_one_381 = 1.0f;
-
-f32 fd_muj_12_negone_one_360[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
-
-f32 fd_muj_12_neg_one_365 = -1.0f;
-
-f32 fd_muj_12___local_PI_366 = 3.1415927f;
-
-f32 fd_muj_12___local_3PIO2_368 = 4.712389f;
-
-f32 fd_muj_12_one_negone_359[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
-
-f32 fd_muj_12___local_PIO2_367 = 1.5707964f;
-
-f32 fd_muj_12_one_364 = 1.0f;
 
 static EVT_BEGIN(back_dark)
     CALL(evt_sub_intpl_msec_init, 11, 255, 0, LW(10))
@@ -245,7 +195,6 @@ static EVT_BEGIN(w_open)
     CALL(evt_mapobj_rotate, 0, STRING("S_doa"), 0, LW(0), 0)
     RETURN
 EVT_END()
-
 
 static BeroEntry bero_entry_data[] = {
     {

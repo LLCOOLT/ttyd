@@ -1,4 +1,3 @@
-#pragma dollar_identifiers on
 #include "driver/envdrv.h"
 #include "driver/arcdrv.h"
 #include "driver/dispdrv.h"
@@ -12,19 +11,10 @@
 #include "memory.h"
 #include "sdk/texPalette.h"
 #include "libc_decls.h"
+#include <math.h>
 #define EXT_LIT(sym, val) (val)
 
 //.data
-// static data from an inlined header function
-#pragma force_active on // FAKE: keep asm-only-referenced data from being dead-stripped
-__declspec(section ".data") f32 envdrv_negone_one_a[] = {-1.0f, 1.0f};
-__declspec(section ".data") static f32 negone_one$374[] = {-1.0f, 1.0f};
-__declspec(section ".data") f32 envdrv_one_negone_a[] = {1.0f, -1.0f};
-__declspec(section ".data") static f32 one_negone$373[] = {1.0f, -1.0f};
-__declspec(section ".data") f32 envdrv_negone_one_b[] = {-1.0f, 1.0f};
-__declspec(section ".data") static f32 negone_one$360[] = {-1.0f, 1.0f};
-__declspec(section ".data") f32 envdrv_one_negone_b[] = {1.0f, -1.0f};
-__declspec(section ".data") static f32 one_negone$359[] = {1.0f, -1.0f};
 
 EnvironmentGlare envGlare0 = {
     GX_BM_BLEND, GX_BL_ONE, GX_BL_ONE, (GXTevKColorSel)1, (GXTevKColorSel)0, 5.25f, 16,
@@ -74,9 +64,6 @@ EnvironmentGlare envGlare3 = {
 };
 
 //.bss
-#ifndef VERSION_G8ME01
-__declspec(section ".data") u32 gap_06_803E10D8_bss[2];
-#endif
 static EnvironmentWork work[2];
 
 //.sbss
@@ -126,7 +113,7 @@ void envTexSetup(void) { //1:1
     tpl = arcOpen("env.tpl", 0, 0);
     env_tpl = tpl;
     if (!tpl) {
-        sprintf(path, EXT_LIT(str_802F93D0, "%s/env.tpl\0\0\0\0\0"), getMarioStDvdRoot());
+        sprintf(path, EXT_LIT(str_802F93D0, "%s/env.tpl"), getMarioStDvdRoot());
         entry = DVDMgrOpen(path, 2, 0);
         size = DVDMgrGetLength(entry);
         env_tpl = __memAlloc(HEAP_DEFAULT, OSRoundUp32B(size));
@@ -143,7 +130,7 @@ void envCapture(CameraId camId, void* param) { //1:1
     EnvironmentWork* wp = envGetWork();
     u16 var0, var1, var2, var3;
     u32 size;
-    
+
     var0 = gp->fbWidth;
     var1 = gp->efbHeight;
     var2 = (u16)(((u32)var0 & 0xFFFF) / 2);
@@ -800,10 +787,6 @@ void envGlareFilterZ(f32 zscale) {
 }
 
 int rand(void);
-static inline s32
-env_fpclassifyf(f32 x) { switch (*(s32*)&x & 0x7F800000) { case 0x7F800000: if (*(s32*)&x & 0x007FFFFF) { return 1; } else { return 2; } break; case 0: if (*(s32*)&x & 0x007FFFFF) { return 5; } else { return 3; } break; default: return 4; } }
-static inline f32
-env_sqrtf(f32 x) { if (x > 0.0f) { f64 guess = __frsqrte(x); guess = 0.5 * guess * (3.0 - guess * guess * x); guess = 0.5 * guess * (3.0 - guess * guess * x); return x * (0.5 * guess * (3.0 - guess * guess * x)); } else if (x < 0.0) { return *(f32*)__float_nan; } else if (env_fpclassifyf(x) == 1) { return *(f32*)__float_nan; } return x; }
 
 #pragma opt_propagation off
 #pragma opt_lifetimes off
@@ -838,7 +821,7 @@ void envDisp_FF(void) {
         GXSetVtxDesc(GX_VA_TEX0, GX_DIRECT);
         GXSetVtxAttrFmt(GX_VTXFMT0, GX_VA_POS, GX_POS_XYZ, GX_F32, 0);
         GXSetVtxAttrFmt(GX_VTXFMT0, GX_VA_TEX0, GX_TEX_ST, GX_F32, 0);
-        r = env_sqrtf(gp->fbWidth / 2 * gp->fbWidth / 2 + gp->efbHeight / 2 * gp->efbHeight / 2);
+        r = sqrtf(gp->fbWidth / 2 * gp->fbWidth / 2 + gp->efbHeight / 2 * gp->efbHeight / 2);
         GXBegin(GX_LINES, GX_VTXFMT0, 2000);
         for (i = 0; i < 1000; i++) {
             angle = 6.2831855f * i / 1000.0f;
@@ -1391,12 +1374,11 @@ void envSetYami(MapTevCallbackInfo* info) {
     static f32 u1 = 0.0f;
     static f32 u2 = 0.0f;
     static u32 v_count = 0;
-    static s32 gap_08_80418A8C_sbss = 0;
     EnvironmentWork* wp;
     GXTevStageID stage;
     GXTexMapID map;
     GXTexCoordID coord;
-    s32 unk18;
+    s32 indStage;
     GXTexObj obj;
     Mtx mtx;
     u32 rc;
@@ -1405,7 +1387,7 @@ void envSetYami(MapTevCallbackInfo* info) {
     stage = info->tevStage;
     map = info->texCoord;
     coord = info->texMap;
-    unk18 = info->indStage;
+    indStage = info->indStage;
 
     if (v_count != (rc = gp->retraceCount)) {
         u1 += 0.004f;
@@ -1461,7 +1443,7 @@ void envSetYami(MapTevCallbackInfo* info) {
     map += 2;
     info->tevStage = stage;
     info->texMap = coord;
-    info->indStage = unk18;
+    info->indStage = indStage;
     info->texCoord = map;
 }
 

@@ -10,7 +10,7 @@
 #include <string.h>
 
 typedef struct StickRotateParams {
-    u8 field_0x0[0x34 - 0x0];
+    u8 header[0x34 - 0x0]; // 0x0, BattleActions header up to acFlags
     u32 flags;       // 0x34
     s32 maxCount;    // 0x38
     s32 startTime;   // 0x3C
@@ -39,11 +39,9 @@ typedef struct StickRotateWork {
 } StickRotateWork;
 
 #define AC_PARAMS(work) ((StickRotateParams*)&(work)->actionCommands)
-// FAKE: the no-op (BattleActions*) casts here and on disp below keep the address add early (the plain field reschedules the disp functions)
-#define AC_WORK(bw) ((StickRotateWork*)((BattleActions*)&(bw)->actionCommands)->work)
 #define AC_DISP(w) ((BattleACDispParams*)&(w)->actionCommands.disp)
 
-#define PAD(m) (((s32(*)(s32))BattlePadCheckNow)(m))
+#define PAD(m) (BattlePadCheckNow(m))
 
 static void actionCommandDisp(f32 x, f32 y);
 void actionCommandDisp2(f32 x, f32 y);
@@ -333,16 +331,17 @@ s32 battleAcResult_StickRotate(BattleWork* work) {
 }
 
 void battleAcDisp_StickRotate(CameraId cameraId, void* param) {
-    BattleACDispParams* disp = &((BattleActions*)&((BattleWork*)param)->actionCommands)->disp;
+    BattleWork* work = (BattleWork*)param;
+    BattleActions* ac = &work->actionCommands;
+    BattleACDispParams* disp = &ac->disp;
     void (*fn)(f32, f32);
-#define work ((BattleWork*)param)
 
     if (AC_PARAMS(work)->flags & 2) {
         fn = actionCommandDisp;
     } else {
         fn = actionCommandDisp2;
     }
-    switch (work->actionCommands.mAcState) {
+    switch (ac->mAcState) {
         case 99:
             disp->iconX = intplGetValue(4, 20 - disp->slideTimer, 20, -300.0f, 30.0f);
             fn(disp->iconX, disp->iconY);
@@ -372,7 +371,6 @@ void battleAcDisp_StickRotate(CameraId cameraId, void* param) {
             fn(disp->iconX, disp->iconY);
             break;
     }
-#undef work
 }
 
 #pragma auto_inline off
@@ -407,8 +405,9 @@ u16 _get_icon_id(s8 dir) {
 
 static void actionCommandDisp(f32 x, f32 y) {
     BattleWork* work = _battleWorkPointer;
+    BattleActions* ac = &work->actionCommands;
     StickRotateParams* p = AC_PARAMS(work);
-    StickRotateWork* sw = AC_WORK(work);
+    StickRotateWork* sw = (StickRotateWork*)ac->work;
     Vec v0, v1, v2, v3, v4, v5;
 
     switch (work->actionCommands.mAcState) {
@@ -442,8 +441,9 @@ static void actionCommandDisp(f32 x, f32 y) {
 
 void actionCommandDisp2(f32 x, f32 y) {
     BattleWork* work = _battleWorkPointer;
+    BattleActions* ac = &work->actionCommands;
     StickRotateParams* p = AC_PARAMS(work);
-    StickRotateWork* sw = AC_WORK(work);
+    StickRotateWork* sw = (StickRotateWork*)ac->work;
     Vec v0, v1, v2;
 
     switch (work->actionCommands.mAcState) {

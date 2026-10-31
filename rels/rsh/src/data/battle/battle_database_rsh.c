@@ -2,7 +2,6 @@
 #include "evt/evt_cmd.h"
 #include "manager/evtmgr_cmd.h"
 
-#pragma force_active on
 #include "battle/battle_stage_object.h"
 #include "battle/battle.h"
 #include "battle/battle_weapon_power.h"
@@ -14,20 +13,6 @@ USER_FUNC(_set_destroy_flag);
 USER_FUNC(_set_offset);
 extern BattleUnitKind unit_boss_moamoa;
 
-f32 fd_battle_database_rsh_negone_one_374[2] __attribute__((aligned(8)));
-f32 fd_battle_database_rsh_neg_one_382;
-f32 fd_battle_database_rsh___local_PI_383;
-f32 fd_battle_database_rsh___local_3PIO2_385;
-f32 fd_battle_database_rsh_one_negone_373[2] __attribute__((aligned(8)));
-f32 fd_battle_database_rsh___local_PIO2_384;
-f32 fd_battle_database_rsh_one_381;
-f32 fd_battle_database_rsh_negone_one_360[2] __attribute__((aligned(8)));
-f32 fd_battle_database_rsh_neg_one_365;
-f32 fd_battle_database_rsh___local_PI_366;
-f32 fd_battle_database_rsh___local_3PIO2_368;
-f32 fd_battle_database_rsh_one_negone_359[2] __attribute__((aligned(8)));
-f32 fd_battle_database_rsh___local_PIO2_367;
-f32 fd_battle_database_rsh_one_364;
 BattleStageObjectData rsh_btlobject_data[7];
 BattleStageData rsh_btlstage_data[1];
 BattleUnitSetup btlparty_rsh_rsh_06_01_off_1[1];
@@ -36,35 +21,7 @@ NpcBattleSelect btlgrpsel_rsh_btlno_rsh_test1_off[2];
 NpcBattleSelect btlgrpsel_rsh_btlno_rsh_06_01_off[2];
 NpcSetupBattleInfo btlsetup_rsh_tbl[3];
 NpcTerritoryInfo btl_rsh_setup_no_tbl[3];
-EvtWord bgset_rsh_bg_event[30];
-
-f32 fd_battle_database_rsh_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
-
-f32 fd_battle_database_rsh_neg_one_382 = -1.0f;
-
-f32 fd_battle_database_rsh___local_PI_383 = 3.1415927f;
-
-f32 fd_battle_database_rsh___local_3PIO2_385 = 4.712389f;
-
-f32 fd_battle_database_rsh_one_negone_373[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
-
-f32 fd_battle_database_rsh___local_PIO2_384 = 1.5707964f;
-
-f32 fd_battle_database_rsh_one_381 = 1.0f;
-
-f32 fd_battle_database_rsh_negone_one_360[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
-
-f32 fd_battle_database_rsh_neg_one_365 = -1.0f;
-
-f32 fd_battle_database_rsh___local_PI_366 = 3.1415927f;
-
-f32 fd_battle_database_rsh___local_3PIO2_368 = 4.712389f;
-
-f32 fd_battle_database_rsh_one_negone_359[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
-
-f32 fd_battle_database_rsh___local_PIO2_367 = 1.5707964f;
-
-f32 fd_battle_database_rsh_one_364 = 1.0f;
+extern EvtWord bgset_rsh_bg_event[];
 
 BattleStageObjectData rsh_btlobject_data[] = {
     {"r_mae", 2, 1, {170.0f, 0.0f, -50.0f}, 0, 60, {0}},
@@ -110,7 +67,7 @@ BattleGroupSetup btlgrp_rsh_rsh_06_01_off_1 = {
     100, // noItemWeight
     battle_heart_drop_param_default, // hpDropTable
     battle_heart_drop_param_default, // fpDropTable
-    5, // field_1C
+    5, // reserved_1C
 };
 
 NpcBattleSelect btlgrpsel_rsh_btlno_rsh_test1_off[] = {
@@ -130,8 +87,8 @@ NpcSetupBattleInfo btlsetup_rsh_tbl[] = {
         -1, // swFlag
         NULL, // altSelect
         btlgrpsel_rsh_btlno_rsh_test1_off, // select
-        0, 0, // battleFlags..field_1C
-        {{3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {1, 1}, {1, 1}, {1, 1}, {1, 1}}, // field_20
+        0, 0, // battleFlags, randomMode
+        {{3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {1, 1}, {1, 1}, {1, 1}, {1, 1}}, // randomRanges
         "BGM_ZAKO_BATTLE1", // bgmName
     },
     {
@@ -141,8 +98,8 @@ NpcSetupBattleInfo btlsetup_rsh_tbl[] = {
         NULL, // altSelect
         btlgrpsel_rsh_btlno_rsh_06_01_off, // select
         0x20000010, // battleFlags
-        6, // field_1C
-        {{3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {1, 1}, {1, 1}, {1, 1}, {1, 1}}, // field_20
+        6, // randomMode
+        {{3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {1, 1}, {1, 1}, {1, 1}, {1, 1}}, // randomRanges
         "BGM_BOSS_STG6_GREAT_MOAMOA1", // bgmName
     },
     {0},

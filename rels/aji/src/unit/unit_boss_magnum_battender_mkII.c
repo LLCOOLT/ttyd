@@ -1,7 +1,6 @@
 #include "battle/battle_unit.h"
 #include "evt/evt_cmd.h"
 
-#pragma force_active on
 #include "manager/evtmgr_cmd.h"
 #include "driver/effdrv.h"
 #include "battle/battle.h"
@@ -23,14 +22,15 @@
 #include "evt/evt_eff.h"
 #include "party/party_motion.h"
 #include "battle/battle_database_common.h"
+#include "battle/battle_sub.h"
+#include "pmario_sound.h"
 
 typedef struct ArmWork { Vec prevPos; Vec pos; f32 rot; f32 targetRot; EffectEntry* eff; } ArmWork;
 double atan(double x);
-typedef struct BattenEffWork { s32 field_0x0; Vec pos; u8 field_0x10[0x28 - 0x10]; Mtx mtx; } BattenEffWork;
+typedef struct BattenEffWork { s32 type; Vec pos; u8 drawState[0x28 - 0x10]; Mtx mtx; } BattenEffWork; /* type/drawState mirror EffBattenWork */
 EffectEntry* effBattenEntry(s32 type, s32 time, f32 x, f32 y, f32 z, f32 scale);
 typedef struct TargetWork { s32 state; s32 count; EffectEntry* eff; } TargetWork;
 f32 intplGetValue(f32 start, f32 end, s32 mode, s32 cur, s32 steps);
-s32 psndSFXOn(const char* name);
 void psndSFXOff(s32 id);
 typedef struct AudMember { s32 flags; s32 step; s32 counter; u8 pad_0C[0x48 - 0xC]; Vec position; u8 pad_54[0x60 - 0x54]; Vec scale; u8 pad_6C[0x9C - 0x6C]; Vec rotation; u8 pad_A8[0xB4 - 0xA8]; Vec home; u8 pad_C0[0xF8 - 0xC0]; s32 frame; s32 frames; } AudMember;
 s32 irand(s32 scalar);
@@ -121,20 +121,6 @@ USER_FUNC(aud_jet);
 USER_FUNC(drill_jet);
 USER_FUNC(drill_tor);
 
-f32 fd_boss_magnum_battender_mkII_negone_one_374[2] __attribute__((aligned(8)));
-f32 fd_boss_magnum_battender_mkII_neg_one_382;
-f32 fd_boss_magnum_battender_mkII___local_PI_383;
-f32 fd_boss_magnum_battender_mkII___local_3PIO2_385;
-f32 fd_boss_magnum_battender_mkII_one_negone_373[2] __attribute__((aligned(8)));
-f32 fd_boss_magnum_battender_mkII___local_PIO2_384;
-f32 fd_boss_magnum_battender_mkII_one_381;
-f32 fd_boss_magnum_battender_mkII_negone_one_360[2] __attribute__((aligned(8)));
-f32 fd_boss_magnum_battender_mkII_neg_one_365;
-f32 fd_boss_magnum_battender_mkII___local_PI_366;
-f32 fd_boss_magnum_battender_mkII___local_3PIO2_368;
-f32 fd_boss_magnum_battender_mkII_one_negone_359[2] __attribute__((aligned(8)));
-f32 fd_boss_magnum_battender_mkII___local_PIO2_367;
-f32 fd_boss_magnum_battender_mkII_one_364;
 BattleUnitKind unit_boss_magnum_battender_mkII;
 static BattleUnitDefense defence;
 static BattleUnitDefenseAttr defence_attr;
@@ -147,18 +133,18 @@ BattleWeapon weapon_batten_drill_attack;
 BattleWeapon weapon_batten_boomerang_attack;
 BattleWeapon weapon_batten_aud_attack;
 static BattleUnitSetup entry_rocket_punch;
-EvtWord aud_hit_event[24];
-EvtWord aud_no_hit_event[16];
+extern EvtWord aud_hit_event[];
+extern EvtWord aud_no_hit_event[];
 static EvtWord init_event[92];
 static EvtWord waku_event[23];
 static EvtWord damage_event[111];
 static EvtWord dead_event[234];
 static EvtWord entry_event[78];
 static EvtWord attack_event[320];
-EvtWord drill_attack_event[392];
-EvtWord boomerang_attack_event[324];
-EvtWord aud_attack_event[823];
-EvtWord aud_attack_event_sub[139];
+extern EvtWord drill_attack_event[];
+extern EvtWord boomerang_attack_event[];
+extern EvtWord aud_attack_event[];
+extern EvtWord aud_attack_event_sub[];
 static EvtWord arm_bunri_event[199];
 static EvtWord arm_return_event[151];
 static EvtWord wait_event[6];
@@ -176,34 +162,6 @@ static EvtWord arm_event_end[35];
 static EvtWord damage_event_r[30];
 static EvtWord attack_event_r[368];
 static EvtWord wait_event_r[18];
-
-f32 fd_boss_magnum_battender_mkII_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
-
-f32 fd_boss_magnum_battender_mkII_neg_one_382 = -1.0f;
-
-f32 fd_boss_magnum_battender_mkII___local_PI_383 = 3.1415927f;
-
-f32 fd_boss_magnum_battender_mkII___local_3PIO2_385 = 4.712389f;
-
-f32 fd_boss_magnum_battender_mkII_one_negone_373[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
-
-f32 fd_boss_magnum_battender_mkII___local_PIO2_384 = 1.5707964f;
-
-f32 fd_boss_magnum_battender_mkII_one_381 = 1.0f;
-
-f32 fd_boss_magnum_battender_mkII_negone_one_360[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
-
-f32 fd_boss_magnum_battender_mkII_neg_one_365 = -1.0f;
-
-f32 fd_boss_magnum_battender_mkII___local_PI_366 = 3.1415927f;
-
-f32 fd_boss_magnum_battender_mkII___local_3PIO2_368 = 4.712389f;
-
-f32 fd_boss_magnum_battender_mkII_one_negone_359[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
-
-f32 fd_boss_magnum_battender_mkII___local_PIO2_367 = 1.5707964f;
-
-f32 fd_boss_magnum_battender_mkII_one_364 = 1.0f;
 
 BattleUnitKind unit_boss_magnum_battender_mkII = {
     121,
@@ -499,7 +457,7 @@ static USER_FUNC(waku_main) {
     animPoseWorldPositionEvalOn(poseId);
     animPoseGetAnimBaseDataPtr(poseId);
     pose = animPoseGetAnimPosePtr(poseId);
-    idx = animPoseGetGroupIdx(poseId, "locator17\0\0");
+    idx = animPoseGetGroupIdx(poseId, "locator17");
     BtlUnit_SetPartsPos(waku, (*pose->worldPositions)[idx].x, (*pose->worldPositions)[idx].y,
                         (*pose->worldPositions)[idx].z);
     yaw = camGetPtr(CAMERA_3D)->viewYaw;

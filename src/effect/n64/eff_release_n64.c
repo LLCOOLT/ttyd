@@ -26,7 +26,7 @@ typedef struct EffReleaseN64Work {
     f32 scale;     // 0x3C
     f32 size[4];   // 0x40
     s32 alpha[4];  // 0x50
-    s32 unk60[4];  // 0x60
+    s32 counter[4]; // 0x60, only cleared at entry
     s32 state;     // 0x70
     s32 step;      // 0x74
 } EffReleaseN64Work;
@@ -40,14 +40,6 @@ typedef struct AnimeEntry {
 void effReleaseMain(EffectEntry* effect);
 void effReleaseDisp(CameraId cameraId, EffectEntry* effect);
 
-__declspec(section ".data") f32 eff_release_n64_negone_one_a[2] = {-1.0f, 1.0f};
-__declspec(section ".data") static f32 negone_one_374[2] = {-1.0f, 1.0f};
-__declspec(section ".data") f32 eff_release_n64_one_negone_a[2] = {1.0f, -1.0f};
-__declspec(section ".data") static f32 one_negone_373[2] = {1.0f, -1.0f};
-__declspec(section ".data") f32 eff_release_n64_negone_one_b[2] = {-1.0f, 1.0f};
-__declspec(section ".data") static f32 negone_one_360[2] = {-1.0f, 1.0f};
-__declspec(section ".data") f32 eff_release_n64_one_negone_b[2] = {1.0f, -1.0f};
-__declspec(section ".data") static f32 one_negone_359[2] = {1.0f, -1.0f};
 
 static AnimeEntry anime_data[30] = {
     {0x0064, 0x00FF},
@@ -188,7 +180,7 @@ EffectEntry* effReleaseN64Entry(s32 type, s32 lifetime, f32 x, f32 y, f32 z, f32
     s32 sub;
 
     effect = effEntry();
-    effect->type = "ReleaseN64\0";
+    effect->type = "ReleaseN64";
     effect->count = 1;
     work = __memAlloc(HEAP_EFFECT, sizeof(EffReleaseN64Work));
     effect->userdata = work;
@@ -214,10 +206,10 @@ EffectEntry* effReleaseN64Entry(s32 type, s32 lifetime, f32 x, f32 y, f32 z, f32
     work->g2 = 255;
     work->b2 = 255;
     work->a2 = 255;
-    work->unk60[0] = 0;
-    work->unk60[1] = 0;
-    work->unk60[2] = 0;
-    work->unk60[3] = 0;
+    work->counter[0] = 0;
+    work->counter[1] = 0;
+    work->counter[2] = 0;
+    work->counter[3] = 0;
     work->size[0] = 1.0f;
     work->size[1] = 0.0f;
     work->size[2] = 0.0f;

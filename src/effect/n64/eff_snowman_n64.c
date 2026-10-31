@@ -33,7 +33,7 @@ static u8 land_hscale_data[] = "dZRLHFJYdlnlf`_`ceddddddddd";
 
 static u8 jump2_hscale_data[] = {100, 90, 82, 76, 72, 70, 70, 70, 70, 70, 70, 70, 70, 70, 70, 70, 70, 70, 70, 70, 70, 70, 70, 70, 70, 70, 70, 70, 70, 70, 70, 70, 70, 70, 70, 70, 70, 70, 70, 70, 70, 70, 70, 70, 70, 70, 70, 70, 70, 70, 70, 70, 70, 70, 70, 70, 70, 70, 70, 70, 70, 70, 74, 89, 103, 116, 118, 120, 120, 120, 120, 118, 114, 110};
 
-static s8 jump2_ry_data[] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 5, 10, 16, 22, 28, 33, 38, 40, 41, 41, 40, 38, 33, 28, 22, 16, 10, 5, 1, 1, 5, 10, 16, 22, 28, 33, 38, 40, 41, 41, 40, 38, 33, 28, 22, 16, 10, 5, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
+static s8 jump2_ry_data[] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 5, 10, 16, 22, 28, 33, 38, 40, 41, 41, 40, 38, 33, 28, 22, 16, 10, 5, 1, 1, 5, 10, 16, 22, 28, 33, 38, 40, 41, 41, 40, 38, 33, 28, 22, 16, 10, 5, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
 
 void effSnowmanMain(EffectEntry* effect);
 void effSnowmanDisp(CameraId cameraId, EffectEntry* effect);
@@ -43,7 +43,7 @@ EffectEntry* effSnowmanN64Entry(s32 type, s32 lifetime, f32 x, f32 y, f32 z, f32
     EffSnowmanN64Work* work;
 
     effect = effEntry();
-    effect->type = "SnowmanN64\0";
+    effect->type = "SnowmanN64";
     effect->count = 1;
     work = __memAlloc(HEAP_EFFECT, sizeof(EffSnowmanN64Work));
     effect->userdata = work;

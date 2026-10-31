@@ -2,8 +2,6 @@
 #include "evt/evt_cmd.h"
 #include "evt/evt_bero.h"
 
-#pragma force_active on
-
 USER_FUNC(evt_bero_get_info);
 USER_FUNC(evt_cam_shake);
 USER_FUNC(evt_item_entry);
@@ -40,60 +38,8 @@ USER_FUNC(evt_sub_intpl_get_value);
 USER_FUNC(evt_sub_intpl_init);
 USER_FUNC(evt_sub_rumble_onoff);
 
-f32 fd_gon_09_negone_one_374[2] __attribute__((aligned(8)));
-f32 fd_gon_09_neg_one_382;
-f32 fd_gon_09___local_PI_383;
-f32 fd_gon_09___local_3PIO2_385;
-f32 fd_gon_09_one_negone_373[2] __attribute__((aligned(8)));
-f32 fd_gon_09___local_PIO2_384;
-f32 fd_gon_09_one_381;
-f32 fd_gon_09_negone_one_360[2] __attribute__((aligned(8)));
-f32 fd_gon_09_neg_one_365;
-f32 fd_gon_09___local_PI_366;
-f32 fd_gon_09___local_3PIO2_368;
-f32 fd_gon_09_one_negone_359[2] __attribute__((aligned(8)));
-f32 fd_gon_09___local_PIO2_367;
-f32 fd_gon_09_one_364;
-static EvtWord door01_close[12];
-static EvtWord door01_open[12];
-static EvtWord door02_close[12];
-static EvtWord door02_open[12];
 static BeroEntry bero_entry_data[3];
-static EvtWord init_0[37];
-#ifdef VERSION_G8ME01
-static EvtWord main_0[465];
-#else
-static EvtWord main_0[491];
-#endif
-EvtWord gon_09_init_evt[239];
-
-f32 fd_gon_09_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
-
-f32 fd_gon_09_neg_one_382 = -1.0f;
-
-f32 fd_gon_09___local_PI_383 = 3.1415927f;
-
-f32 fd_gon_09___local_3PIO2_385 = 4.712389f;
-
-f32 fd_gon_09_one_negone_373[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
-
-f32 fd_gon_09___local_PIO2_384 = 1.5707964f;
-
-f32 fd_gon_09_one_381 = 1.0f;
-
-f32 fd_gon_09_negone_one_360[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
-
-f32 fd_gon_09_neg_one_365 = -1.0f;
-
-f32 fd_gon_09___local_PI_366 = 3.1415927f;
-
-f32 fd_gon_09___local_3PIO2_368 = 4.712389f;
-
-f32 fd_gon_09_one_negone_359[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
-
-f32 fd_gon_09___local_PIO2_367 = 1.5707964f;
-
-f32 fd_gon_09_one_364 = 1.0f;
+extern EvtWord gon_09_init_evt[];
 
 static EVT_BEGIN(door01_close)
     MULTIPLY_FLOAT(LW(0), FLOAT(0.44433594f))
@@ -437,7 +383,7 @@ EVT_BEGIN(gon_09_init_evt)
     CALL(evt_mobj_switch_float_blk, STRING("sw_0"), 588, -50, 138, STRING("blk_0"), 2, PTR(main_0), LSWF(1))
     CALL(evt_mapobj_flag_onoff, 1, 1, STRING("fuyu_boxS"), 1)
     CALL(evt_map_playanim, STRING("hokori"), 1, 0)
-    CALL(evt_map_entry_airport_harbor, 0, STRING("hikou"), STRING("a_hi\0\0\0"))
+    CALL(evt_map_entry_airport_harbor, 0, STRING("hikou"), STRING("a_hi"))
     RETURN
 EVT_END()
 

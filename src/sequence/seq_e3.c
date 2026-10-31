@@ -19,6 +19,12 @@
 #include <string.h>
 #include "libc_decls.h"
 #include "eff/eff_magic1_n64.h"
+#include "mario/mario_motion.h"
+#include "statuswindow.h"
+#include "win/win_main.h"
+#include "manager/fontmgr.h"
+#include "driver/msgdrv.h"
+#include "driver/windowdrv.h"
 
 // TODO: move all this into other TUs
 typedef enum winTexMode {
@@ -28,9 +34,6 @@ typedef enum winTexMode {
     MODE_8 = 8,
     MODE_11 = 11,
 } winTexMode;
-
-void winTexSet(winTexMode mode, Vec pos, Vec scale, GXColor color);
-void windowDispGX_Waku_col(s32 r3, GXColor r4, f32 f1, f32 f2, f32 f3, f32 f4, f32 f5);
 
 typedef struct seq_e3_entry {
     s32 id; // 0x0
@@ -96,7 +99,7 @@ void seq_e3Init(SequenceWork* seq) {
     wp->scenario = 0;
     wp->reserved_64 = 270.0f;
     OSCreateAlarm(&wp->alarm);
-#ifdef VERSION_G8ME01
+#if defined(VERSION_G8ME01) && !defined(VERSION_G8MP01)
     OSSetAlarm(&wp->alarm, (OSTime)OS_TIMER_CLOCK * 300, alarm_handler);
 #else
     OSSetAlarm(&wp->alarm, (OSTime)OS_TIMER_CLOCK * 600, alarm_handler);
@@ -111,7 +114,7 @@ void seq_e3Init(SequenceWork* seq) {
     psndStopAllFadeOut();
     psndBGMOn(0x200, "BGM_FILE_MENU1");
     seq->state = 0;
-    animGroupBaseAsync("OFF_d_meku\0", 0, NULL);
+    animGroupBaseAsync("OFF_d_meku", 0, NULL);
 }
 
 void seq_e3Exit(SequenceWork* seq) {
@@ -336,19 +339,32 @@ void seq_e3Main(SequenceWork* seq) {
                 pouchGetPtr()->partyData[i].HPLevel = 1;
             }
 
+#ifdef VERSION_G8MP01
+            // PAL: the first scenario starts without items or badges
+            if (wp->scenario != 0) {
+#endif
             for (i = 0; i < 2; i++) {
                 pouchGetItem(ITEM_THUNDER_RAGE);
                 pouchGetItem(ITEM_SHOOTING_STAR);
                 pouchGetItem(ITEM_FIRE_FLOWER);
                 pouchGetItem(ITEM_POW_BLOCK);
             }
+#ifdef VERSION_G8MP01
+            }
+#endif
 
             pouchGetPtr()->availableBP = 20;
             pouchGetPtr()->maximumBP = 20;
+#ifdef VERSION_G8MP01
+            if (wp->scenario != 0) {
+#endif
             pouchGetItem(ITEM_POWER_BOUNCE);
             pouchGetItem(ITEM_POWER_SMASH);
             pouchEquipBadgeID(ITEM_POWER_BOUNCE);
             pouchEquipBadgeID(ITEM_POWER_SMASH);
+#ifdef VERSION_G8MP01
+            }
+#endif
             pouchReviseMarioParam();
             pouchRevisePartyParam();
             statusWinForceUpdate();
@@ -363,6 +379,19 @@ void seq_e3Main(SequenceWork* seq) {
     }
     dispEntry(CAMERA_3D, 0.0f, 0, e3Disp, seq);
 }
+
+#ifdef VERSION_G8MP01
+// PAL monthry.tpl has one texture fewer before the tile and the scenario boxes
+#define E3_TEX_TILE 4
+#define E3_TEX_CURSOR0 MODE_5
+#define E3_TEX_CURSOR1 MODE_6
+#define E3_TEX_BOX 7
+#else
+#define E3_TEX_TILE MODE_5
+#define E3_TEX_CURSOR0 MODE_6
+#define E3_TEX_CURSOR1 MODE_7
+#define E3_TEX_BOX MODE_8
+#endif
 
 void e3Disp(CameraId cameraId, void* param) {
     CameraEntry* camera = camGetPtr(CAMERA_2D);
@@ -403,6 +432,11 @@ void e3Disp(CameraId cameraId, void* param) {
     if (active == 0) {
         // 'Press Start' overlay with alpha pulsing
         alpha = (s32)((f32)sin((f64)((f32)gp->retraceCount / 30.0f)) * 459.0f);
+#ifdef VERSION_G8MP01
+        {
+        // PAL: per-language title texture
+        s32 tbl[6] = { 11, 11, 12, 13, 14, 15 };
+#endif
         if (alpha < 0) {
             alpha = 0;
         }
@@ -411,18 +445,23 @@ void e3Disp(CameraId cameraId, void* param) {
         }
 
         winTexInit(*wp->handle->data);
-#ifdef VERSION_G8ME01
+#ifdef VERSION_G8MP01
+        winTexSet(tbl[gp->language], (Vec){ 0.0f, 0.0f, 0.0f }, (Vec){ 1.0f, 1.0f, 1.0f }, (GXColor){ 0xFF, 0xFF, 0xFF, 0xFF });
+#elif defined(VERSION_G8ME01)
         winTexSet(12, (Vec){ 0.0f, 0.0f, 0.0f }, (Vec){ 1.0f, 1.0f, 1.0f }, (GXColor){ 0xFF, 0xFF, 0xFF, 0xFF });
 #else
         winTexSet(MODE_11, (Vec){ 0.0f, 0.0f, 0.0f }, (Vec){ 1.0f, 1.0f, 1.0f }, (GXColor){ 0xFF, 0xFF, 0xFF, 0xFF });
 #endif
         pressStartGX(alpha, 0.0f, -110.0f);
+#ifdef VERSION_G8MP01
+        }
+#endif
     } else {
         // Tiled background fill (40 x 32 quads)
         winTexInit(*wp->handle->data);
         for (row = 0, py = -304; row < 40; row++, py += 16) {
             for (col = 0, px = 0; col < 32; col++, px += 16) {
-                winTexSet(5, (Vec){ (f32)py, (f32)(240 - px), 0.0f }, (Vec){ 1.0f, 1.0f, 1.0f },
+                winTexSet(E3_TEX_TILE, (Vec){ (f32)py, (f32)(240 - px), 0.0f }, (Vec){ 1.0f, 1.0f, 1.0f },
                           (GXColor){ 0xFF, 0xFF, 0xFF, 0xFF });
             }
         }
@@ -436,13 +475,13 @@ void e3Disp(CameraId cameraId, void* param) {
 
             if (i == wp->scenario) {
                 // Shadow Box
-                winTexSet(i + (u32)8, (Vec){ 10.0f + e3_tbl[i].x, e3_tbl[i].y - 10.0f, 0.0f },
+                winTexSet(i + (u32)E3_TEX_BOX, (Vec){ 10.0f + e3_tbl[i].x, e3_tbl[i].y - 10.0f, 0.0f },
                           (Vec){ 0.35f, 0.35f, 0.35f }, (GXColor){ 0x00, 0x00, 0x00, 0x40 });
                 // Content Box
-                winTexSet(i + 8, (Vec){ e3_tbl[i].x, e3_tbl[i].y, 0.0f }, (Vec){ 0.35f, 0.35f, 0.35f },
+                winTexSet(i + E3_TEX_BOX, (Vec){ e3_tbl[i].x, e3_tbl[i].y, 0.0f }, (Vec){ 0.35f, 0.35f, 0.35f },
                           (GXColor){ 0xFF, 0xFF, 0xFF, 0xFF });
             } else {
-                winTexSet(i + 8, (Vec){ 10.0f + e3_tbl[i].x, e3_tbl[i].y - 10.0f, 0.0f }, (Vec){ 0.35f, 0.35f, 0.35f },
+                winTexSet(i + E3_TEX_BOX, (Vec){ 10.0f + e3_tbl[i].x, e3_tbl[i].y - 10.0f, 0.0f }, (Vec){ 0.35f, 0.35f, 0.35f },
                           (GXColor){ 0x80, 0x80, 0x80, 0xFF });
             }
 
@@ -459,9 +498,8 @@ void e3Disp(CameraId cameraId, void* param) {
 
                 // Centered Label
                 FontDrawStart();
-                FontDrawColor(&(GXColor){ 0xFF, 0xFF, 0xFF, 0xFF });
-                msgSearch(keys[i]);
-                MTXTrans(mtx, ((f32)step + e3_tbl[i].x) - 0.7f * (f32)(s32)((FontGetMessageWidth() >> 1) & 0x7FFF),
+                FontDrawColor((GXColor){ 0xFF, 0xFF, 0xFF, 0xFF });
+                MTXTrans(mtx, ((f32)step + e3_tbl[i].x) - 0.7f * (f32)(s32)((FontGetMessageWidth(msgSearch(keys[i])) >> 1) & 0x7FFF),
                          (((e3_tbl[i].y - (f32)step) - 60.0f) - 8.0f), 0.0f);
                 MTXScale(mtxScale, 0.7f, 1.0f, 1.0f);
                 MTXConcat(mtx, mtxScale, mtx);
@@ -473,22 +511,22 @@ void e3Disp(CameraId cameraId, void* param) {
         winTexInit(*wp->handle->data);
         for (pass = 1, inset = 5; pass >= 0; pass--, inset -= 5) {
             // Top-Left
-            winTexSet(((gp->retraceCount >> 4) & 1) ? MODE_6 : MODE_7,
+            winTexSet(((gp->retraceCount >> 4) & 1) ? E3_TEX_CURSOR0 : E3_TEX_CURSOR1,
                       (Vec){ (110.0f + wp->curX) + (f32)inset, (90.0f + wp->curY) - (f32)inset, 0.0f },
                       (Vec){ 1.0f, 1.0f, 1.0f },
                       (pass != 0) ? (GXColor){ 0x00, 0x00, 0x00, 0x40 } : (GXColor){ 0xFF, 0xFF, 0xFF, 0xFF });
             // Top-Right
-            winTexSet(((gp->retraceCount >> 4) & 1) ? MODE_6 : MODE_7,
+            winTexSet(((gp->retraceCount >> 4) & 1) ? E3_TEX_CURSOR0 : E3_TEX_CURSOR1,
                       (Vec){ (wp->curX - 110.0f) + (f32)inset, (90.0f + wp->curY) - (f32)inset, 0.0f },
                       (Vec){ -1.0f, 1.0f, 1.0f },
                       (pass != 0) ? (GXColor){ 0x00, 0x00, 0x00, 0x40 } : (GXColor){ 0xFF, 0xFF, 0xFF, 0xFF });
             // Bottom-Left
-            winTexSet(((gp->retraceCount >> 4) & 1) ? MODE_6 : MODE_7,
+            winTexSet(((gp->retraceCount >> 4) & 1) ? E3_TEX_CURSOR0 : E3_TEX_CURSOR1,
                       (Vec){ (110.0f + wp->curX) + (f32)inset, (wp->curY - 90.0f) - (f32)inset, 0.0f },
                       (Vec){ 1.0f, -1.0f, 1.0f },
                       (pass != 0) ? (GXColor){ 0x00, 0x00, 0x00, 0x40 } : (GXColor){ 0xFF, 0xFF, 0xFF, 0xFF });
             // Bottom-Right
-            winTexSet(((gp->retraceCount >> 4) & 1) ? MODE_6 : MODE_7,
+            winTexSet(((gp->retraceCount >> 4) & 1) ? E3_TEX_CURSOR0 : E3_TEX_CURSOR1,
                       (Vec){ (wp->curX - 110.0f) + (f32)inset, (wp->curY - 90.0f) - (f32)inset, 0.0f },
                       (Vec){ -1.0f, -1.0f, 1.0f },
                       (pass != 0) ? (GXColor){ 0x00, 0x00, 0x00, 0x40 } : (GXColor){ 0xFF, 0xFF, 0xFF, 0xFF });
@@ -526,10 +564,20 @@ void pressStartGX(s32 alpha, f32 x, f32 y) {
     CameraEntry* camera = camGetCurPtr();
     GXTexObj startText, gradient;
     Mtx v17, v16;
+#ifdef VERSION_G8MP01
+    // PAL: per-language "press start" texture
+    s32 tbl[6] = { 16, 16, 17, 18, 19, 20 };
+#endif
 
+#ifdef VERSION_G8MP01
+    TEXGetGXTexObjFromPalette(*wp->handle->data, &startText, tbl[gp->language]);
+    GXLoadTexObj(&startText, GX_TEXMAP0);
+    TEXGetGXTexObjFromPalette(*wp->handle->data, &gradient, 3);
+#else
     TEXGetGXTexObjFromPalette(*wp->handle->data, &startText, 3);
     GXLoadTexObj(&startText, GX_TEXMAP0);
     TEXGetGXTexObjFromPalette(*wp->handle->data, &gradient, 4);
+#endif
     GXLoadTexObj(&gradient, GX_TEXMAP1);
     GXSetNumTevStages(2);
     GXSetTevOrder(GX_TEVSTAGE0, GX_TEXCOORD0, GX_TEXMAP0, GX_COLOR_NULL);

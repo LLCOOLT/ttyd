@@ -1,7 +1,6 @@
 #include "battle/battle_unit.h"
 #include "evt/evt_cmd.h"
 
-#pragma force_active on
 #include "driver/npcdrv.h"
 #include "eff/eff_stardust.h"
 #include "manager/evtmgr_cmd.h"
@@ -90,41 +89,15 @@ static USER_FUNC(wariai_enzan_0f);
 static USER_FUNC(wariai_enzan_0);
 static USER_FUNC(wariai_enzan_1);
 
-f32 fd_tik_11_negone_one_374[2] __attribute__((aligned(8)));
-f32 fd_tik_11_neg_one_382;
-f32 fd_tik_11___local_PI_383;
-f32 fd_tik_11___local_3PIO2_385;
-f32 fd_tik_11_one_negone_373[2] __attribute__((aligned(8)));
-f32 fd_tik_11___local_PIO2_384;
-f32 fd_tik_11_one_381;
-f32 fd_tik_11_negone_one_360[2] __attribute__((aligned(8)));
-f32 fd_tik_11_neg_one_365;
-f32 fd_tik_11___local_PI_366;
-f32 fd_tik_11___local_3PIO2_368;
-f32 fd_tik_11_one_negone_359[2] __attribute__((aligned(8)));
-f32 fd_tik_11___local_PIO2_367;
-f32 fd_tik_11_one_364;
-EvtWord powerdownya_face_left[16];
-#ifdef VERSION_G8ME01
-EvtWord powerdownya_mario_level_rtn[639];
-#else
-EvtWord powerdownya_mario_level_rtn[616];
-#endif
-#ifdef VERSION_G8ME01
-EvtWord powerdownya_party_lank_rtn[963];
-#else
-EvtWord powerdownya_party_lank_rtn[937];
-#endif
-#ifdef VERSION_G8ME01
-EvtWord powerdownya_table_talk[105];
-#else
-EvtWord powerdownya_table_talk[84];
-#endif
-EvtWord powerdownya_direct_talk[8];
-EvtWord powerdownya_init[10];
+extern EvtWord powerdownya_face_left[];
+extern EvtWord powerdownya_mario_level_rtn[];
+extern EvtWord powerdownya_party_lank_rtn[];
+extern EvtWord powerdownya_table_talk[];
+extern EvtWord powerdownya_direct_talk[];
+extern EvtWord powerdownya_init[];
 static NpcSetupInfo npcEnt[2];
 static BeroEntry bero_entry_data[2];
-EvtWord tik_11_init_evt[31];
+extern EvtWord tik_11_init_evt[];
 
 static USER_FUNC(setmertn) {
     event->ownerNPC = npcNameToPtr((const char*)evtGetValue(event, event->args[0]));
@@ -137,12 +110,12 @@ static USER_FUNC(effect_stardust) {
     f32 x = evtGetFloat(event, args[1]);
     f32 y = evtGetFloat(event, args[2]);
     f32 z = evtGetFloat(event, args[3]);
-    f32 arg6 = evtGetFloat(event, args[4]);
-    f32 arg7 = evtGetFloat(event, args[5]);
-    s32 arg1 = evtGetValue(event, args[6]);
-    s32 arg2 = evtGetValue(event, args[7]);
+    f32 vx = evtGetFloat(event, args[4]);
+    f32 vy = evtGetFloat(event, args[5]);
+    s32 count = evtGetValue(event, args[6]);
+    s32 camera = evtGetValue(event, args[7]);
 
-    effStardustEntry(type, arg1, arg2, x, y, z, arg6, arg7);
+    effStardustEntry(type, count, camera, x, y, z, vx, vy);
     return EVT_RETURN_DONE;
 }
 
@@ -289,34 +262,6 @@ BOOL psndBGMStartCheck(s32 id);
 static USER_FUNC(bgm_start_wait) {
     return psndBGMStartCheck(1) ? EVT_RETURN_DONE : EVT_RETURN_BLOCK;
 }
-
-f32 fd_tik_11_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
-
-f32 fd_tik_11_neg_one_382 = -1.0f;
-
-f32 fd_tik_11___local_PI_383 = 3.1415927f;
-
-f32 fd_tik_11___local_3PIO2_385 = 4.712389f;
-
-f32 fd_tik_11_one_negone_373[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
-
-f32 fd_tik_11___local_PIO2_384 = 1.5707964f;
-
-f32 fd_tik_11_one_381 = 1.0f;
-
-f32 fd_tik_11_negone_one_360[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
-
-f32 fd_tik_11_neg_one_365 = -1.0f;
-
-f32 fd_tik_11___local_PI_366 = 3.1415927f;
-
-f32 fd_tik_11___local_3PIO2_368 = 4.712389f;
-
-f32 fd_tik_11_one_negone_359[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
-
-f32 fd_tik_11___local_PIO2_367 = 1.5707964f;
-
-f32 fd_tik_11_one_364 = 1.0f;
 
 EVT_BEGIN(powerdownya_face_left)
     LOOP(0)

@@ -1,7 +1,6 @@
 #include "battle/battle_unit.h"
 #include "evt/evt_cmd.h"
 
-#pragma force_active on
 #include "driver/itemdrv.h"
 #include "mario/mariost.h"
 #include "manager/evtmgr_cmd.h"
@@ -88,82 +87,25 @@ USER_FUNC(urouro_main_func);
 USER_FUNC(win_item_move_3d_position);
 USER_FUNC(mariowalk_wait);
 
-f32 fd_win_00_negone_one_374[2] __attribute__((aligned(8)));
-f32 fd_win_00_neg_one_382;
-f32 fd_win_00___local_PI_383;
-f32 fd_win_00___local_3PIO2_385;
-f32 fd_win_00_one_negone_373[2] __attribute__((aligned(8)));
-f32 fd_win_00___local_PIO2_384;
-f32 fd_win_00_one_381;
-f32 fd_win_00_negone_one_360[2] __attribute__((aligned(8)));
-f32 fd_win_00_neg_one_365;
-f32 fd_win_00___local_PI_366;
-f32 fd_win_00___local_3PIO2_368;
-f32 fd_win_00_one_negone_359[2] __attribute__((aligned(8)));
-f32 fd_win_00___local_PIO2_367;
-f32 fd_win_00_one_364;
-f64 fd_win_00__three_localstatic4_sqrtf;
-f64 fd_win_00__half_localstatic3_sqrtf;
-static EvtWord vivian_init[37];
-static EvtWord vivian_talk[8];
-static EvtWord maririn_init[19];
-EvtWord maririn_talk[8];
-EvtWord majorin_init[19];
-EvtWord majorin_talk[8];
-static EvtWord fabio_init[21];
-static EvtWord fabio_talk[26];
-static EvtWord kizayarou_regl[19];
-static EvtWord kizayarou_talk[8];
-static EvtWord kizayarou_init[38];
+extern EvtWord maririn_talk[];
+extern EvtWord majorin_init[];
+extern EvtWord majorin_talk[];
 static NpcSetupInfo npcEnt[5];
 static BeroEntry bero_entry_data[3];
-EvtWord witchtrio_momeru[880];
-EvtWord majorin_have_picture[25];
-EvtWord witchtrio_picture[533];
-EvtWord mario_vs_witchtrio[554];
-EvtWord get_necklace[115];
-EvtWord witchtrio_lose_item[19];
-EvtWord witchtrio_mess_vivi[8];
-EvtWord witchtrio_mess_mari[8];
-EvtWord witchtrio_lose[563];
-static EvtWord ki_data_evt_01[20];
+extern EvtWord witchtrio_momeru[];
+extern EvtWord majorin_have_picture[];
+extern EvtWord witchtrio_picture[];
+extern EvtWord mario_vs_witchtrio[];
+extern EvtWord get_necklace[];
+extern EvtWord witchtrio_lose_item[];
+extern EvtWord witchtrio_mess_vivi[];
+extern EvtWord witchtrio_mess_mari[];
+extern EvtWord witchtrio_lose[];
 static TreeAccess tree_access_data[10];
-EvtWord iri_28_enemy_all_dead[148];
-EvtWord iri_28_enemy_dead[13];
-EvtWord iri_28_init[60];
-EvtWord win_00_init_evt[85];
-
-f32 fd_win_00_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
-
-f32 fd_win_00_neg_one_382 = -1.0f;
-
-f32 fd_win_00___local_PI_383 = 3.1415927f;
-
-f32 fd_win_00___local_3PIO2_385 = 4.712389f;
-
-f32 fd_win_00_one_negone_373[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
-
-f32 fd_win_00___local_PIO2_384 = 1.5707964f;
-
-f32 fd_win_00_one_381 = 1.0f;
-
-f32 fd_win_00_negone_one_360[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
-
-f32 fd_win_00_neg_one_365 = -1.0f;
-
-f32 fd_win_00___local_PI_366 = 3.1415927f;
-
-f32 fd_win_00___local_3PIO2_368 = 4.712389f;
-
-f32 fd_win_00_one_negone_359[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
-
-f32 fd_win_00___local_PIO2_367 = 1.5707964f;
-
-f32 fd_win_00_one_364 = 1.0f;
-
-f64 fd_win_00__three_localstatic4_sqrtf = 3.0;
-
-f64 fd_win_00__half_localstatic3_sqrtf = 0.5;
+extern EvtWord iri_28_enemy_all_dead[];
+extern EvtWord iri_28_enemy_dead[];
+extern EvtWord iri_28_init[];
+extern EvtWord win_00_init_evt[];
 
 static EVT_BEGIN(vivian_init)
     CALL(evt_npc_flag_onoff, 0, STRING("me"), 268435456)

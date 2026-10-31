@@ -23,13 +23,11 @@
 #include "mario/mario_hit.h"
 #include "eff/eff_magic1_n64.h"
 #include "libc_decls.h"
-
-
+#include <math.h>
 
 static const Vec zv0 = {0.0f, 0.0f, 0.0f};
 static const Vec zv1 = {0.0f, 0.0f, 0.0f};
 
-extern void kpaClearHitobjRide(void);
 extern BOOL marioChgMot(s32 mot);
 extern HitEntry* kpaSearchGround(f32* a, f32* b, f32* c, f32 d);
 extern BOOL kpaFireAttackCheck(void);
@@ -98,9 +96,6 @@ static inline BOOL marioChkBeroSub6(s32 attr) {
     }
 }
 
-static inline s32 hit_fpclassifyf(f32 x) { switch (*(s32*)&x & 0x7F800000) { case 0x7F800000: if (*(s32*)&x & 0x007FFFFF) { return 1; } else { return 2; } break; case 0: if (*(s32*)&x & 0x007FFFFF) { return 5; } else { return 3; } break; default: return 4; } }
-static inline f32 hit_sqrtf(f32 x) { if (x > 0.0f) { f64 guess = __frsqrte(x); guess = 0.5 * guess * (3.0 - guess * guess * x); guess = 0.5 * guess * (3.0 - guess * guess * x); guess = 0.5 * guess * (3.0 - guess * guess * x); return x * guess; } else if (x < 0.0) { return *(f32*)__float_nan; } else if (hit_fpclassifyf(x) == 1) { return *(f32*)__float_nan; } return x; }
-
 static inline f32 marioHitNrmAngle(Vec* nrm) {
     f32 nz = nrm->z;
     f32 ny = nrm->y;
@@ -110,7 +105,7 @@ static inline f32 marioHitNrmAngle(Vec* nrm) {
     mp->groundRot.x = (s32)(100.0f * (angleABf(0.0f, 0.0f, 100.0f * nz, y100) - 180.0f) + 0.5f) / 100.0f;
     mp->groundRot.y = 0.0f;
     mp->groundRot.z = (s32)(100.0f * (angleABf(0.0f, 0.0f, 100.0f * nx, y100) - 180.0f) + 0.5f) / 100.0f;
-    return angleABf(0.0f, 0.0f, hit_sqrtf(nx * nx + nz * nz), -ny);
+    return angleABf(0.0f, 0.0f, sqrtf(nx * nx + nz * nz), -ny);
 }
 
 static inline f32 marioHitNrmAnglePtr(Vec* nrm) {
@@ -118,7 +113,7 @@ static inline f32 marioHitNrmAnglePtr(Vec* nrm) {
     mp->groundRot.x = (s32)(100.0f * (angleABf(0.0f, 0.0f, 100.0f * nrm->z, 100.0f * nrm->y) - 180.0f) + 0.5f) / 100.0f;
     mp->groundRot.y = 0.0f;
     mp->groundRot.z = (s32)(100.0f * (angleABf(0.0f, 0.0f, 100.0f * nrm->x, 100.0f * nrm->y) - 180.0f) + 0.5f) / 100.0f;
-    return angleABf(0.0f, 0.0f, hit_sqrtf(nrm->x * nrm->x + nrm->z * nrm->z), -nrm->y);
+    return angleABf(0.0f, 0.0f, sqrtf(nrm->x * nrm->x + nrm->z * nrm->z), -nrm->y);
 }
 
 void marioHitCheckWidth(void) {
@@ -398,7 +393,7 @@ static inline void marioChkGndRoll(MarioWork* w) {
             if (hit) {
                 gx = (s32)(100.0f * (angleABf(0.0f, 0.0f, 100.0f * outNrm.z, 100.0f * outNrm.y) - 180.0f) + 0.5f) / 100.0f;
                 gz = (s32)(100.0f * (angleABf(0.0f, 0.0f, 100.0f * outNrm.x, 100.0f * outNrm.y) - 180.0f) + 0.5f) / 100.0f;
-                angleABf(0.0f, 0.0f, hit_sqrtf(outNrm.x * outNrm.x + outNrm.z * outNrm.z), -outNrm.y);
+                angleABf(0.0f, 0.0f, sqrtf(outNrm.x * outNrm.x + outNrm.z * outNrm.z), -outNrm.y);
             }
             if (hit) {
                 roll_grx = gx;
@@ -652,7 +647,6 @@ void marioChkGnd2(void) {
     }
 }
 
-extern void marioUpdateCamCollision(Vec pos);
 
 HitEntry* marioSearchGround(f32* y, f32* b, f32* c, f32 spd, f32 h) {
     f32 dist;
@@ -972,7 +966,7 @@ static inline f32 landonNrmAngle(f32 nx, f32 ny, f32 nz) {
     mp->groundRot.x = (s32)(100.0f * (angleABf(0.0f, 0.0f, 100.0f * nz, y100) - 180.0f) + 0.5f) / 100.0f;
     mp->groundRot.y = 0.0f;
     mp->groundRot.z = (s32)(100.0f * (angleABf(0.0f, 0.0f, 100.0f * nx, y100) - 180.0f) + 0.5f) / 100.0f;
-    return angleABf(0.0f, 0.0f, hit_sqrtf(nx * nx + nz * nz), -ny);
+    return angleABf(0.0f, 0.0f, sqrtf(nx * nx + nz * nz), -ny);
 }
 
 static inline HitEntry* landonHitCheck(LandonRay* ray, Vec* outPos, Vec* outNrm, f32* dist) {
@@ -1279,7 +1273,7 @@ f32 marioChkOverhead(void) {
     Vec pc = {0.0f, 0.0f, 0.0f};
     Vec pd = {0.0f, 0.0f, 0.0f};
     Vec pos;
-    HitEntry* hj;
+    s32 hj;
     f32 h;
     MarioWork* w = marioGetPtr();
     if (w->currMotionId == 8) {
@@ -1372,25 +1366,24 @@ f32 marioChkOverhead(void) {
     return pos.y;
 }
 
-f32 marioChkOverheadJabara(HitEntry** hitOut, f32* distOut) {
+f32 marioChkOverheadJabara(s32* sideOut, f32* distOut) {
     Vec pos;
-    f32 new_var; // FAKE: constant temp needed for 100%
+    f32 margin = 5.0f;
     f32 h;
     MarioWork* w;
     w = marioGetPtr();
-    *hitOut = NULL;
+    *sideOut = 0;
     *distOut = -1.0f;
     pos = w->position;
-    new_var = 5.0f;
     h = w->wPlayerCollisionBox.y;
     if (w->currMotionId == 8) {
         return pos.y;
     }
     if (!jabaraNoHitChk()) {
-        h += new_var;
-        w->hitobjHead = marioSearchHead_jabara(&pos, &h, hitOut, 0.0f);
+        h += margin;
+        w->hitobjHead = marioSearchHead_jabara(&pos, &h, sideOut, 0.0f);
         if (!w->hitobjHead) {
-            { f32 t = w->wPlayerCollisionBox.y; h = t + new_var; }
+            h = w->wPlayerCollisionBox.y + margin;
             w->hitobjHead = marioSearchHead(&pos, &h, 0.0f);
         }
     }
@@ -1595,14 +1588,14 @@ HitEntry* marioSearchHead_roll(Vec* pos, f32* h, f32 d) {
     return NULL;
 }
 
-HitEntry* marioSearchHead_jabara(Vec* pos, f32* h, HitEntry** out, f32 d) {
+HitEntry* marioSearchHead_jabara(Vec* pos, f32* h, s32* side, f32 d) {
     Vec v, dir, outPos, outNrm;
     f32 dist;
     f32 base, top, off;
     HitEntry* hit;
     s32 i;
     MarioWork* w = marioGetPtr();
-    *out = NULL;
+    *side = 0;
     i = 0;
     base = *h;
     off = -23.7f;
@@ -1621,7 +1614,7 @@ HitEntry* marioSearchHead_jabara(Vec* pos, f32* h, HitEntry** out, f32 d) {
                 if (pos->y + base >= outPos.y) {
                     pos->y = outPos.y;
                     *h = 0.0f;
-                    *out = (v.z - pos->z < 0.0f) ? (HitEntry*)-1 : (HitEntry*)1;
+                    *side = (v.z - pos->z < 0.0f) ? -1 : 1;
                     return hit;
                 }
                 *h = outPos.y - pos->y - base;
@@ -1629,7 +1622,7 @@ HitEntry* marioSearchHead_jabara(Vec* pos, f32* h, HitEntry** out, f32 d) {
                 if (pos->y + base >= outPos.y) {
                     pos->y = outPos.y;
                     *h = 0.0f;
-                    *out = NULL;
+                    *side = 0;
                     return hit;
                 }
                 *h = outPos.y - pos->y - base;
@@ -2606,10 +2599,10 @@ HitEntry* marioChkFront(f32* out, const Vec* pos, f32 angle, f32 dist);
 void marioCheckWall_roll(f32 dx, f32 dz);
 void marioSearchFrontWall_staying(f32 dz);
 void marioCheckWall(f32 dx, f32 dz);
-HitEntry* marioSearchHead_jabara(Vec* pos, f32* h, HitEntry** out, f32 d);
+HitEntry* marioSearchHead_jabara(Vec* pos, f32* h, s32* side, f32 d);
 HitEntry* marioSearchHead_roll(Vec* pos, f32* h, f32 d);
 HitEntry* marioSearchHead(Vec* pos, f32* h, f32 dd);
-f32 marioChkOverheadJabara(HitEntry** hitOut, f32* distOut);
+f32 marioChkOverheadJabara(s32* sideOut, f32* distOut);
 f32 marioChkOverhead(void);
 HitEntry* marioChkLandon2(f32* y, f32 spd, f32 ofs);
 HitEntry* marioLandonChk_old(f32* outY, f32 spd);

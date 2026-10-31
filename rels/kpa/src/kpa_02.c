@@ -4,8 +4,6 @@
 #include "evt/evt_npc.h"
 #include "kpa_stage_data.h"
 
-#pragma force_active on
-
 USER_FUNC(evt_bero_mapchange);
 USER_FUNC(evt_cam_letter_box_disable);
 USER_FUNC(evt_koopa_chk_dead);
@@ -17,60 +15,11 @@ USER_FUNC(evt_seq_set_seq);
 USER_FUNC(evt_sub_get_system_flag);
 USER_FUNC(kpa_status_init);
 
-f32 fd_kpa_02_negone_one_374[2] __attribute__((aligned(8)));
-f32 fd_kpa_02_neg_one_382;
-f32 fd_kpa_02___local_PI_383;
-f32 fd_kpa_02___local_3PIO2_385;
-f32 fd_kpa_02_one_negone_373[2] __attribute__((aligned(8)));
-f32 fd_kpa_02___local_PIO2_384;
-f32 fd_kpa_02_one_381;
-f32 fd_kpa_02_negone_one_360[2] __attribute__((aligned(8)));
-f32 fd_kpa_02_neg_one_365;
-f32 fd_kpa_02___local_PI_366;
-f32 fd_kpa_02___local_3PIO2_368;
-f32 fd_kpa_02_one_negone_359[2] __attribute__((aligned(8)));
-f32 fd_kpa_02___local_PIO2_367;
-f32 fd_kpa_02_one_364;
-f64 fd_kpa_02__three_localstatic4_sqrtf;
-f64 fd_kpa_02__half_localstatic3_sqrtf;
 EvtWord kpa_act_stg1_mobj[151];
 EvtWord kpa_act_stg1_item[31];
-static EvtWord kpa_fall[41];
 static EvtWord kpa_goal[38];
 static NpcSetupInfo npcEnt[1];
-EvtWord kpa_02_init_evt[36];
-
-f32 fd_kpa_02_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
-
-f32 fd_kpa_02_neg_one_382 = -1.0f;
-
-f32 fd_kpa_02___local_PI_383 = 3.1415927f;
-
-f32 fd_kpa_02___local_3PIO2_385 = 4.712389f;
-
-f32 fd_kpa_02_one_negone_373[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
-
-f32 fd_kpa_02___local_PIO2_384 = 1.5707964f;
-
-f32 fd_kpa_02_one_381 = 1.0f;
-
-f32 fd_kpa_02_negone_one_360[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
-
-f32 fd_kpa_02_neg_one_365 = -1.0f;
-
-f32 fd_kpa_02___local_PI_366 = 3.1415927f;
-
-f32 fd_kpa_02___local_3PIO2_368 = 4.712389f;
-
-f32 fd_kpa_02_one_negone_359[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
-
-f32 fd_kpa_02___local_PIO2_367 = 1.5707964f;
-
-f32 fd_kpa_02_one_364 = 1.0f;
-
-f64 fd_kpa_02__three_localstatic4_sqrtf = 3.0;
-
-f64 fd_kpa_02__half_localstatic3_sqrtf = 0.5;
+extern EvtWord kpa_02_init_evt[];
 
 EvtWord kpa_act_stg1_mobj[] = {
     KPA_OBJ_BRICK_2(-1225.0f, 125.0f), KPA_OBJ_BRICK_2(-1100.0f, 125.0f), KPA_OBJ_OJAMA_BLK(-1050.0f, 125.0f),
@@ -133,7 +82,7 @@ static EVT_BEGIN(kpa_goal)
             WAIT_MS(300)
             CALL(evt_cam_letter_box_disable, 0)
         END_INLINE_EVENT
-        CALL(evt_bero_mapchange, STRING("nok_00"), STRING("w_bero\0"))
+        CALL(evt_bero_mapchange, STRING("nok_00"), STRING("w_bero"))
     END_IF
     CALL(evt_mario_key_onoff, 1)
     RETURN

@@ -1,14 +1,13 @@
 #include "battle/battle_unit.h"
 #include "evt/evt_cmd.h"
 
-#pragma force_active on
 #include "manager/evtmgr_cmd.h"
 #include "mario/mariost.h"
 #include "driver/mapdrv.h"
 #include "evt/evt_sub.h"
 #include "data_tables.h"
-typedef struct SharinData { const char* name; s32 field_0x4; s32 field_0x8; EvtFloat speed; } SharinData;
-typedef struct ClankData { const char* name; s32 field_0x4; s32 field_0x8; EvtFloat x; EvtFloat y; } ClankData;
+typedef struct SharinData { const char* name; s32 wheelType; s32 speedSource; EvtFloat speed; } SharinData;
+typedef struct ClankData { const char* name; s32 wheelType; s32 speedSource; EvtFloat x; EvtFloat y; } ClankData;
 
 USER_FUNC(evt_bero_mapchange);
 USER_FUNC(evt_cam3d_evt_set);
@@ -35,70 +34,18 @@ USER_FUNC(evt_sub_intpl_msec_init);
 static USER_FUNC(ramp_r);
 static void resha_tev(MapTevCallbackInfo* info);
 
-f32 fd_hom_10_negone_one_374[2] __attribute__((aligned(8)));
-f32 fd_hom_10_neg_one_382;
-f32 fd_hom_10___local_PI_383;
-f32 fd_hom_10___local_3PIO2_385;
-f32 fd_hom_10_one_negone_373[2] __attribute__((aligned(8)));
-f32 fd_hom_10___local_PIO2_384;
-f32 fd_hom_10_one_381;
-f32 fd_hom_10_negone_one_360[2] __attribute__((aligned(8)));
-f32 fd_hom_10_neg_one_365;
-f32 fd_hom_10___local_PI_366;
-f32 fd_hom_10___local_3PIO2_368;
-f32 fd_hom_10_one_negone_359[2] __attribute__((aligned(8)));
-f32 fd_hom_10___local_PIO2_367;
-f32 fd_hom_10_one_364;
 static SharinData sharinDt[29];
-static EvtWord evt_sharin_main[87];
-static EvtWord evt_sharin[19];
 static ClankData clankDt[9];
-static EvtWord evt_clank_main[104];
-static EvtWord evt_clank[21];
-static EvtWord evt_bg[81];
-static EvtWord evt_hoshi[88];
-EvtWord hom_10_evt_resha_start[244];
-EvtWord hom_10_evt_resha_start2[259];
-EvtWord hom_10_evt_resha_start3[11];
-EvtWord hom_10_evt_resha_start4[11];
-static EvtWord stop_1[90];
-static EvtWord stop_2[90];
-EvtWord hom_10_evt_resha_stop[36];
-static EvtWord evt_ramp[33];
+extern EvtWord hom_10_evt_resha_start[];
+extern EvtWord hom_10_evt_resha_start2[];
+extern EvtWord hom_10_evt_resha_start3[];
+extern EvtWord hom_10_evt_resha_start4[];
+extern EvtWord hom_10_evt_resha_stop[];
 static const char* pika_tbl[15];
 static const char* pika_tbl_rsh_06[10];
-static EvtWord hom_10_evt_resha_sub[102];
-EvtWord hom_10_evt_resha_right[35];
-EvtWord hom_10_evt_resha_left[28];
-EvtWord hom_10_init_evt[140];
-
-f32 fd_hom_10_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
-
-f32 fd_hom_10_neg_one_382 = -1.0f;
-
-f32 fd_hom_10___local_PI_383 = 3.1415927f;
-
-f32 fd_hom_10___local_3PIO2_385 = 4.712389f;
-
-f32 fd_hom_10_one_negone_373[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
-
-f32 fd_hom_10___local_PIO2_384 = 1.5707964f;
-
-f32 fd_hom_10_one_381 = 1.0f;
-
-f32 fd_hom_10_negone_one_360[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
-
-f32 fd_hom_10_neg_one_365 = -1.0f;
-
-f32 fd_hom_10___local_PI_366 = 3.1415927f;
-
-f32 fd_hom_10___local_3PIO2_368 = 4.712389f;
-
-f32 fd_hom_10_one_negone_359[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
-
-f32 fd_hom_10___local_PIO2_367 = 1.5707964f;
-
-f32 fd_hom_10_one_364 = 1.0f;
+extern EvtWord hom_10_evt_resha_right[];
+extern EvtWord hom_10_evt_resha_left[];
+extern EvtWord hom_10_init_evt[];
 
 static SharinData sharinDt[] = {
     {"sha_1_1", 0, 0, FLOAT(1.0f)},

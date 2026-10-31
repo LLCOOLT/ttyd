@@ -30,7 +30,7 @@ typedef enum SoundEffectFlags {
     SFX_FLAG_8 = (1 << 31)
 } SoundEffectFlags;
 
-// most are translated in __psndSFXOn, TODO
+// most fields are translated in __psndSFXOn
 typedef struct SoundEffectEntry {
     const char* name;       // 0x0, sfx name
     u32 fxId;               // 0x4, lower 2 bytes are SND_FXID, top bits SoundEffectFlags
@@ -146,8 +146,9 @@ void psndSFXAllOff(void);
 
 #include "sfx_name_word.h"
 
-void psndSFXOn(const char* name);
+s32 psndSFXOn(const char* name);
 s32 psndSFXOn_3D(const char* name, Vec* position);
+s32 psndSFXOnEx_3D(const char* name, Vec* position, u8 vol, u8 pan, u16 pitch, u16 dist);
 
 BOOL psndBGMOff_f_d(s32 flags, u32 fadetime, u32 someswitch);
 BOOL psndBGMStartCheck(s32 id);
@@ -160,3 +161,7 @@ void psndClearFlag(s32 flag);
 void psndSetPosDirListener(Vec* position, f32 direction);
 
 extern PaperSoundBGM psbgm[2];
+
+BOOL psndBGMOff(u32 flags);
+s32 psndGetFlag(void);
+void psndSFX_pos(s32 id, Vec* position);

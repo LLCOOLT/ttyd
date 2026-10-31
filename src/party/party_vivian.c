@@ -35,12 +35,9 @@ extern void partyPaperOff(PartyEntry* party);
 extern void partyChgRunMode(PartyEntry* party, s32 mode);
 extern char* partyChgPoseId(PartyEntry* party, s32 index);
 
-#pragma force_active on
-s32 gap_08_80418A34_sbss;
 #pragma explicit_zero_data reset
 s32 vivian_cancel_req;
 
-#pragma explicit_zero_data on
 void N_marioForceVivianAnime(void) {
     static const u32 gap_09_8041DF6C_sdata2 = 0;
     MarioWork* mario = marioGetPtr();
@@ -55,7 +52,6 @@ void N_marioForceVivianAnime(void) {
     animPoseSetLocalTime(mario->paperAnimGroupId[marioAnimeId()], mario->poseTime);
 }
 
-#pragma explicit_zero_data reset
 void mot_vivian(void) {
     MarioWork* mario = marioGetPtr();
 
@@ -287,7 +283,6 @@ static inline void vivianFollow(PartyEntry* party) {
 }
 
 #pragma defer_codegen off
-#pragma explicit_zero_data on
 void vivian_use(PartyEntry* party) {
     Vec s;
     void* rip;
@@ -528,13 +523,8 @@ void vivian_use(PartyEntry* party) {
     }
 }
 
-#pragma explicit_zero_data reset
 #pragma opt_common_subs reset
 
 
 
 
-#pragma force_active on
-#pragma explicit_zero_data on
-#pragma explicit_zero_data reset
-#pragma force_active reset

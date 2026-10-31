@@ -2,7 +2,6 @@
 #include "battle/battle_unit.h"
 #include "evt/evt_cmd.h"
 
-#pragma force_active on
 #include "driver/camdrv.h"
 #include "driver/msgdrv.h"
 #include "driver/swdrv.h"
@@ -18,6 +17,7 @@
 #include "mario/mario_pouch.h"
 #include "evt/evt_cmd.h"
 #include "gor.h"
+#include "pmario_sound.h"
 #ifdef VERSION_G8ME01
 USER_FUNC(evt_mario_set_dir);
 USER_FUNC(evt_party_set_dir);
@@ -25,10 +25,14 @@ USER_FUNC(evt_item_delete_check);
 USER_FUNC(evt_item_delete);
 #endif
 
-typedef struct IraiWork { s32 state; s32 count; s32 list[30]; s32 cursor; s32 last; s32 top; s32 yubiX; s32 yubiY; s32 field_0x94; f32 scroll; char client[30][21]; char contents[30][31]; u8 field_0x6B4[0x416C - 0x6B4]; } IraiWork;
+#ifdef VERSION_G8MP01
+// PAL: the request names and texts get 101 bytes each, and there is no unused tail
+typedef struct IraiWork { s32 state; s32 count; s32 list[30]; s32 cursor; s32 last; s32 top; s32 yubiX; s32 yubiY; s32 cursorTimer; f32 scroll; char client[30][101]; char contents[30][101]; } IraiWork;
+#else
+typedef struct IraiWork { s32 state; s32 count; s32 list[30]; s32 cursor; s32 last; s32 top; s32 yubiX; s32 yubiY; s32 cursorTimer; f32 scroll; char client[30][21]; char contents[30][31]; u8 textWork[0x416C - 0x6B4]; } IraiWork; /* textWork: never accessed */
+#endif
 void FontDrawString(const char* message, f32 x, f32 y);
 void FontDrawScale(f32 scale);
-void psndSFXOn(const char* name);
 void irai_window_disp(CameraId camera, void* param);
 void irai_flag_disp(void);
 void irai_flag_clear(void);
@@ -54,20 +58,6 @@ void irai_window_disp(CameraId camera, void* param);
 void irai_flag_disp(void);
 void irai_flag_clear(void);
 
-f32 fd_gor_irai_negone_one_374[2] __attribute__((aligned(8)));
-f32 fd_gor_irai_neg_one_382;
-f32 fd_gor_irai___local_PI_383;
-f32 fd_gor_irai___local_3PIO2_385;
-f32 fd_gor_irai_one_negone_373[2] __attribute__((aligned(8)));
-f32 fd_gor_irai___local_PIO2_384;
-f32 fd_gor_irai_one_381;
-f32 fd_gor_irai_negone_one_360[2] __attribute__((aligned(8)));
-f32 fd_gor_irai_neg_one_365;
-f32 fd_gor_irai___local_PI_366;
-f32 fd_gor_irai___local_3PIO2_368;
-f32 fd_gor_irai_one_negone_359[2] __attribute__((aligned(8)));
-f32 fd_gor_irai___local_PIO2_367;
-f32 fd_gor_irai_one_364;
 const char* irai_msg_client[30];
 const char* irai_msg_contents[30];
 const char* irai_msg_exposition[30];
@@ -84,49 +74,21 @@ s32 irai_item_data25[2];
 s32 irai_item_data29[2];
 s32 irai_item_null[1];
 s32* irai_item_table[30];
-EvtWord irai_start_event_null[2];
-EvtWord irai_start_event01[13];
-EvtWord irai_start_event04[8];
+extern EvtWord irai_start_event_null[];
+extern EvtWord irai_start_event01[];
+extern EvtWord irai_start_event04[];
 EvtWord* irai_start_event[30];
-EvtWord irai_end_event_null[2];
-EvtWord irai_end_event01[13];
-EvtWord irai_end_event04[8];
+extern EvtWord irai_end_event_null[];
+extern EvtWord irai_end_event01[];
+extern EvtWord irai_end_event04[];
 #ifdef VERSION_G8ME01
-EvtWord irai_end_event19[15];
+extern EvtWord irai_end_event19[];
 #endif
 EvtWord* irai_end_event[30];
-EvtWord gor_irai_init[18];
-EvtWord gor_irai_lecture[40];
-EvtWord gor_irai_main[VERSION_PICK(105, 126)];
-EvtWord gor_irai_tenshu_main[VERSION_PICK(258, 261)];
-
-f32 fd_gor_irai_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
-
-f32 fd_gor_irai_neg_one_382 = -1.0f;
-
-f32 fd_gor_irai___local_PI_383 = 3.1415927f;
-
-f32 fd_gor_irai___local_3PIO2_385 = 4.712389f;
-
-f32 fd_gor_irai_one_negone_373[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
-
-f32 fd_gor_irai___local_PIO2_384 = 1.5707964f;
-
-f32 fd_gor_irai_one_381 = 1.0f;
-
-f32 fd_gor_irai_negone_one_360[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
-
-f32 fd_gor_irai_neg_one_365 = -1.0f;
-
-f32 fd_gor_irai___local_PI_366 = 3.1415927f;
-
-f32 fd_gor_irai___local_3PIO2_368 = 4.712389f;
-
-f32 fd_gor_irai_one_negone_359[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
-
-f32 fd_gor_irai___local_PIO2_367 = 1.5707964f;
-
-f32 fd_gor_irai_one_364 = 1.0f;
+extern EvtWord gor_irai_init[];
+extern EvtWord gor_irai_lecture[];
+extern EvtWord gor_irai_main[];
+extern EvtWord gor_irai_tenshu_main[];
 
 const char* irai_msg_client[] = {
     "irai_client_01", "irai_client_02", "irai_client_03", "irai_client_04", "irai_client_05", "irai_client_06",
@@ -669,7 +631,7 @@ USER_FUNC(irai_init_func) {
     wp->cursor = 0;
     wp->last = wp->cursor;
     wp->top = 0;
-    wp->field_0x94 = 0;
+    wp->cursorTimer = 0;
     wp->scroll = 0.0f;
     event->lwData[10] = (EvtWord)wp;
     return EVT_RETURN_DONE;
@@ -772,7 +734,7 @@ USER_FUNC(irai_main_func) {
                 psndSFXOn((const char*)5);
             }
             if (wp->cursor != wp->last) {
-                wp->field_0x94 = 0;
+                wp->cursorTimer = 0;
             }
             wp->last = wp->cursor;
             wp->scroll += (wp->top * 30 - wp->scroll) / 6.0f;

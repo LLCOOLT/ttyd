@@ -65,14 +65,6 @@ static inline void xf(Mtx m, effN64Vtx* dst, effN64Vtx* src) {
 }
 
 
-__declspec(section ".data") f32 flame_negone_one_a[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
-__declspec(section ".data") f32 fd_eff_flame_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
-__declspec(section ".data") f32 flame_one_negone_a[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
-__declspec(section ".data") f32 fd_eff_flame_one_negone_373[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
-__declspec(section ".data") f32 flame_negone_one_b[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
-__declspec(section ".data") f32 fd_eff_flame_negone_one_360[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
-__declspec(section ".data") f32 flame_one_negone_b[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
-__declspec(section ".data") f32 fd_eff_flame_one_negone_359[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
 
 static effN64Vtx stg_flame_v[] = {
     {-50, -20, 2, 0, 0, 255, 255, 255, 255},
@@ -113,7 +105,7 @@ EffectEntry* effFlameN64Entry(s32 type, f32 x, f32 y, f32 z, f32 scale) {
     EffFlameN64Work* work;
 
     effect = effEntry();
-    effect->type = "FlameN64\0\0\0";
+    effect->type = "FlameN64";
     effect->count = 1;
     work = __memAlloc(HEAP_EFFECT, sizeof(EffFlameN64Work));
     effect->userdata = work;
@@ -303,8 +295,6 @@ void effFlameMain(EffectEntry* effect) {
     }
 }
 
-#pragma push
-#pragma opt_dead_assignments off
 void effFlameDisp(CameraId cameraId, EffectEntry* effect) {
     s32 alpha;
     s32 type;
@@ -488,4 +478,3 @@ void effFlameDisp(CameraId cameraId, EffectEntry* effect) {
         break;
     }
 }
-#pragma pop

@@ -3,7 +3,6 @@
 #include "evt/evt_cmd.h"
 #include "manager/evtmgr_cmd.h"
 
-#pragma force_active on
 #include "driver/hitdrv.h"
 #include "string.h"
 #include "mario/mario.h"
@@ -15,6 +14,9 @@
 #include "evt/evt_bero.h"
 #include "aji.h"
 #include "mario/mario_pouch.h"
+#ifdef VERSION_G8MP01
+#include "mario/mariost.h"
+#endif
 
 static BOOL _hitIsGroupSub(HitEntry* target, HitEntry* node, BOOL checkSibling);
 BOOL hitIsGroup(HitEntry* target, HitEntry* group);
@@ -86,32 +88,13 @@ USER_FUNC(hit_group_chk);
 static BOOL hitIsGroup(HitEntry* target, HitEntry* group);
 static BOOL _hitIsGroupSub(HitEntry* target, HitEntry* node, BOOL checkSibling);
 
-f32 fd_aji_13_negone_one_374[2] __attribute__((aligned(8)));
-f32 fd_aji_13_neg_one_382;
-f32 fd_aji_13___local_PI_383;
-f32 fd_aji_13___local_3PIO2_385;
-f32 fd_aji_13_one_negone_373[2] __attribute__((aligned(8)));
-f32 fd_aji_13___local_PIO2_384;
-f32 fd_aji_13_one_381;
-f32 fd_aji_13_negone_one_360[2] __attribute__((aligned(8)));
-f32 fd_aji_13_neg_one_365;
-f32 fd_aji_13___local_PI_366;
-f32 fd_aji_13___local_3PIO2_368;
-f32 fd_aji_13_one_negone_359[2] __attribute__((aligned(8)));
-f32 fd_aji_13___local_PIO2_367;
-f32 fd_aji_13_one_364;
-static EvtWord w_door_close[22];
-static EvtWord w_door_open[22];
-static EvtWord e_door_close[22];
-static EvtWord e_door_open[22];
-EvtWord evt_snd_stop[12];
-static EvtWord evt_haikei_in[16];
+extern EvtWord evt_snd_stop[];
 static BeroEntry bero_entry_data[15];
 static const char* name_tbl[13];
 const char* name_tbl2[6];
-EvtWord move_left_right[128];
-EvtWord move_up_down[226];
-EvtWord move_r[84];
+extern EvtWord move_left_right[];
+extern EvtWord move_up_down[];
+extern EvtWord move_r[];
 /* moving-floor gimmick read by shikake_init: hit, mapobj, two motion params, time; a NULL mapobj ends the table */
 typedef struct ShikakeMove { const char* hit; const char* mapobj; s32 param0; s32 param1; s32 time; } ShikakeMove;
 typedef struct ShikakeMoveTbl7 { ShikakeMove rows[7]; const char* end[2]; } ShikakeMoveTbl7;
@@ -120,15 +103,11 @@ typedef struct ShikakeMoveTbl6 { ShikakeMove rows[6]; const char* end[2]; } Shik
 ShikakeMoveTbl6 up_down_tbl;
 typedef struct ShikakeMoveTbl15 { ShikakeMove rows[15]; const char* end[2]; } ShikakeMoveTbl15;
 ShikakeMoveTbl15 r_tbl;
-EvtWord shikake_init[66];
-static EvtWord evt_sw[134];
-static EvtWord evt_hari[70];
-static EvtWord evt_ramp[68];
-EvtWord evt_bcv_sw[99];
-EvtWord evt_key_get[5];
+extern EvtWord shikake_init[];
+extern EvtWord evt_bcv_sw[];
+extern EvtWord evt_key_get[];
 static s32 key_tbl[2];
-static EvtWord evt_door_msg[87];
-EvtWord aji_13_init_evt[295];
+extern EvtWord aji_13_init_evt[];
 
 static BOOL _hitIsGroupSub(HitEntry* target, HitEntry* node, BOOL checkSibling) {
     if (strcmp(target->joint->name, node->joint->name) == 0) {
@@ -147,34 +126,6 @@ static BOOL hitIsGroup(HitEntry* target, HitEntry* group) {
     // whether target is group or one of its descendants
     return _hitIsGroupSub(target, group, FALSE);
 }
-
-f32 fd_aji_13_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
-
-f32 fd_aji_13_neg_one_382 = -1.0f;
-
-f32 fd_aji_13___local_PI_383 = 3.1415927f;
-
-f32 fd_aji_13___local_3PIO2_385 = 4.712389f;
-
-f32 fd_aji_13_one_negone_373[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
-
-f32 fd_aji_13___local_PIO2_384 = 1.5707964f;
-
-f32 fd_aji_13_one_381 = 1.0f;
-
-f32 fd_aji_13_negone_one_360[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
-
-f32 fd_aji_13_neg_one_365 = -1.0f;
-
-f32 fd_aji_13___local_PI_366 = 3.1415927f;
-
-f32 fd_aji_13___local_3PIO2_368 = 4.712389f;
-
-f32 fd_aji_13_one_negone_359[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
-
-f32 fd_aji_13___local_PIO2_367 = 1.5707964f;
-
-f32 fd_aji_13_one_364 = 1.0f;
 
 static EVT_BEGIN(w_door_close)
     MULTIPLY_FLOAT(LW(0), FLOAT(0.25f))
@@ -534,9 +485,15 @@ static USER_FUNC(mario_chk) {
         PartyEntry* party = partyGetPtr(0);
         if (mario != NULL && mario->hitobjStandOn != NULL && hitIsGroup(mario->hitobjStandOn, hitNameToPtr("A_bel"))) {
             mario->floorMove.x = 0.6f;
+#ifdef VERSION_G8MP01
+            mario->floorMove.x *= 60.0f / gp->framerate; // PAL: the push per frame is scaled to the frame rate
+#endif
         }
         if (party != NULL && party->hitobjUnder != NULL && hitIsGroup(party->hitobjStandOn, hitNameToPtr("A_bel"))) {
             party->floorMoveX = 0.6f;
+#ifdef VERSION_G8MP01
+            party->floorMoveX *= 60.0f / gp->framerate;
+#endif
         }
     }
     for (i = 0; i < 6; i++) {
@@ -1161,7 +1118,6 @@ EVT_BEGIN(aji_13_init_evt)
     END_INLINE_EVENT
     RETURN
 EVT_END()
-
 
 USER_FUNC(hit_group_chk) {
     EvtWord* args = event->args;

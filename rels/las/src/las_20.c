@@ -2,8 +2,7 @@
 #include "evt/evt_cmd.h"
 #include "evt/evt_bero.h"
 #include "las.h"
-
-#pragma force_active on
+#include "manager/evtmgr_cmd.h"
 
 USER_FUNC(evt_bero_get_info);
 USER_FUNC(evt_cam3d_evt_off);
@@ -30,69 +29,23 @@ USER_FUNC(evt_snd_sfxon_3d);
 USER_FUNC(evt_sub_get_sincos);
 USER_FUNC(get_hosi_name);
 
-f32 fd_las_20_negone_one_374[2] __attribute__((aligned(8)));
-f32 fd_las_20_neg_one_382;
-f32 fd_las_20___local_PI_383;
-f32 fd_las_20___local_3PIO2_385;
-f32 fd_las_20_one_negone_373[2] __attribute__((aligned(8)));
-f32 fd_las_20___local_PIO2_384;
-f32 fd_las_20_one_381;
-f32 fd_las_20_negone_one_360[2] __attribute__((aligned(8)));
-f32 fd_las_20_neg_one_365;
-f32 fd_las_20___local_PI_366;
-f32 fd_las_20___local_3PIO2_368;
-f32 fd_las_20_one_negone_359[2] __attribute__((aligned(8)));
-f32 fd_las_20___local_PIO2_367;
-f32 fd_las_20_one_364;
-static EvtWord e_door_close[22];
-static EvtWord e_door_open[22];
 static BeroEntry bero_entry_data[4];
 static const char* haguruma_hontai[14];
 static const char* haguruma_hontai2[6];
 static const char* haguruma_kage[12];
 static const char* haguruma_kage2[5];
-static EvtWord haguruma_evt[194];
-static EvtWord dai_evt[13];
 const char* hosi_name[14];
-EvtWord hosi_sw_check[303];
-EvtWord hosi_onoff[69];
-EvtWord hosi_02_sw_evt[15];
-EvtWord hosi_03_sw_evt[15];
-EvtWord hosi_04_sw_evt[15];
-EvtWord hosi_05_sw_evt[15];
-EvtWord hosi_06_sw_evt[15];
-EvtWord hosi_07_sw_evt[15];
-EvtWord hosi_08_sw_evt[15];
-EvtWord hosi_init[175];
-EvtWord las_20_init_evt[103];
-
-f32 fd_las_20_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
-
-f32 fd_las_20_neg_one_382 = -1.0f;
-
-f32 fd_las_20___local_PI_383 = 3.1415927f;
-
-f32 fd_las_20___local_3PIO2_385 = 4.712389f;
-
-f32 fd_las_20_one_negone_373[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
-
-f32 fd_las_20___local_PIO2_384 = 1.5707964f;
-
-f32 fd_las_20_one_381 = 1.0f;
-
-f32 fd_las_20_negone_one_360[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
-
-f32 fd_las_20_neg_one_365 = -1.0f;
-
-f32 fd_las_20___local_PI_366 = 3.1415927f;
-
-f32 fd_las_20___local_3PIO2_368 = 4.712389f;
-
-f32 fd_las_20_one_negone_359[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
-
-f32 fd_las_20___local_PIO2_367 = 1.5707964f;
-
-f32 fd_las_20_one_364 = 1.0f;
+extern EvtWord hosi_sw_check[];
+extern EvtWord hosi_onoff[];
+extern EvtWord hosi_02_sw_evt[];
+extern EvtWord hosi_03_sw_evt[];
+extern EvtWord hosi_04_sw_evt[];
+extern EvtWord hosi_05_sw_evt[];
+extern EvtWord hosi_06_sw_evt[];
+extern EvtWord hosi_07_sw_evt[];
+extern EvtWord hosi_08_sw_evt[];
+extern EvtWord hosi_init[];
+extern EvtWord las_20_init_evt[];
 
 static EVT_BEGIN(e_door_close)
     MULTIPLY_FLOAT(LW(0), FLOAT(0.38867188f))
@@ -538,7 +491,7 @@ EVT_END()
 USER_FUNC(get_hosi_name) {
     EvtWord* args = event->args;
     s32 idx = evtGetValue(event, args[0]);
-    evtSetValue(event, args[1], hosi_name[idx * 2]);
-    evtSetValue(event, args[2], hosi_name[idx * 2 + 1]);
+    evtSetValue(event, args[1], (EvtWord)hosi_name[idx * 2]);
+    evtSetValue(event, args[2], (EvtWord)hosi_name[idx * 2 + 1]);
     return EVT_RETURN_DONE;
 }

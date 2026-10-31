@@ -32,6 +32,7 @@
 #include <string.h>
 #include "evt/evt_lecture.h"
 #include "libc_decls.h"
+#include <math.h>
 
 inline Vec unknownVec0(void) {
     return (Vec){ 0.0f, 0.0f, 0.0f };
@@ -53,9 +54,6 @@ inline Vec makeVecByValue(f32 x, f32 y, f32 z) {
     return v;
 }
 
-static inline s32 item_fpclassifyf(f32 x) { switch (*(s32*)&x & 0x7F800000) { case 0x7F800000: if (*(s32*)&x & 0x007FFFFF) { return 1; } else { return 2; } break; case 0: if (*(s32*)&x & 0x007FFFFF) { return 5; } else { return 3; } break; default: return 4; } }
-static inline f32 item_sqrtf(f32 x) { if (x > 0.0f) { f64 guess = __frsqrte(x); guess = 0.5 * guess * (3.0 - guess * guess * x); guess = 0.5 * guess * (3.0 - guess * guess * x); guess = 0.5 * guess * (3.0 - guess * guess * x); return x * guess; } else if (x < 0.0) { return *(f32*)__float_nan; } else if (item_fpclassifyf(x) == 1) { return *(f32*)__float_nan; } return x; }
-
 extern ItemData itemDataTable[];
 void iconEntry(const char* name, u16 iconId);
 void iconChange(const char* name, u16 iconId);
@@ -67,7 +65,7 @@ EffectEntry* effItemGetEntry(s32 type, f32 x, f32 y, f32 z);
 u32 psndBGMChkSilent(s32 a1);
 BOOL psndBGMChk(s32 a1);
 BOOL psndBGMOff(u32 flags);
-s32 msgWindow_Entry(const char* msg, s32 a2, s32 a3);
+s32 msgWindow_Entry(const char* msg, s32 callback, s32 priority);
 BOOL nokonoko_holdItem(void);
 BOOL N_fbatPreventMarioEventChk(void);
 s32 marioGetJabaraState(void);
@@ -93,7 +91,7 @@ HitEntry* itemHitCheckSide(ItemEntry* entry, f32* outX, f32 dx, f32* outZ, f32 d
 void itemseq_GetItem(ItemEntry* entry);
 void itemDelete(const char* name);
 void itemModeChange(ItemEntry* entry, s32 mode);
-ItemEntry* itemEntry(const char* name, s32 itemId, s32 type, s32 evtId, s32 a5, f32 x, f32 y, f32 z);
+ItemEntry* itemEntry(const char* name, s32 itemId, s32 type, s32 collectFlag, s32 a5, f32 x, f32 y, f32 z);
 
 //.bss
 static ItemWork work[2];
@@ -127,10 +125,10 @@ static inline BOOL itemGetPouch(ItemEntry* entry) {
 		return FALSE;
 	}
 	if (entry->flags & 0x20) {
-		swSet(entry->evtId);
+		swSet(entry->collectFlag);
 	}
 	else if (entry->flags & 0x40) {
-		_swSet(entry->evtId);
+		_swSet(entry->collectFlag);
 	}
 	if ((u32)entry->evtCode != 0) {
 		evt = evtEntry((EvtWord*)entry->evtCode, 0, 0x20);
@@ -486,7 +484,7 @@ static inline ItemEntry* itemFindDeletable(ItemWork* wp, s32 itemId) {
 }
 #endif
 
-ItemEntry* itemEntry(const char* name, s32 itemId, s32 type, s32 evtId, s32 a5, f32 x, f32 y, f32 z) {
+ItemEntry* itemEntry(const char* name, s32 itemId, s32 type, s32 collectFlag, s32 a5, f32 x, f32 y, f32 z) {
 	ItemWork* wp = itemGetWork();
 	int i;
 	ItemEntry* entry;
@@ -501,18 +499,18 @@ ItemEntry* itemEntry(const char* name, s32 itemId, s32 type, s32 evtId, s32 a5, 
 
 	isGswf = FALSE;
 	isLswf = FALSE;
-	if (evtId != -1) {
-		if (evtId >= GSWF(0) && evtId <= EVTDAT_GSWF_MAX) {
-			evtId += EVTDAT_GSWF_BASE;
+	if (collectFlag != -1) {
+		if (collectFlag >= GSWF(0) && collectFlag <= EVTDAT_GSWF_MAX) {
+			collectFlag += EVTDAT_GSWF_BASE;
 			isGswf = TRUE;
-			if (swGet(evtId)) {
+			if (swGet(collectFlag)) {
 				return NULL;
 			}
 		}
-		else if (evtId >= LSWF(0) && evtId <= EVTDAT_LSWF_MAX) {
-			evtId += EVTDAT_LSWF_BASE;
+		else if (collectFlag >= LSWF(0) && collectFlag <= EVTDAT_LSWF_MAX) {
+			collectFlag += EVTDAT_LSWF_BASE;
 			isLswf = TRUE;
-			if (_swGet(evtId)) {
+			if (_swGet(collectFlag)) {
 				return NULL;
 			}
 		}
@@ -610,18 +608,18 @@ ItemEntry* itemEntry(const char* name, s32 itemId, s32 type, s32 evtId, s32 a5, 
 	entry->flags |= 1;
 	entry->scale = 1.0f;
 	entry->alpha = 0xFF;
-	if (evtId != -1) {
+	if (collectFlag != -1) {
 		if (isGswf) {
-			entry->evtId = evtId;
+			entry->collectFlag = collectFlag;
 			entry->flags |= 0x20;
 		}
 		else if (isLswf) {
-			entry->evtId = evtId;
+			entry->collectFlag = collectFlag;
 			entry->flags |= 0x40;
 		}
 	}
 	else {
-		entry->evtId = -1;
+		entry->collectFlag = -1;
 	}
 
 	switch (entry->itemId) {
@@ -768,8 +766,8 @@ ItemEntry* itemHitCheck(f32 x, f32 y, f32 z, f32 range) {
 		if (entry->mode == 2) continue;
 		dx = x - entry->position.x; dy = y - entry->position.y;
 		dz = z - entry->position.z;
-		xzdist = item_sqrtf(dx * dx + dz * dz);
-		dist = item_sqrtf(dx * dx + dy * dy + dz * dz);
+		xzdist = sqrtf(dx * dx + dz * dz);
+		dist = sqrtf(dx * dx + dy * dy + dz * dz);
 		if (xzdist < range && marioItemGetOk() && marioGetJabaraState() != 1 &&
 			marioGetJabaraState() != 4 && marioGetJabaraState() != 5)
 		{
@@ -1249,7 +1247,7 @@ void itemseq_GetItem(ItemEntry* entry) {
 				entry->flags2 &= ~1;
 				entry->itemId = select;
 				entry->evtCode = 0;
-				entry->evtId = 0;
+				entry->collectFlag = 0;
 				entry->flags &= ~0x60;
 				iconChange(entry->name, itemDataTable[entry->itemId].icon_id);
 				wp->currId++;
@@ -1451,7 +1449,8 @@ void itemseq_Bound(ItemEntry* entry) {
 			t1 = OSTicksToMicroseconds(entry->airTime) / 1000000.0f;
 			t2 = OSTicksToMicroseconds(entry->airTime + delta) / 1000000.0f;
 			dx = dt * (entry->speed * (f32)sin(6.2831855f * entry->direction / 360.0f));
-			{ f32 c = (f32)cos(6.2831855f * entry->direction / 360.0f); dz = dt * (entry->speed * -c); } // FAKE: cos result in a local
+			dz = (f32)cos(6.2831855f * entry->direction / 360.0f);
+			dz = dt * (entry->speed * -dz);
 			if (entry->flags2 & 0x8000) {
 				dz = 0.0f;
 			}
@@ -1492,14 +1491,14 @@ void itemseq_Bound(ItemEntry* entry) {
 					}
 					else {
 						x = entry->position.x; y = 20.0f + entry->position.y; z = entry->position.z;
-						{ f64 d = __fabs(dy); hitDist = 20.0 + d; }
+						hitDist = 20.0 + fabs(dy);
 						if (h = hitCheckFilter(NULL, &hitX, &hitY, &hitZ, &hitDist, &hitNX, &hitNY, &hitNZ, x, y, z, 0.0f, 1.0f, 0.0f)) {
 							entry->position.y = hitY - 20.0f - 4.0f;
 							r = h;
 						}
 						else {
 							x = entry->position.x; y = entry->position.y; z = entry->position.z;
-							{ f64 d = __fabs(dy); hitDist = 20.0 + d; }
+							hitDist = 20.0 + fabs(dy);
 							if (h = hitCheckFilter(NULL, &hitX, &hitY, &hitZ, &hitDist, &hitNX, &hitNY, &hitNZ, x, y, z, 0.0f, 1.0f, 0.0f)) {
 								entry->position.y = hitY - 20.0f;
 								r = h;
@@ -1512,7 +1511,7 @@ void itemseq_Bound(ItemEntry* entry) {
 					hit = r;
 				}
 				if (hit) {
-					entry->velocityY = -entry->velocityY / 4.0f; // FAKE: /4.0f (exact) gives the target register order
+					entry->velocityY = -entry->velocityY / 4.0f;
 					dy = 0.0f;
 					entry->airTime = 0;
 					entry->baseTime = entry->curTime;
@@ -1552,7 +1551,7 @@ void itemseq_Bound(ItemEntry* entry) {
 				f32 hitNZ, hitNY, hitNX, hitDist, hitZ, hitY, hitX;
 				HitEntry* h;
 				f32 x = entry->position.x, y = 20.0f + entry->position.y, z = entry->position.z;
-				{ f64 d = __fabs(dy); hitDist = 20.0 + d; }
+				hitDist = 20.0 + fabs(dy);
 				h = hitCheckFilter(NULL, &hitX, &hitY, &hitZ, &hitDist, &hitNX, &hitNY, &hitNZ, x, y, z, 0.0f, -1.0f, 0.0f);
 				if (h) {
 					entry->position.y = hitY;
@@ -1641,7 +1640,7 @@ void itemseq_Bound(ItemEntry* entry) {
 						v = entry->velocityY * dt + (-980.0f * entry->gravityScale) * ((t2 + dt) * (t2 + dt) - t2sq);
 						entry->velocityY = 0.7f * (entry->bounceFactor * (-v / dt));
 					}
-					{ f64 d = __fabs(0.5f * (entry->velocityY / (-980.0f * entry->gravityScale))); peak = d; } // FAKE: fabs result in an f64 local
+					peak = fabs(0.5f * (entry->velocityY / (-980.0f * entry->gravityScale)));
 					height = entry->velocityY * peak + peak * ((-980.0f * entry->gravityScale) * peak);
 					if (!isFloor && height <= 8.0f) {
 						itemModeChange(entry, 1);
@@ -1702,7 +1701,7 @@ HitEntry* itemHitCheckSide(ItemEntry* entry, f32* outX, f32 dx, f32* outZ, f32 d
 	f32 hitX, hitY, hitZ, hitDist, hitNX, hitNY, hitNZ;
 	f32 sin, cos;
 	f32 dot, ox, oz;
-	f32 h; // FAKE: 15.0f in a local set before each hitDist store, so the y argument stays pos.y + h (a literal would be put on the left)
+	f32 h = 15.0f;
 
 	*outX = entry->position.x;
 	*outZ = entry->position.z;
@@ -1710,8 +1709,7 @@ HitEntry* itemHitCheckSide(ItemEntry* entry, f32* outX, f32 dx, f32* outZ, f32 d
 		return NULL;
 	}
 	sincosf(&sin, &cos, angleABf(0.0f, 0.0f, dx, dz));
-	h = 15.0f;
-	hitDist = 10.0f + item_sqrtf(dx * dx + dz * dz);
+	hitDist = 10.0f + sqrtf(dx * dx + dz * dz);
 	hit = hitCheckFilter(NULL, &hitX, &hitY, &hitZ, &hitDist, &hitNX, &hitNY, &hitNZ,
 		entry->position.x, entry->position.y + h, entry->position.z, sin, 0.0f, cos);
 	if (hit) {
@@ -1725,8 +1723,7 @@ HitEntry* itemHitCheckSide(ItemEntry* entry, f32* outX, f32 dx, f32* outZ, f32 d
 		*angle = reviseAngle(b + reviseAngle(b - a));
 		return hit;
 	}
-	h = 15.0f;
-	hitDist = 10.0f + item_sqrtf(dx * dx + dz * dz);
+	hitDist = 10.0f + sqrtf(dx * dx + dz * dz);
 	hit = hitCheckFilter(NULL, &hitX, &hitY, &hitZ, &hitDist, &hitNX, &hitNY, &hitNZ,
 		entry->position.x, entry->position.y + h, entry->position.z, sin, 0.0f, cos);
 	if (hit) {
@@ -1750,7 +1747,7 @@ itemHitCheckY(ItemEntry* entry, f32 z, f32 y, f32 x, f32 vy) {
 	HitEntry* hit;
 	f32 hitX, hitY, hitZ, hitDist, hitNX, hitNY, hitNZ;
 
-	{ f64 d = __fabs(vy); hitDist = 20.0 + d; } // FAKE: f64 local keeps 20.0 on the left of the fadd
+	hitDist = 20.0 + __fabs(vy);
 	if (hit = hitCheckFilter(NULL, &hitX, &hitY, &hitZ, &hitDist, &hitNX, &hitNY, &hitNZ, x, y, z, 0.0f, -1.0f, 0.0f)) {
 		entry->position.y = hitY;
 	}
@@ -1771,13 +1768,13 @@ itemHitCheckUp(ItemEntry* entry, f32 vy) {
 		return NULL;
 	}
 	x = entry->position.x; y = 20.0f + entry->position.y; z = entry->position.z;
-	{ f64 d = __fabs(vy); hitDist = 20.0 + d; } // FAKE: f64 local keeps 20.0 on the left of the fadd
+	hitDist = 20.0 + __fabs(vy);
 	if (hit = hitCheckFilter(NULL, &hitX, &hitY, &hitZ, &hitDist, &hitNX, &hitNY, &hitNZ, x, y, z, 0.0f, 1.0f, 0.0f)) {
 		entry->position.y = hitY - 20.0f - 4.0f;
 		return hit;
 	}
 	x = entry->position.x; y = entry->position.y; z = entry->position.z;
-	{ f64 d = __fabs(vy); hitDist = 20.0 + d; } // FAKE: f64 local keeps 20.0 on the left of the fadd
+	hitDist = 20.0 + __fabs(vy);
 	if (hit = hitCheckFilter(NULL, &hitX, &hitY, &hitZ, &hitDist, &hitNX, &hitNY, &hitNZ, x, y, z, 0.0f, 1.0f, 0.0f)) {
 		entry->position.y = hitY - 20.0f;
 		return hit;
@@ -1858,7 +1855,7 @@ ItemEntry* itemNearDistCheck(f32 x, f32 y, f32 z, f32 range);
 ItemEntry* itemHitCheck(f32 x, f32 y, f32 z, f32 range);
 ItemEntry* itemNameToPtr(char* name);
 void itemDelete(const char* name);
-ItemEntry* itemEntry(const char* name, s32 itemId, s32 type, s32 evtId, s32 a5, f32 x, f32 y, f32 z);
+ItemEntry* itemEntry(const char* name, s32 itemId, s32 type, s32 collectFlag, s32 a5, f32 x, f32 y, f32 z);
 void itemModeChange(ItemEntry* entry, s32 mode);
 void itemMain(void);
 BOOL N_itemPickUpFromFieldCheck(void);

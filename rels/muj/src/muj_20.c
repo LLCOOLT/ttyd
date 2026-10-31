@@ -3,7 +3,6 @@
 #include "battle/battle_unit.h"
 #include "evt/evt_cmd.h"
 
-#pragma force_active on
 #include "driver/npcdrv.h"
 #include "mario/mariost.h"
 #include "dolphin/os.h"
@@ -32,7 +31,7 @@
 #include "data_tables.h"
 
 NpcEntry* evtNpcNameToPtr(EventEntry* event, const char* name);
-typedef struct MarcoShip { f32 angle; f32 speed; f32 max; s32 stopped; s32 state; s32 field_0x14; OSTime time; } MarcoShip;
+typedef struct MarcoShip { f32 angle; f32 speed; f32 max; s32 stopped; s32 state; s32 pad_14; OSTime time; } MarcoShip;
 MarcoShip* marcoship;
 void mapSetPlayRate(const char* name, f32 rate);
 typedef struct MapAnimRate { f32 fune; f32 funeTarget; f32 nami; f32 namiTarget; } MapAnimRate;
@@ -40,10 +39,10 @@ MapAnimRate mapAnimRate;
 static u8* _ap;
 double sin(double x);
 double cos(double x);
-EffectEntry* effMistEntry(s32 type, s32 arg1, f32 x, f32 y, f32 z, f32 arg5);
+EffectEntry* effMistEntry(s32 type, s32 life, f32 x, f32 y, f32 z, f32 yaw);
 void mapObjTranslate(const char* name, f32 x, f32 y, f32 z);
 EffectEntry* effSplashEntry(s32 type, f32 x, f32 y, f32 z, f32 scale);
-EffectEntry* effFunemizuEntry(s32 type, f32 x, f32 y, f32 z, f32 arg4, f32 arg5);
+EffectEntry* effFunemizuEntry(s32 type, f32 x, f32 y, f32 z, f32 size, f32 yaw);
 void mapObjGetPos(const char* name, Vec* pos);
 f32 distABf(f32 x1, f32 z1, f32 x2, f32 z2);
 f32 angleABf(f32 x1, f32 z1, f32 x2, f32 z2);
@@ -136,90 +135,42 @@ USER_FUNC(marcoship_stop_func);
 extern s32 evt_npc_set_run_anim[];
 extern s32 evt_npc_set_stay_anim[];
 
-f32 fd_muj_20_negone_one_374[2] __attribute__((aligned(8)));
-f32 fd_muj_20_neg_one_382;
-f32 fd_muj_20___local_PI_383;
-f32 fd_muj_20___local_3PIO2_385;
-f32 fd_muj_20_one_negone_373[2] __attribute__((aligned(8)));
-f32 fd_muj_20___local_PIO2_384;
-f32 fd_muj_20_one_381;
-f32 fd_muj_20_negone_one_360[2] __attribute__((aligned(8)));
-f32 fd_muj_20_neg_one_365;
-f32 fd_muj_20___local_PI_366;
-f32 fd_muj_20___local_3PIO2_368;
-f32 fd_muj_20_one_negone_359[2] __attribute__((aligned(8)));
-f32 fd_muj_20___local_PIO2_367;
-f32 fd_muj_20_one_364;
-EvtWord hiru_yoru_event[46];
-EvtWord yoru_hiru_event[46];
-EvtWord urouro[61];
-EvtWord urouro_fuwafuwa[35];
-EvtWord buruburu[23];
-EvtWord fuwafuwa[15];
-EvtWord kirimomi[29];
-EvtWord marco_ship_yure[29];
-EvtWord moya_effect01[52];
-EvtWord moya_effect02[52];
-EvtWord moya_effect03[52];
-EvtWord moya_effect04[52];
-EvtWord moya_effect05[52];
-EvtWord nami_alpha[41];
-EvtWord moonout_effect[53];
-EvtWord moya_effect[19];
-EvtWord _kakushuku[32];
-EvtWord elmos_a_kakushuku[63];
-EvtWord elmos_a_kaku[13];
-EvtWord elmos_a_shuku[13];
+extern EvtWord hiru_yoru_event[];
+extern EvtWord yoru_hiru_event[];
+extern EvtWord urouro[];
+extern EvtWord urouro_fuwafuwa[];
+extern EvtWord buruburu[];
+extern EvtWord fuwafuwa[];
+extern EvtWord kirimomi[];
+extern EvtWord marco_ship_yure[];
+extern EvtWord moya_effect01[];
+extern EvtWord moya_effect02[];
+extern EvtWord moya_effect03[];
+extern EvtWord moya_effect04[];
+extern EvtWord moya_effect05[];
+extern EvtWord nami_alpha[];
+extern EvtWord moonout_effect[];
+extern EvtWord moya_effect[];
+extern EvtWord _kakushuku[];
+extern EvtWord elmos_a_kakushuku[];
+extern EvtWord elmos_a_kaku[];
+extern EvtWord elmos_a_shuku[];
 static ExtTexInfo ext_entry_data[21];
 static s16 elmos_animtbl[22];
-static EvtWord nannpc_mode_setup[35];
 s32 mist_pos[91];
-EvtWord mist_setup[45];
-EvtWord marcoship_shizumu[156];
-EvtWord onryo_event[2250];
-EvtWord muj_20_koopa_evt[133];
-EvtWord kaizoku_hata[65];
-EvtWord gor_muj_ship[195];
-static EvtWord muj_gor_ship[195];
-EvtWord anm_kaji[61];
-EvtWord anm_wakka[40];
-EvtWord anm_entotsu[33];
-EvtWord anm_neji[33];
-EvtWord anm_yure[132];
-static EvtWord evt_prologue[182];
-static EvtWord epilogue_npc_entry[25];
-EvtWord fune_move[136];
-static EvtWord epilogue_evt[97];
-EvtWord muj_20_init_evt[362];
-
-
-f32 fd_muj_20_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
-
-f32 fd_muj_20_neg_one_382 = -1.0f;
-
-f32 fd_muj_20___local_PI_383 = 3.1415927f;
-
-f32 fd_muj_20___local_3PIO2_385 = 4.712389f;
-
-f32 fd_muj_20_one_negone_373[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
-
-f32 fd_muj_20___local_PIO2_384 = 1.5707964f;
-
-f32 fd_muj_20_one_381 = 1.0f;
-
-f32 fd_muj_20_negone_one_360[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
-
-f32 fd_muj_20_neg_one_365 = -1.0f;
-
-f32 fd_muj_20___local_PI_366 = 3.1415927f;
-
-f32 fd_muj_20___local_3PIO2_368 = 4.712389f;
-
-f32 fd_muj_20_one_negone_359[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
-
-f32 fd_muj_20___local_PIO2_367 = 1.5707964f;
-
-f32 fd_muj_20_one_364 = 1.0f;
+extern EvtWord mist_setup[];
+extern EvtWord marcoship_shizumu[];
+extern EvtWord onryo_event[];
+extern EvtWord muj_20_koopa_evt[];
+extern EvtWord kaizoku_hata[];
+extern EvtWord gor_muj_ship[];
+extern EvtWord anm_kaji[];
+extern EvtWord anm_wakka[];
+extern EvtWord anm_entotsu[];
+extern EvtWord anm_neji[];
+extern EvtWord anm_yure[];
+extern EvtWord fune_move[];
+extern EvtWord muj_20_init_evt[];
 
 EVT_BEGIN(hiru_yoru_event)
     CALL(evt_map_playanim, STRING("hiru_yoru"), 0, 0)
@@ -1111,14 +1062,12 @@ EVT_BEGIN(onryo_event)
     SET_VALUE(GSW(0), 230)
     LABEL(100)
     CALL(evt_mario_cont_onoff, 1)
-#ifdef VERSION_G8ME01
-#else
+#ifndef VERSION_G8ME01
     CALL(evt_party_cont_onoff, 0, 0)
 #endif
     CALL(evt_mario_set_pos, 5, 90, -100)
     CALL(evt_mario_set_dir, 90, 0, 0)
-#ifdef VERSION_G8ME01
-#else
+#ifndef VERSION_G8ME01
     CALL(evt_party_set_pos, 0, 0, -1000, 0)
 #endif
     CALL(evt_mapobj_flag_onoff, 1, 0, STRING("S_a1"), 2)
@@ -1198,6 +1147,10 @@ EVT_BEGIN(onryo_event)
     CALL(evt_set_fune_anim_rate, FLOAT(0.69921875f))
     CALL(evt_set_nami_anim_rate, FLOAT(0.69921875f))
     WAIT_MS(1000)
+#ifdef VERSION_G8MP01 // PAL: NPC flag 0x200 on the two sailors for this part of the scene
+    CALL(evt_npc_flag_onoff, 1, STRING(/*"ガラの悪い水夫"*/"\x83\x4B\x83\x89\x82\xCC\x88\xAB\x82\xA2\x90\x85\x95\x76"), 512)
+    CALL(evt_npc_flag_onoff, 1, STRING(/*"オドオド水夫"*/"\x83\x49\x83\x68\x83\x49\x83\x68\x90\x85\x95\x76"), 512)
+#endif
     WAIT_MS(1500)
     CALL(evt_msg_print, 0, STRING("stg5_sea_03"), 0, STRING(/*"ガラの悪い水夫"*/"\x83\x4B\x83\x89\x82\xCC\x88\xAB\x82\xA2\x90\x85\x95\x76"))
     WAIT_MS(500)
@@ -1334,6 +1287,10 @@ EVT_BEGIN(onryo_event)
     END_INLINE_EVENT
     CALL(evt_msg_print, 0, STRING("stg5_sea_11"), 0, STRING(/*"ガラの悪い水夫"*/"\x83\x4B\x83\x89\x82\xCC\x88\xAB\x82\xA2\x90\x85\x95\x76"))
     WAIT_WHILE(GF(0))
+#ifdef VERSION_G8MP01
+    CALL(evt_npc_flag_onoff, 0, STRING(/*"ガラの悪い水夫"*/"\x83\x4B\x83\x89\x82\xCC\x88\xAB\x82\xA2\x90\x85\x95\x76"), 512)
+    CALL(evt_npc_flag_onoff, 0, STRING(/*"オドオド水夫"*/"\x83\x49\x83\x68\x83\x49\x83\x68\x90\x85\x95\x76"), 512)
+#endif
     CALL(evt_npc_set_anim, STRING(/*"ガラの悪い水夫"*/"\x83\x4B\x83\x89\x82\xCC\x88\xAB\x82\xA2\x90\x85\x95\x76"), STRING("R_1"))
     CALL(muj_npc_guruguru, STRING(/*"ガラの悪い水夫"*/"\x83\x4B\x83\x89\x82\xCC\x88\xAB\x82\xA2\x90\x85\x95\x76"), -52, -90, 0, FLOAT(-12.0f), 3000)
     SET_VALUE(GF(0), 1)
@@ -1986,7 +1943,11 @@ static void pressStartGX(LogoWork* wp, s32 alpha, f32 x, f32 y) {
     GXTexObj startText, gradient;
     Mtx v17, v16;
 
+#ifdef VERSION_G8MP01
+    TEXGetGXTexObjFromPalette(*wp->tpl->data, &startText, 13); // PAL: texture 13 of the TPL
+#else
     TEXGetGXTexObjFromPalette(*wp->tpl->data, &startText, VERSION_PICK(8, 15));
+#endif
     GXLoadTexObj(&startText, GX_TEXMAP0);
     TEXGetGXTexObjFromPalette(*wp->tpl->data, &gradient, VERSION_PICK(9, 6));
     GXLoadTexObj(&gradient, GX_TEXMAP1);
@@ -2044,7 +2005,10 @@ static void draw(CameraId camera, void* param) {
     f32 viewport[6];
     f32 projection[7];
     CameraEntry* cam;
-#ifdef VERSION_G8ME01
+#if defined(VERSION_G8MP01)
+    // PAL: logo texture per language (indexed by gp->language)
+    s32 logoTex[6] = {0x13, 0x13, 0x14, 0x15, 0x16, 0x17};
+#elif defined(VERSION_G8ME01)
     // US: logo texture per language (indexed by gp->language)
     s32 logoTex[6] = {0x15, 0x15, 0x16, 0x17, 0x18, 0x19};
 #endif

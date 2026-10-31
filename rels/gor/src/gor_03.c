@@ -2,7 +2,6 @@
 #include "battle/battle_unit.h"
 #include "evt/evt_cmd.h"
 
-#pragma force_active on
 #include "driver/npcdrv.h"
 #include "evt/evt_npc.h"
 #include "mario/mariost.h"
@@ -40,21 +39,20 @@ USER_FUNC(evt_msg_fmt_str);
 typedef struct FuwaTable { f32 v[40]; } FuwaTable;
 static const FuwaTable fuwa_table = {{0.0f, 0.5f, 1.0f, 1.4f, 1.8f, 2.0f, 2.3f, 2.5f, 2.6f, 2.7f, 2.7f, 2.7f, 2.6f, 2.5f, 2.3f, 2.0f, 1.8f, 1.4f, 1.0f, 0.5f, -0.0f, -0.5f, -1.0f, -1.4f, -1.8f, -2.0f, -2.3f, -2.5f, -2.6f, -2.7f, -2.7f, -2.7f, -2.6f, -2.5f, -2.3f, -2.0f, -1.8f, -1.4f, -1.0f, -0.5f}};
 typedef struct ExchangeRyokin { s32 ryokin; s32 medal; } ExchangeRyokin;
-#define RYOKIN_TBL ((ExchangeRyokin(*)[3])exchange_ryokin_medal_tbl)
 s32 exchange_ret_tbl_no(void);
 s32 yuugijou_montemedal_keep(EventEntry* event, BOOL isFirstCall);
 void monteCountDisp(void);
 typedef struct GoryuuWork { EventEntry* event; EventEntry* subEvent; u16 flags; s32 type; s32 (*init)(EventEntry* event, BOOL isFirstCall); s32 (*main)(EventEntry* event, BOOL isFirstCall); void (*disp)(CameraId camera, void* param); void* data; } GoryuuWork;
 typedef struct SlotWork { u32 flags; s32 phase; f32 reberAngle; f32 angle[2][3]; f32 speed[3]; s8 state[3]; s8 face[2][3]; s8 stopCount[3]; s32 wait[3]; s32 extra[3]; s32 counter; s32 neonCount; s32 monteCount; s32 nowSlot; s32 caseId[2]; EventEntry* monteEvt; s32 sfxId; s16 cursor; } SlotWork;
-typedef struct GMonteSub { s32 unk0; Vec pos; f32 scale; u8 unk14[0x38 - 0x14]; } GMonteSub;
-typedef struct GMonte { u8 hidden; u8 state; s16 wait; s16 timer; u8 unk6[2]; GMonteSub sub; Vec vel; SlotWork* owner; } GMonte;
+typedef struct GMonteSub { s32 flags; Vec pos; f32 scale; u8 iconData[0x38 - 0x14]; } GMonteSub; /* mirrors IconEntry */
+typedef struct GMonte { u8 hidden; u8 state; s16 wait; s16 timer; u8 pad_6[2]; GMonteSub sub; Vec vel; SlotWork* owner; } GMonte;
 static s32 dataadr[8];
 static GMonte* monte_p;
 NpcEntry* npc;
 static EffectEntry* eff;
 static s32 xlw[16];
 char* exchange_msgp;
-typedef struct GorYuuWork { s32 unk0; s32 unk4; s32 medals; } GorYuuWork;
+typedef struct GorYuuWork { s32 flags; s32 keptTokens; s32 medals; } GorYuuWork;
 extern GorYuuWork* yuwp;
 int rand(void);
 static void monte_disp(CameraId camera, void* param);
@@ -64,7 +62,7 @@ typedef struct SlotDrum { const char* drum[3]; const char* reber; const char* an
 void mapObjRotate(const char* name, f32 x, f32 y, f32 z);
 void goryuugijo_upsidewindow_disp_sub(s32 slot, s32 reel);
 #define UPSIDEGARA ((s32(*)[3][8])upsidegara)
-void mapPlayAnimationLv(const char* name, s32 a, s32 b);
+void mapPlayAnimationLv(const char* name, s32 mode, s32 level);
 void goryuugijo_upsidewindow_dispoff_sub(s32 slot, s32 reel);
 #define SLOTGARA ((s32(*)[3][8])slotgara)
 s32 slot_rotate_sub(GoryuuWork* wp, SlotWork* data, s32 reel);
@@ -73,7 +71,7 @@ void mapObjGetPos(const char* name, Vec* pos);
 EffectEntry* effMarioBalloonEntry(s32 type, NpcEntry* npc);
 s32 shadowEntry(f32 x, f32 y, f32 z, f32 size);
 void shadowSetCollision(s32 id, s32 on);
-typedef struct KujiMsgWork { u8 unk0[8]; u16 unk8; u8 unkA[6]; s32 unk10; } KujiMsgWork;
+typedef struct KujiMsgWork { u8 tagFlags[8]; u16 curPage; u8 pageInfo[6]; s32 nextEntry; } KujiMsgWork; /* mirrors MsgWinData */
 void* effBombEntry(s32 type, f32 x, f32 y, f32 z, f32 scale);
 
 USER_FUNC(desk_talk_func);
@@ -292,186 +290,145 @@ void goryuugijo_main_montemedal(EventEntry* event, BOOL isFirstCall);
 void goryuugijo_init_montemedal(EventEntry* event, BOOL isFirstCall);
 s32 exchange_ret_tbl_no(void);
 
-f32 fd_gor_03_negone_one_374[2] __attribute__((aligned(8)));
-f32 fd_gor_03_neg_one_382;
-f32 fd_gor_03___local_PI_383;
-f32 fd_gor_03___local_3PIO2_385;
-f32 fd_gor_03_one_negone_373[2] __attribute__((aligned(8)));
-f32 fd_gor_03___local_PIO2_384;
-f32 fd_gor_03_one_381;
-f32 fd_gor_03_negone_one_360[2] __attribute__((aligned(8)));
-f32 fd_gor_03_neg_one_365;
-f32 fd_gor_03___local_PI_366;
-f32 fd_gor_03___local_3PIO2_368;
-f32 fd_gor_03_one_negone_359[2] __attribute__((aligned(8)));
-f32 fd_gor_03___local_PIO2_367;
-f32 fd_gor_03_one_364;
-EvtWord debug_event[16];
-EvtWord gor_03_down_evt[8];
+extern EvtWord debug_event[];
+extern EvtWord gor_03_down_evt[];
 static BeroEntry bero_entry_data[6];
 BeroEntry yuu_00_data[1];
 BeroEntry yuu_01_data[1];
 BeroEntry yuu_02_data[1];
 BeroEntry yuu_03_data[1];
-EvtWord maffiaboss_ticket_put[31];
-EvtWord maffiaboss_ticket_check[241];
-EvtWord maffiaboss_init[73];
-EvtWord maffiaboss_maffiaboss[495];
-EvtWord maffiaboss_airship_ticket[768];
-EvtWord maffiaboss_teshita_irai[253];
-EvtWord maffiaboss_train_ticket_init[50];
-EvtWord maffiaboss_train_ticket[824];
-EvtWord maffiaboss_talk_common[106];
-EvtWord maffiaboss_talk[10];
-EvtWord maffiaboss_desk_talk[VERSION_PICK(46, 54)];
-EvtWord maffiaboss_casino_init[17];
-EvtWord maffiaboss_casino_talk[45];
-EvtWord maffiaboss_nekomu00[14];
-EvtWord maffiaboss_nekomu01[14];
-EvtWord maffiaboss_nekomu02[14];
-EvtWord maffia1_init[23];
-EvtWord maffia1_talk[128];
-EvtWord maffia2_init[23];
-EvtWord maffia2_talk[128];
-EvtWord maffia3_init[8];
-EvtWord maffia3_talk[68];
-static EvtWord mony_init[54];
-static EvtWord mony_talk[53];
-static EvtWord peton_init[69];
+extern EvtWord maffiaboss_ticket_put[];
+extern EvtWord maffiaboss_ticket_check[];
+extern EvtWord maffiaboss_init[];
+extern EvtWord maffiaboss_maffiaboss[];
+extern EvtWord maffiaboss_airship_ticket[];
+extern EvtWord maffiaboss_teshita_irai[];
+extern EvtWord maffiaboss_train_ticket_init[];
+extern EvtWord maffiaboss_train_ticket[];
+extern EvtWord maffiaboss_talk_common[];
+extern EvtWord maffiaboss_talk[];
+extern EvtWord maffiaboss_desk_talk[];
+extern EvtWord maffiaboss_casino_init[];
+extern EvtWord maffiaboss_casino_talk[];
+extern EvtWord maffiaboss_nekomu00[];
+extern EvtWord maffiaboss_nekomu01[];
+extern EvtWord maffiaboss_nekomu02[];
+extern EvtWord maffia1_init[];
+extern EvtWord maffia1_talk[];
+extern EvtWord maffia2_init[];
+extern EvtWord maffia2_talk[];
+extern EvtWord maffia3_init[];
+extern EvtWord maffia3_talk[];
 s32 iri_19_item_tbl[2];
-EvtWord peton_talk_common[235];
-static EvtWord peton_talk[4];
-EvtWord peton_desk_talk[47];
-static EvtWord init_gurume[28];
-static EvtWord talk_gurume[4];
-static EvtWord luigi_init[18];
-static EvtWord luigi_talk[4];
-static EvtWord luigi_npcEnt[19];
-EvtWord cherry_init[12];
-EvtWord cherry_talk[8];
+extern EvtWord peton_talk_common[];
+extern EvtWord peton_desk_talk[];
+extern EvtWord cherry_init[];
+extern EvtWord cherry_talk[];
 NpcSetupInfo cherryEnt[2];
-EvtWord bteresa_n_fadein[45];
-EvtWord bteresa_n_fadeout[42];
-EvtWord exchange_return_sub[VERSION_PICK(111, 132)];
-EvtWord exchange_keep_sub[VERSION_PICK(111, 132)];
-EvtWord gor_03_dokan_init_evt[35];
-EvtWord gor_03_dokan_up_evt[60];
-EvtWord gor_03_dokan_down_evt[63];
-s32 exchange_ryokin_medal_tbl[54];
-EvtWord bteresa_talk_sub_minigame[245];
-EvtWord bteresa_talk_sub_keihin[VERSION_PICK(220, 242)];
-EvtWord bteresa_table_talk[437];
-EvtWord bteresa_init[18];
-EvtWord bteresa_talk[81];
-EvtWord kyaku1_init[2];
-EvtWord kyaku1_talk[66];
-EvtWord kyaku4_init[2];
-EvtWord kyaku4_talk[66];
+extern EvtWord bteresa_n_fadein[];
+extern EvtWord bteresa_n_fadeout[];
+extern EvtWord exchange_return_sub[];
+extern EvtWord exchange_keep_sub[];
+extern EvtWord gor_03_dokan_init_evt[];
+extern EvtWord gor_03_dokan_up_evt[];
+extern EvtWord gor_03_dokan_down_evt[];
+ExchangeRyokin exchange_ryokin_medal_tbl[9][3];
+extern EvtWord bteresa_talk_sub_minigame[];
+extern EvtWord bteresa_talk_sub_keihin[];
+extern EvtWord bteresa_table_talk[];
+extern EvtWord bteresa_init[];
+extern EvtWord bteresa_talk[];
+extern EvtWord kyaku1_init[];
+extern EvtWord kyaku1_talk[];
+extern EvtWord kyaku4_init[];
+extern EvtWord kyaku4_talk[];
 f32 montemedalzpos[2];
-EvtWord slot_fall_monte[4];
-EvtWord slot_set[VERSION_PICK(148, 168)];
-EvtWord slot1_set[7];
-EvtWord slot2_set[7];
+extern EvtWord slot_fall_monte[];
+extern EvtWord slot_set[];
+extern EvtWord slot1_set[];
+extern EvtWord slot2_set[];
 SlotDrum drumname[2];
 EvtWord* slotevttbl[2];
 s32 slotgara[48];
 s32 upsidegara[48];
-EvtWord ranking_set[65];
-EvtWord exchange_set[VERSION_PICK(195, 210)];
-EvtWord roten_4_init[13];
-EvtWord roten_4_regl[19];
-EvtWord roten_4_talk[68];
-EvtWord kinopiko_a_init[8];
-EvtWord kinopiko_a_talk[68];
-static EvtWord kinopiko_b_init[13];
-EvtWord kinopiko_b_regl[19];
-static EvtWord kinopiko_b_talk[159];
-EvtWord kinopio_a_init[8];
-EvtWord kinopio_a_talk[68];
-EvtWord kokinopio_a_init[8];
-EvtWord kokinopio_a_talk[68];
-EvtWord kokinopio_b_init[13];
-EvtWord kokinopio_b_regl[19];
-EvtWord kokinopio_b_talk[68];
-EvtWord nokonoko_a_init[8];
-EvtWord nokonoko_a_talk[68];
-EvtWord kuribo_1_init[8];
-EvtWord kuribo_1_talk[68];
+extern EvtWord ranking_set[];
+extern EvtWord exchange_set[];
+extern EvtWord roten_4_init[];
+extern EvtWord roten_4_regl[];
+extern EvtWord roten_4_talk[];
+extern EvtWord kinopiko_a_init[];
+extern EvtWord kinopiko_a_talk[];
+extern EvtWord kinopiko_b_regl[];
+extern EvtWord kinopio_a_init[];
+extern EvtWord kinopio_a_talk[];
+extern EvtWord kokinopio_a_init[];
+extern EvtWord kokinopio_a_talk[];
+extern EvtWord kokinopio_b_init[];
+extern EvtWord kokinopio_b_regl[];
+extern EvtWord kokinopio_b_talk[];
+extern EvtWord nokonoko_a_init[];
+extern EvtWord nokonoko_a_talk[];
+extern EvtWord kuribo_1_init[];
+extern EvtWord kuribo_1_talk[];
 static NpcSetupInfo npcEnt[22];
-static EvtWord evt_door_01_00[39];
-static EvtWord evt_wall_01[28];
-EvtWord evt_door_01_10[39];
+extern EvtWord evt_door_01_10[];
 static const char* door_data_01_npc[2];
-EvtWord evt_door_01_0_open[31];
-EvtWord evt_door_01_0_close[69];
-EvtWord evt_door_01_1_open[132];
-EvtWord evt_door_01_1_close[146];
+extern EvtWord evt_door_01_0_open[];
+extern EvtWord evt_door_01_0_close[];
+extern EvtWord evt_door_01_1_open[];
+extern EvtWord evt_door_01_1_close[];
 DoorParam door_data_01_0;
 DoorParam door_data_01_1;
-EvtWord evt_door_01_entry[39];
-static EvtWord evt_door_02_00[44];
-EvtWord evt_wall_02_0[15];
+extern EvtWord evt_door_01_entry[];
+extern EvtWord evt_wall_02_0[];
 const char* door_data_02_0_npc[6];
-EvtWord door_data_02_0_open_sub[13];
-EvtWord door_data_02_0_open[28];
-EvtWord door_data_02_0_close[51];
+extern EvtWord door_data_02_0_open_sub[];
+extern EvtWord door_data_02_0_open[];
+extern EvtWord door_data_02_0_close[];
 const char* door_data_02_mobj[2];
 DoorParam door_data_02_0l;
 DoorParam door_data_02_0r;
-EvtWord evt_door_02_10[15];
-EvtWord evt_door_02_11[15];
-EvtWord evt_wall_02_1[28];
+extern EvtWord evt_door_02_10[];
+extern EvtWord evt_door_02_11[];
+extern EvtWord evt_wall_02_1[];
 const char* door_data_02_1_npc[6];
-EvtWord desk_talk_check[173];
-EvtWord evt_door_02_1_open[118];
-EvtWord evt_door_02_1_close[48];
+extern EvtWord desk_talk_check[];
+extern EvtWord evt_door_02_1_open[];
+extern EvtWord evt_door_02_1_close[];
 DoorParam door_data_02_1;
-static EvtWord evt_door_03_00[12];
-static EvtWord evt_wall_03[28];
 static const char* door_data_03_npc[2];
-EvtWord door_data_03_open[17];
-EvtWord door_data_03_close[19];
+extern EvtWord door_data_03_open[];
+extern EvtWord door_data_03_close[];
 static DoorParam door_data_03;
-static EvtWord evt_door_03_caseopen[6];
-static EvtWord evt_door_03_open[170];
-static EvtWord evt_door_03_close[19];
 static DoorParam door_data_03_roll;
-static EvtWord evt_door_03_entry[24];
-static EvtWord evt_door_04_00[12];
-static EvtWord evt_wall_04[28];
 static const char* door_data_04_npc[3];
-static EvtWord evt_door_04_open[17];
-EvtWord evt_door_04_close_snd[19];
+extern EvtWord evt_door_04_close_snd[];
 static DoorParam door_data_04;
-EvtWord evt_door_04_caseclose[6];
-static EvtWord evt_door_04_close[70];
+extern EvtWord evt_door_04_caseclose[];
 DoorParam door_data_04_roll;
-static EvtWord evt_door_04_entry[20];
-EvtWord wall_bomb_init[51];
-static EvtWord wall_bomb[146];
-EvtWord uraguchi_tenin[23];
-EvtWord uraguchi_event[323];
-EvtWord uraguchi_check[34];
+extern EvtWord wall_bomb_init[];
+extern EvtWord uraguchi_tenin[];
+extern EvtWord uraguchi_event[];
+extern EvtWord uraguchi_check[];
 static ShopObj obj_list[6];
 static ShopItem goods_list[6];
 static ShopDb trade_list[12];
 static ShopperData35 shopper_data;
-EvtWord majorin_nusumigiki[331];
-EvtWord yuureturn_rtn[101];
-static EvtWord peach_mail[248];
-EvtWord kuzi_bomb_talk_normal[372];
-EvtWord kuzi_bomb_talk_husei[589];
-EvtWord kuzi_bomb_bomb[152];
-EvtWord kuzi_keiziban_normal[391];
-EvtWord kuzi_keiziban_husei[14];
-EvtWord kuzi_bomb_talk[16];
-EvtWord kuzi_keiziban_entry[27];
-EvtWord tenin_fuwafuwa[7];
-EvtWord casino_fuwafuwa[7];
-EvtWord debug_event_mode[144];
-EvtWord monte_evt_door_close[16];
-EvtWord monte_evt_door_entry[73];
-EvtWord gor_03_init_evt[VERSION_PICK(462, 681)];
+extern EvtWord majorin_nusumigiki[];
+extern EvtWord yuureturn_rtn[];
+extern EvtWord kuzi_bomb_talk_normal[];
+extern EvtWord kuzi_bomb_talk_husei[];
+extern EvtWord kuzi_bomb_bomb[];
+extern EvtWord kuzi_keiziban_normal[];
+extern EvtWord kuzi_keiziban_husei[];
+extern EvtWord kuzi_bomb_talk[];
+extern EvtWord kuzi_keiziban_entry[];
+extern EvtWord tenin_fuwafuwa[];
+extern EvtWord casino_fuwafuwa[];
+extern EvtWord debug_event_mode[];
+extern EvtWord monte_evt_door_close[];
+extern EvtWord monte_evt_door_entry[];
+extern EvtWord gor_03_init_evt[];
 
 static USER_FUNC(setmertn) {
     event->ownerNPC = npcNameToPtr((const char*)evtGetValue(event, event->args[0]));
@@ -539,13 +496,11 @@ s32 exchange_ret_tbl_no(void) {
 
 USER_FUNC(exchange_ryokin_medal) {
     EvtWord* args = event->args;
-    ExchangeRyokin (*tbl)[3];
     s32 idx = evtGetValue(event, args[0]);
     s32 no = exchange_ret_tbl_no();
 
-    evtSetValue(event, args[1], RYOKIN_TBL[no][idx].ryokin);
-    tbl = RYOKIN_TBL; // FAKE: table pointer reloaded right before use; direct RYOKIN_TBL[no][idx] is 12 B shorter
-    evtSetValue(event, args[2], tbl[no][idx].medal);
+    evtSetValue(event, args[1], exchange_ryokin_medal_tbl[no][idx].ryokin);
+    evtSetValue(event, args[2], exchange_ryokin_medal_tbl[no][idx].medal);
     return EVT_RETURN_DONE;
 }
 
@@ -572,12 +527,12 @@ USER_FUNC(evt_exchange_msg_set) {
 
 #ifdef VERSION_G8ME01
     if ((u32)gp->language == 0) {
-        sprintf(exchange_msgp, msg, value, exchange_ryokin_medal_tbl[n * 6 + 1], exchange_ryokin_medal_tbl[n * 6], exchange_ryokin_medal_tbl[n * 6 + 3], exchange_ryokin_medal_tbl[n * 6 + 2], exchange_ryokin_medal_tbl[n * 6 + 5], exchange_ryokin_medal_tbl[n * 6 + 4]);
+        sprintf(exchange_msgp, msg, value, exchange_ryokin_medal_tbl[n][0].medal, exchange_ryokin_medal_tbl[n][0].ryokin, exchange_ryokin_medal_tbl[n][1].medal, exchange_ryokin_medal_tbl[n][1].ryokin, exchange_ryokin_medal_tbl[n][2].medal, exchange_ryokin_medal_tbl[n][2].ryokin);
     } else {
         sprintf(exchange_msgp, msg, value);
     }
 #else
-    sprintf(exchange_msgp, msg, value, exchange_ryokin_medal_tbl[n * 6 + 1], exchange_ryokin_medal_tbl[n * 6], exchange_ryokin_medal_tbl[n * 6 + 3], exchange_ryokin_medal_tbl[n * 6 + 2], exchange_ryokin_medal_tbl[n * 6 + 5], exchange_ryokin_medal_tbl[n * 6 + 4]);
+    sprintf(exchange_msgp, msg, value, exchange_ryokin_medal_tbl[n][0].medal, exchange_ryokin_medal_tbl[n][0].ryokin, exchange_ryokin_medal_tbl[n][1].medal, exchange_ryokin_medal_tbl[n][1].ryokin, exchange_ryokin_medal_tbl[n][2].medal, exchange_ryokin_medal_tbl[n][2].ryokin);
 #endif
     evtSetValue(event, args[2], (EvtWord)exchange_msgp);
     return EVT_RETURN_DONE;
@@ -739,34 +694,6 @@ static void monte_disp(CameraId camera, void* param) {
         }
     }
 }
-
-f32 fd_gor_03_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
-
-f32 fd_gor_03_neg_one_382 = -1.0f;
-
-f32 fd_gor_03___local_PI_383 = 3.1415927f;
-
-f32 fd_gor_03___local_3PIO2_385 = 4.712389f;
-
-f32 fd_gor_03_one_negone_373[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
-
-f32 fd_gor_03___local_PIO2_384 = 1.5707964f;
-
-f32 fd_gor_03_one_381 = 1.0f;
-
-f32 fd_gor_03_negone_one_360[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
-
-f32 fd_gor_03_neg_one_365 = -1.0f;
-
-f32 fd_gor_03___local_PI_366 = 3.1415927f;
-
-f32 fd_gor_03___local_3PIO2_368 = 4.712389f;
-
-f32 fd_gor_03_one_negone_359[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
-
-f32 fd_gor_03___local_PIO2_367 = 1.5707964f;
-
-f32 fd_gor_03_one_364 = 1.0f;
 
 EVT_BEGIN(debug_event)
     CALL(evt_sub_get_system_flag, LW(0))
@@ -2500,14 +2427,16 @@ EVT_BEGIN(gor_03_dokan_down_evt)
     RETURN
 EVT_END()
 
-s32 exchange_ryokin_medal_tbl[] = {
-    3, 1, 15, 5, 30, 10, 3, 1,
-    15, 5, 30, 10, 3, 1, 15, 5,
-    30, 10, 3, 1, 15, 5, 30, 10,
-    3, 1, 15, 5, 30, 10, 3, 1,
-    15, 5, 30, 10, 3, 1, 15, 5,
-    30, 10, 3, 1, 15, 5, 30, 10,
-    3, 1, 15, 5, 30, 10,
+ExchangeRyokin exchange_ryokin_medal_tbl[9][3] = {
+    {{3, 1}, {15, 5}, {30, 10}},
+    {{3, 1}, {15, 5}, {30, 10}},
+    {{3, 1}, {15, 5}, {30, 10}},
+    {{3, 1}, {15, 5}, {30, 10}},
+    {{3, 1}, {15, 5}, {30, 10}},
+    {{3, 1}, {15, 5}, {30, 10}},
+    {{3, 1}, {15, 5}, {30, 10}},
+    {{3, 1}, {15, 5}, {30, 10}},
+    {{3, 1}, {15, 5}, {30, 10}},
 };
 
 EVT_BEGIN(bteresa_talk_sub_minigame)
@@ -5572,9 +5501,22 @@ EVT_BEGIN(kuzi_keiziban_normal)
             CALL(evt_mario_set_pose, STRING("M_S_1"))
             CALL(evt_set_dir_to_target, STRING("グルメボム兵"), STRING("mario"))
             CALL(kuzi_get_keihin, LW(0), LW(1))
+#ifdef VERSION_G8MP01
+            CALL(evt_sub_get_language, LW(10))
+            IF_INT_EQUAL(LW(10), 4)
+                SET_VALUE(LW(2), LW(0))
+                ADD(LW(2), 1)
+                CALL(evt_msg_print, 0, STRING("kuji_bomb_028"), 0, STRING("グルメボム兵"))
+            ELSE
+                SET_VALUE(LW(2), LW(0))
+                ADD(LW(2), 1)
+                CALL(evt_msg_print_insert, 0, STRING("kuji_bomb_028"), 0, STRING("グルメボム兵"), LW(2))
+            END_IF
+#else
             SET_VALUE(LW(2), LW(0))
             ADD(LW(2), 1)
             CALL(evt_msg_print_insert, 0, STRING("kuji_bomb_028"), 0, STRING("グルメボム兵"), LW(2))
+#endif
             CALL(evt_mario_mov_pos2, -120, 480, 60)
             CALL(evt_item_entry, STRING("keihin"), LW(1), 0, -1000, 0, 17, -1, 0)
             CALL(evt_item_get_item, STRING("keihin"))
@@ -6385,7 +6327,7 @@ void goryuugijo_main_slot(EventEntry* event, BOOL isFirstCall) {
             if (data->counter >= 15) {
                 data->counter = 0;
                 data->phase++;
-                data->sfxId = ((s32 (*)(const char*))psndSFXOn)("SFX_EVT_GAME_SLOT_ROUND1");
+                data->sfxId = psndSFXOn("SFX_EVT_GAME_SLOT_ROUND1");
             } else {
                 data->counter++;
                 data->reberAngle += 4.0f;
@@ -6730,7 +6672,6 @@ void goryuugijo_disp_slot(CameraId camera, void* param) {
     }
 }
 
-
 static USER_FUNC(mario_keyoff_wait) {
     switch (!marioChkKey()) {
         default:
@@ -6822,16 +6763,16 @@ static USER_FUNC(viewport) {
 
 void kuji_bomb_055_callback(s32 type, KujiMsgWork** work) {
     KujiMsgWork* wp = *work;
-    NpcEntry* npc = npcNameToPtr("\203O\203\213\203\201\203{\203\200\225\272");
+    NpcEntry* npc = npcNameToPtr("グルメボム兵");
 
     switch (type) {
         case 3:
-            if (wp->unk8 == 1) {
+            if (wp->curPage == 1) {
                 evtSetValue(NULL, GF(0), 1);
             }
             break;
         case 5:
-            switch (wp->unk10) {
+            switch (wp->nextEntry) {
                 case 0x1D:
                     animPoseSetAnim(npc->poseId, "T_3", 1);
                     break;
@@ -6893,7 +6834,7 @@ USER_FUNC(kuzi_bomb_bomb_eff) {
     EvtWord* args = event->args;
     s32 type = evtGetValue(event, args[0]);
     s32 phase = (0, evtGetValue(event, args[1]));
-    NpcEntry* npc = npcNameToPtr("\203O\203\213\203\201\203{\203\200\225\272");
+    NpcEntry* npc = npcNameToPtr("グルメボム兵");
 
     if (type == 2 || type == 3) {
         return EVT_RETURN_DONE;

@@ -5,8 +5,6 @@
 #include "mri.h"
 #include "data_tables.h"
 
-#pragma force_active on
-
 USER_FUNC(evt_bero_exec_get);
 USER_FUNC(evt_bero_exec_wait);
 USER_FUNC(evt_bero_get_info);
@@ -36,60 +34,14 @@ USER_FUNC(evt_snd_bgmon);
 USER_FUNC(evt_snd_envon);
 USER_FUNC(evt_snd_sfxon_3d);
 
-f32 fd_mri_15_negone_one_374[2] __attribute__((aligned(8)));
-f32 fd_mri_15_neg_one_382;
-f32 fd_mri_15___local_PI_383;
-f32 fd_mri_15___local_3PIO2_385;
-f32 fd_mri_15_one_negone_373[2] __attribute__((aligned(8)));
-f32 fd_mri_15___local_PIO2_384;
-f32 fd_mri_15_one_381;
-f32 fd_mri_15_negone_one_360[2] __attribute__((aligned(8)));
-f32 fd_mri_15_neg_one_365;
-f32 fd_mri_15___local_PI_366;
-f32 fd_mri_15___local_3PIO2_368;
-f32 fd_mri_15_one_negone_359[2] __attribute__((aligned(8)));
-f32 fd_mri_15___local_PIO2_367;
-f32 fd_mri_15_one_364;
-static EvtWord bero_s_doa_close[10];
-static EvtWord bero_s_doa_open[10];
-EvtWord evt_dokan[12];
+extern EvtWord evt_dokan[];
 static BeroEntry bero_entry_data[3];
-static EvtWord door_switch_init[17];
-static EvtWord door_switch[59];
-EvtWord dai3_escape[32];
-EvtWord dai3_battle_init[66];
-EvtWord dai3_battle[140];
-EvtWord ueki_evt_01[20];
+extern EvtWord dai3_escape[];
+extern EvtWord dai3_battle_init[];
+extern EvtWord dai3_battle[];
+extern EvtWord ueki_evt_01[];
 static KusaAccess ueki_access_data[7];
-EvtWord mri_15_init_evt[156];
-
-f32 fd_mri_15_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
-
-f32 fd_mri_15_neg_one_382 = -1.0f;
-
-f32 fd_mri_15___local_PI_383 = 3.1415927f;
-
-f32 fd_mri_15___local_3PIO2_385 = 4.712389f;
-
-f32 fd_mri_15_one_negone_373[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
-
-f32 fd_mri_15___local_PIO2_384 = 1.5707964f;
-
-f32 fd_mri_15_one_381 = 1.0f;
-
-f32 fd_mri_15_negone_one_360[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
-
-f32 fd_mri_15_neg_one_365 = -1.0f;
-
-f32 fd_mri_15___local_PI_366 = 3.1415927f;
-
-f32 fd_mri_15___local_3PIO2_368 = 4.712389f;
-
-f32 fd_mri_15_one_negone_359[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
-
-f32 fd_mri_15___local_PIO2_367 = 1.5707964f;
-
-f32 fd_mri_15_one_364 = 1.0f;
+extern EvtWord mri_15_init_evt[];
 
 static EVT_BEGIN(bero_s_doa_close)
     SET_VALUE(LW(9), 0)
@@ -329,7 +281,7 @@ EVT_BEGIN(mri_15_init_evt)
         SPAWN_EVENT(PTR(dai3_battle))
     END_IF
     SPAWN_EVENT(PTR(door_switch_init))
-    CALL(evt_run_case_evt, 9, 1, STRING("A_sui\0\0"), 0, PTR(door_switch), 0)
+    CALL(evt_run_case_evt, 9, 1, STRING("A_sui"), 0, PTR(door_switch), 0)
     RETURN
 EVT_END()
 

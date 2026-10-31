@@ -2,7 +2,6 @@
 #include "eff/eff_starstone.h"
 #include "evt/evt_cmd.h"
 
-#pragma force_active on
 #include "driver/offscreendrv.h"
 #include "mario/mario.h"
 #include "mario/mariost.h"
@@ -145,69 +144,26 @@ static void _mapsetofs_all(CloudWork* wp);
 static void _mapclsofs_all(CloudWork* wp);
 extern s32 envSetYami[];
 
-f32 fd_mri_00_negone_one_374[2] __attribute__((aligned(8)));
-f32 fd_mri_00_neg_one_382;
-f32 fd_mri_00___local_PI_383;
-f32 fd_mri_00___local_3PIO2_385;
-f32 fd_mri_00_one_negone_373[2] __attribute__((aligned(8)));
-f32 fd_mri_00___local_PIO2_384;
-f32 fd_mri_00_one_381;
-f32 fd_mri_00_negone_one_360[2] __attribute__((aligned(8)));
-f32 fd_mri_00_neg_one_365;
-f32 fd_mri_00___local_PI_366;
-f32 fd_mri_00___local_3PIO2_368;
-f32 fd_mri_00_one_negone_359[2] __attribute__((aligned(8)));
-f32 fd_mri_00___local_PIO2_367;
-f32 fd_mri_00_one_364;
 static s16 puni_rand_position[196];
-EvtWord mario_see_you_init[54];
+extern EvtWord mario_see_you_init[];
 static f32 spline_dt[24];
-EvtWord seal_bigtree[213];
-EvtWord seal_bigtree2[143];
-static EvtWord guide_init[72];
+extern EvtWord seal_bigtree[];
+extern EvtWord seal_bigtree2[];
 static EvtWord guide_talk[29];
-static EvtWord rival_init[21];
-static EvtWord rival_talk[8];
-static EvtWord chibitoge_init[25];
-static EvtWord chibitoge_talk[60];
-static EvtWord sister_init[21];
-static EvtWord sister_talk[8];
-static EvtWord elder_init[21];
-static EvtWord elder_talk[8];
-static EvtWord fabio_init[20];
-static EvtWord fabio_talk[20];
-static EvtWord odoriko_1_talk[20];
-static EvtWord odoriko_1_init[33];
-static EvtWord odoriko_2_talk[20];
-static EvtWord odoriko_2_init[33];
-static EvtWord odoriko_3_talk[20];
-static EvtWord odoriko_3_init[33];
 static NpcSetupInfo npcEnt[7];
-static EvtWord bero_01_doa_close[7];
-static EvtWord bero_01_doa_open[7];
-static EvtWord first_time_w_bero[18];
-EvtWord out_ne_bero[44];
-static EvtWord out_w_bero[12];
-EvtWord out_dokan_1[30];
+extern EvtWord out_ne_bero[];
+extern EvtWord out_dokan_1[];
 BeroEntry bero_lostitem[1];
 static BeroEntry bero_entry_data[4];
-EvtWord first_bigtree[99];
+extern EvtWord first_bigtree[];
 static const char* capturemap[4];
 static EvtWord evt_cloud_main_evt[4];
 f32 guide_move_data[15];
-EvtWord open_bigtree[446];
-EvtWord mario_see_you[210];
-EvtWord puni_set[59];
-static EvtWord sekai_yami_npc[59];
-EvtWord sekai_yami_puni[70];
-static EvtWord sekai_yami_evt[322];
-static EvtWord minnnanokoe_evt[620];
-static EvtWord evt_switch_init[17];
-#ifdef VERSION_G8ME01
-EvtWord mri_00_init_evt[377];
-#else
-EvtWord mri_00_init_evt[296];
-#endif
+extern EvtWord open_bigtree[];
+extern EvtWord mario_see_you[];
+extern EvtWord puni_set[];
+extern EvtWord sekai_yami_puni[];
+extern EvtWord mri_00_init_evt[];
 
 static void _img_alloc_capture(EvtWord a0, EvtWord a1, EvtWord a2, EvtWord a3, EvtWord a4, EvtWord a5, EvtWord a6, EvtWord a7) {
     EventEntry event;
@@ -265,34 +221,6 @@ static void _mapclsofs_all(CloudWork* wp) {
         mapGrpClearOffScreen(wp->groupNames[i]);
     }
 }
-
-f32 fd_mri_00_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
-
-f32 fd_mri_00_neg_one_382 = -1.0f;
-
-f32 fd_mri_00___local_PI_383 = 3.1415927f;
-
-f32 fd_mri_00___local_3PIO2_385 = 4.712389f;
-
-f32 fd_mri_00_one_negone_373[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
-
-f32 fd_mri_00___local_PIO2_384 = 1.5707964f;
-
-f32 fd_mri_00_one_381 = 1.0f;
-
-f32 fd_mri_00_negone_one_360[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
-
-f32 fd_mri_00_neg_one_365 = -1.0f;
-
-f32 fd_mri_00___local_PI_366 = 3.1415927f;
-
-f32 fd_mri_00___local_3PIO2_368 = 4.712389f;
-
-f32 fd_mri_00_one_negone_359[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
-
-f32 fd_mri_00___local_PIO2_367 = 1.5707964f;
-
-f32 fd_mri_00_one_364 = 1.0f;
 
 static s16 puni_rand_position[] = {
     83, 10, 33, 31, 176, 118, -98, 49,
@@ -1328,7 +1256,6 @@ static USER_FUNC(starstone_set_ry) {
     return EVT_RETURN_DONE;
 }
 
-
 EVT_BEGIN(puni_set)
     SET_VALUE(LW(0), 5)
     SET_VALUE(LW(1), 0)
@@ -1784,7 +1711,7 @@ EVT_BEGIN(mri_00_init_evt)
     IF_INT_LESS_OR_EQUAL(GSW(0), 87)
         CALL(evt_mapobj_flag_onoff, 1, 1, STRING("S_non"), 1)
         CALL(evt_mri_cloud_init)
-        CALL(evt_mri_cloud_ent, PTR(&capturemap), STRING("A_kaze\0"), PTR(open_bigtree))
+        CALL(evt_mri_cloud_ent, PTR(&capturemap), STRING("A_kaze"), PTR(open_bigtree))
         SET_VALUE(LW(0), STRING("ne_bero"))
         CALL_CHILD(PTR(bero_case_switch_off))
         ELSE

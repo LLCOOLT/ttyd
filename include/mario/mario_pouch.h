@@ -3,7 +3,6 @@
 #include <dolphin/types.h>
 
 #define MAX_KEY_ITEMS 121
-// TODO: change name if it collides with backpack something
 #define MAX_HELD_ITEMS 20
 #define HELD_ITEM_COUNT_BASE 10
 #define GetHeldItemCount pouchCheckItem(ITEM_STRANGE_SACK) ? MAX_HELD_ITEMS : HELD_ITEM_COUNT_BASE
@@ -451,29 +450,29 @@ s32 pouchGetEmptyHaveItemCnt(void);
 s32 pouchGetEmptyKeepItemCnt(void);
 BOOL pouchGetItem(ItemType type);
 
-u32 pouchCheckItem(u32 itemId);
+s32 pouchCheckItem(u32 itemId);
 
 BOOL pouchRemoveItem(ItemType type);
 
 s32 pouchGetCoin(void);
 s16 pouchAddCoin(s16 coins);
 s32 pouchSetCoin(s32 coins);
-s16 pouchGetSuperCoin(void);
+s32 pouchGetSuperCoin(void);
 s16 pouchSetSuperCoin(s16 count);
-s16 pouchGetStarPiece(void);
+s32 pouchGetStarPiece(void);
 s16 pouchAddStarPiece(s16 count);
 s16 pouchAddHP(s16 points);
-s16 pouchGetHP(void);
+s32 pouchGetHP(void);
 s16 pouchGetMaxHP(void);
 void pouchSetHP(s16 points);
 void pouchSetMaxHP(s16 points);
-s16 pouchGetPartyHP(PartyId partnerId);
+s32 pouchGetPartyHP(PartyId partnerId);
 void pouchSetPartyHP(PartyId partnerId, s16 points);
-s16 pouchGetFP(void);
+s32 pouchGetFP(void);
 s16 pouchGetMaxFP(void);
 void pouchSetFP(s16 points);
 void pouchSetMaxFP(s16 points);
-s16 pouchGetAP(void);
+s32 pouchGetAP(void);
 void pouchAddAP(s16 points);
 void pouchSetAP(s16 points);
 s16 pouchGetMaxAP(void);
@@ -508,3 +507,6 @@ s32 pouchGetPartyColor(PartyId partnerId);
 void pouchSetPartyColor(PartyId partnerId, s32 color);
 void pouchSetYoshiName(char* name);
 char* pouchGetYoshiName(void);
+
+BOOL pouchRemoveItemIndex(ItemType type, s32 index);
+void pouchSortItem(s32 mode);

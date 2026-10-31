@@ -44,11 +44,11 @@ typedef struct EffFallVtx {
 typedef struct EffFallElem {
     s32 type;         // 0x0
     Vec pos;          // 0x4
-    f32 arg4;         // 0x10
-    f32 arg5;         // 0x14
+    f32 width;        // 0x10
+    f32 drop;         // 0x14
     f32 rotY;         // 0x18
-    s32 arg7;         // 0x1C
-    s32 arg8;         // 0x20
+    s32 num;          // 0x1C
+    s32 duration;     // 0x20
     s32 timer;        // 0x24
     s32 scroll;       // 0x28
     f32 scale;        // 0x2C
@@ -66,26 +66,18 @@ typedef struct EffFallElem {
     s32 sfx;          // 0x64
 } EffFallElem;
 
-__declspec(section ".data") f32 eff_fall_negone_one_a[] = { -1.0f, 1.0f };
-__declspec(section ".data") static f32 negone_one_374[] = { -1.0f, 1.0f };
-__declspec(section ".data") f32 eff_fall_one_negone_a[] = { 1.0f, -1.0f };
-__declspec(section ".data") static f32 one_negone_373[] = { 1.0f, -1.0f };
-__declspec(section ".data") f32 eff_fall_negone_one_b[] = { -1.0f, 1.0f };
-__declspec(section ".data") static f32 negone_one_360[] = { -1.0f, 1.0f };
-__declspec(section ".data") f32 eff_fall_one_negone_b[] = { 1.0f, -1.0f };
-__declspec(section ".data") static f32 one_negone_359[] = { 1.0f, -1.0f };
-static s16 shibuki_vertex_tbl[] = { -14012, 946, -2560, -7355, 946, -2560, -697, 946, -2560, 5959, 946, -2560, 12617, 946, -2560, -17337, 7417, -2560, -8130, 10717, -2560, -697, 12271, -2560, 6734, 10717, -2560, 15942, 7417, -2560, -23097, 11535, -2560, -11577, 18594, -2560, -697, 20431, -2560, 10822, 18594, -2560, 21702, 11535, -2560, -14777, 3888, -2560, -7591, 3922, -2560, -697, 3922, -2560, 6195, 3922, -2560, 13262, 3922, -2560, -19292, 8815, -2560, -9810, 14556, -2560, -697, 16241, -2560, 8831, 14757, -2560, 17896, 8815, -2560, -12537, 0, -3520, 262, 0, -3520, 13062, 0, -3520, -12537, 1702, -3520, 262, 4006, -3520, 13062, 1702, -3520, -12537, 4940, -3520, 262, 8012, -3520, 13062, 4940, -3520, 10533, 5964, -3520, 10439, 2726, -3520, 10468, 0, -3520, -10037, 5964, -3520, -10021, 2726, -3520, -10006, 0, -3520, 0, 0, 0, 0, 0, 0, 0, 0 };
-static s16 shibuki_texcoord0_tbl[] = { 0, 12018, 4096, 12749, 4096, 14745, 0, 14745, 8192, 13023, 8192, 14745, 12288, 12749, 12288, 14745, 16384, 12018, 16384, 14745, 0, 1638, 4096, 1638, 4096, 4997, 0, 5968, 8192, 1638, 8192, 5003, 12288, 1638, 12288, 4830, 16384, 1638, 16384, 5968, 0, 8192, 4096, 8192, 8192, 8192, 12288, 8192, 16384, 8192, -3220, 8192, -16384, 8192, -16384, 16384, -3240, 16384, 13026, 8192, 16384, 16384, 13064, 16384, -3200, 0, -16384, 0, 13147, 0, 16384, 0, 0, 0, 0, 16384, 0, 0, 0, 0 };
-static u8 shibuki_dl_0_0[] = { 0x98, 0x00, 0x0A, 0x0A, 0x00, 0x00, 0x0A, 0x0B, 0x00, 0x00, 0x0B, 0x14, 0x00, 0x00, 0x0D, 0x15, 0x00, 0x02, 0x0C, 0x05, 0x00, 0x00, 0x14, 0x06, 0x00, 0x03, 0x15, 0x0F, 0x00, 0x00, 0x00, 0x10, 0x00, 0x01, 0x01, 0x00, 0x00, 0x00, 0x03, 0x01, 0x00, 0x00, 0x02, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 };
-static u8 shibuki_dl_0_1[] = { 0x98, 0x00, 0x0A, 0x0B, 0x00, 0x00, 0x0B, 0x0C, 0x00, 0x00, 0x0E, 0x15, 0x00, 0x02, 0x0C, 0x16, 0x00, 0x02, 0x0F, 0x06, 0x00, 0x03, 0x15, 0x07, 0x00, 0x03, 0x16, 0x10, 0x00, 0x01, 0x01, 0x11, 0x00, 0x01, 0x04, 0x01, 0x00, 0x00, 0x02, 0x02, 0x00, 0x00, 0x05, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 };
-static u8 shibuki_dl_0_2[] = { 0x98, 0x00, 0x0A, 0x0C, 0x00, 0x00, 0x0E, 0x0D, 0x00, 0x00, 0x10, 0x16, 0x00, 0x02, 0x0F, 0x17, 0x00, 0x02, 0x11, 0x07, 0x00, 0x03, 0x16, 0x08, 0x00, 0x03, 0x17, 0x11, 0x00, 0x01, 0x04, 0x12, 0x00, 0x01, 0x06, 0x02, 0x00, 0x00, 0x05, 0x03, 0x00, 0x00, 0x07, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 };
-static u8 shibuki_dl_0_3[] = { 0x98, 0x00, 0x0A, 0x0D, 0x00, 0x00, 0x10, 0x0E, 0x00, 0x00, 0x12, 0x17, 0x00, 0x02, 0x11, 0x18, 0x00, 0x00, 0x13, 0x08, 0x00, 0x03, 0x17, 0x09, 0x00, 0x00, 0x18, 0x12, 0x00, 0x01, 0x06, 0x13, 0x00, 0x00, 0x08, 0x03, 0x00, 0x00, 0x07, 0x04, 0x00, 0x00, 0x09, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 };
-static s8 shibuki_normal_tbl[] = { 0, 0, 64, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
-static u8 shibuki_color0_tbl[] = { 0xFF, 0xFF, 0xFF, 0x00, 0xFF, 0xFF, 0xFF, 0x7F, 0xFF, 0xFF, 0xFF, 0x19, 0xFF, 0xFF, 0xFF, 0x4C, 0xB6, 0xCC, 0xCB, 0x33, 0xB6, 0xCC, 0xCB, 0x4C, 0xB6, 0xCC, 0xCB, 0x99, 0xB6, 0xCC, 0xCB, 0x00 };
-static u8 shibuki_dl_1_0[] = { 0x98, 0x00, 0x06, 0x1F, 0x00, 0x07, 0x24, 0x25, 0x00, 0x04, 0x20, 0x1C, 0x00, 0x07, 0x14, 0x26, 0x00, 0x04, 0x19, 0x19, 0x00, 0x07, 0x25, 0x27, 0x00, 0x06, 0x1C, 0x00, 0x00, 0x00, 0x00, 0x00 };
-static u8 shibuki_dl_1_1[] = { 0x98, 0x00, 0x06, 0x20, 0x00, 0x04, 0x24, 0x22, 0x00, 0x04, 0x22, 0x1D, 0x00, 0x05, 0x14, 0x23, 0x00, 0x04, 0x1D, 0x1A, 0x00, 0x06, 0x25, 0x24, 0x00, 0x06, 0x1F, 0x00, 0x00, 0x00, 0x00, 0x00 };
-static u8 shibuki_dl_1_2[] = { 0x98, 0x00, 0x06, 0x22, 0x00, 0x04, 0x22, 0x21, 0x00, 0x07, 0x23, 0x23, 0x00, 0x04, 0x1D, 0x1E, 0x00, 0x07, 0x18, 0x24, 0x00, 0x06, 0x1F, 0x1B, 0x00, 0x07, 0x1E, 0x00, 0x00, 0x00, 0x00, 0x00 };
-static u8 shibuki_dl_1_3[] = { 0x98, 0x00, 0x06, 0x25, 0x00, 0x04, 0x20, 0x20, 0x00, 0x04, 0x21, 0x26, 0x00, 0x04, 0x19, 0x1D, 0x00, 0x05, 0x1A, 0x27, 0x00, 0x06, 0x1C, 0x1A, 0x00, 0x06, 0x1B, 0x00, 0x00, 0x00, 0x00, 0x00 };
+static s16 shibuki_vertex_tbl[] __attribute__((aligned(32))) = { -14012, 946, -2560, -7355, 946, -2560, -697, 946, -2560, 5959, 946, -2560, 12617, 946, -2560, -17337, 7417, -2560, -8130, 10717, -2560, -697, 12271, -2560, 6734, 10717, -2560, 15942, 7417, -2560, -23097, 11535, -2560, -11577, 18594, -2560, -697, 20431, -2560, 10822, 18594, -2560, 21702, 11535, -2560, -14777, 3888, -2560, -7591, 3922, -2560, -697, 3922, -2560, 6195, 3922, -2560, 13262, 3922, -2560, -19292, 8815, -2560, -9810, 14556, -2560, -697, 16241, -2560, 8831, 14757, -2560, 17896, 8815, -2560, -12537, 0, -3520, 262, 0, -3520, 13062, 0, -3520, -12537, 1702, -3520, 262, 4006, -3520, 13062, 1702, -3520, -12537, 4940, -3520, 262, 8012, -3520, 13062, 4940, -3520, 10533, 5964, -3520, 10439, 2726, -3520, 10468, 0, -3520, -10037, 5964, -3520, -10021, 2726, -3520, -10006, 0, -3520};
+static s16 shibuki_texcoord0_tbl[] __attribute__((aligned(32))) = { 0, 12018, 4096, 12749, 4096, 14745, 0, 14745, 8192, 13023, 8192, 14745, 12288, 12749, 12288, 14745, 16384, 12018, 16384, 14745, 0, 1638, 4096, 1638, 4096, 4997, 0, 5968, 8192, 1638, 8192, 5003, 12288, 1638, 12288, 4830, 16384, 1638, 16384, 5968, 0, 8192, 4096, 8192, 8192, 8192, 12288, 8192, 16384, 8192, -3220, 8192, -16384, 8192, -16384, 16384, -3240, 16384, 13026, 8192, 16384, 16384, 13064, 16384, -3200, 0, -16384, 0, 13147, 0, 16384, 0, 0, 0, 0, 16384};
+static u8 shibuki_dl_0_0[] __attribute__((aligned(32))) = { 0x98, 0x00, 0x0A, 0x0A, 0x00, 0x00, 0x0A, 0x0B, 0x00, 0x00, 0x0B, 0x14, 0x00, 0x00, 0x0D, 0x15, 0x00, 0x02, 0x0C, 0x05, 0x00, 0x00, 0x14, 0x06, 0x00, 0x03, 0x15, 0x0F, 0x00, 0x00, 0x00, 0x10, 0x00, 0x01, 0x01, 0x00, 0x00, 0x00, 0x03, 0x01, 0x00, 0x00, 0x02, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 };
+static u8 shibuki_dl_0_1[] __attribute__((aligned(32))) = { 0x98, 0x00, 0x0A, 0x0B, 0x00, 0x00, 0x0B, 0x0C, 0x00, 0x00, 0x0E, 0x15, 0x00, 0x02, 0x0C, 0x16, 0x00, 0x02, 0x0F, 0x06, 0x00, 0x03, 0x15, 0x07, 0x00, 0x03, 0x16, 0x10, 0x00, 0x01, 0x01, 0x11, 0x00, 0x01, 0x04, 0x01, 0x00, 0x00, 0x02, 0x02, 0x00, 0x00, 0x05, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 };
+static u8 shibuki_dl_0_2[] __attribute__((aligned(32))) = { 0x98, 0x00, 0x0A, 0x0C, 0x00, 0x00, 0x0E, 0x0D, 0x00, 0x00, 0x10, 0x16, 0x00, 0x02, 0x0F, 0x17, 0x00, 0x02, 0x11, 0x07, 0x00, 0x03, 0x16, 0x08, 0x00, 0x03, 0x17, 0x11, 0x00, 0x01, 0x04, 0x12, 0x00, 0x01, 0x06, 0x02, 0x00, 0x00, 0x05, 0x03, 0x00, 0x00, 0x07, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 };
+static u8 shibuki_dl_0_3[] __attribute__((aligned(32))) = { 0x98, 0x00, 0x0A, 0x0D, 0x00, 0x00, 0x10, 0x0E, 0x00, 0x00, 0x12, 0x17, 0x00, 0x02, 0x11, 0x18, 0x00, 0x00, 0x13, 0x08, 0x00, 0x03, 0x17, 0x09, 0x00, 0x00, 0x18, 0x12, 0x00, 0x01, 0x06, 0x13, 0x00, 0x00, 0x08, 0x03, 0x00, 0x00, 0x07, 0x04, 0x00, 0x00, 0x09, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 };
+static s8 shibuki_normal_tbl[] __attribute__((aligned(32))) = { 0, 0, 64};
+static u8 shibuki_color0_tbl[] __attribute__((aligned(32))) = { 0xFF, 0xFF, 0xFF, 0x00, 0xFF, 0xFF, 0xFF, 0x7F, 0xFF, 0xFF, 0xFF, 0x19, 0xFF, 0xFF, 0xFF, 0x4C, 0xB6, 0xCC, 0xCB, 0x33, 0xB6, 0xCC, 0xCB, 0x4C, 0xB6, 0xCC, 0xCB, 0x99, 0xB6, 0xCC, 0xCB, 0x00 };
+static u8 shibuki_dl_1_0[] __attribute__((aligned(32))) = { 0x98, 0x00, 0x06, 0x1F, 0x00, 0x07, 0x24, 0x25, 0x00, 0x04, 0x20, 0x1C, 0x00, 0x07, 0x14, 0x26, 0x00, 0x04, 0x19, 0x19, 0x00, 0x07, 0x25, 0x27, 0x00, 0x06, 0x1C, 0x00, 0x00, 0x00, 0x00, 0x00 };
+static u8 shibuki_dl_1_1[] __attribute__((aligned(32))) = { 0x98, 0x00, 0x06, 0x20, 0x00, 0x04, 0x24, 0x22, 0x00, 0x04, 0x22, 0x1D, 0x00, 0x05, 0x14, 0x23, 0x00, 0x04, 0x1D, 0x1A, 0x00, 0x06, 0x25, 0x24, 0x00, 0x06, 0x1F, 0x00, 0x00, 0x00, 0x00, 0x00 };
+static u8 shibuki_dl_1_2[] __attribute__((aligned(32))) = { 0x98, 0x00, 0x06, 0x22, 0x00, 0x04, 0x22, 0x21, 0x00, 0x07, 0x23, 0x23, 0x00, 0x04, 0x1D, 0x1E, 0x00, 0x07, 0x18, 0x24, 0x00, 0x06, 0x1F, 0x1B, 0x00, 0x07, 0x1E, 0x00, 0x00, 0x00, 0x00, 0x00 };
+static u8 shibuki_dl_1_3[] __attribute__((aligned(32))) = { 0x98, 0x00, 0x06, 0x25, 0x00, 0x04, 0x20, 0x20, 0x00, 0x04, 0x21, 0x26, 0x00, 0x04, 0x19, 0x1D, 0x00, 0x05, 0x1A, 0x27, 0x00, 0x06, 0x1C, 0x1A, 0x00, 0x06, 0x1B, 0x00, 0x00, 0x00, 0x00, 0x00 };
 
 s32 evt_cam_shake(EventEntry* event, BOOL isFirstCall);
 
@@ -176,7 +168,7 @@ static inline f32 fall_cosf(f32 x) {
     return a;
 }
 
-EffectEntry* effFallEntry(s32 type, f32 x, f32 y, f32 z, f32 arg4, f32 arg5, f32 arg6, s32 arg7, s32 arg8);
+EffectEntry* effFallEntry(s32 type, f32 x, f32 y, f32 z, f32 width, f32 drop, f32 dir, s32 num, s32 duration);
 void DCFlushRange(void* addr, u32 nBytes);
 void GXBegin(GXPrimitive type, GXVtxFmt vtxfmt, u16 nverts);
 void GXCallDisplayList(void* list, u32 nbytes);
@@ -209,7 +201,7 @@ void PSMTXRotAxisRad(Mtx m, const Vec* axis, f32 rad);
 void PSMTXRotRad(Mtx m, char axis, f32 rad);
 void PSMTXScale(Mtx m, f32 xS, f32 yS, f32 zS);
 void PSMTXTrans(Mtx m, f32 xT, f32 yT, f32 zT);
-EffectEntry* effFallEntry(s32 type, f32 x, f32 y, f32 z, f32 arg4, f32 arg5, f32 arg6, s32 arg7, s32 arg8) {
+EffectEntry* effFallEntry(s32 type, f32 x, f32 y, f32 z, f32 width, f32 drop, f32 dir, s32 num, s32 duration) {
     const char* sfxName;
     EffectEntry* effect;
     EffFallElem* e;
@@ -221,10 +213,10 @@ EffectEntry* effFallEntry(s32 type, f32 x, f32 y, f32 z, f32 arg4, f32 arg5, f32
     f32 r;
 
     effect = effEntry();
-    count = arg7 + 1;
+    count = num + 1;
     switch (type) {
     case 0:
-        count = arg7 + 1;
+        count = num + 1;
         break;
     case 1:
     case 2:
@@ -234,7 +226,7 @@ EffectEntry* effFallEntry(s32 type, f32 x, f32 y, f32 z, f32 arg4, f32 arg5, f32
     case 6:
     case 7:
     case 8:
-        arg7 = 1;
+        num = 1;
         count = 2;
         break;
     }
@@ -245,19 +237,19 @@ EffectEntry* effFallEntry(s32 type, f32 x, f32 y, f32 z, f32 arg4, f32 arg5, f32
     effect->callback = effFallMain;
     effect->flags |= 2;
     // FAKE: comma temps are coloured in assignment order (ia r30 above sfxName r29)
-    ia = (0, (s32)arg4);
-    sfxName = (0, "SFX_BTL_STAGE_FALL_WATER1\0\0");
+    ia = (0, (s32)width);
+    sfxName = (0, "SFX_BTL_STAGE_FALL_WATER1");
     w->type = type;
     w->pos.x = x;
     w->pos.y = y;
     w->pos.z = z;
-    w->arg4 = arg4;
-    w->arg5 = arg5;
-    w->rotY = arg6;
-    w->arg7 = arg7;
+    w->width = width;
+    w->drop = drop;
+    w->rotY = dir;
+    w->num = num;
     w->timer = 0;
     w->scroll = 0;
-    w->arg8 = arg8;
+    w->duration = duration;
     w->pose0 = -1;
     w->pose1 = -1;
     for (i = 1, e = w + 1; i < effect->count; i++, e++) {
@@ -377,14 +369,14 @@ void effFallMain(EffectEntry* effect) {
     EffFallElem* e;
     s32 i;
     s32 type;
-    s32 arg8;
+    s32 duration;
     s32 played;
     s32 done;
     s32 group;
     f32 y;
     f32 angle;
     f32 top;
-    f32 arg4;
+    f32 width;
     f32 ground;
     f32 a;
     s32 j;
@@ -398,11 +390,11 @@ void effFallMain(EffectEntry* effect) {
         sndPos = v;
     }
     played = 0;
-    ground = y + e->arg5;
+    ground = y + e->drop;
     type = e->type;
-    arg4 = e->arg4;
+    width = e->width;
     rotY = e->rotY;
-    arg8 = e->arg8;
+    duration = e->duration;
     group = gp->inBattle != 0;
     if (effect->flags & 4) {
         effect->flags &= ~4;
@@ -438,7 +430,7 @@ void effFallMain(EffectEntry* effect) {
                         }
                         e->pos.y += e->f34;
                         e->f34 -= e->f30;
-                        if (distABf(e->pos.x, e->pos.z, 0.0f, 0.0f) < arg4 / 2.0f) {
+                        if (distABf(e->pos.x, e->pos.z, 0.0f, 0.0f) < width / 2.0f) {
                             if (e->pos.y < ground) {
                                 e->pos.y = ground;
                                 e->f34 *= -0.3f;
@@ -499,7 +491,7 @@ void effFallMain(EffectEntry* effect) {
                             e->pos.y = y;
                             e->timer = 0;
                             e->state++;
-                            psndSFXOn_3D(SFX_NAME_WORD("SFX_BTL_STAGE_DAMAGE_FORK1\0"), &sndPos);
+                            psndSFXOn_3D(SFX_NAME_WORD("SFX_BTL_STAGE_DAMAGE_FORK1"), &sndPos);
                         }
                         break;
                     case 1:
@@ -564,7 +556,7 @@ void effFallMain(EffectEntry* effect) {
                             effWaterDamageN64Entry(4, 20, sndPos.x, sndPos.y, sndPos.z, 1.0f);
                         }
                         e->timer++;
-                        if (e->timer > arg8) {
+                        if (e->timer > duration) {
                             e->state++;
                         }
                         break;
@@ -585,19 +577,19 @@ void effFallMain(EffectEntry* effect) {
                 switch (e->state) {
                     case 0:
                         if (type == 5) {
-                            if (!animGroupBaseAsync("EFF_Baketu\0", group, 0)) {
+                            if (!animGroupBaseAsync("EFF_Baketu", group, 0)) {
                                 break;
                             }
                             if (e->pose0 == -1) {
-                                e->pose0 = animPoseEntry("EFF_Baketu\0", group);
+                                e->pose0 = animPoseEntry("EFF_Baketu", group);
                                 animPoseSetAnim(e->pose0, "Z_1", 1);
                             }
                         } else {
-                            if (!animGroupBaseAsync("EFF_Tarai\0\0", group, 0)) {
+                            if (!animGroupBaseAsync("EFF_Tarai", group, 0)) {
                                 break;
                             }
                             if (e->pose0 == -1) {
-                                e->pose0 = animPoseEntry("EFF_Tarai\0\0", group);
+                                e->pose0 = animPoseEntry("EFF_Tarai", group);
                                 animPoseSetAnim(e->pose0, "Z_1", 1);
                             }
                         }
@@ -611,7 +603,7 @@ void effFallMain(EffectEntry* effect) {
                     case 1:
                         e->pos.y += e->f34;
                         e->f34 -= e->f30;
-                        if (distABf(e->pos.x, e->pos.z, 0.0f, 0.0f) < arg4 / 2.0f) {
+                        if (distABf(e->pos.x, e->pos.z, 0.0f, 0.0f) < width / 2.0f) {
                             if (e->pos.y < ground) {
                                 e->pos.y = ground;
                                 e->f34 *= -0.3f;
@@ -680,13 +672,13 @@ void effFallMain(EffectEntry* effect) {
             case 6:
                 switch (e->state) {
                     case 0:
-                        if (!animGroupBaseAsync("EFF_koopa\0\0", group, 0)) {
+                        if (!animGroupBaseAsync("EFF_koopa", group, 0)) {
                             break;
                         }
                         if (e->pose0 == -1) {
-                            e->pose0 = animPoseEntry("EFF_koopa\0\0", group);
+                            e->pose0 = animPoseEntry("EFF_koopa", group);
                             animPoseSetAnim(e->pose0, "Z_1", 1);
-                            psndSFXOn_3D(SFX_NAME_WORD("SFX_BTL_STAGE_FALL_KOOPA1\0\0"), &sndPos);
+                            psndSFXOn_3D(SFX_NAME_WORD("SFX_BTL_STAGE_FALL_KOOPA1"), &sndPos);
                         }
                         e->pos.x += e->vel.x;
                         e->pos.y += e->vel.y;
@@ -711,7 +703,7 @@ void effFallMain(EffectEntry* effect) {
                             e->state++;
                         }
                         if (e->timer == 100) {
-                            psndSFXOn_3D(SFX_NAME_WORD("SFX_BTL_STAGE_FALL_KOOPA1\0\0"), &sndPos);
+                            psndSFXOn_3D(SFX_NAME_WORD("SFX_BTL_STAGE_FALL_KOOPA1"), &sndPos);
                         }
                         break;
                     case 2:
@@ -727,7 +719,7 @@ void effFallMain(EffectEntry* effect) {
                             done++;
                         }
                         if (e->timer == 70) {
-                            psndSFXOn_3D(SFX_NAME_WORD("SFX_BTL_STAGE_FALL_KOOPA1\0\0"), &sndPos);
+                            psndSFXOn_3D(SFX_NAME_WORD("SFX_BTL_STAGE_FALL_KOOPA1"), &sndPos);
                         }
                         break;
                 }
@@ -738,16 +730,16 @@ void effFallMain(EffectEntry* effect) {
             case 7:
                 switch (e->state) {
                     case 0:
-                        if (!animGroupBaseAsync("EFF_inseki\0", group, 0)) {
+                        if (!animGroupBaseAsync("EFF_inseki", group, 0)) {
                             break;
                         }
-                        psndSFXOn_3D(SFX_NAME_WORD("SFX_BTL_STAGE_FALL_METEOR1\0"), &sndPos);
+                        psndSFXOn_3D(SFX_NAME_WORD("SFX_BTL_STAGE_FALL_METEOR1"), &sndPos);
                         if (e->pose0 == -1) {
-                            e->pose0 = animPoseEntry("EFF_inseki\0", group);
+                            e->pose0 = animPoseEntry("EFF_inseki", group);
                             animPoseSetAnim(e->pose0, "Z_1", 1);
                         }
                         if (e->pose1 == -1) {
-                            e->pose1 = animPoseEntry("EFF_inseki\0", group);
+                            e->pose1 = animPoseEntry("EFF_inseki", group);
                             animPoseSetAnim(e->pose1, "Z_2", 1);
                         }
                     case 2:
@@ -784,7 +776,7 @@ void effFallMain(EffectEntry* effect) {
                             e->pos.z = e->vel.z;
                             e->state++;
                             if (e->state == 2) {
-                                e->sfx = psndSFXOn_3D(SFX_NAME_WORD("SFX_BTL_STAGE_DAMAGE_METEOR2\0\0\0"), &sndPos);
+                                e->sfx = psndSFXOn_3D(SFX_NAME_WORD("SFX_BTL_STAGE_DAMAGE_METEOR2"), &sndPos);
                             }
                             if (e->state != 8) {
                                 effKemuri1N64Entry(4, sndPos.x + e->pos.x, sndPos.y + e->pos.y - 40.0f, sndPos.z + e->pos.z, 0.0f);
@@ -815,10 +807,10 @@ void effFallMain(EffectEntry* effect) {
             case 8:
                 switch (e->state) {
                     case 0:
-                        if (!animGroupBaseAsync("EFF_light\0\0", group, 0)) {
+                        if (!animGroupBaseAsync("EFF_light", group, 0)) {
                             break;
                         }
-                        e->pose0 = animPoseEntry("EFF_light\0\0", group);
+                        e->pose0 = animPoseEntry("EFF_light", group);
                         animPoseSetAnim(e->pose0, "Z_1", 1);
                         e->state++;
                         break;
@@ -844,7 +836,7 @@ void effFallMain(EffectEntry* effect) {
                             break;
                         }
                         e->timer++;
-                        if (e->timer > e->arg8) {
+                        if (e->timer > e->duration) {
                             e->state++;
                         }
                         break;
@@ -1212,9 +1204,10 @@ void effFallDispWater(CameraId cameraId, EffectEntry *effect) {
         EffFallWork *w2;
         w = effect->userdata;
         w2 = w;
+        s = 0.8f;
         if (w2->state > 0) {
             PSMTXTrans(trans, w2->pos2.x, w2->pos2.y, w2->pos2.z);
-            PSMTXScale(scl, 0.56f, 0.4f, 0.8f);
+            PSMTXScale(scl, 0.7f * s, 0.5f * s, s);
             PSMTXConcat(mtx, trans, trans);
             PSMTXConcat(trans, scl, trans);
             GXLoadPosMtxImm(trans, 0);
@@ -1241,8 +1234,6 @@ void effFallDispWater(CameraId cameraId, EffectEntry *effect) {
             GXCallDisplayList(shibuki_dl_1_2, 0x20);
             GXCallDisplayList(shibuki_dl_1_3, 0x20);
             PSMTXTrans(trans, w2->pos2.x, w2->pos2.y, w2->pos2.z);
-            // FAKE: constant parked in s first; target loads scale before 0.8f (natural `s = w2->scale * 0.8f` swaps the loads)
-            s = 0.8f;
             s = w2->scale * s;
             PSMTXScale(scl, 0.7f * s, 0.5f * s, s);
             PSMTXConcat(mtx, trans, trans);
@@ -1277,7 +1268,6 @@ void effFallDispWater(CameraId cameraId, EffectEntry *effect) {
     }
 }
 
-#pragma opt_propagation off
 s32 effFallCheckHit(EffectEntry* effect) {
     EffFallWork* w = effect->userdata;
     switch (w->type) {

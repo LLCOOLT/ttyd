@@ -12,7 +12,7 @@ double cos(double x);
 
 typedef struct EffKemuri7N64Work {
     BOOL active;      // 0x0
-    s16 field_0x4;    // 0x4
+    s16 type;         // 0x4, never read or written
     s16 timer;        // 0x6
     u8 alpha;         // 0x8
     u8 pad_9[3];      // 0x9
@@ -21,13 +21,13 @@ typedef struct EffKemuri7N64Work {
     Vec rotation;     // 0x24
     Mtx mtx;          // 0x30
     f32 side;         // 0x60
-    f32 field_0x64;   // 0x64
-    f32 field_0x68;   // 0x68
-    f32 field_0x6C;   // 0x6C
-    f32 field_0x70;   // 0x70
-    f32 field_0x74;   // 0x74
-    f32 field_0x78;   // 0x78
-    f32 field_0x7C;   // 0x7C
+    f32 accel;        // 0x64, motion terms mirror Kemuri3; this effect never moves
+    f32 accelStep;    // 0x68
+    f32 accelStep2;   // 0x6C
+    f32 velY;         // 0x70
+    f32 accelY;       // 0x74
+    f32 accelStepY;   // 0x78
+    f32 accelStep2Y;  // 0x7C
     f32 sinAngle;     // 0x80
     f32 cosAngle;     // 0x84
 } EffKemuri7N64Work;
@@ -50,14 +50,14 @@ EffectEntry* effKemuri7N64Entry(f32 x, f32 y, f32 z, f32 angle, f32 side) {
     f32 rad;
 
     effect = effEntry();
-    effect->type = "Kemuri7N64\0";
+    effect->type = "Kemuri7N64";
     effect->count = 1;
     work = __memAlloc(HEAP_EFFECT, sizeof(EffKemuri7N64Work));
     effect->userdata = work;
     effect->callback = effKemuri7Main;
     for (i = 0; i < 1; i++, work++) {
         work->active = TRUE;
-        work->field_0x6C = 0.0f;
+        work->accelStep2 = 0.0f;
         work->position.x = x;
         work->position.y = y;
         work->position.z = z;
@@ -66,8 +66,8 @@ EffectEntry* effKemuri7N64Entry(f32 x, f32 y, f32 z, f32 angle, f32 side) {
         work->scale.z = 1.0f;
         work->alpha = 255;
         work->side = side;
-        work->field_0x70 = 0.0f;
-        work->field_0x74 = 0.0f;
+        work->velY = 0.0f;
+        work->accelY = 0.0f;
         work->timer = 255;
         work->rotation.x = 0.0f;
         work->rotation.y = angle + 30.0f * side - 15.0f;

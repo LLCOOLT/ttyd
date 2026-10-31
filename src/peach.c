@@ -169,7 +169,7 @@ void peachChgPose(const char* name) {
         else if (strcmp(name, "P_S_1") == 0) name = "P_S_8";
         else if (strcmp(name, "P_W_1") == 0) name = "P_W_8";
         else if (strcmp(name, "P_R_1") == 0) name = "P_R_8";
-        else if (strcmp(name, "P_T_1") == 0) name = "P_T_14\0";
+        else if (strcmp(name, "P_T_1") == 0) name = "P_T_14";
     }
     if (mp->animName == NULL || strcmp(mp->animName, name) != 0) {
         mp->animName = name;
@@ -401,7 +401,27 @@ void peach_talk(void) {
         mp->airTimer = 0;
         mp->currSubMotionId = 0;
         mp->baseSpeed = 0.0f;
+#ifdef VERSION_G8MP01
+        if (mp->peachFlags & 0x2000) {
+            mp->multiTimer = 60;
+            mp->currSubMotionId = 10;
+        }
+#endif
         marioAdjustMoveDir();
         peachChgPose("P_T_1");
     }
+#ifdef VERSION_G8MP01
+    // PAL: while transformed, the talk pose drops back to the stand pose after 60 frames
+    switch (mp->currSubMotionId) {
+        case 10:
+            if (--mp->multiTimer <= 0) {
+                peachChgPose("P_S_1");
+                mp->currSubMotionId = 11;
+            }
+            break;
+        case 0:
+        case 11:
+            break;
+    }
+#endif
 }

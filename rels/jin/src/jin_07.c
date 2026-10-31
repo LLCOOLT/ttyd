@@ -2,7 +2,6 @@
 #include "evt/evt_cmd.h"
 
 #pragma defer_codegen on
-#pragma force_active on
 #include "manager/evtmgr_cmd.h"
 #include "driver/npcdrv.h"
 #include "dolphin/mtx.h"
@@ -30,8 +29,7 @@ void extLoadTev(void);
 void extDraw(void);
 void extLoadTextureExit(void);
 static void senteresa_ext_disp(CameraId camera, void* param);
-s32 jin_07_bss_pad_C;
-typedef struct Teresa { Vec pos; Vec dst; f32 t; f32 field_0x1C; f32 field_0x20; f32 field_0x24; s32 wait; u8 state; } Teresa;
+typedef struct Teresa { Vec pos; Vec dst; f32 t; f32 bobPhase; f32 angleSpeed; f32 tangentX; s32 wait; u8 state; } Teresa;
 static Teresa* pTeresa;
 static s32 g_nNumEndProc[1];
 s32 g_nNumOutBox[1];
@@ -110,61 +108,13 @@ static f32 computePos(f32 a, f32 b, f32 t);
 static void senteresa_ext_init(void);
 static f32 randf(f32 min, f32 max);
 
-f32 fd_jin_07_negone_one_374[2] __attribute__((aligned(8)));
-f32 fd_jin_07_neg_one_382;
-f32 fd_jin_07___local_PI_383;
-f32 fd_jin_07___local_3PIO2_385;
-f32 fd_jin_07_one_negone_373[2] __attribute__((aligned(8)));
-f32 fd_jin_07___local_PIO2_384;
-f32 fd_jin_07_one_381;
-f32 fd_jin_07_negone_one_360[2] __attribute__((aligned(8)));
-f32 fd_jin_07_neg_one_365;
-f32 fd_jin_07___local_PI_366;
-f32 fd_jin_07___local_3PIO2_368;
-f32 fd_jin_07_one_negone_359[2] __attribute__((aligned(8)));
-f32 fd_jin_07___local_PIO2_367;
-f32 fd_jin_07_one_364;
-static EvtWord w_close[12];
-static EvtWord w_open[12];
-static EvtWord e_close[12];
-static EvtWord e_open[12];
-EvtWord jin_07_juyo_oumu_vivian[59];
-static EvtWord check_roll[16];
+extern EvtWord jin_07_juyo_oumu_vivian[];
 static BeroEntry bero_entry_data[4];
-EvtWord evt_locked[14];
-static EvtWord evt_unlock[7];
+extern EvtWord evt_locked[];
 static NpcSetupInfo npcEnt[2];
 static ExtTexInfo senteresa_ext_entry_data[5];
-EvtWord evt_teresa_box_open[576];
-EvtWord jin_07_init_evt[151];
-
-f32 fd_jin_07_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
-
-f32 fd_jin_07_neg_one_382 = -1.0f;
-
-f32 fd_jin_07___local_PI_383 = 3.1415927f;
-
-f32 fd_jin_07___local_3PIO2_385 = 4.712389f;
-
-f32 fd_jin_07_one_negone_373[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
-
-f32 fd_jin_07___local_PIO2_384 = 1.5707964f;
-
-f32 fd_jin_07_one_381 = 1.0f;
-
-f32 fd_jin_07_negone_one_360[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
-
-f32 fd_jin_07_neg_one_365 = -1.0f;
-
-f32 fd_jin_07___local_PI_366 = 3.1415927f;
-
-f32 fd_jin_07___local_3PIO2_368 = 4.712389f;
-
-f32 fd_jin_07_one_negone_359[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
-
-f32 fd_jin_07___local_PIO2_367 = 1.5707964f;
-
-f32 fd_jin_07_one_364 = 1.0f;
+extern EvtWord evt_teresa_box_open[];
+extern EvtWord jin_07_init_evt[];
 
 static EVT_BEGIN(w_close)
     MULTIPLY_FLOAT(LW(0), FLOAT(-0.44433594f))
@@ -311,8 +261,6 @@ static ExtTexInfo senteresa_ext_entry_data[] = {
     {0},
 };
 
-
-
 static f32 randf(f32 min, f32 max) {
     f32 r = rand() / 32767.0f;
 
@@ -342,12 +290,12 @@ static void senteresa_ext_init(void) {
         pTeresa[i].dst.x = 200.0f;
         pTeresa[i].dst.y = pTeresa[i].pos.y + randf(27.0f, 170.0f);
         pTeresa[i].dst.z = pTeresa[i].pos.z + r * cosf(a);
-        pTeresa[i].field_0x1C = 0.0f;
-        pTeresa[i].field_0x20 = randf(-0.1f, 0.1f);
+        pTeresa[i].bobPhase = 0.0f;
+        pTeresa[i].angleSpeed = randf(-0.1f, 0.1f);
         pTeresa[i].t = 0.0f;
         pTeresa[i].wait = 1.7f * (i + 1);
         pTeresa[i].state = 0;
-        pTeresa[i].field_0x24 = randf(0.0f, 350.0f);
+        pTeresa[i].tangentX = randf(0.0f, 350.0f);
     }
     g_nNumOutBox[0] = 0;
     g_nNumEndProc[0] = 0;
@@ -374,7 +322,7 @@ void computePosHermite(ExtdrvPose* pose, Teresa* ter) {
     h10 = t * u * u;
     h11 = (t * t) * (t - 1.0f);
     h01 = (3.0f - t2) * (t * t);
-    m0.x = ter->field_0x24;
+    m0.x = ter->tangentX;
     m0.y = 3.4f * ter->dst.y;
     (*pose->mtx)[0][3] = ter->pos.x * h00 + m0.x * h10 + m1.x * h11 + ter->dst.x * h01;
     (*pose->mtx)[1][3] = ter->pos.y * h00 + m0.y * h10 + m1.y * h11 + ter->dst.y * h01;
@@ -475,7 +423,7 @@ USER_FUNC(senteresa_okure_move_init) {
 
 USER_FUNC(senteresa_okure_move) {
     EvtWord* args = event->args;
-    NpcEntry* npc = npcNameToPtr("\203e\203\214\203T");
+    NpcEntry* npc = npcNameToPtr("テレサ");
     f32 t = evtGetFloat(event, args[0]);
     Vec pos;
     Vec m0 = {0.0f, 250.0f, 0.0f};
@@ -494,7 +442,6 @@ USER_FUNC(senteresa_okure_move) {
     npc->position = pos;
     return EVT_RETURN_DONE;
 }
-
 
 EVT_BEGIN(evt_teresa_box_open)
     CALL(evt_snd_bgmoff, 512)

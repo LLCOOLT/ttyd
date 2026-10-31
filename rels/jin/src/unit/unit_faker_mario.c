@@ -2,7 +2,6 @@
 #include "battle/battle_unit.h"
 #include "evt/evt_cmd.h"
 
-#pragma force_active on
 #include "battle/battle.h"
 #include "battle/battle_sub.h"
 #include "mario/mario_pouch.h"
@@ -14,6 +13,7 @@
 #include "battle/battle_weapon_power.h"
 #include "evt/evt_sub.h"
 #include "battle/battle_database_common.h"
+#include "manager/evtmgr_cmd.h"
 
 BOOL BattlePartyAnimeLoad(s32 id);
 typedef struct FakerStatus { s16 data[15]; } FakerStatus;
@@ -83,20 +83,6 @@ extern BattleUnitKind unit_gullible_clauda;
 extern BattleUnitKind unit_gullible_nokotarou;
 extern BattleUnitKind unit_gullible_yoshi;
 
-f32 fd_faker_mario_negone_one_374[2] __attribute__((aligned(8)));
-f32 fd_faker_mario_neg_one_382;
-f32 fd_faker_mario___local_PI_383;
-f32 fd_faker_mario___local_3PIO2_385;
-f32 fd_faker_mario_one_negone_373[2] __attribute__((aligned(8)));
-f32 fd_faker_mario___local_PIO2_384;
-f32 fd_faker_mario_one_381;
-f32 fd_faker_mario_negone_one_360[2] __attribute__((aligned(8)));
-f32 fd_faker_mario_neg_one_365;
-f32 fd_faker_mario___local_PI_366;
-f32 fd_faker_mario___local_3PIO2_368;
-f32 fd_faker_mario_one_negone_359[2] __attribute__((aligned(8)));
-f32 fd_faker_mario___local_PIO2_367;
-f32 fd_faker_mario_one_364;
 BattleUnitKind unit_faker_mario;
 static BattleUnitDefense defence_fmario;
 static BattleUnitDefenseAttr defence_attr_fmario;
@@ -112,23 +98,18 @@ BattleUnitSetup entry_gullible_christine;
 BattleUnitSetup entry_gullible_nokotarou;
 BattleUnitSetup entry_gullible_clauda;
 BattleUnitSetup entry_gullible_yoshi;
-static EvtWord mario_zoom[19];
-static EvtWord enemy_zoom[19];
-static EvtWord fmario_zoom[19];
-static EvtWord gparty_zoom[19];
 static EvtWord init_event_fmario[189];
-EvtWord fmario_entry_event[24];
-EvtWord dead_event_fmario_down[53];
+extern EvtWord fmario_entry_event[];
+extern EvtWord dead_event_fmario_down[];
 static EvtWord dead_event_fmario[198];
 static EvtWord damage_event_fmario[22];
-EvtWord phase_event_fmario[VERSION_PICK(400, 403)];
+extern EvtWord phase_event_fmario[];
 static EvtWord attack_event_fmario[60];
-static EvtWord jump_attack_voice[36];
 static EvtWord marioAttackEvent_NormalJump[344];
 static EvtWord marioAttackEvent_KururinJump[469];
 static EvtWord marioAttackEvent_NormalHammer[299];
 static EvtWord marioAttackEvent_KaitenHammer[299];
-EvtWord party_change_event[196];
+extern EvtWord party_change_event[];
 static EvtWord wait_event_fmario[6];
 
 static USER_FUNC(_anime_load_wait) {
@@ -260,34 +241,6 @@ USER_FUNC(_load_param) {
     party->currentFp = p->currentFp;
     return EVT_RETURN_DONE;
 }
-
-f32 fd_faker_mario_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
-
-f32 fd_faker_mario_neg_one_382 = -1.0f;
-
-f32 fd_faker_mario___local_PI_383 = 3.1415927f;
-
-f32 fd_faker_mario___local_3PIO2_385 = 4.712389f;
-
-f32 fd_faker_mario_one_negone_373[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
-
-f32 fd_faker_mario___local_PIO2_384 = 1.5707964f;
-
-f32 fd_faker_mario_one_381 = 1.0f;
-
-f32 fd_faker_mario_negone_one_360[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
-
-f32 fd_faker_mario_neg_one_365 = -1.0f;
-
-f32 fd_faker_mario___local_PI_366 = 3.1415927f;
-
-f32 fd_faker_mario___local_3PIO2_368 = 4.712389f;
-
-f32 fd_faker_mario_one_negone_359[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
-
-f32 fd_faker_mario___local_PIO2_367 = 1.5707964f;
-
-f32 fd_faker_mario_one_364 = 1.0f;
 
 BattleUnitKind unit_faker_mario = {
     79,

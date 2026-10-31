@@ -1,10 +1,8 @@
 #include "version.h"
 #include "eff/eff_funemizu.h"
-#pragma dollar_identifiers on
 #include "battle/battle_unit.h"
 #include "evt/evt_cmd.h"
 
-#pragma force_active on
 #include "driver/npcdrv.h"
 #include "mario/mario_pouch.h"
 #include "driver/mapdrv.h"
@@ -34,13 +32,12 @@
 s32 marioShipChanging(void);
 void mapGrpFlagOn(const char* name, u32 flags);
 void mapGrpFlagOff(const char* name, u32 flags);
-EffectEntry* effFunemizuEntry(s32 type, f32 x, f32 y, f32 z, f32 arg4, f32 arg5);
+EffectEntry* effFunemizuEntry(s32 type, f32 x, f32 y, f32 z, f32 size, f32 yaw);
 EffectEntry* effWaterDamageN64Entry(s32 type, s32 count, f32 x, f32 y, f32 z, f32 scale);
 void mapObjGetPos(const char* name, Vec* pos);
 void suifu100taikikan_seq01(NanNPC* npc);
 void suifu100taikikan_seq00(NanNPC* npc);
 typedef struct KaitenParam { Vec pos; Vec target; f32 angle; f32 dist; } KaitenParam;
-u32 gap_05_0000001C_bss;
 static u8* _ap;
 static s32* itemsel_table_ram;
 static KaitenParam* ckp0;
@@ -276,179 +273,104 @@ static void alpha_tev(MapTevCallbackInfo* info);
 #define SAVE_EVT evt_memcard_save
 #endif
 
-f32 negone_one$374[2] __attribute__((aligned(8)));
-f32 neg_one$382;
-f32 __local_PI$383;
-f32 __local_3PIO2$385;
-u32 gap_04_0000086C_data[1];
-f32 one_negone$373[2] __attribute__((aligned(8)));
-f32 __local_PIO2$384;
-f32 one$381;
-f32 negone_one$360[2] __attribute__((aligned(8)));
-f32 neg_one$365;
-f32 __local_PI$366;
-f32 __local_3PIO2$368;
-u32 gap_04_00000894_data[1];
-f32 one_negone$359[2] __attribute__((aligned(8)));
-f32 __local_PIO2$367;
-f32 one$364;
 ExtTexInfo nannpc_entry_data[41];
 static s16 dai3_animtbl[VERSION_PICK(42, 82)];
 s16 dai3_run_animtbl[VERSION_PICK(22, 42)];
-EvtWord no00_custom[48];
+extern EvtWord no00_custom[];
 static BeroEntry bero_entry_data[2];
-static EvtWord mony_init[18];
-EvtWord gor_00_mony_regl[VERSION_PICK(9, 11)];
-EvtWord mony_peton_talk[286];
-static EvtWord mony_talk[28];
-static EvtWord peton_init[18];
-EvtWord gor_00_peton_regl[VERSION_PICK(9, 11)];
-static EvtWord peton_talk[28];
-static EvtWord marco_init[32];
-EvtWord marco_party_move[120];
-static EvtWord marco_talk[364];
-EvtWord garawaru_urouro2[25];
-static EvtWord garawaru_init[74];
-EvtWord garawaru_regl[60];
-static EvtWord garawaru_talk[77];
-static EvtWord megane_init[18];
-EvtWord megane_regl[2];
-static EvtWord megane_talk[14];
-static EvtWord odoodo_init[61];
-EvtWord odoodo_regl[29];
-static EvtWord odoodo_talk[108];
-EvtWord odoodo_ani_urouro[31];
-EvtWord odoodo_ani_init[17];
-EvtWord odoodo_ani_regl[9];
-EvtWord odoodo_ani_talk[37];
-static EvtWord suifu_a_init[36];
-EvtWord suifu_a_regl[28];
-static EvtWord suifu_a_talk[116];
-EvtWord suifu_b_init[48];
-EvtWord suifu_b_regl[29];
-EvtWord suifu_b_talk[116];
-static EvtWord suifu_d_init[14];
-static EvtWord suifu_d_talk[8];
-EvtWord suifubomb_a_urouro2[31];
-EvtWord suifubomb_a_init[53];
-EvtWord suifubomb_a_regl[30];
-EvtWord suifubomb_a_talk[VERSION_PICK(226, 218)];
-EvtWord suifubomb_b_urouro2[27];
-EvtWord suifubomb_b_init[39];
-EvtWord suifubomb_b_regl[60];
-EvtWord suifubomb_b_talk[116];
-EvtWord suifubomb_c_init[14];
-EvtWord suifubomb_c_talk[8];
-static EvtWord sanders_init[42];
+extern EvtWord gor_00_mony_regl[];
+extern EvtWord mony_peton_talk[];
+extern EvtWord gor_00_peton_regl[];
+extern EvtWord marco_party_move[];
+extern EvtWord garawaru_urouro2[];
+extern EvtWord garawaru_regl[];
+extern EvtWord megane_regl[];
+extern EvtWord odoodo_regl[];
+extern EvtWord odoodo_ani_urouro[];
+extern EvtWord odoodo_ani_init[];
+extern EvtWord odoodo_ani_regl[];
+extern EvtWord odoodo_ani_talk[];
+extern EvtWord suifu_a_regl[];
+extern EvtWord suifu_b_init[];
+extern EvtWord suifu_b_regl[];
+extern EvtWord suifu_b_talk[];
+extern EvtWord suifubomb_a_urouro2[];
+extern EvtWord suifubomb_a_init[];
+extern EvtWord suifubomb_a_regl[];
+extern EvtWord suifubomb_a_talk[];
+extern EvtWord suifubomb_b_urouro2[];
+extern EvtWord suifubomb_b_init[];
+extern EvtWord suifubomb_b_regl[];
+extern EvtWord suifubomb_b_talk[];
+extern EvtWord suifubomb_c_init[];
+extern EvtWord suifubomb_c_talk[];
 static EvtWord sanders_talk[8];
-static EvtWord korutesu_init[19];
-static EvtWord korutesu_talk[33];
-EvtWord tentyou_init[36];
-EvtWord tentyou_talk[14];
-EvtWord tenin_init[36];
-EvtWord tenin_talk[14];
-static EvtWord borodo2_init[42];
-static EvtWord borodo2_escape[43];
+extern EvtWord tentyou_init[];
+extern EvtWord tentyou_talk[];
+extern EvtWord tenin_init[];
+extern EvtWord tenin_talk[];
 static EvtWord borodo2_talk[13];
-EvtWord mokorim_init[28];
-EvtWord mokorim_talk[546];
-static EvtWord baba_init[9];
-static EvtWord luigi_init[18];
-static EvtWord luigi_talk[4];
+extern EvtWord mokorim_init[];
+extern EvtWord mokorim_talk[];
 static NpcSetupInfo luigiEnt[2];
-static EvtWord luigi_npcEnt[30];
-EvtWord rakgan_init[12];
-EvtWord rakgan_talk[8];
+extern EvtWord rakgan_init[];
+extern EvtWord rakgan_talk[];
 NpcSetupInfo rakganEnt[2];
 static NpcSetupInfo npcEnt[17];
-EvtWord ship_a_kaji_animation[51];
-EvtWord ship_a_wakka_animation[56];
-EvtWord ship_a_entotsu_animation[56];
-EvtWord ship_a_neji_animation[56];
-EvtWord ship_a_yure_animation[56];
-EvtWord ship_a_animation[132];
-static EvtWord ship_pera[119];
-EvtWord enter_gorotsuki_town_init[58];
-EvtWord christine_osoware_setup[82];
-EvtWord enter_gorotsuki_town[594];
-EvtWord christine_osoware[357];
-EvtWord gundan1000tai_beforebattle[524];
-static EvtWord _kemuri_sub[56];
-EvtWord gundan1000tai_kemuri[VERSION_PICK(20, 16)];
-EvtWord gundan1000tai_zaza_se[61];
-EvtWord gundan1000tai_jump_se[19];
-EvtWord gundan1000tai_yure[22];
-EvtWord gundan1000tai_afterbattle[1201];
-EvtWord mony_peton_after[37];
-EvtWord shukko_event_move_ship_se00[20];
-EvtWord shukko_event_move_ship_se01[20];
+extern EvtWord ship_a_kaji_animation[];
+extern EvtWord ship_a_wakka_animation[];
+extern EvtWord ship_a_entotsu_animation[];
+extern EvtWord ship_a_neji_animation[];
+extern EvtWord ship_a_yure_animation[];
+extern EvtWord ship_a_animation[];
+extern EvtWord enter_gorotsuki_town_init[];
+extern EvtWord christine_osoware_setup[];
+extern EvtWord enter_gorotsuki_town[];
+extern EvtWord christine_osoware[];
+extern EvtWord gundan1000tai_beforebattle[];
+extern EvtWord gundan1000tai_kemuri[];
+extern EvtWord gundan1000tai_zaza_se[];
+extern EvtWord gundan1000tai_jump_se[];
+extern EvtWord gundan1000tai_yure[];
+extern EvtWord gundan1000tai_afterbattle[];
+extern EvtWord mony_peton_after[];
+extern EvtWord shukko_event_move_ship_se00[];
+extern EvtWord shukko_event_move_ship_se01[];
 const char* shukko_npc_list[10];
-EvtWord shukko_event_move_ship[223];
-EvtWord shukko_event[498];
+extern EvtWord shukko_event_move_ship[];
+extern EvtWord shukko_event[];
 ExtTexInfo nannpc_entry_data01[41];
 static s16 suifu_animtbl[42];
 static s16 suifu_run_animtbl[22];
 Vec suifu100kaidanDOWN[];
 Vec suifu100kaidanUP[];
-EvtWord marco_run_away[100];
-EvtWord gorotsuki_kikan[599];
-EvtWord into_gor_ship[265];
-EvtWord mony_run_away[108];
-EvtWord peton_run_away[88];
-EvtWord mony_peton_depart[VERSION_PICK(61, 64)];
-EvtWord gor_00_koopa_evt[1095];
+extern EvtWord marco_run_away[];
+extern EvtWord gorotsuki_kikan[];
+extern EvtWord into_gor_ship[];
+extern EvtWord mony_run_away[];
+extern EvtWord peton_run_away[];
+extern EvtWord mony_peton_depart[];
+extern EvtWord gor_00_koopa_evt[];
+#ifdef VERSION_G8MP01
+static EvtWord peach_mail[215];
+#else
 static EvtWord peach_mail[209];
+#endif
 f32 gor_ship_puka_data[];
-EvtWord gor_ship_puka[21];
-EvtWord gor_muj_ship_sub[53];
+extern EvtWord gor_ship_puka[];
+extern EvtWord gor_muj_ship_sub[];
 static EvtWord option_ship_mario[139];
-EvtWord gor_muj_ship_init[42];
-EvtWord gor_muj_ship_pera[115];
-EvtWord gor_muj_ship_start[258];
-EvtWord tsumini[212];
+extern EvtWord gor_muj_ship_init[];
+extern EvtWord gor_muj_ship_pera[];
+extern EvtWord gor_muj_ship_start[];
+extern EvtWord tsumini[];
 static HitDamageReturn dmgRetPoint[VERSION_PICK(4, 6)];
-static EvtWord mobj_box00[34];
-static EvtWord epilogue_npc_entry[340];
-EvtWord punio_kinoko[22];
-EvtWord puniko_kinoko[22];
-static EvtWord epilogue_evt[1520];
-EvtWord epilogue_npc_entry2[30];
-static EvtWord epilogue_evt2[74];
-EvtWord return_gorotsuki_town_init[25];
-EvtWord return_gorotsuki_town[625];
-EvtWord gor_00_init_evt[VERSION_PICK(537, 540)];
-
-f32 negone_one$374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
-
-f32 neg_one$382 = -1.0f;
-
-f32 __local_PI$383 = 3.1415927f;
-
-f32 __local_3PIO2$385 = 4.712389f;
-
-u32 gap_04_0000086C_data[1] = {0};
-
-f32 one_negone$373[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
-
-f32 __local_PIO2$384 = 1.5707964f;
-
-f32 one$381 = 1.0f;
-
-f32 negone_one$360[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
-
-f32 neg_one$365 = -1.0f;
-
-f32 __local_PI$366 = 3.1415927f;
-
-f32 __local_3PIO2$368 = 4.712389f;
-
-u32 gap_04_00000894_data[1] = {0};
-
-f32 one_negone$359[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
-
-f32 __local_PIO2$367 = 1.5707964f;
-
-f32 one$364 = 1.0f;
+extern EvtWord punio_kinoko[];
+extern EvtWord puniko_kinoko[];
+extern EvtWord epilogue_npc_entry2[];
+extern EvtWord return_gorotsuki_town_init[];
+extern EvtWord return_gorotsuki_town[];
+extern EvtWord gor_00_init_evt[];
 
 ExtTexInfo nannpc_entry_data[] = {
     {"c_zako_n", "S_1", 0.0f},
@@ -4861,6 +4783,9 @@ EVT_END()
 EVT_BEGIN(gorotsuki_kikan)
     CALL(evt_snd_bgm_scope, 0, 1)
     CALL(evt_mario_key_onoff, 0)
+#ifdef VERSION_G8MP01
+    CALL(evt_party_stop, 0)
+#endif
     CALL(evt_mario_cont_onoff, 0)
     CALL(evt_mario_cont_onoff, 1)
     WAIT_FRAMES(2)
@@ -4991,6 +4916,9 @@ EVT_BEGIN(gorotsuki_kikan)
     WAIT_MS(1000)
     CALL(evt_msg_print_party, STRING("mac_5_000_10"))
     CALL(evt_cam3d_evt_off, 500, 11)
+#ifdef VERSION_G8MP01
+    CALL(evt_party_run, 0)
+#endif
     CALL(evt_mario_key_onoff, 1)
     CALL(evt_snd_bgm_scope, 0, 0)
     SPAWN_EVENT(PTR(peach_mail))
@@ -5477,6 +5405,9 @@ static EVT_BEGIN(peach_mail)
     END_LOOP
     CALL(evt_mario_key_onoff, 0)
     CALL(evt_mario_normalize)
+#ifdef VERSION_G8MP01
+    CALL(evt_party_stop, 0)
+#endif
     CALL(evt_snd_bgmoff, 1024)
     CALL(evt_snd_bgmon, 1, STRING("BGM_FF_MAIL_RECEPTION1"))
     BEGIN_INLINE_EVENT
@@ -5519,6 +5450,9 @@ static EVT_BEGIN(peach_mail)
     CALL(evt_msg_print, 0, STRING("gor_00_mail5_01"), 0, 0)
     CALL(evt_msg_print_party, STRING("gor_00_mail5_02"))
     CALL(evt_mario_set_pose, STRING("M_S_1"))
+#ifdef VERSION_G8MP01
+    CALL(evt_party_run, 0)
+#endif
     CALL(evt_mario_key_onoff, 1)
     CALL(evt_cam_shift_reset)
     CALL(evt_cam3d_evt_off, 500, 11)
@@ -7099,4 +7033,3 @@ EVT_BEGIN(gor_00_init_evt)
 EVT_END()
 #endif
 
-u32 gap_04_0000F75C_data[1] = {0};

@@ -1,11 +1,11 @@
 #include "battle/battle_unit.h"
 #include "evt/evt_cmd.h"
 
-#pragma force_active on
 #include "mario/mario_pouch.h"
 #include "party.h"
 #include "driver/camdrv.h"
 #include "evt/evt_bero.h"
+#include "manager/evtmgr_cmd.h"
 
 void mapGrpFlagOn(const char* name, u32 flags);
 void mapGrpFlagOff(const char* name, u32 flags);
@@ -77,65 +77,48 @@ USER_FUNC(evt_win_item_select);
 USER_FUNC(make_kagi_tbl);
 USER_FUNC(temae_kesu);
 
-f32 fd_las_10_negone_one_374[2] __attribute__((aligned(8)));
-f32 fd_las_10_neg_one_382;
-f32 fd_las_10___local_PI_383;
-f32 fd_las_10___local_3PIO2_385;
-f32 fd_las_10_one_negone_373[2] __attribute__((aligned(8)));
-f32 fd_las_10___local_PIO2_384;
-f32 fd_las_10_one_381;
-f32 fd_las_10_negone_one_360[2] __attribute__((aligned(8)));
-f32 fd_las_10_neg_one_365;
-f32 fd_las_10___local_PI_366;
-f32 fd_las_10___local_3PIO2_368;
-f32 fd_las_10_one_negone_359[2] __attribute__((aligned(8)));
-f32 fd_las_10___local_PIO2_367;
-f32 fd_las_10_one_364;
-static EvtWord s_door_close[22];
-static EvtWord s_door_open[22];
-EvtWord nw_door_close[12];
-EvtWord nw_door_open[12];
-EvtWord ne_door_close[12];
-EvtWord ne_door_open[12];
-EvtWord sw_door_close[12];
-EvtWord sw_door_open[12];
-EvtWord se_door_close[12];
-EvtWord se_door_open[12];
-EvtWord nw2_door_close[12];
-EvtWord nw2_door_open[12];
-EvtWord ne2_door_close[12];
-EvtWord ne2_door_open[12];
-EvtWord sw2_door_close[12];
-EvtWord sw2_door_open[12];
-EvtWord se2_door_close[12];
-EvtWord se2_door_open[12];
+extern EvtWord nw_door_close[];
+extern EvtWord nw_door_open[];
+extern EvtWord ne_door_close[];
+extern EvtWord ne_door_open[];
+extern EvtWord sw_door_close[];
+extern EvtWord sw_door_open[];
+extern EvtWord se_door_close[];
+extern EvtWord se_door_open[];
+extern EvtWord nw2_door_close[];
+extern EvtWord nw2_door_open[];
+extern EvtWord ne2_door_close[];
+extern EvtWord ne2_door_open[];
+extern EvtWord sw2_door_close[];
+extern EvtWord sw2_door_open[];
+extern EvtWord se2_door_close[];
+extern EvtWord se2_door_open[];
 static BeroEntry bero_entry_data[10];
 const char* kabe_list_1[8];
 const char* kabe_list_2[8];
 const char* kabe_list_3[8];
-EvtWord las_10_temae_kabe[12];
-static EvtWord first_evt[182];
-EvtWord tenkyugi_evt[311];
-EvtWord tenkyugi_evt2[134];
-EvtWord kagi_rotate[69];
+extern EvtWord las_10_temae_kabe[];
+extern EvtWord tenkyugi_evt[];
+extern EvtWord tenkyugi_evt2[];
+extern EvtWord kagi_rotate[];
 s32 kagi_tbl[9];
-EvtWord kagi1_evt[80];
-EvtWord kagi2_evt[80];
-EvtWord kagi3_evt[80];
-EvtWord kagi4_evt[80];
-EvtWord kagi5_evt[80];
-EvtWord kagi6_evt[80];
-EvtWord kagi7_evt[80];
-EvtWord kagi8_evt[80];
-EvtWord daiza_up[201];
-EvtWord kagi_8_off[48];
+extern EvtWord kagi1_evt[];
+extern EvtWord kagi2_evt[];
+extern EvtWord kagi3_evt[];
+extern EvtWord kagi4_evt[];
+extern EvtWord kagi5_evt[];
+extern EvtWord kagi6_evt[];
+extern EvtWord kagi7_evt[];
+extern EvtWord kagi8_evt[];
+extern EvtWord daiza_up[];
+extern EvtWord kagi_8_off[];
 const char* daiza_name[25];
-EvtWord kagi_8_on[365];
-EvtWord kagi_8_init[11];
-EvtWord kagi_8_syutugen[19];
+extern EvtWord kagi_8_on[];
+extern EvtWord kagi_8_init[];
+extern EvtWord kagi_8_syutugen[];
 s32 daiza_key_tbl[2];
-EvtWord daiza_evt[57];
-EvtWord las_10_init_evt[294];
+extern EvtWord daiza_evt[];
+extern EvtWord las_10_init_evt[];
 
 USER_FUNC(make_kagi_tbl) {
     EvtWord* args = event->args;
@@ -152,34 +135,6 @@ USER_FUNC(make_kagi_tbl) {
     evtSetValue(event, args[1], n);
     return EVT_RETURN_DONE;
 }
-
-f32 fd_las_10_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
-
-f32 fd_las_10_neg_one_382 = -1.0f;
-
-f32 fd_las_10___local_PI_383 = 3.1415927f;
-
-f32 fd_las_10___local_3PIO2_385 = 4.712389f;
-
-f32 fd_las_10_one_negone_373[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
-
-f32 fd_las_10___local_PIO2_384 = 1.5707964f;
-
-f32 fd_las_10_one_381 = 1.0f;
-
-f32 fd_las_10_negone_one_360[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
-
-f32 fd_las_10_neg_one_365 = -1.0f;
-
-f32 fd_las_10___local_PI_366 = 3.1415927f;
-
-f32 fd_las_10___local_3PIO2_368 = 4.712389f;
-
-f32 fd_las_10_one_negone_359[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
-
-f32 fd_las_10___local_PIO2_367 = 1.5707964f;
-
-f32 fd_las_10_one_364 = 1.0f;
 
 static EVT_BEGIN(s_door_close)
     MULTIPLY_FLOAT(LW(0), FLOAT(0.38867188f))
@@ -1330,7 +1285,7 @@ USER_FUNC(temae_kesu) {
     if (idx >= 2 && idx <= 4) {
         mapGrpFlagOn("S14_hashira", 1);
         mapGrpFlagOn("S115_hashira", 1);
-        mapGrpFlagOn("S116_hashira\0\0\0", 1);
+        mapGrpFlagOn("S116_hashira", 1);
     }
     return EVT_RETURN_DONE;
 }

@@ -28,8 +28,6 @@
 #include "mario/mariost.h"
 #include "data/npc_data.h"
 
-#pragma force_active on
-
 typedef struct RankEntry {
     u16 flags;
     // pad 2 bytes
@@ -60,7 +58,7 @@ typedef struct FighterData {
     s32 setupId;
     const char* taunt;
     const char* victory;
-    s16 field_18; // priority, order, sortId?
+    s16 initPoints; // starting ranking points
     // pad 2 bytes
 } FighterData;
 
@@ -107,8 +105,8 @@ typedef struct RuleData {
     const char* name;
     const char* desc;
     s32 id;
-    s32 field_C;
-    s32 field_10;
+    s32 param;
+    s32 param2;
 } RuleData;
 
 typedef struct DispWork {
@@ -130,34 +128,6 @@ void FontDrawMessageMtx(Mtx mtx, const char* msg);
 static RankData rank_work;
 static DispWork disp_work;
 static s32 champion_belt_onoff;
-
-f32 fd_tou2_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
-
-f32 fd_tou2_neg_one_382 = -1.0f;
-
-f32 fd_tou2___local_PI_383 = 3.1415927f;
-
-f32 fd_tou2___local_3PIO2_385 = 4.712389f;
-
-f32 fd_tou2_one_negone_373[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
-
-f32 fd_tou2___local_PIO2_384 = 1.5707964f;
-
-f32 fd_tou2_one_381 = 1.0f;
-
-f32 fd_tou2_negone_one_360[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
-
-f32 fd_tou2_neg_one_365 = -1.0f;
-
-f32 fd_tou2___local_PI_366 = 3.1415927f;
-
-f32 fd_tou2___local_3PIO2_368 = 4.712389f;
-
-f32 fd_tou2_one_negone_359[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
-
-f32 fd_tou2___local_PIO2_367 = 1.5707964f;
-
-f32 fd_tou2_one_364 = 1.0f;
 
 static FighterData fighterDt[23] = {
     { FIGHT_CHAMPION, "stg3_tou_sensyu_00", "stg3_tou_sensyu2_00", 22, "stg3_tou_400_02", "stg3_tou_400_03", 250 },                // Rawk Hawk
@@ -440,7 +410,6 @@ static void disp_proc(CameraId cameraId, void* param) {
         GXSetScissor(scissorX, (u16)sy, scissorW, (u16)sh);
     }
 
-
     num = 0;
     for (i = 0; i < rank_wp->count; i++) {
         x = 10.0f + left;
@@ -694,8 +663,8 @@ static USER_FUNC(evt_tou_get_rule_info) {
     }
     evtSetValue(event, args[1], (EvtWord)rules[i].name);
     evtSetValue(event, args[2], rules[i].id);
-    evtSetValue(event, args[3], rules[i].field_C);
-    evtSetValue(event, args[4], rules[i].field_10);
+    evtSetValue(event, args[3], rules[i].param);
+    evtSetValue(event, args[4], rules[i].param2);
     return EVT_RETURN_DONE;
 }
 
@@ -1057,7 +1026,7 @@ static void rankingControll(void) {
     for (i = 0; i < nAbove; i++) {
         buf[i] = rank_wp->entries[above[i]];
     }
-    // TODO: fixup
+    // Put the player's own entry between the two lists.
     buf[nAbove].flags = RANK_PLAYER;
     buf[nAbove].id = FIGHTER_PLAYER;
     buf[nAbove].points.total = 0;
@@ -1173,7 +1142,7 @@ static void rankingInit(void) {
                 entry->points.bytes[j] = swByteGet(2 * entry->id + 519 + j);
             }
         } else {
-            entry->points.total = fighterDt[entry->id].field_18;
+            entry->points.total = fighterDt[entry->id].initPoints;
         }
         if (entry->id == FIGHTER_PLAYER) {
             entry->flags |= RANK_PLAYER;
@@ -1241,4 +1210,3 @@ void _prolog(void) {
     rankingInit();
 }
 
-#pragma force_active reset

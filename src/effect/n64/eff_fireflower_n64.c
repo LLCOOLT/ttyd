@@ -6,6 +6,7 @@
 #include <dolphin/gx.h>
 #include <dolphin/mtx.h>
 #include <stdlib.h>
+#include "eff/n64/eff_rothammer_success_n64.h"
 
 typedef struct EffFireFlowerN64Work {
     s32 type;     // 0x0
@@ -30,14 +31,6 @@ typedef struct EffFireFlowerN64Work {
 } EffFireFlowerN64Work;
 
 #ifdef __MWERKS__
-__declspec(section ".data") f32 eff_fireflower_n64_negone_one_a[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
-__declspec(section ".data") f32 negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
-__declspec(section ".data") f32 eff_fireflower_n64_one_negone_a[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
-__declspec(section ".data") f32 one_negone_373[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
-__declspec(section ".data") f32 eff_fireflower_n64_negone_one_b[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
-__declspec(section ".data") f32 negone_one_360[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
-__declspec(section ".data") f32 eff_fireflower_n64_one_negone_b[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
-__declspec(section ".data") f32 one_negone_359[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
 #endif
 
 effN64Vtx size4x4_tex4x4_vtx[] = {
@@ -65,7 +58,6 @@ static s8 scale_data[] = "27<AFKPUZ_dgigd";
 
 void effFireFlowerMain(EffectEntry* effect);
 void effFireFlowerDisp(CameraId cameraId, EffectEntry* effect);
-EffectEntry* effRotHammerSuccessN64Entry();
 
 EffectEntry* effFireFlowerN64Entry(s32 type, f32 x, f32 y, f32 z, s32 lifetime) {
     EffectEntry* effect;
@@ -74,7 +66,7 @@ EffectEntry* effFireFlowerN64Entry(s32 type, f32 x, f32 y, f32 z, s32 lifetime) 
     s32 i;
 
     effect = effEntry();
-    effect->type = "FireFlowerN64\0\0";
+    effect->type = "FireFlowerN64";
     effect->count = 31;
     work = __memAlloc(HEAP_EFFECT, sizeof(EffFireFlowerN64Work) * 31);
     effect->userdata = work;

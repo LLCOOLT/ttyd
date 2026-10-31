@@ -20,7 +20,7 @@ typedef struct effExpBomData {
 	f32 offsetY; //0x1C
 	f32 velX; //0x20, from bom_dir/bom_spd
 	f32 velY; //0x24
-	u8 field_0x28[0x2C - 0x28]; //0x28
+	u8 pad_28[0x2C - 0x28]; //0x28
 } effExpBomData;
 
 //.sdata
@@ -51,7 +51,7 @@ void effExpBomDisp(CameraId camId, void* param);
 EffectEntry* effExpBomN64Entry(f32 x, f32 y, f32 z) {
 	EffectEntry* effect;
 	f32 sv, cv;
-	f32 v29, v28; //TODO: rename
+	f32 angle, vel;
 	f32* direction;
 	f32* speed;
 	effExpBomData* data;
@@ -59,7 +59,7 @@ EffectEntry* effExpBomN64Entry(f32 x, f32 y, f32 z) {
 	int i;
 
 	effect = effEntry();
-	effect->type = "ExpBomN64\0\0";
+	effect->type = "ExpBomN64";
 	effect->count = 10;
 	data = __memAlloc(HEAP_EFFECT, sizeof(effExpBomData) * 10);
 	effect->userdata = data;
@@ -77,12 +77,12 @@ EffectEntry* effExpBomN64Entry(f32 x, f32 y, f32 z) {
 		data->offsetX = 0.0f;
 		data->offsetY = 0.0f;
 
-		v28 = 2.0f * *speed;
-		v29 = ((6.2831855f * (90.0f + *direction)) / 360.0f);
-		sv = sin(v29);
-		cv = cos(v29);
-		data->velX = v28 * sv;
-		data->velY = -v28 * cv;
+		vel = 2.0f * *speed;
+		angle = ((6.2831855f * (90.0f + *direction)) / 360.0f);
+		sv = sin(angle);
+		cv = cos(angle);
+		data->velX = vel * sv;
+		data->velY = -vel * cv;
 	}
 	return effect;
 }

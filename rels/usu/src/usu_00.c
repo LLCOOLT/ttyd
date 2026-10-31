@@ -1,9 +1,7 @@
-#pragma defer_codegen on
 #include "battle/battle_unit.h"
 #include "eff/eff_starstone.h"
 #include "evt/evt_cmd.h"
 
-#pragma force_active on
 #include "mario/mario_pouch.h"
 #include "party.h"
 #include "driver/animdrv.h"
@@ -30,8 +28,7 @@
 #include "driver/msgdrv.h"
 #include "driver/extdrv.h"
 
-typedef struct KpaSen { s8 state; u8 field_0x1; u16 wait; f32 t; Vec start; Vec end; u8 pose99Lo; u8 pose99Hi; u8 pose1Lo; u8 pose1Hi; } KpaSen;
-static s32 kpaSen_pad;
+typedef struct KpaSen { s8 state; u8 pad_1; u16 wait; f32 t; Vec start; Vec end; u8 pose99Lo; u8 pose99Hi; u8 pose1Lo; u8 pose1Hi; } KpaSen;
 KpaSen* kpaSen;
 s32 calcPose(s32 i, s32 lo, s32 hi, s32 flag);
 void kpaSen_ext_disp(CameraId camera, void* param);
@@ -219,146 +216,90 @@ USER_FUNC(N_evt_sub_status_gauge_force_update);
 #endif
 extern s32 envSetYami[];
 
-f32 fd_usu_00_negone_one_374[2] __attribute__((aligned(8)));
-f32 fd_usu_00_neg_one_382;
-f32 fd_usu_00___local_PI_383;
-f32 fd_usu_00___local_3PIO2_385;
-f32 fd_usu_00_one_negone_373[2] __attribute__((aligned(8)));
-f32 fd_usu_00___local_PIO2_384;
-f32 fd_usu_00_one_381;
-f32 fd_usu_00_negone_one_360[2] __attribute__((aligned(8)));
-f32 fd_usu_00_neg_one_365;
-f32 fd_usu_00___local_PI_366;
-f32 fd_usu_00___local_3PIO2_368;
-f32 fd_usu_00_one_negone_359[2] __attribute__((aligned(8)));
-f32 fd_usu_00___local_PIO2_367;
-f32 fd_usu_00_one_364;
-EvtWord villagerA_init[28];
-EvtWord villagerA_pig_init[19];
-EvtWord villagerA_talk[65];
-EvtWord villagerB_init[7];
-EvtWord villagerB_talk[52];
-EvtWord villagerC_init[7];
-EvtWord villagerC_talk[52];
-EvtWord villagerD_init[19];
-EvtWord villagerD_pig_init[19];
-EvtWord villagerD_talk[88];
-EvtWord villagerE_init[19];
-EvtWord villagerE_pig_init[19];
-EvtWord villagerE_talk[65];
-EvtWord villagerK_init[19];
-EvtWord villagerK_pig_init[19];
-EvtWord villagerK_talk[65];
-EvtWord village_chief_init[20];
-EvtWord village_chief_pig_init[27];
+extern EvtWord villagerA_init[];
+extern EvtWord villagerA_pig_init[];
+extern EvtWord villagerA_talk[];
+extern EvtWord villagerB_init[];
+extern EvtWord villagerB_talk[];
+extern EvtWord villagerC_init[];
+extern EvtWord villagerC_talk[];
+extern EvtWord villagerD_init[];
+extern EvtWord villagerD_pig_init[];
+extern EvtWord villagerD_talk[];
+extern EvtWord villagerE_init[];
+extern EvtWord villagerE_pig_init[];
+extern EvtWord villagerE_talk[];
+extern EvtWord villagerK_init[];
+extern EvtWord villagerK_pig_init[];
+extern EvtWord villagerK_talk[];
+extern EvtWord village_chief_init[];
+extern EvtWord village_chief_pig_init[];
 s32 iri_15_item_tbl[2];
-EvtWord village_chief_talk[199];
-EvtWord chief_mario_talk_init[183];
-EvtWord chief_mario_talk[55];
-static EvtWord vivian_init[44];
+extern EvtWord village_chief_talk[];
+extern EvtWord chief_mario_talk_init[];
+extern EvtWord chief_mario_talk[];
 static s32 key_tbl[2];
-static EvtWord vivian_talk[29];
-EvtWord nise_mario_talk[8];
-EvtWord christine_talk[8];
-EvtWord nokotaro_talk[8];
-EvtWord cloud_talk[8];
-EvtWord yoshi_talk[8];
-EvtWord crow_a_init[8];
-EvtWord crow_b_init[8];
-EvtWord crow_c_init[8];
-EvtWord crow_d_init[8];
-EvtWord crow_e_init[8];
+extern EvtWord nise_mario_talk[];
+extern EvtWord christine_talk[];
+extern EvtWord nokotaro_talk[];
+extern EvtWord cloud_talk[];
+extern EvtWord yoshi_talk[];
+extern EvtWord crow_a_init[];
+extern EvtWord crow_b_init[];
+extern EvtWord crow_c_init[];
+extern EvtWord crow_d_init[];
+extern EvtWord crow_e_init[];
 static EvtWord urouro_move[24];
 static NpcSetupInfo npcEnt[20];
-EvtWord usu00_stage4_coming_event[839];
-EvtWord usu00_3witch_init[41];
-EvtWord usu00_3witch_event[275];
-EvtWord gra00_2witch_find_ranpel_event[197];
-EvtWord usu00_vivian_cry_event[58];
-EvtWord usu00_vivian_joinup_event[608];
-static EvtWord cam_up[34];
-static EvtWord cam_down[8];
-EvtWord usu00_check_vivian[33];
-#ifdef VERSION_G8ME01
-EvtWord usu00_crowAB_talk_event[338];
-#else
-EvtWord usu00_crowAB_talk_event[299];
-#endif
-#ifdef VERSION_G8ME01
-EvtWord usu00_crowCDE_talk_event[346];
-#else
-EvtWord usu00_crowCDE_talk_event[307];
-#endif
-EvtWord chief_pig_event[66];
+extern EvtWord usu00_stage4_coming_event[];
+extern EvtWord usu00_3witch_init[];
+extern EvtWord usu00_3witch_event[];
+extern EvtWord gra00_2witch_find_ranpel_event[];
+extern EvtWord usu00_vivian_cry_event[];
+extern EvtWord usu00_vivian_joinup_event[];
+extern EvtWord usu00_check_vivian[];
+extern EvtWord usu00_crowAB_talk_event[];
+extern EvtWord usu00_crowCDE_talk_event[];
+extern EvtWord chief_pig_event[];
 static KinopioData kino_dt;
 static const char* yado_npc[2];
 const char* yado_mobj[2];
 const char* village_chief_npc[8];
-static EvtWord evt_door_1_1[12];
-static EvtWord evt_door_1_2[2];
-static EvtWord evt_wall_1[30];
 const char* door_1_npc[2];
-static EvtWord door_1_open[12];
-static EvtWord door_1_close[14];
 static DoorParam door_1;
-EvtWord evt_door_2_1[12];
-EvtWord evt_door_2_2[15];
-static EvtWord evt_wall_2[123];
-EvtWord evt_door2_chk[30];
-EvtWord evt_door2_close[14];
+extern EvtWord evt_door_2_1[];
+extern EvtWord evt_door_2_2[];
+extern EvtWord evt_door2_chk[];
+extern EvtWord evt_door2_close[];
 static DoorParam door_2;
-static EvtWord evt_door_3_1[12];
-static EvtWord evt_door_3_2[12];
-static EvtWord evt_wall_3[30];
-static EvtWord door_3_open[12];
-static EvtWord door_3_close[14];
 static DoorParam door_3;
-EvtWord dokan_1_evt[32];
+extern EvtWord dokan_1_evt[];
 static BeroEntry bero_entry_data[3];
-static EvtWord oshimodo_event[28];
 static BeroEntry bero_oshimodo[1];
-EvtWord koopa_dokan_evt[57];
+extern EvtWord koopa_dokan_evt[];
 BeroEntry bero_koopa_dokan[1];
-EvtWord door_ie1_koopa_evt[26];
-EvtWord door_ie2_koopa_evt[26];
-EvtWord door_ie3_koopa_evt[26];
-static EvtWord evt_ki_1[20];
-static EvtWord evt_ki_2[28];
+extern EvtWord door_ie1_koopa_evt[];
+extern EvtWord door_ie2_koopa_evt[];
+extern EvtWord door_ie3_koopa_evt[];
 static TreeAccess tree_tbl[4];
-EvtWord usu_00_tree_init[7];
-EvtWord kusa_01_evt[26];
-EvtWord evt_kusa_04[25];
-EvtWord evt_kusa_06[25];
+extern EvtWord usu_00_tree_init[];
+extern EvtWord kusa_01_evt[];
+extern EvtWord evt_kusa_04[];
+extern EvtWord evt_kusa_06[];
 static KusaAccess kusa_tbl[21];
-EvtWord usu_00_kusa_init[7];
-EvtWord evt_ichikorori_ball_get[5];
-EvtWord usu_00_touch_ichikorori_ball[72];
-typedef struct BoobooName { const char* name; u8 field_0x4; u8 field_0x5; u8 pad_0x6[2]; } BoobooName; /* field_0x4/0x5 never read */
+extern EvtWord usu_00_kusa_init[];
+extern EvtWord evt_ichikorori_ball_get[];
+extern EvtWord usu_00_touch_ichikorori_ball[];
+typedef struct BoobooName { const char* name; u8 villagerNo; u8 isVillager; u8 pad_0x6[2]; } BoobooName; /* villagerNo/isVillager never read */
 static BoobooName booboo_name[5];
 ExtTexInfo kpaSen_ext_entry_data[39];
-static EvtWord baba_talk[8];
-EvtWord kanbu_regl[48];
-EvtWord kanbu_talk[4];
-static EvtWord koopa_npc_entry[205];
-EvtWord usu_00_koopa_first_evt[196];
-EvtWord bakuhatu_evt[64];
-EvtWord murabito_out[172];
-EvtWord usu_00_koopa_second_evt[1315];
-static EvtWord sekai_yami_npc_init[17];
-static EvtWord sekai_yami_npc[22];
-static EvtWord sekai_yami_shake[11];
-static EvtWord sekai_yami_evt[260];
-static EvtWord minnnanokoe_npc_entry[94];
-static EvtWord minnnanokoe_evt[381];
-static EvtWord evt_after_peach[151];
-static EvtWord epilogue_npc_entry[48];
-static EvtWord epilogue_evt_sub[167];
-static EvtWord epilogue_evt[73];
-#ifdef VERSION_G8ME01
-EvtWord usu_00_init_evt[660];
-#else
-EvtWord usu_00_init_evt[658];
-#endif
+extern EvtWord kanbu_regl[];
+extern EvtWord kanbu_talk[];
+extern EvtWord usu_00_koopa_first_evt[];
+extern EvtWord bakuhatu_evt[];
+extern EvtWord murabito_out[];
+extern EvtWord usu_00_koopa_second_evt[];
+extern EvtWord usu_00_init_evt[];
 
 static USER_FUNC(getYoshiColor) {
     EvtWord* args = event->args;
@@ -377,7 +318,7 @@ void kpa_stg5_009_7_cb(s32 type, smartEntry* smart) {
     switch (type) {
         case 3:
             if (info->curPage == 1) {
-                psndBGMOn(0x201, "BGM_FF_GET_ITEM1\0\0\0");
+                psndBGMOn(0x201, "BGM_FF_GET_ITEM1");
             }
             break;
     }
@@ -392,34 +333,6 @@ static USER_FUNC(booboo_main) {
     }
     return EVT_RETURN_DONE;
 }
-
-f32 fd_usu_00_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
-
-f32 fd_usu_00_neg_one_382 = -1.0f;
-
-f32 fd_usu_00___local_PI_383 = 3.1415927f;
-
-f32 fd_usu_00___local_3PIO2_385 = 4.712389f;
-
-f32 fd_usu_00_one_negone_373[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
-
-f32 fd_usu_00___local_PIO2_384 = 1.5707964f;
-
-f32 fd_usu_00_one_381 = 1.0f;
-
-f32 fd_usu_00_negone_one_360[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
-
-f32 fd_usu_00_neg_one_365 = -1.0f;
-
-f32 fd_usu_00___local_PI_366 = 3.1415927f;
-
-f32 fd_usu_00___local_3PIO2_368 = 4.712389f;
-
-f32 fd_usu_00_one_negone_359[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
-
-f32 fd_usu_00___local_PIO2_367 = 1.5707964f;
-
-f32 fd_usu_00_one_364 = 1.0f;
 
 EVT_BEGIN(villagerA_init)
     CALL(evt_npc_flag_onoff, 1, STRING("村人Ａ"), 1536)

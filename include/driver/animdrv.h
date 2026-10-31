@@ -26,8 +26,8 @@ typedef struct AnimPoseShape {
     AnimPoseShapeVertex vtxNrm;    // 0x48
     AnimPoseShapeVertex vtxClr0;   // 0x50
     AnimPoseShapeVertex vtxTex[8]; // 0x48
-    s32 shapeDrawStart;            // 0x98, TODO: rename?
-    s32 shapeDrawCount;            // 0x9C, TODO: rename?
+    s32 shapeDrawStart;            // 0x98, first entry in AnimationPoseData.draws
+    s32 shapeDrawCount;            // 0x9C, number of draws entries
     s32 dispMode;                  // 0xA0, TODO: enum?
     s32 cullMode;                  // 0xA4, TODO: enum?
 } AnimPoseShape;
@@ -138,7 +138,7 @@ typedef struct AnimPoseGroup {
     s32 shapeId;        // 0x48
     s32 visibilityId;   // 0x4C
     s32 nodeId;         // 0x50
-    BOOL useSSC;        // 0x54, Segment Scale Compensation, TODO: rename?
+    BOOL useSSC;        // 0x54, Segment Scale Compensation
 } AnimPoseGroup;
 
 // this is the structure of the actual stored files
@@ -178,8 +178,8 @@ typedef struct AnimationPoseData {
     u32* texIndex[8];              // 0x16C, finished name, same entries as posIndex
     f32* texVtxBuffer;             // 0x18C, finished name, pointer to list of [S, T]
     AnimTexMtx* texAnimEntries;    // 0x190, copied into the pose buffer each keyframe reset
-    AnimPoseTexEntry* texData;     // 0x194, TODO: rename
-    AnimTexBind* texBinds;         // 0x198, TODO: rename
+    AnimPoseTexEntry* texData;     // 0x194, indexed by AnimPoseShapeDraw.texDataIds
+    AnimTexBind* texBinds;         // 0x198, texBindCount entries
     AnimPoseShapeDraw* draws;      // 0x19C
     s8* groupVisibility;           // 0x1A0, copied into the pose buffer each keyframe reset
     AnimPoseNode* nodeData;        // 0x1A4, copied into the pose buffer each keyframe reset
@@ -217,7 +217,7 @@ typedef struct AnimationPose {
     AnimTexMtx* mpTexAnimEntries;       // 0x6C
     f32 peraRotY;                       // 0x70, base Y rotation for the paper turn (flags & 8)
     f32 rotationY;                      // 0x74
-    f32 scaleZFlip;                     // 0x78, -1.0f mirrors Z (NpcEntry wScaleZ_flip)
+    f32 scaleZFlip;                     // 0x78, -1.0f mirrors Z (NpcFieldEntry savedScaleZFlip)
     f32 peraTargetRotY;                 // 0x7C, rotationY turns toward this; animPoseGetPeraEnd checks it
     s32 curKeyValue;                    // 0x80, AnimValueKey.value of valueKeyIdx; not read in C
     f32 loopTime;                       // 0x84
@@ -376,3 +376,5 @@ void animPoseDrawMtx(s32 poseId, Mtx matrix, s32 xluMode, f32 rotY, f32 scale);
 extern u32 anim_ext_tex_size;
 
 extern const s32 g_moamoa_chain_num;
+
+void animPoseAutoRelease(s32 type);

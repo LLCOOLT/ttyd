@@ -58,14 +58,14 @@ u8 color_table[] = {
     0xE8, 0xA0, 0xE8, 0xB0, 0x40, 0xA0, 0xA0, 0xD8, 0xD8, 0x58, 0xA8, 0xA8,
 };
 
-u8 anm_seq[] = {0, 1, 2, 3, 2, 1, 0, 0};
+u8 anm_seq[] = {0, 1, 2, 3, 2, 1};
 
 void effConfettiN64SetCamId(EffectEntry* effect, s32 camId) {
     EffConfettiN64Work* w = effect->userdata;
     w->camId = camId;
 }
 
-EffectEntry* effConfettiN64Entry(s32 type, s32 arg1, f32 x, f32 y, f32 z, f32 scale) {
+EffectEntry* effConfettiN64Entry(s32 type, s32 life, f32 x, f32 y, f32 z, f32 scale) {
     s32 mod;
     EffectEntry* effect;
     EffConfettiN64Work* w;
@@ -128,7 +128,7 @@ EffectEntry* effConfettiN64Entry(s32 type, s32 arg1, f32 x, f32 y, f32 z, f32 sc
     w[0].position.y = y;
     w[0].position.z = z;
     w[0].frame = 0;
-    w[0].life = arg1;
+    w[0].life = life;
     w[0].type = type;
     w[0].count = n;
     w[0].alpha = 0xFF;

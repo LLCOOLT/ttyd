@@ -9,6 +9,7 @@
 #include <dolphin/mtx.h>
 #include "memory.h"
 #include <string.h>
+#include "koopa_hit.h"
 
 void kpaSetSpec(void);
 void kpa2DMain(void);
@@ -46,12 +47,9 @@ void kpaFall(void);
 void* kpaFlameHitCheck(f32, f32, f32, f32);
 const f32 vec3_802fc920[3] = {0.0f, 0.0f, 0.0f};
 extern f32 marioJumpData[];
-void kpaClearHitobjRide(void);
-void* kpaChkHitobjRide(void);
 f32 marioGetFallSpd(void);
 void* marioChkLandon(f32* outY, f32 y);
 void marioLandOn(void);
-s32 hitGetAttr(void* hit);
 s32 marioKeyOffChk(void);
 s32 marioCtrlOffChk(void);
 
@@ -133,6 +131,11 @@ static inline void kpaFireSEOn(void) {
         KPW(mp)->fireSfxId = psndSFXOn_3D((const char*)0x821, &mp->position);
         psndSFXOn_3D((const char*)0x131, &mp->position);
     }
+}
+
+static inline void kpaFireSEInit(void) {
+    MarioWork* mp = marioGetPtr();
+    KPW(mp)->fireSfxId = -1;
 }
 
 static inline void kpaFireSEOff(void) {
@@ -248,7 +251,6 @@ s32 kpaCamFollow(void) {
 }
 
 void kpaPreInit(void) {
-    s32* new_var;
     MarioWork* mp = marioGetPtr();
     if (KPW(mp) == NULL) {
         KPW(mp) = (KpaWork*)__memAlloc(0, sizeof(KpaWork));
@@ -258,12 +260,11 @@ void kpaPreInit(void) {
     KPW(mp)->walkRate = 1;
     KPW(mp)->fireCount = 0;
     KPW(mp)->fireRate = 1;
-    new_var = &KPW(marioGetPtr())->fireSfxId; // FAKE: address temp; direct store differs
-    *new_var = -1;
+    kpaFireSEInit();
     mp = marioGetPtr();
     if (strcmp(gp->currentMapName, "kpa_02") == 0 || strcmp(gp->currentMapName, "kpa_03") == 0 ||
         strcmp(gp->currentMapName, "kpa_04") == 0 || strcmp(gp->currentMapName, "kpa_05") == 0 ||
-        strcmp(gp->currentMapName, "kpa_06\0") == 0) {
+        strcmp(gp->currentMapName, "kpa_06") == 0) {
         mp->stageFlags |= 1;
     } else {
         mp->stageFlags &= ~1;
@@ -478,33 +479,30 @@ void kpa3DMain(void) {
     mp->floorMove.z = 0.0f;
 }
 
-#define SETPV(m, v, a, b, c, d) do { JP(m, v) = (a); JP(m, 1) = (b); JP(m, 2) = (c); JP(m, 3) = (d); } while (v)
 f32 kpaSetJumpPara(void) {
-    int new_var;
     f32* jd = marioJumpData;
     MarioWork* mp = marioGetPtr();
-    new_var = 0; // FAKE: register-held 0 for SETPV/JP index and the dead empty if below; literal 0 differs
-    SETPV(mp, new_var, jd[new_var], jd[1], jd[2], jd[3]);
+    mp->jumpVelocityY = *jd++;
+    mp->jumpAccelerationY = *jd++;
+    mp->jumpJerkY = *jd++;
+    mp->jumpSnapY = *jd;
     switch (KPW(mp)->level) {
     case 0:
-        SETPV(mp, new_var, 7.0f, -0.4f, 0.08f, -0.02f);
+        SETP(mp, 7.0f, -0.4f, 0.08f, -0.02f);
         break;
     case 1:
-        SETPV(mp, new_var, 8.1f, -0.3f, 0.08f, -0.02f);
+        SETP(mp, 8.1f, -0.3f, 0.08f, -0.02f);
         break;
     case 2:
-        SETPV(mp, new_var, 8.4f, -0.1f, 0.08f, -0.018f);
+        SETP(mp, 8.4f, -0.1f, 0.08f, -0.018f);
         break;
-        if (!new_var) {
-        }
     case 3:
-        SETPV(mp, new_var, 10.5f, -0.12f, 0.08f, -0.018f);
+        SETP(mp, 10.5f, -0.12f, 0.08f, -0.018f);
         break;
     }
-    return JP(mp, new_var);
+    return JP(mp, 0);
 }
 
-f32 kpaSetFallPara(void);
 f32 kpaSetFallPara(void) {
     MarioWork* mp = marioGetPtr();
     if ((mp->buttonHold & 0x100)) {
@@ -634,7 +632,6 @@ void kpaStrippedFallPool(f32* f) {
     f[7] = -0.01f;
 }
 
-f32 kpaSetFallPara(void);
 s32 kpaFireAttackCheck(void) {
     s32 m;
     MarioWork* mp = marioGetPtr();

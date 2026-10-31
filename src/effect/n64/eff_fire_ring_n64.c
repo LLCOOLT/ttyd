@@ -11,7 +11,7 @@ double cos(double x);
 typedef struct EffFireRingN64Work {
     s32 type;      // 0x0
     Vec position;  // 0x4
-    f32 unk10[3];  // 0x10
+    f32 reserved_10[3]; // 0x10, never read or written
     f32 scale;     // 0x1c
     f32 scaleVel;  // 0x20
     s32 alpha;     // 0x24

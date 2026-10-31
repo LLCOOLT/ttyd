@@ -22,8 +22,8 @@ typedef struct EffKemuri4N64Work {
     Mtx mtx;         // 0x30
     f32 rotSpeed;    // 0x60
     f32 moveScale;   // 0x64
-    f32 field_68;    // 0x68
-    f32 field_6C;    // 0x6C
+    f32 rising;      // 0x68, nonzero until velocity turns negative
+    f32 reserved_6C; // 0x6C, only cleared at entry
     f32 velocity;    // 0x70
     f32 accel;       // 0x74
     f32 accel2;      // 0x78
@@ -35,7 +35,7 @@ typedef struct EffKemuri4N64Work {
 double sin(double);
 double cos(double);
 
-struct { effN64Vtx v[41]; u8 pad[2]; } flowers_v = { { // FAKE: padded to the original symbol size (trailing zero bytes, never read)
+effN64Vtx flowers_v[41] = {
     {-9, 8, -7, 0, 512, 255, 255, 255, 255},
     {-9, 4, 2, 512, 512, 255, 255, 255, 255},
     {0, 0, 0, 512, 0, 255, 255, 255, 255},
@@ -77,7 +77,7 @@ struct { effN64Vtx v[41]; u8 pad[2]; } flowers_v = { { // FAKE: padded to the or
     {-3, -16, 0, 0, 0, 100, 160, 60, 255},
     {-4, -7, 0, 0, 0, 100, 160, 60, 255},
     {-11, -5, 0, 0, 0, 100, 160, 60, 255},
-}, {0} };
+};
 
 void effKemuri4Main(EffectEntry* effect);
 void effKemuri4Disp(CameraId cameraId, EffectEntry* effect);
@@ -99,7 +99,7 @@ EffectEntry* effKemuri4N64Entry(s32 type, f32 x, f32 y, f32 z, f32 angle, f32 fl
     for (i = 0; i < 1; i++, work++) {
     work->active = 1;
     work->type = type;
-    work->field_6C = 0.0f;
+    work->reserved_6C = 0.0f;
     work->position.x = x;
     work->position.y = y;
     work->position.z = z;
@@ -107,7 +107,7 @@ EffectEntry* effKemuri4N64Entry(s32 type, f32 x, f32 y, f32 z, f32 angle, f32 fl
     work->scale.y = 1.0f;
     work->scale.z = 1.0f;
     work->alpha = 255;
-    work->field_68 = 1.0f;
+    work->rising = 1.0f;
     work->moveScale = 5.4f;
     work->rotSpeed = (f32)(flip != zero ? -10 : 10);
     work->velocity = 0.5f;
@@ -151,7 +151,7 @@ void effKemuri4Main(EffectEntry* effect) {
             continue;
         }
         anyActive = 1;
-        if (work->type == 0 && work->field_68 && marioGetPtr()->currMotionId == 0U) {
+        if (work->type == 0 && work->rising && marioGetPtr()->currMotionId == 0U) {
             work->timer++;
         } else {
             work->accel2 = work->accel2 + work->accel3;
@@ -162,7 +162,7 @@ void effKemuri4Main(EffectEntry* effect) {
             work->position.z = work->position.z - work->dirZ * (work->velocity * work->moveScale);
             work->alpha -= 12;
             if (work->velocity < 0.0f) {
-                work->field_68 = 0.0f;
+                work->rising = 0.0f;
             }
         }
         PSMTXRotRad(rotX, 'x', 0.017453292f * work->rotation.x);
@@ -195,8 +195,8 @@ void effKemuri4Disp(CameraId cameraId, EffectEntry* effect) {
 
     work = effect->userdata;
     GXSetCullMode(GX_CULL_NONE);
-    vtx1 = &flowers_v.v[25];
-    vtx2 = &flowers_v.v[35];
+    vtx1 = &flowers_v[25];
+    vtx2 = &flowers_v[35];
     for (i = 0; i < effect->count; i++, work++) {
         if (work->active == 0) {
             continue;

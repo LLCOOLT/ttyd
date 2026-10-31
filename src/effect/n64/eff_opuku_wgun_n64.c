@@ -81,7 +81,7 @@ EffectEntry* effOpukuWgunN64Entry(s32 type, s32 lifetime, f32 x1, f32 y1, f32 z1
     s32 k;
 
     effect = effEntry();
-    effect->type = "OpukuWgunN64\0\0\0";
+    effect->type = "OpukuWgunN64";
     effect->count = 1;
     work = __memAlloc(HEAP_EFFECT, sizeof(EffOpukuWgunN64Work));
     effect->userdata = work;
@@ -198,7 +198,6 @@ void effOpukuWgunMain(EffectEntry* effect) {
 
 static u8 a_data[12] = {255, 255, 255, 255, 255, 255, 255, 255, 255, 200, 128, 32};
 void effOpukuWgunDisp(CameraId cameraId, EffectEntry* effect) {
-    s32 k;
     CameraEntry* camera;
     EffOpukuWgunN64Work* work;
     Mtx scale;
@@ -256,8 +255,7 @@ void effOpukuWgunDisp(CameraId cameraId, EffectEntry* effect) {
         p->x = 20.0f * (work->x[i] + dx);
         p->y = 20.0f * (work->y[i] + dy);
         p->z = 20.0f * (work->z[i] + zero);
-        // FAKE: (u32)(i * 64) * 5 == i * 320 (the old k IV) for i in 0..11; the unsigned multiply is strength-reduced by the back-end loop pass, so no li k = 0 competes with the work IV copy in the block after smartAlloc (target order li r28 / mr r30)
-        p->s = (u32)(i * 64) * 5;
+        p->s = (i * 10) << 5;
         p->t = 0;
         p->r = (i & 1) * 255;
         p->g = ((i >> 1) & 1) * 255;
@@ -267,7 +265,7 @@ void effOpukuWgunDisp(CameraId cameraId, EffectEntry* effect) {
         p->x = 20.0f * (work->x[i] - dx);
         p->y = 20.0f * (work->y[i] - dy);
         p->z = 20.0f * (work->z[i] + zero);
-        p->s = (u32)(i * 64) * 5;
+        p->s = (i * 10) << 5;
         p->t = 1024;
         p->r = (i & 1) * 255;
         p->g = ((i >> 1) & 1) * 255;

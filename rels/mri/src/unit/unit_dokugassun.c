@@ -2,7 +2,6 @@
 #include "battle/battle_unit.h"
 #include "evt/evt_cmd.h"
 
-#pragma force_active on
 #include "driver/effdrv.h"
 #include "system.h"
 #include "stdlib.h"
@@ -16,7 +15,7 @@
 #include "battle/battle_weapon_power.h"
 #include "party/party_motion.h"
 #include "battle/battle_database_common.h"
-
+#include "manager/evtmgr_cmd.h"
 
 USER_FUNC(btlevtcmd_CheckPartsCounterAttribute);
 USER_FUNC(btlevtcmd_EnemyItemUseCheck);
@@ -35,20 +34,6 @@ static USER_FUNC(eff_poison_barrier);
 USER_FUNC(evt_sub_random);
 static USER_FUNC(eff_poison_breath);
 
-f32 fd_dokugassun_negone_one_374[2] __attribute__((aligned(8)));
-f32 fd_dokugassun_neg_one_382;
-f32 fd_dokugassun___local_PI_383;
-f32 fd_dokugassun___local_3PIO2_385;
-f32 fd_dokugassun_one_negone_373[2] __attribute__((aligned(8)));
-f32 fd_dokugassun___local_PIO2_384;
-f32 fd_dokugassun_one_381;
-f32 fd_dokugassun_negone_one_360[2] __attribute__((aligned(8)));
-f32 fd_dokugassun_neg_one_365;
-f32 fd_dokugassun___local_PI_366;
-f32 fd_dokugassun___local_3PIO2_368;
-f32 fd_dokugassun_one_negone_359[2] __attribute__((aligned(8)));
-f32 fd_dokugassun___local_PIO2_367;
-f32 fd_dokugassun_one_364;
 static BattleUnitKind unit_dokugassun;
 static BattleUnitDefense defence;
 static BattleUnitDefenseAttr defence_attr;
@@ -56,7 +41,6 @@ static StatusVulnerability regist;
 static BattleUnitKindPart parts[1];
 static BattleWeapon weapon_dokugassun_attack;
 static BattleWeapon weapon_dokugassun_poisongas_attack;
-static EvtWord attack_event[69];
 static EvtWord poisongas_event[303];
 static PoseTableEntry pose_table[17];
 static BattleDataEntry data_table[3];
@@ -69,34 +53,6 @@ static EvtWord unison_phase_event[140];
 static EvtWord normal_attack_event[386];
 static EvtWord charge_event[58];
 static EvtWord wait_event[13];
-
-f32 fd_dokugassun_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
-
-f32 fd_dokugassun_neg_one_382 = -1.0f;
-
-f32 fd_dokugassun___local_PI_383 = 3.1415927f;
-
-f32 fd_dokugassun___local_3PIO2_385 = 4.712389f;
-
-f32 fd_dokugassun_one_negone_373[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
-
-f32 fd_dokugassun___local_PIO2_384 = 1.5707964f;
-
-f32 fd_dokugassun_one_381 = 1.0f;
-
-f32 fd_dokugassun_negone_one_360[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
-
-f32 fd_dokugassun_neg_one_365 = -1.0f;
-
-f32 fd_dokugassun___local_PI_366 = 3.1415927f;
-
-f32 fd_dokugassun___local_3PIO2_368 = 4.712389f;
-
-f32 fd_dokugassun_one_negone_359[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
-
-f32 fd_dokugassun___local_PIO2_367 = 1.5707964f;
-
-f32 fd_dokugassun_one_364 = 1.0f;
 
 static BattleUnitKind unit_dokugassun = {
     166, // mUnitType
@@ -598,7 +554,7 @@ static EVT_BEGIN(normal_attack_event)
     WAIT_FRAMES(10)
     CALL(btlevtcmd_SetScale, -2, FLOAT(1.0f), FLOAT(1.0f), FLOAT(1.0f))
     CALL(btlevtcmd_snd_se, -2, STRING("SFX_ENM_KUMO_MOVE2"), -250000000, 0, LW(15))
-    CALL(btlevtcmd_AnimeChangePose, -2, 1, STRING("A_1A\0\0\0"))
+    CALL(btlevtcmd_AnimeChangePose, -2, 1, STRING("A_1A"))
     CALL(btlevtcmd_GetHitPos, LW(3), LW(4), LW(10), LW(11), LW(12))
     CALL(btlevtcmd_DivePosition, -2, LW(10), LW(11), LW(12), 40, -40, 1, 0, -1)
     CALL(evt_snd_sfxoff, LW(15))

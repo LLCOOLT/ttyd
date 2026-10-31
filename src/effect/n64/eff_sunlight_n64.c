@@ -17,7 +17,7 @@ typedef struct EffSunlightN64Work {
     s32 frame;     // 0x14
     u8 color[7];   // 0x18
     f32 offset[5]; // 0x20
-    f32 unk34;     // 0x34
+    f32 entryArg;  // 0x34, the last entry argument; never read
     s32 alpha;     // 0x38
     s32 alphaMax;  // 0x3C
 } EffSunlightN64Work;
@@ -46,7 +46,7 @@ EffectEntry* effSunlightN64Entry(s32 type, s32 lifetime, f32 x, f32 y, f32 z, f3
     work->position.x = x;
     work->position.y = y;
     work->position.z = z;
-    work->unk34 = w;
+    work->entryArg = w;
     work->color[0] = 255;
     work->color[1] = 255;
     work->color[2] = 255;

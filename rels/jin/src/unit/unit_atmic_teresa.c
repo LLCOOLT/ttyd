@@ -1,7 +1,6 @@
 #include "battle/battle_unit.h"
 #include "evt/evt_cmd.h"
 
-#pragma force_active on
 #include "battle/battle.h"
 #include "driver/camdrv.h"
 #include "battle/battle_unit.h"
@@ -17,12 +16,14 @@
 #include "battle/battle_database_common.h"
 #include "data_tables.h"
 #include "driver/extdrv.h"
+#include "manager/evtmgr_cmd.h"
+#include "battle/battle_sub.h"
 
 typedef struct AtmTeresa { u8 state; u8 flag; s32 anim; s32 wait; s32 timer; Vec vel; Vec start; Vec target; u8 mode; } AtmTeresa;
 AtmTeresa* teresa;
 #define ATMIC_TERESA_SCALE atmic_teresa_scale
 s32 teresa_count;
-s32 BtlUnit_snd_se_pos(BattleUnit* unit, const char* name, u32 flags, s32 arg3, Vec* pos);
+s32 BtlUnit_snd_se_pos(BattleUnit* unit, const char* name, u32 flags, s32 pitch, Vec* pos);
 s32 irand(s32 scalar);
 f32 intplGetValue(s32 mode, f32 start, f32 end, s32 cur, s32 steps);
 s32 irand(s32 scalar);
@@ -59,20 +60,6 @@ void teresa_ext_disp(CameraId camera, void* param);
 void teresa_ext_main(void);
 void teresa_ext_init(void);
 
-f32 fd_atmic_teresa_negone_one_374[2] __attribute__((aligned(8)));
-f32 fd_atmic_teresa_neg_one_382;
-f32 fd_atmic_teresa___local_PI_383;
-f32 fd_atmic_teresa___local_3PIO2_385;
-f32 fd_atmic_teresa_one_negone_373[2] __attribute__((aligned(8)));
-f32 fd_atmic_teresa___local_PIO2_384;
-f32 fd_atmic_teresa_one_381;
-f32 fd_atmic_teresa_negone_one_360[2] __attribute__((aligned(8)));
-f32 fd_atmic_teresa_neg_one_365;
-f32 fd_atmic_teresa___local_PI_366;
-f32 fd_atmic_teresa___local_3PIO2_368;
-f32 fd_atmic_teresa_one_negone_359[2] __attribute__((aligned(8)));
-f32 fd_atmic_teresa___local_PIO2_367;
-f32 fd_atmic_teresa_one_364;
 BattleUnitKind unit_atmic_teresa;
 static BattleUnitDefense defence;
 static BattleUnitDefenseAttr defence_attr;
@@ -88,47 +75,19 @@ BattleWeapon weapon_atmic_teresa_breath;
 static EvtWord init_event[26];
 static EvtWord damage_event[10];
 static EvtWord attack_event[101];
-EvtWord kaokakusi_event[110];
-EvtWord press_event[264];
-EvtWord surprise_event[303];
-EvtWord bikkuri_event[285];
+extern EvtWord kaokakusi_event[];
+extern EvtWord press_event[];
+extern EvtWord surprise_event[];
+extern EvtWord bikkuri_event[];
 static EvtWord breath_event[254];
-EvtWord breath_event_sub[102];
+extern EvtWord breath_event_sub[];
 static EvtWord wait_event[6];
 s32 atmic_teresa_id[1];
 s32 target_unit_id[1];
 s32 target_parts_id[1];
 f32 atmic_teresa_scale;
 ExtTexInfo teresa_ext_entry_data[17];
-EvtWord teresa_entry[19];
-
-f32 fd_atmic_teresa_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
-
-f32 fd_atmic_teresa_neg_one_382 = -1.0f;
-
-f32 fd_atmic_teresa___local_PI_383 = 3.1415927f;
-
-f32 fd_atmic_teresa___local_3PIO2_385 = 4.712389f;
-
-f32 fd_atmic_teresa_one_negone_373[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
-
-f32 fd_atmic_teresa___local_PIO2_384 = 1.5707964f;
-
-f32 fd_atmic_teresa_one_381 = 1.0f;
-
-f32 fd_atmic_teresa_negone_one_360[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
-
-f32 fd_atmic_teresa_neg_one_365 = -1.0f;
-
-f32 fd_atmic_teresa___local_PI_366 = 3.1415927f;
-
-f32 fd_atmic_teresa___local_3PIO2_368 = 4.712389f;
-
-f32 fd_atmic_teresa_one_negone_359[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
-
-f32 fd_atmic_teresa___local_PIO2_367 = 1.5707964f;
-
-f32 fd_atmic_teresa_one_364 = 1.0f;
+extern EvtWord teresa_entry[];
 
 BattleUnitKind unit_atmic_teresa = {
     76,

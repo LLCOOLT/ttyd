@@ -1,7 +1,6 @@
 #include "battle/battle_unit.h"
 #include "evt/evt_cmd.h"
 
-#pragma force_active on
 #include "manager/evtmgr_cmd.h"
 #include "dolphin/mtx.h"
 #include "driver/npcdrv.h"
@@ -15,6 +14,9 @@
 #include "evt/evt_shop.h"
 #include "data_tables.h"
 #include "mario/mario_pouch.h"
+#ifdef VERSION_G8MP01
+#include "eff/eff_nice.h"
+#endif
 
 static USER_FUNC(anim_tevcallback);
 static USER_FUNC(anim_tevcallback_mobj);
@@ -104,117 +106,50 @@ USER_FUNC(evt_sub_intpl_msec_init);
 USER_FUNC(evt_sub_save_playtime);
 USER_FUNC(evt_win_item_select);
 static USER_FUNC(yami_view);
+#ifdef VERSION_G8MP01
+static USER_FUNC(nice_effect_shrink);
+#endif
 extern s32 envSetYami[];
 
-f32 fd_bom_02_negone_one_374[2] __attribute__((aligned(8)));
-f32 fd_bom_02_neg_one_382;
-f32 fd_bom_02___local_PI_383;
-f32 fd_bom_02___local_3PIO2_385;
-f32 fd_bom_02_one_negone_373[2] __attribute__((aligned(8)));
-f32 fd_bom_02___local_PIO2_384;
-f32 fd_bom_02_one_381;
-f32 fd_bom_02_negone_one_360[2] __attribute__((aligned(8)));
-f32 fd_bom_02_neg_one_365;
-f32 fd_bom_02___local_PI_366;
-f32 fd_bom_02___local_3PIO2_368;
-f32 fd_bom_02_one_negone_359[2] __attribute__((aligned(8)));
-f32 fd_bom_02___local_PIO2_367;
-f32 fd_bom_02_one_364;
-EvtWord evt_ie1_door_1[12];
-EvtWord evt_ie1_wall[12];
+extern EvtWord evt_ie1_door_1[];
+extern EvtWord evt_ie1_wall[];
 const char* ie1_npc[2];
-EvtWord evt_ie1_door_open[12];
-EvtWord evt_ie1_door_close[14];
+extern EvtWord evt_ie1_door_open[];
+extern EvtWord evt_ie1_door_close[];
 DoorParam ie1_door;
-EvtWord evt_ie2_door_1[12];
-EvtWord evt_ie2_wall[12];
+extern EvtWord evt_ie2_door_1[];
+extern EvtWord evt_ie2_wall[];
 const char* ie2_npc[2];
-EvtWord evt_ie2_door_open[12];
-EvtWord evt_ie2_door_close[14];
+extern EvtWord evt_ie2_door_open[];
+extern EvtWord evt_ie2_door_close[];
 DoorParam ie2_door;
-EvtWord evt_ie3_door_1[12];
-EvtWord evt_ie3_door_2[12];
-EvtWord evt_ie3_wall[12];
+extern EvtWord evt_ie3_door_1[];
+extern EvtWord evt_ie3_door_2[];
+extern EvtWord evt_ie3_wall[];
 const char* ie3_npc[3];
-EvtWord evt_ie3_door_open[12];
-EvtWord evt_ie3_door_close[14];
+extern EvtWord evt_ie3_door_open[];
+extern EvtWord evt_ie3_door_close[];
 const char* ie3_item[2];
 DoorParam ie3_door;
 static BeroEntry bero_entry_data[2];
-static EvtWord evt_kime_pose[52];
-static EvtWord evt_taihou[190];
-EvtWord urotuku_white[190];
-static EvtWord init_soncho[13];
-static EvtWord talk_soncho[421];
-static EvtWord init_murabito_e[2];
-#ifdef VERSION_G8ME01
-static EvtWord talk_murabito_e[281];
-#else
-static EvtWord talk_murabito_e[253];
-#endif
-static EvtWord init_murabito_f[2];
-static EvtWord talk_murabito_f[44];
-static EvtWord init_murabito_g[17];
-static EvtWord talk_murabito_g[81];
-static EvtWord init_murabito_h[2];
+extern EvtWord urotuku_white[];
 s32 iri_26_item_tbl[2];
-static EvtWord talk_murabito_h[151];
-static EvtWord init_murabito_i[2];
-static EvtWord talk_murabito_i[44];
-EvtWord init_tenin[8];
-EvtWord talk_tenin[2];
-static EvtWord init_white[83];
-#ifdef VERSION_G8ME01
-EvtWord mario_jump[203];
-#else
-EvtWord mario_jump[197];
-#endif
+extern EvtWord init_tenin[];
+extern EvtWord talk_tenin[];
+extern EvtWord mario_jump[];
 #ifndef VERSION_G8ME01
 EvtWord mario_jump_tail[6];
 #endif
 s32 iri_25_item_tbl[2];
-static EvtWord talk_white[117];
-EvtWord iri_25_white_bed[363];
-EvtWord evt_white_bed[505];
-static EvtWord kiza_talk[28];
-static EvtWord kiza_entry[30];
+extern EvtWord iri_25_white_bed[];
+extern EvtWord evt_white_bed[];
 static NpcSetupInfo npcEnt[9];
 static ShopObj obj_list[6];
 static ShopItem goods_list[6];
 static ShopDb trade_list[13];
 static ShopperData35 shopper_data;
-static EvtWord sekai_yami_evt[459];
-static EvtWord minnnanokoe_evt[183];
 static KinopioData kino_dt;
-EvtWord bom_02_init_evt[312];
-
-f32 fd_bom_02_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
-
-f32 fd_bom_02_neg_one_382 = -1.0f;
-
-f32 fd_bom_02___local_PI_383 = 3.1415927f;
-
-f32 fd_bom_02___local_3PIO2_385 = 4.712389f;
-
-f32 fd_bom_02_one_negone_373[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
-
-f32 fd_bom_02___local_PIO2_384 = 1.5707964f;
-
-f32 fd_bom_02_one_381 = 1.0f;
-
-f32 fd_bom_02_negone_one_360[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
-
-f32 fd_bom_02_neg_one_365 = -1.0f;
-
-f32 fd_bom_02___local_PI_366 = 3.1415927f;
-
-f32 fd_bom_02___local_3PIO2_368 = 4.712389f;
-
-f32 fd_bom_02_one_negone_359[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
-
-f32 fd_bom_02___local_PIO2_367 = 1.5707964f;
-
-f32 fd_bom_02_one_364 = 1.0f;
+extern EvtWord bom_02_init_evt[];
 
 EVT_BEGIN(evt_ie1_door_1)
     MULTIPLY_FLOAT(LW(0), FLOAT(0.44433594f))
@@ -962,7 +897,12 @@ EVT_BEGIN(mario_jump)
     BEGIN_INLINE_EVENT
         SUBTRACT(LW(0), 40)
         SUBTRACT(LW(2), 40)
+#ifdef VERSION_G8MP01
+        CALL(evt_eff, STRING("eff_nice"), STRING("nice"), 0, LW(0), LW(1), LW(2), 0, 0, 0, 0, 0, 0, 0, 0)
+        CALL(nice_effect_shrink, STRING("eff_nice"))
+#else
         CALL(evt_eff, 0, STRING("nice"), 0, LW(0), LW(1), LW(2), 0, 0, 0, 0, 0, 0, 0, 0)
+#endif
     END_INLINE_EVENT
     CALL(evt_eff, 0, STRING("small_star"), 3, LW(0), LW(1), LW(2), 0, -1, 0, 3, 0, 0, 0, 0)
     CALL(evt_snd_sfxon_3d, STRING("SFX_STG7_WHITE_DAMAGED1"), LW(0), LW(1), LW(2), 0)
@@ -976,7 +916,12 @@ EVT_BEGIN(mario_jump)
     BEGIN_INLINE_EVENT
         SUBTRACT(LW(0), 40)
         SUBTRACT(LW(2), 40)
+#ifdef VERSION_G8MP01
+        CALL(evt_eff, STRING("eff_good"), STRING("nice"), 1, LW(0), LW(1), LW(2), 0, 0, 0, 0, 0, 0, 0, 0)
+        CALL(nice_effect_shrink, STRING("eff_good"))
+#else
         CALL(evt_eff, 0, STRING("nice"), 1, LW(0), LW(1), LW(2), 0, 0, 0, 0, 0, 0, 0, 0)
+#endif
     END_INLINE_EVENT
     CALL(evt_eff, 0, STRING("small_star"), 3, LW(0), LW(1), LW(2), 0, -1, 0, 3, 0, 0, 0, 0)
     CALL(evt_snd_sfxon_3d, STRING("SFX_STG7_WHITE_DAMAGED1"), LW(0), LW(1), LW(2), 0)
@@ -1534,6 +1479,16 @@ static ShopperData35 shopper_data = {
     NULL, NULL, // fook_evt..buy_evt
     {"shop_00", "shop_01", "shop_02", "shop_03", "shop_04", "shop_05", "shop_06", "shop_07", "shop_08", "shop_09", "shop_10", "shop_11", "shop_12", "shop_13", "shop_14", "shop_15", "shop_16", "shop_17", "shop_18", "shop_19", "shop_20", "shop_21", "shop_22", "shop_23", "shop_24", "shop_25", "shop_26", "shop_27", "shop_28", "shop_29", "shop_30", "shop_31", "shop_32", "shop_33", "shop_34"}, // msgs
 };
+
+#ifdef VERSION_G8MP01
+// PAL: the NICE / GOOD letters of Mario's jumps on White are drawn at 5/7 size
+static USER_FUNC(nice_effect_shrink) {
+    EffectEntry* eff = effNameToPtr((const char*)evtGetValue(event, event->args[0]));
+
+    ((NiceEffectWork*)eff->userdata)->overallScale = 0.71428573f;
+    return EVT_RETURN_DONE;
+}
+#endif
 
 void envSetYamiView(Mtx mtx);
 

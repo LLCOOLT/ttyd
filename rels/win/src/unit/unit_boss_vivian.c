@@ -9,8 +9,6 @@
 #include "unit/party/unit_party_vivian.h"
 #include "battle/battle_database_common.h"
 
-#pragma force_active on
-
 USER_FUNC(btlevtcmd_AnimeChangePose);
 USER_FUNC(btlevtcmd_AnimeChangePoseFromTable);
 USER_FUNC(btlevtcmd_AnimeChangePoseType);
@@ -52,20 +50,6 @@ extern EvtWord majo_unison_phase_event[];
 extern BattleUnitKind unit_boss_majolyne;
 extern BattleUnitKind unit_boss_marilyn;
 
-f32 fd_boss_vivian_negone_one_374[2] __attribute__((aligned(8)));
-f32 fd_boss_vivian_neg_one_382;
-f32 fd_boss_vivian___local_PI_383;
-f32 fd_boss_vivian___local_3PIO2_385;
-f32 fd_boss_vivian_one_negone_373[2] __attribute__((aligned(8)));
-f32 fd_boss_vivian___local_PIO2_384;
-f32 fd_boss_vivian_one_381;
-f32 fd_boss_vivian_negone_one_360[2] __attribute__((aligned(8)));
-f32 fd_boss_vivian_neg_one_365;
-f32 fd_boss_vivian___local_PI_366;
-f32 fd_boss_vivian___local_3PIO2_368;
-f32 fd_boss_vivian_one_negone_359[2] __attribute__((aligned(8)));
-f32 fd_boss_vivian___local_PIO2_367;
-f32 fd_boss_vivian_one_364;
 BattleUnitKind unit_boss_vivian;
 static BattleUnitDefense defence;
 static BattleUnitDefenseAttr defence_attr;
@@ -77,13 +61,10 @@ BattleWeapon weapon_vivian_kagenuke_attack1;
 BattleWeapon weapon_vivian_flame_attack1;
 static BattleUnitSetup entry_marilyn;
 static BattleUnitSetup entry_majolyne;
-static EvtWord vivian_down[19];
-static EvtWord vivian_up[27];
 static EvtWord init_event[179];
 static EvtWord entry_event[46];
 static EvtWord damage_event[22];
 static EvtWord dead_event[189];
-static EvtWord unison_phase_event[81];
 static EvtWord phase_event[2];
 static EvtWord attack_event[98];
 #ifdef VERSION_G8ME01
@@ -91,40 +72,12 @@ static EvtWord kagenuke_attack_event[207];
 #else
 static EvtWord kagenuke_attack_event[204];
 #endif
-EvtWord flame_attack_event[185];
+extern EvtWord flame_attack_event[];
 #ifdef VERSION_G8ME01
 static EvtWord wait_event[7];
 #else
 static EvtWord wait_event[6];
 #endif
-
-f32 fd_boss_vivian_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
-
-f32 fd_boss_vivian_neg_one_382 = -1.0f;
-
-f32 fd_boss_vivian___local_PI_383 = 3.1415927f;
-
-f32 fd_boss_vivian___local_3PIO2_385 = 4.712389f;
-
-f32 fd_boss_vivian_one_negone_373[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
-
-f32 fd_boss_vivian___local_PIO2_384 = 1.5707964f;
-
-f32 fd_boss_vivian_one_381 = 1.0f;
-
-f32 fd_boss_vivian_negone_one_360[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
-
-f32 fd_boss_vivian_neg_one_365 = -1.0f;
-
-f32 fd_boss_vivian___local_PI_366 = 3.1415927f;
-
-f32 fd_boss_vivian___local_3PIO2_368 = 4.712389f;
-
-f32 fd_boss_vivian_one_negone_359[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
-
-f32 fd_boss_vivian___local_PIO2_367 = 1.5707964f;
-
-f32 fd_boss_vivian_one_364 = 1.0f;
 
 BattleUnitKind unit_boss_vivian = {
     33,

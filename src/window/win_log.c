@@ -16,6 +16,9 @@
 #include <dolphin/gx.h>
 #include "win/win_root.h"
 #include "eff/eff_starstone.h"
+#include "mario/mario.h"
+#include "pmario_sound.h"
+#include "system.h"
 
 typedef struct TubuDt {
     s16 x;
@@ -189,7 +192,7 @@ void winLogInit(WindowWork* w) {
 
     w->log.stoneNum = 0;
     for (i = 0; i < 7; i++) {
-        if (((s32 (*)(s32))pouchCheckItem)(stone_tbl[i])) {
+        if (pouchCheckItem(stone_tbl[i])) {
             w->log.stoneNum++;
         }
     }
@@ -248,7 +251,7 @@ void winLogInit(WindowWork* w) {
     if (!strncmp(gp->currentMapName, "hom", 3)) area = "eki";
     if (!strncmp(gp->currentMapName, "jon", 3)) area = "tik";
     if (!strcmp(gp->currentMapName, "gra_06")) area = "jin";
-    if (!strcmp(gp->currentMapName, "muj_10") || !strcmp(gp->currentMapName, "muj_11") || !strcmp(gp->currentMapName, "muj_12\0")) area = "dou";
+    if (!strcmp(gp->currentMapName, "muj_10") || !strcmp(gp->currentMapName, "muj_11") || !strcmp(gp->currentMapName, "muj_12")) area = "dou";
 
     {
         for (k = 0; k < 93; k++) {
@@ -449,7 +452,7 @@ s32 winLogMain(WindowWork* w) {
     switch (w->log.fD68) {
     case 0:
         if (w->buttonTrg & 0x200) {
-            psndSFXOn(0x20013);
+            psndSFXOn(SFX_NAME_WORD(0x20013));
             return -1;
         }
         if (w->buttonTrg & 0x1000) {
@@ -459,12 +462,12 @@ s32 winLogMain(WindowWork* w) {
             old = w->log.cursor;
             w->log.cursor++;
             if (w->log.cursor >= w->log.count) w->log.cursor = 0;
-            if (old != w->log.cursor) psndSFXOn(0x20005);
+            if (old != w->log.cursor) psndSFXOn(SFX_NAME_WORD(0x20005));
         } else if (w->dirRep & 0x1000) {
             old = w->log.cursor;
             w->log.cursor--;
             if (w->log.cursor < 0) w->log.cursor = w->log.count - 1;
-            if (old != w->log.cursor) psndSFXOn(0x20005);
+            if (old != w->log.cursor) psndSFXOn(SFX_NAME_WORD(0x20005));
         } else if (w->buttonTrg & 0x100) {
             for (i = 0; i < w->log.count; i++) {
                 w->log.menu[i].state = 30;
@@ -494,7 +497,7 @@ s32 winLogMain(WindowWork* w) {
             case 4:
                 break;
             }
-            psndSFXOn(0x20012);
+            psndSFXOn(SFX_NAME_WORD(0x20012));
         }
         w->helpTgtX = -128.0f;
         w->helpTgtY = 8.0f + (45.0f * w->log.count / 2.0f - 45.0f * w->log.cursor);
@@ -554,7 +557,7 @@ s32 winLogMain(WindowWork* w) {
             animPoseSetMaterialFlagOn(w->log.pose, 0x1800);
         }
         if (w->buttonTrg & 0x200) {
-            psndSFXOn(0x20013);
+            psndSFXOn(SFX_NAME_WORD(0x20013));
             for (i = 0; i < w->log.count; i++) {
                 w->log.menu[i].state = 40;
             }
@@ -588,7 +591,7 @@ s32 winLogMain(WindowWork* w) {
         if (min < 50.0f) {
             sprintf(name, "menu_monosiri_%s", tubuDt[sel].map);
             sprintf(help, "menu_map_%s", tubuDt[sel].map);
-            if (w->log.fE14 != sel) psndSFXOn(0x20035);
+            if (w->log.fE14 != sel) psndSFXOn(SFX_NAME_WORD(0x20035));
             w->log.fE14 = sel;
             winMsgEntry(w, 0, help, name);
         } else {
@@ -638,7 +641,7 @@ s32 winLogMain(WindowWork* w) {
         break;
     case 11:
         if (w->buttonTrg & 0x200) {
-            psndSFXOn(0x20013);
+            psndSFXOn(SFX_NAME_WORD(0x20013));
             for (i = 0; i < w->log.count; i++) {
                 w->log.menu[i].state = 40;
             }
@@ -651,15 +654,15 @@ s32 winLogMain(WindowWork* w) {
             while (w->log.fE60 < 0) w->log.fE60 += 7;
             w->log.fE7C = 51.42857f * w->log.fE60;
             while (w->log.fE80 < w->log.fE7C) w->log.fE80 += 360.0f;
-            psndSFXOn(0x209D6);
-            psndSFXOn(0x20037);
+            psndSFXOn(SFX_NAME_WORD(0x209D6));
+            psndSFXOn(SFX_NAME_WORD(0x20037));
         } else if (w->dirRep & 0x8000) {
             w->log.fE60++;
             while (w->log.fE60 > 6) w->log.fE60 -= 7;
             w->log.fE7C = 51.42857f * w->log.fE60;
             while (w->log.fE80 > w->log.fE7C) w->log.fE80 -= 360.0f;
-            psndSFXOn(0x209D6);
-            psndSFXOn(0x20037);
+            psndSFXOn(SFX_NAME_WORD(0x209D6));
+            psndSFXOn(SFX_NAME_WORD(0x20037));
         } else if (w->buttonTrg & 0x1000) {
             return -2;
         }
@@ -673,7 +676,7 @@ s32 winLogMain(WindowWork* w) {
     case 12:
         pages = (w->log.badge.num + 27) / 28;
         if (w->buttonTrg & 0x200) {
-            psndSFXOn(0x20013);
+            psndSFXOn(SFX_NAME_WORD(0x20013));
             for (i = 0; i < w->log.count; i++) {
                 w->log.menu[i].state = 40;
             }
@@ -687,22 +690,22 @@ s32 winLogMain(WindowWork* w) {
             w->log.badge.idx--;
             if (w->log.badge.idx < 0) w->log.badge.idx = 0;
             w->log.badge.cursor = w->log.badge.idx * 28;
-            psndSFXOn(0x20035);
+            psndSFXOn(SFX_NAME_WORD(0x20035));
         } else if (w->buttonRep & 0x20) {
             w->log.badge.idx++;
             if (w->log.badge.idx >= pages) w->log.badge.idx = pages - 1;
             w->log.badge.cursor = w->log.badge.idx * 28;
-            psndSFXOn(0x20035);
+            psndSFXOn(SFX_NAME_WORD(0x20035));
         } else if (w->dirRep & 0x8000) {
             if (w->log.badge.cursor % 7 < 6 && w->log.badge.cursor + 1 < w->log.badge.num) w->log.badge.cursor++;
-            psndSFXOn(0x20035);
+            psndSFXOn(SFX_NAME_WORD(0x20035));
         } else if (w->dirRep & 0x4000) {
             if (w->log.badge.cursor % 7 > 0) w->log.badge.cursor--;
-            psndSFXOn(0x20035);
+            psndSFXOn(SFX_NAME_WORD(0x20035));
         } else if (w->dirRep & 0x1000) {
             if ((s32)(w->log.badge.cursor - 7) >= 0 && w->log.badge.cursor - 7 < w->log.badge.num) { w->log.badge.cursor -= 7; }
             w->log.badge.idx = w->log.badge.cursor / 28;
-            psndSFXOn(0x20035);
+            psndSFXOn(SFX_NAME_WORD(0x20035));
         } else if (w->dirRep & 0x2000) {
             if ((s32)(w->log.badge.cursor + 7) >= 0 && w->log.badge.cursor + 7 < w->log.badge.num) {
                 w->log.badge.cursor += 7;
@@ -710,11 +713,11 @@ s32 winLogMain(WindowWork* w) {
                 w->log.badge.cursor = w->log.badge.num - 1;
             }
             w->log.badge.idx = w->log.badge.cursor / 28;
-            psndSFXOn(0x20035);
+            psndSFXOn(SFX_NAME_WORD(0x20035));
         } else if (w->buttonTrg & 0x10) {
             winSortEntry(w, 4, -310.0f, 150.0f);
             w->savedState = w->log.fD68;
-            psndSFXOn(0x20012);
+            psndSFXOn(SFX_NAME_WORD(0x20012));
             w->log.fD68 = 1000;
         } else if (w->buttonTrg & 0x1000) {
             return -2;
@@ -730,7 +733,7 @@ s32 winLogMain(WindowWork* w) {
     case 13:
         pages = (w->log.recipe.num + 27) / 28;
         if (w->buttonTrg & 0x200) {
-            psndSFXOn(0x20013);
+            psndSFXOn(SFX_NAME_WORD(0x20013));
             for (i = 0; i < w->log.count; i++) {
                 w->log.menu[i].state = 40;
             }
@@ -744,22 +747,22 @@ s32 winLogMain(WindowWork* w) {
             w->log.recipe.idx--;
             if (w->log.recipe.idx < 0) w->log.recipe.idx = 0;
             w->log.recipe.cursor = w->log.recipe.idx * 28;
-            psndSFXOn(0x20035);
+            psndSFXOn(SFX_NAME_WORD(0x20035));
         } else if (w->buttonRep & 0x20) {
             w->log.recipe.idx++;
             if (w->log.recipe.idx >= pages) w->log.recipe.idx = pages - 1;
             w->log.recipe.cursor = w->log.recipe.idx * 28;
-            psndSFXOn(0x20035);
+            psndSFXOn(SFX_NAME_WORD(0x20035));
         } else if (w->dirRep & 0x8000) {
             if (w->log.recipe.cursor % 7 < 6 && w->log.recipe.cursor + 1 < w->log.recipe.num) w->log.recipe.cursor++;
-            psndSFXOn(0x20035);
+            psndSFXOn(SFX_NAME_WORD(0x20035));
         } else if (w->dirRep & 0x4000) {
             if (w->log.recipe.cursor % 7 > 0) w->log.recipe.cursor--;
-            psndSFXOn(0x20035);
+            psndSFXOn(SFX_NAME_WORD(0x20035));
         } else if (w->dirRep & 0x1000) {
             if ((s32)(w->log.recipe.cursor - 7) >= 0 && w->log.recipe.cursor - 7 < w->log.recipe.num) { w->log.recipe.cursor -= 7; }
             w->log.recipe.idx = w->log.recipe.cursor / 28;
-            psndSFXOn(0x20035);
+            psndSFXOn(SFX_NAME_WORD(0x20035));
         } else if (w->dirRep & 0x2000) {
             if ((s32)(w->log.recipe.cursor + 7) >= 0 && w->log.recipe.cursor + 7 < w->log.recipe.num) {
                 w->log.recipe.cursor += 7;
@@ -767,11 +770,11 @@ s32 winLogMain(WindowWork* w) {
                 w->log.recipe.cursor = w->log.recipe.num - 1;
             }
             w->log.recipe.idx = w->log.recipe.cursor / 28;
-            psndSFXOn(0x20035);
+            psndSFXOn(SFX_NAME_WORD(0x20035));
         } else if (w->buttonTrg & 0x10) {
             winSortEntry(w, 5, -310.0f, 150.0f);
             w->savedState = w->log.fD68;
-            psndSFXOn(0x20012);
+            psndSFXOn(SFX_NAME_WORD(0x20012));
             w->log.fD68 = 1000;
         } else if (w->buttonTrg & 0x1000) {
             return -2;
@@ -787,7 +790,7 @@ s32 winLogMain(WindowWork* w) {
     case 14:
         pages = (w->log.enemyNum + 15) / 16;
         if (w->buttonTrg & 0x200) {
-            psndSFXOn(0x20013);
+            psndSFXOn(SFX_NAME_WORD(0x20013));
             for (i = 0; i < w->log.count; i++) {
                 w->log.menu[i].state = 40;
             }
@@ -799,12 +802,12 @@ s32 winLogMain(WindowWork* w) {
             w->log.enemyPage--;
             if (w->log.enemyPage < 0) w->log.enemyPage = 0;
             w->log.enemySel = w->log.enemyPage * 16;
-            psndSFXOn(0x20035);
+            psndSFXOn(SFX_NAME_WORD(0x20035));
         } else if (w->buttonRep & 0x20) {
             w->log.enemyPage++;
             if (w->log.enemyPage >= pages) w->log.enemyPage = pages - 1;
             w->log.enemySel = w->log.enemyPage * 16;
-            psndSFXOn(0x20035);
+            psndSFXOn(SFX_NAME_WORD(0x20035));
         } else if (w->dirRep & 0xC000) {
             if (w->log.enemySel % 16 < 8) {
                 w->log.enemySel += 8;
@@ -813,7 +816,7 @@ s32 winLogMain(WindowWork* w) {
             }
             if (w->log.enemySel >= w->log.enemyNum) w->log.enemySel = w->log.enemyNum - 1;
             if (w->log.enemySel < 0) w->log.enemySel = 0;
-            psndSFXOn(0x20035);
+            psndSFXOn(SFX_NAME_WORD(0x20035));
         } else if (w->dirRep & 0x1000) {
             if (w->log.enemySel % 8 == 0) {
                 w->log.enemySel -= 9;
@@ -822,7 +825,7 @@ s32 winLogMain(WindowWork* w) {
             }
             if (w->log.enemySel < 0) w->log.enemySel = 0;
             w->log.enemyPage = w->log.enemySel / 16;
-            psndSFXOn(0x20035);
+            psndSFXOn(SFX_NAME_WORD(0x20035));
         } else if (w->dirRep & 0x2000) {
             if (w->log.enemySel % 8 == 7) {
                 w->log.enemySel += 9;
@@ -831,17 +834,17 @@ s32 winLogMain(WindowWork* w) {
             }
             if (w->log.enemySel >= w->log.enemyNum) w->log.enemySel = w->log.enemyNum - 1;
             w->log.enemyPage = w->log.enemySel / 16;
-            psndSFXOn(0x20035);
+            psndSFXOn(SFX_NAME_WORD(0x20035));
         } else if (w->buttonTrg & 0x100) {
             if (swGet(w->log.enemy[w->log.enemySel].id + 0x117A)) {
-                psndSFXOn(0x20012);
+                psndSFXOn(SFX_NAME_WORD(0x20012));
                 w->log.fD68 = 21;
                 w->log.mono = monosiriInit(w->log.enemy[w->log.enemySel].id, -60.0f, 150.0f);
             }
         } else if (w->buttonTrg & 0x10) {
             winSortEntry(w, 6, -310.0f, 150.0f);
             w->savedState = w->log.fD68;
-            psndSFXOn(0x20012);
+            psndSFXOn(SFX_NAME_WORD(0x20012));
             w->log.fD68 = 1001;
         } else if (w->buttonTrg & 0x1000) {
             return -2;
@@ -856,7 +859,7 @@ s32 winLogMain(WindowWork* w) {
         break;
     case 21:
         if (w->buttonTrg & 0x200) {
-            psndSFXOn(0x20013);
+            psndSFXOn(SFX_NAME_WORD(0x20013));
             w->log.fD68 = 22;
             monosiriClose(w->log.mono);
         } else if (w->buttonTrg & 0x1000) {
@@ -1028,7 +1031,7 @@ void winLogDisp(CameraId cam, void* param, s32 idx) {
 
             black = (GXColor){0x00, 0x00, 0x00, 0xFF};
             winKirinukiGX(w, 0, (x + w->log.badge.f24) - 50.0f, (y + w->log.badge.f2C) - 120.0f, 100.0f, 30.0f);
-            sprintf(buf, (u32)gp->language != 0 ? "%d/%d" : "%d\201^%d", w->log.badge.page, w->log.badge.num);
+            sprintf(buf, (u32)gp->language != 0 ? "%d/%d" : "%d／%d", w->log.badge.page, w->log.badge.num);
             width = 0.75f * FontGetMessageWidth(buf);
             winFontInit();
             winFontSet((Vec){(f32)((100 - width) / 2) + ((x + w->log.badge.f24) - 50.0f), (y + w->log.badge.f2C) - 128.0f, 0.0f},
@@ -1052,7 +1055,7 @@ void winLogDisp(CameraId cam, void* param, s32 idx) {
 
             black = (GXColor){0x00, 0x00, 0x00, 0xFF};
             winKirinukiGX(w, 0, (x + w->log.recipe.f24) - 50.0f, (y + w->log.recipe.f2C) - 120.0f, 100.0f, 30.0f);
-            sprintf(buf, (u32)gp->language != 0 ? "%d/%d" : "%d\201^%d", w->log.recipe.page, w->log.recipe.num);
+            sprintf(buf, (u32)gp->language != 0 ? "%d/%d" : "%d／%d", w->log.recipe.page, w->log.recipe.num);
             width = 0.75f * FontGetMessageWidth(buf);
             winFontInit();
             winFontSet((Vec){(f32)((100 - width) / 2) + ((x + w->log.recipe.f24) - 50.0f), (y + w->log.recipe.f2C) - 128.0f, 0.0f},
@@ -1241,10 +1244,10 @@ void monoshiriGX(WindowWork* w, f32 x, f32 y) {
     winFontInit();
 #ifdef VERSION_G8ME01
     winFontSetWidth((Vec){(x - 108.0f) + (100 - tw) / 2, y - 166.0f, 0.0f}, (Vec){0.75f, 0.75f, 0.75f}, k1, 80.0f, msg);
-    sprintf(buf, (u32)gp->language != 0 ? "%d/%d" : "%d\201^%d", w->log.enemyKnown, w->log.enemyNum);
+    sprintf(buf, (u32)gp->language != 0 ? "%d/%d" : "%d／%d", w->log.enemyKnown, w->log.enemyNum);
 #else
     winFontSet((Vec){(x - 108.0f) + (100 - tw) / 2, y - 166.0f, 0.0f}, (Vec){0.75f, 0.75f, 0.75f}, k1, msg);
-    sprintf(buf, "%d\201^%d", w->log.enemyKnown, w->log.enemyNum);
+    sprintf(buf, "%d／%d", w->log.enemyKnown, w->log.enemyNum);
 #endif
     tw = 0.75f * FontGetMessageWidth(buf);
     winFontSet((Vec){(x - 108.0f) + (100 - tw) / 2, y - 184.0f, 0.0f}, (Vec){0.75f, 0.75f, 0.75f}, k1, buf);
@@ -1265,17 +1268,17 @@ void monoshiriGX(WindowWork* w, f32 x, f32 y) {
             }
         } else {
 #ifdef VERSION_G8ME01
-            name = (u32)gp->language != 0 ? "???" : "\201H\201H\201H";
+            name = (u32)gp->language != 0 ? "???" : "？？？";
 #else
-            name = "\201H\201H\201H";
+            name = "？？？";
 #endif
         }
 #ifdef VERSION_G8ME01
-        sprintf(num, (u32)gp->language != 0 ? "%d. " : "%d\201D", enemy_monoshiri_sort_table[id]);
+        sprintf(num, (u32)gp->language != 0 ? "%d. " : "%d．", enemy_monoshiri_sort_table[id]);
         winFontSetWidth((Vec){((24.0f + x) - 5.0f) + (i / 8) * 216, (y - 16.0f) - (i % 8) * 24, 0.0f}, (Vec){0.75f, 0.75f, 0.75f}, k2, 40.0f, num);
         winFontSetWidth((Vec){(56.0f + x) + (i / 8) * 216, (y - 16.0f) - (i % 8) * 24, 0.0f}, (Vec){0.75f, 0.75f, 0.75f}, k2, 145.0f, name);
 #else
-        sprintf(num, "%d\201D", enemy_monoshiri_sort_table[id]);
+        sprintf(num, "%d．", enemy_monoshiri_sort_table[id]);
         winFontSet((Vec){((24.0f + x) - 5.0f) + (i / 8) * 216, (y - 16.0f) - (i % 8) * 24, 0.0f}, (Vec){0.75f, 0.75f, 0.75f}, k2, num);
         winFontSet((Vec){(56.0f + x) + (i / 8) * 216, (y - 16.0f) - (i % 8) * 24, 0.0f}, (Vec){0.75f, 0.75f, 0.75f}, k2, name);
 #endif
@@ -1676,38 +1679,36 @@ void monosiri_disp(CameraId camera, void* param) {
         te = battleGetUnitMonosiriPtr(id);
         if (id == 0x4D || id == 0x87) {
             if (evtGetValue(NULL, GSW(0)) < 0xD2) {
-                sprintf(buf, (u32)gp->language != 0 ? "%d. %s" : "%d\201D%s", enemy_monoshiri_sort_table[id], msgSearch("btl_un_hatena"));
+                sprintf(buf, (u32)gp->language != 0 ? "%d. %s" : "%d．%s", enemy_monoshiri_sort_table[id], msgSearch("btl_un_hatena"));
             } else {
-                sprintf(buf, (u32)gp->language != 0 ? "%d. %s" : "%d\201D%s", enemy_monoshiri_sort_table[id], msgSearch("btl_un_rampell"));
+                sprintf(buf, (u32)gp->language != 0 ? "%d. %s" : "%d．%s", enemy_monoshiri_sort_table[id], msgSearch("btl_un_rampell"));
             }
         } else {
-            sprintf(buf, (u32)gp->language != 0 ? "%d. %s" : "%d\201D%s", enemy_monoshiri_sort_table[id], msgSearch(te->enemyTag));
+            sprintf(buf, (u32)gp->language != 0 ? "%d. %s" : "%d．%s", enemy_monoshiri_sort_table[id], msgSearch(te->enemyTag));
         }
 #else
         id = m->id;
         te = battleGetUnitMonosiriPtr(id);
         if (id == 0x4D || id == 0x87) {
             if (evtGetValue(NULL, GSW(0)) < 0xD2) {
-                sprintf(buf, "%d\201D%s", enemy_monoshiri_sort_table[id], msgSearch("btl_un_hatena"));
+                sprintf(buf, "%d．%s", enemy_monoshiri_sort_table[id], msgSearch("btl_un_hatena"));
             } else {
-                sprintf(buf, "%d\201D%s", enemy_monoshiri_sort_table[id], msgSearch("btl_un_rampell"));
+                sprintf(buf, "%d．%s", enemy_monoshiri_sort_table[id], msgSearch("btl_un_rampell"));
             }
         } else {
-            sprintf(buf, "%d\201D%s", enemy_monoshiri_sort_table[id], msgSearch(te->enemyTag));
+            sprintf(buf, "%d．%s", enemy_monoshiri_sort_table[id], msgSearch(te->enemyTag));
         }
 #endif
         w = 0.75f * FontGetMessageWidth(buf);
         winFontInit();
         winFontSet((Vec){(16.0f + x) + (248.0f - w) / 2.0f, y - 180.0f, 0.0f}, (Vec){0.75f, 0.75f, 0.75f}, black, buf);
 #ifdef VERSION_G8ME01
-        sprintf(buf, (u32)gp->language != 0 ? "%s %s" : "%s\201@%s", msgSearch("menu_monosiri_derutokoro"), msgSearch(te->locationTag));
+        sprintf(buf, (u32)gp->language != 0 ? "%s %s" : "%s　%s", msgSearch("menu_monosiri_derutokoro"), msgSearch(te->locationTag));
 #else
-        sprintf(buf, "%s\201@%s", msgSearch("menu_monosiri_derutokoro"), msgSearch(te->locationTag));
+        sprintf(buf, "%s　%s", msgSearch("menu_monosiri_derutokoro"), msgSearch(te->locationTag));
 #endif
         w = 0.75f * FontGetMessageWidth(buf);
         winFontSet((Vec){1.0f + ((16.0f + x) + (248.0f - w) / 2.0f), y - 210.0f, 0.0f}, (Vec){0.75f, 0.75f, 0.75f}, black, buf);
     }
 }
 
-#pragma force_active on
-#pragma force_active reset

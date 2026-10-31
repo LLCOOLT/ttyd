@@ -312,6 +312,8 @@ def main():
     data = json.dumps(payload, separators=(",", ":")).replace("</", "<\\/")
     out = template.replace("/*__DATA__*/null", data)
     out = out.replace("__COMMIT__", html.escape(commit or "working tree"))
+    version = next((v for v in ("G8MJ01", "G8ME01", "G8MP01") if v in os.path.abspath(args.report)), "G8MJ01")
+    out = out.replace("__VERSION__", version)
     if (t := payload.get("true")) and "true_fuzzy" in t:
         note = (f'<p class="cmp">All code is C. The map colours each file by how closely its C matches the original: '
                 f'<b>green</b> = byte-exact and linked. Hover a cell for its counts. '

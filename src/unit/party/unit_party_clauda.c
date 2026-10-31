@@ -21,7 +21,7 @@
 #include "party/party_motion.h"
 
 f32 BattleGetFloorHeight(BattleWork* wp, f32 x, f32 y, f32 z);
-EffectEntry* effKumokumoN64Entry(s32 type, s32 time, f32 x, f32 y, f32 z, f32 arg5, f32 arg6, f32 scale);
+EffectEntry* effKumokumoN64Entry(s32 type, s32 time, f32 x, f32 y, f32 z, f32 rot, f32 unused, f32 scale);
 #include "battle/battle_unit.h"
 #include "evt/evt_cmd.h"
 
@@ -65,14 +65,6 @@ static USER_FUNC(_clauda_breath_effect_ready);
 USER_FUNC(_check_blow_rate);
 static void __makeTechMenuFunc(BattleCommand* command, s32* count);
 
-__declspec(section ".data") f32 unit_party_clauda_negone_one_a[2] __attribute__((aligned(8)));
-__declspec(section ".data") f32 fd_clauda_negone_one_374[2] __attribute__((aligned(8)));
-__declspec(section ".data") f32 unit_party_clauda_one_negone_a[2] __attribute__((aligned(8)));
-__declspec(section ".data") f32 fd_clauda_one_negone_373[2] __attribute__((aligned(8)));
-__declspec(section ".data") f32 unit_party_clauda_negone_one_b[2] __attribute__((aligned(8)));
-__declspec(section ".data") f32 fd_clauda_negone_one_360[2] __attribute__((aligned(8)));
-__declspec(section ".data") f32 unit_party_clauda_one_negone_b[2] __attribute__((aligned(8)));
-__declspec(section ".data") f32 fd_clauda_one_negone_359[2] __attribute__((aligned(8)));
 BattleWeapon partyWeapon_ClaudaNormalAttack;
 BattleWeapon partyWeapon_ClaudaBreathAttack;
 BattleWeapon partyWeapon_ClaudaPredationAttack;
@@ -81,17 +73,16 @@ PoseTableEntry pose_table_clauda_stay[25];
 static BattleDataEntry data_table[8];
 BattleUnitKindPart unitpartsdata_Party_Clauda[1];
 BattleUnitKind unitdata_Party_Clauda;
-static EvtWord battle_entry_event[59];
 static EvtWord init_event[60];
 static EvtWord damage_event[16];
-EvtWord partyClaudaAttack_NormalAttack[700];
-EvtWord partyClaudaAttack_BreathAttack[520];
-EvtWord partyClaudaAttack_PredationAttack[875];
-EvtWord partyClaudaAttack_KumoGuard[290];
-EvtWord clauda_appeal_event[71];
+extern EvtWord partyClaudaAttack_NormalAttack[];
+extern EvtWord partyClaudaAttack_BreathAttack[];
+extern EvtWord partyClaudaAttack_PredationAttack[];
+extern EvtWord partyClaudaAttack_KumoGuard[];
+extern EvtWord clauda_appeal_event[];
 static EvtWord attack_audience_event[15];
-EvtWord attack_bad_audience_event[348];
-EvtWord attack_good_audience_event[216];
+extern EvtWord attack_bad_audience_event[];
+extern EvtWord attack_good_audience_event[];
 static BattleUnitDefense defence;
 static BattleUnitDefenseAttr defence_attr;
 static StatusVulnerability regist;
@@ -108,21 +99,13 @@ static EvtWord party_win_reaction[11];
 
 
 
-__declspec(section ".data") f32 unit_party_clauda_negone_one_a[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
 
-__declspec(section ".data") f32 fd_clauda_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
 
-__declspec(section ".data") f32 unit_party_clauda_one_negone_a[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
 
-__declspec(section ".data") f32 fd_clauda_one_negone_373[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
 
-__declspec(section ".data") f32 unit_party_clauda_negone_one_b[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
 
-__declspec(section ".data") f32 fd_clauda_negone_one_360[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
 
-__declspec(section ".data") f32 unit_party_clauda_one_negone_b[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
 
-__declspec(section ".data") f32 fd_clauda_one_negone_359[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
 
 BattleWeapon partyWeapon_ClaudaNormalAttack = {
     "btl_wn_pwd_normal", // name
@@ -1323,8 +1306,6 @@ static EVT_BEGIN(party_win_reaction)
     RETURN
 EVT_END()
 
-#pragma force_active on
-#pragma force_active reset
 
 
 USER_FUNC(_clauda_make_extra_work_area) {

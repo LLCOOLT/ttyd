@@ -13,9 +13,9 @@ typedef struct EffSheepWork {
     s32 type;       // 0x0
     Vec position;   // 0x4
     f32 scale;      // 0x10
-    s32 field_0x14; // 0x14
-    f32 field_0x18; // 0x18
-    f32 field_0x1C; // 0x1C
+    s32 hopFrames;  // 0x14, frames per hop
+    f32 hopVelY;    // 0x18
+    f32 gravity;    // 0x1C
     s32 poseId;     // 0x20
     s32 state;      // 0x24
     s32 timer;      // 0x28
@@ -63,9 +63,9 @@ EffectEntry* effSheepEntry(s32 type, f32 x, f32 y, f32 z) {
         p->timer = i + irand(30);
         p->position.z = 100 - irand(200);
         if (p->type != 0) {
-            p->field_0x14 = (s32)((irand(50) + 50) / p->speed);
-            p->field_0x1C = 0.2f;
-            p->field_0x18 = p->field_0x1C * p->field_0x14 / 2.0f;
+            p->hopFrames = (s32)((irand(50) + 50) / p->speed);
+            p->gravity = 0.2f;
+            p->hopVelY = p->gravity * p->hopFrames / 2.0f;
         }
         if (effect->count - 1 == i) {
             p->position.z = 0.0f;
@@ -156,11 +156,11 @@ void effSheepMain(EffectEntry* effect) {
                 if (p->position.x < 500.0f) {
                     p->position.x += p->speed;
                     if (p->type == 1) {
-                        p->position.y += p->field_0x18;
-                        p->field_0x18 -= p->field_0x1C;
+                        p->position.y += p->hopVelY;
+                        p->hopVelY -= p->gravity;
                         if (p->position.y < 0.0f) {
                             p->position.y = 0.0f;
-                            p->field_0x18 *= -1.0f;
+                            p->hopVelY *= -1.0f;
                         }
                     }
                 }

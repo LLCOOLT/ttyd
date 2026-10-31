@@ -8,57 +8,7 @@
 #include <dolphin/mtx.h>
 #include "eff/eff_magic1_n64.h"
 #include "libc_decls.h"
-
-#define NAN (*(f32*)__float_nan)
-
-#define FP_NAN 1
-#define FP_INFINITE 2
-#define FP_ZERO 3
-#define FP_NORMAL 4
-#define FP_SUBNORMAL 5
-
-static inline s32 __fpclassifyf(f32 x) {
-    switch (*(s32*)&x & 0x7F800000) {
-        case 0x7F800000:
-            if (*(s32*)&x & 0x007FFFFF) {
-                return FP_NAN;
-            } else {
-                return FP_INFINITE;
-            }
-            break;
-        case 0:
-            if (*(s32*)&x & 0x007FFFFF) {
-                return FP_SUBNORMAL;
-            } else {
-                return FP_ZERO;
-            }
-            break;
-        default:
-            return FP_NORMAL;
-    }
-}
-
-#define fpclassify(x) __fpclassifyf(x)
-#define isnan(x) (fpclassify(x) == FP_NAN)
-
-static inline f32 sqrtf(f32 x) {
-    const f64 _half = .5;
-    const f64 _three = 3.0;
-
-    if (x > 0.0f) {
-        f64 guess = __frsqrte(x);
-        guess = _half * guess * (_three - guess * guess * x);
-        guess = _half * guess * (_three - guess * guess * x);
-        guess = _half * guess * (_three - guess * guess * x);
-        return x * guess;
-    } else if (x < 0.0) {
-        return NAN;
-    } else if (isnan(x)) {
-        return NAN;
-    } else {
-        return x;
-    }
-}
+#include <math.h>
 
 #define PI 3.1415927f
 #define HALF_PI 1.5707964f
@@ -123,7 +73,7 @@ EffectEntry* effSmallStarN64Entry(s32 type, s32 count, f32 x, f32 y, f32 z, f32 
         return NULL;
     }
     inv = 1.0f / sqrtf(len);
-    effect->type = "SmallStarN64\0\0\0";
+    effect->type = "SmallStarN64";
     effect->count = count;
     px *= inv;
     py *= inv;

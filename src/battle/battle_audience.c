@@ -169,14 +169,6 @@ extern ItemData itemDataTable[];
 void BattleStatusWindowAPRecoveryOn(void);
 #pragma force_active on
 
-__declspec(section ".data") u8 battle_audience_negone_one_a[8] = {0xBF, 0x80, 0x00, 0x00, 0x3F, 0x80, 0x00, 0x00};
-__declspec(section ".data") f32 aud_uv0[2] = {-1.0f, 1.0f};
-__declspec(section ".data") f32 aud_uv1[2] = {1.0f, -1.0f};
-__declspec(section ".data") f32 aud_uv2[2] = {1.0f, -1.0f};
-__declspec(section ".data") f32 aud_uv3[2] = {-1.0f, 1.0f};
-__declspec(section ".data") f32 aud_uv4[2] = {-1.0f, 1.0f};
-__declspec(section ".data") f32 aud_uv5[2] = {1.0f, -1.0f};
-__declspec(section ".data") f32 aud_uv6[2] = {1.0f, -1.0f};
 BattleWeapon weapon_data_akikan = {
     NULL, 0, // name..icon
     {0}, // pad_06
@@ -366,7 +358,7 @@ void BattleAudience_Init(void) {
 	}
 	BattleAudienceSettingAudience();
 	audience->normalTex = tplRead("battle/audience/audience_normal.tpl");
-	BattleAudienceGuestTPLRead(0, AUDIENCE_LUIGI, "audience_luigi.tpl\0");
+	BattleAudienceGuestTPLRead(0, AUDIENCE_LUIGI, "audience_luigi.tpl");
 	BattleAudienceSetThrowItemMax();
 
 	audience->mTurnEndPhaseEventChance = 0;
@@ -1502,7 +1494,6 @@ BattleUnit* BattleAudienceDetectTargetPlayer(void) {
 extern s32 BtlUnit_CheckShadowGuard(BattleUnit*);
 extern double __fabs(double);
 void BattleAudienceItemCtrlProcess(void) {
-	u8* d = battle_audience_negone_one_a;
 	Vec hv;
 	s32 i;
 	BattleWork* wp = _battleWorkPointer;
@@ -1676,19 +1667,19 @@ void BattleAudienceItemCtrlProcess(void) {
 				BattleAudience_SetPresentTargetUnitId(BtlUnit_GetUnitId((BattleUnit*)aud));
 				switch (it->mItemType) {
 				case 0xec:
-					memcpy(base + 0x137fc, d + 0x40, 0xc0);
+					memcpy(base + 0x137fc, &weapon_data_akikan, sizeof(BattleWeapon));
 					*(s32*)(base + 0x1381c) = (*(s32*)(base + 0x137f8)) + *(s32*)(base + 0x1381c) - 1;
 					break;
 				case 0xed:
-					memcpy(base + 0x137fc, d + 0x100, 0xc0);
+					memcpy(base + 0x137fc, &weapon_data_brick, sizeof(BattleWeapon));
 					*(s32*)(base + 0x1381c) = (*(s32*)(base + 0x137f8)) + *(s32*)(base + 0x1381c) - 1;
 					break;
 				case 0xee:
-					memcpy(base + 0x137fc, d + 0x1c0, 0xc0);
+					memcpy(base + 0x137fc, &weapon_data_bone, sizeof(BattleWeapon));
 					*(s32*)(base + 0x1381c) = (*(s32*)(base + 0x137f8)) + *(s32*)(base + 0x1381c) - 1;
 					break;
 				case 0xef:
-					memcpy(base + 0x137fc, d + 0x280, 0xc0);
+					memcpy(base + 0x137fc, &weapon_data_hammer, sizeof(BattleWeapon));
 					*(s32*)(base + 0x1381c) = (*(s32*)(base + 0x137f8)) + *(s32*)(base + 0x1381c) - 1;
 					break;
 				}
@@ -1823,7 +1814,7 @@ void BattleAudienceApSrcCtrlProcess(void) {
 			(base->starPowerGain)--;
 		}
 		if (cnt == 0 && psndSFXChk(base->apStarSfxId) == -1) {
-			base->apStarSfxId = ((s32 (*)(const char*))psndSFXOn)("SFX_BTL_SYS_AP_STAR1");
+			base->apStarSfxId = psndSFXOn("SFX_BTL_SYS_AP_STAR1");
 		}
 	} else {
 		for (k = 0, i = 0; i < 100; i++) {
@@ -2543,21 +2534,21 @@ void BattleAudience_GetItemOn(s32* memberId, f32* x, f32* y, f32* z, ItemType* i
 			item = BattleAudienceItemGetPtr(member->itemId);
 			if (item->state <= 4 || item->state == 7) {
 				if (memberId) {
-					audience->mItemOnMemberId = i;
+					audience->mItemHolderId = i;
 					*memberId = i;
 				}
-				audience->mItemOnMemberPos.x = member->position.x;
-				audience->mItemOnMemberPos.y = member->position.y;
-				audience->mItemOnMemberPos.z = member->position.z + 3.0f;
+				audience->mItemHolderPos.x = member->position.x;
+				audience->mItemHolderPos.y = member->position.y;
+				audience->mItemHolderPos.z = member->position.z + 3.0f;
 
 				if (x) {
-					*x = audience->mItemOnMemberPos.x;
+					*x = audience->mItemHolderPos.x;
 				}
 				if (y) {
-					*y = audience->mItemOnMemberPos.y;
+					*y = audience->mItemHolderPos.y;
 				}
 				if (z) {
-					*z = audience->mItemOnMemberPos.z;
+					*z = audience->mItemHolderPos.z;
 				}
 
 				if (itemType) {
@@ -2581,19 +2572,19 @@ void BattleAudience_GetItemOn2(s32* memberId, f32* x, f32* y, f32* z, ItemType* 
 	BattleAudienceMember* member;
 
 	audience = BattleAudienceBaseGetPtr();
-	member = BattleAudienceGetPtr(audience->mItemOnMemberId);
+	member = BattleAudienceGetPtr(audience->mItemHolderId);
 	if (memberId) {
-		*memberId = audience->mItemOnMemberId;
+		*memberId = audience->mItemHolderId;
 	}
 
 	if (x) {
-		*x = audience->mItemOnMemberPos.x;
+		*x = audience->mItemHolderPos.x;
 	}
 	if (y) {
-		*y = audience->mItemOnMemberPos.y;
+		*y = audience->mItemHolderPos.y;
 	}
 	if (z) {
-		*z = audience->mItemOnMemberPos.z;
+		*z = audience->mItemHolderPos.z;
 	}
 
 	if (itemType) {
@@ -3993,7 +3984,7 @@ void BattleAudienceSoundStop(s32 index) {
 
 //@@ BattleAudienceSound0
 s32 BattleAudienceSound0(const char* name) {
-	return ((s32 (*)(const char*))psndSFXOn)(name);
+	return psndSFXOn(name);
 }
 
 //@@ BattleAudienceSound1

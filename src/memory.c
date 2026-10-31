@@ -14,14 +14,11 @@ struct MapAllocEntry {
 	u32 size; //0x4
 	u16 inuse; //0x8
 	u16 currId; //0xA
-	u8 field_0xC[0x20 - 0xC]; //0xC
+	u8 pad_0C[0x20 - 0xC]; //0xC, pads the header to 32 bytes
 };
 
 //.bss
-__declspec(section ".data") u8 gap_06_803D48AC_bss[4];
-#pragma force_active on
 SmartWork smartWork;
-#pragma force_active reset
 
 //.sdata
 //flag, size / 0x400 (>> 10)
@@ -49,9 +46,6 @@ s32 size_table[HEAP_COUNT][2] = {
 };
 #endif
 static SmartWork* wp = &smartWork;
-#pragma force_active on
-u32 gap_07_8040F50C_sdata[1] = {0};
-#pragma force_active reset
 
 //.sbss
 OSHeapHandle heapHandle[HEAP_COUNT];

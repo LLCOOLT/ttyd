@@ -11,14 +11,11 @@
 #include "driver/lightdrv.h"
 #include "driver/shadowdrv.h"
 #include "gxsub.h"
+#include <math.h>
 double sin(double);
 double cos(double);
 static inline f32 sinf(f32 x) { return sin(x); }
 #include <string.h>
-// target .bss/.sbss pad (uninitialised objects are emitted in reverse order, so this sits last)
-#pragma force_active on
-u32 gap_08_804184BC_sbss[1];
-#pragma force_active reset
 void envReInit(void);
 
 void mapSetMaterialTev(s32 texCount, s32 drawMode, s32 flags, Mtx mtx);
@@ -53,7 +50,6 @@ void mapSetMaterial(MapObject* obj, void* material);
 void mapSetPolygon(MapObject* obj, MapFileMesh* mesh);
 void mapSetPolygonVtxDesc(MapObject* obj, MapFileMesh* mesh);
 void setColor(MapObject* obj, GXColor color, BOOL doNext);
-int strcat();
 void mapDispMapGrp(CameraId cam, MapObject* obj);
 void mapDispMapGrp_bbox(CameraId cam, MapObject* obj);
 void mapDispMapGrp_off(CameraId cam, MapObject* obj);
@@ -64,6 +60,13 @@ void bmapUnLoad(void);
 extern int sprintf(char* str, const char* format, ...);
 
 #define TWO_PI 6.28318530717958647692528676655900576839433879875021f
+
+// Frames per second of the map animation clock. PAL keeps it at 60 even when the display runs at 50 Hz.
+#ifdef VERSION_G8MP01
+#define MAP_ANIM_FPS 60.0f
+#else
+#define MAP_ANIM_FPS gp->framerate
+#endif
 
 //.bss
 MapError error_data[32];
@@ -110,12 +113,12 @@ void makeDisplayList(BOOL group);
 //anim functions?
 void _mapLoad(MapWork* wp, BOOL group, const char* map);
 
-void mapErrorEntry(s32 arg0, const char* arg1) { //1:1
+void mapErrorEntry(s32 type, const char* name) { //1:1
 	MapError* error = error_data;
 
 	error += error_count;
-	error->type = arg0;
-	strncpy(error->name, arg1, sizeof(error->name) - 1);
+	error->type = type;
+	strncpy(error->name, name, sizeof(error->name) - 1);
 	error_flag = TRUE;
 	error_count++;
 	error_count %= 32;
@@ -258,7 +261,6 @@ void mapBuildTexture(MapObject* obj, TEXPalette* texture, void* table) {
 	}
 }
 
-#pragma dont_inline on
 MapObject* _mapEnt(MapFileJoint* joint, MapObject* parent, Mtx mtx, s32 index) {
 	MapWork* wp = &mapWork[activeGroup];
 	MapObject* obj;
@@ -352,8 +354,11 @@ MapObject* _mapEnt(MapFileJoint* joint, MapObject* parent, Mtx mtx, s32 index) {
 			obj->flags |= 4;
 		}
 	} else {
-		// FAKE: two trailing NULs pad the literal to the original's 0x30 bytes (the stripped data after it is gone); never read
-		OSPanic("mapdrv.c", 0x2e5, "\x83\x57\x83\x87\x83\x43\x83\x93\x83\x67\x82\xcc\x83\x66\x81\x5b\x83\x5e\x82\xcc\x8e\x77\x92\xe8\x82\xc9\x82\xa8\x82\xa9\x82\xb5\x82\xc8\x82\xe0\x82\xcc\x82\xaa\x82\xa0\x82\xe9\n\0\0");
+#ifdef VERSION_G8MP01
+		OSPanic("mapdrv.c", 0x2e8, "\x83\x57\x83\x87\x83\x43\x83\x93\x83\x67\x82\xcc\x83\x66\x81\x5b\x83\x5e\x82\xcc\x8e\x77\x92\xe8\x82\xc9\x82\xa8\x82\xa9\x82\xb5\x82\xc8\x82\xe0\x82\xcc\x82\xaa\x82\xa0\x82\xe9\n");
+#else
+		OSPanic("mapdrv.c", 0x2e5, "\x83\x57\x83\x87\x83\x43\x83\x93\x83\x67\x82\xcc\x83\x66\x81\x5b\x83\x5e\x82\xcc\x8e\x77\x92\xe8\x82\xc9\x82\xa8\x82\xa9\x82\xb5\x82\xc8\x82\xe0\x82\xcc\x82\xaa\x82\xa0\x82\xe9\n");
+#endif
 	}
 	if (joint->partCount) {
 		PSVECAdd(&joint->bboxMin, &joint->bboxMax, &obj->center);
@@ -371,7 +376,6 @@ MapObject* _mapEnt(MapFileJoint* joint, MapObject* parent, Mtx mtx, s32 index) {
 	return obj;
 }
 
-#pragma dont_inline reset
 MapObject* mapEntrySub(MapFileJoint* joint, MapObject* parent, Mtx mtx, BOOL isRoot, s32 index) {
 	MapObject* obj = _mapEnt(joint, parent, mtx, index);
 	if (joint->child) {
@@ -542,14 +546,14 @@ void mapCheckAnimation(const char* animName, BOOL* valid, f32* a3) {
 		if (anim->flags & 2) {
 			*valid = TRUE;
 		}
-		*a3 = 1000.0f * (anim->anim->length - anim->time) / gp->framerate;
+		*a3 = 1000.0f * (anim->anim->length - anim->time) / MAP_ANIM_FPS;
 	}
 	else {
 		*valid = TRUE;
 	}
 }
 
-void mapPlayAnimationLv(const char* name, s32 a, s32 b) {
+void mapPlayAnimationLv(const char* name, s32 mode, s32 level) {
 	MapAnim* anim = NULL;
 	MapWork* wp;
 	MapEntry* entry;
@@ -574,7 +578,7 @@ void mapPlayAnimationLv(const char* name, s32 a, s32 b) {
 	}
 	if (found) {
 		anim->flags = 0;
-		switch (b) {
+		switch (level) {
 			case 0:
 				break;
 			case 1:
@@ -612,11 +616,11 @@ void mapPlayAnimationLv(const char* name, s32 a, s32 b) {
 		anim->time = 0.0f;
 		anim->rate = 1.0f;
 		anim->flags |= 1;
-		if (a == 1) {
+		if (mode == 1) {
 			anim->flags |= 4;
 		}
-		if (a == 2) {
-			anim->startTime -= (u64)(1000.0f * anim->anim->length / gp->framerate);
+		if (mode == 2) {
+			anim->startTime -= (u64)(1000.0f * anim->anim->length / MAP_ANIM_FPS);
 		}
 	}
 }
@@ -733,7 +737,7 @@ static inline void mapLoadHeader_(MapWork* wp, BOOL group) {
 			if (sizeCheck < wp->entries[group].header.file.fileSize) {
 				wp->entries[group].header.strings = (const char*)&data[sizeCheck];
 			}
-			{ MapWork* wo2 = wp; wo2->entries[group].header.rawFile = data; } // FAKE: second MapWork pointer so the entry address is recomputed (not CSE'd with &wp->entries[group]); same store
+			wp->entries[group].header.rawFile = data;
 
 			mapLoadReloc_(&wp->entries[group]);
 		}
@@ -786,11 +790,9 @@ void _mapLoad(MapWork* wp, BOOL group, const char* map) {
 	char str2[128];
 	char str3[128];
 	DVDEntry* dvd;
-	MapWork* wo; // FAKE: alias of wp; the chunk-table stores go through it to keep the original address reloads
 	u8 *data;
 	MapHeader* header;
 
-	wo = wp;
 	error_flag = FALSE;
 	error_count = 0;
 	strncpy(wp->entries[group].name, map, sizeof(wp->entries[group].name));
@@ -828,11 +830,11 @@ void _mapLoad(MapWork* wp, BOOL group, const char* map) {
 	mapLoadHeader_(wp, group);
 	header = &wp->entries[group].header;
 	info = (MapFileInfo*)mapSearchChunk(header, "information");
-	wo->entries[group].textureTable = mapSearchChunk(header, "texture_table");
-	wo->entries[group].lightTable = mapSearchChunk(header, "light_table");
-	wo->entries[group].fogTable = mapSearchChunk(header, "fog_table");
-	wo->entries[group].materialNameTable = mapSearchChunk(header, "material_name_table");
-	wo->entries[group].vcdTable = mapSearchChunk(header, "vcd_table");
+	wp->entries[group].textureTable = mapSearchChunk(header, "texture_table");
+	wp->entries[group].lightTable = mapSearchChunk(header, "light_table");
+	wp->entries[group].fogTable = mapSearchChunk(header, "fog_table");
+	wp->entries[group].materialNameTable = mapSearchChunk(header, "material_name_table");
+	wp->entries[group].vcdTable = mapSearchChunk(header, "vcd_table");
 	{
 		MapFileJoint* mapJoint = mapSearchDmdJoint(info->joint, info->mapName);
 		MapFileJoint* hitJoint = mapSearchDmdJoint(info->joint, info->hitName);
@@ -879,18 +881,18 @@ void _mapLoad(MapWork* wp, BOOL group, const char* map) {
 		}
 		mapResetPaperAmbColor();
 		mapResetPaperCraftAmbColor();
-		if ((&wo->entries[group])->fogTable != NULL) {
-			wo->entries[group].fogEnable = (&wo->entries[group])->fogTable->enable;
-			wp->entries[group].fogType = (&wo->entries[group])->fogTable->type;
-			wp->entries[group].fogStart = (&wo->entries[group])->fogTable->start;
-			wp->entries[group].fogEnd = (&wo->entries[group])->fogTable->end;
-			wp->entries[group].fogColor = (&wo->entries[group])->fogTable->color;
-			if (wo->entries[group].fogEnable != 0) {
+		if (wp->entries[group].fogTable != NULL) {
+			wp->entries[group].fogEnable = wp->entries[group].fogTable->enable;
+			wp->entries[group].fogType = wp->entries[group].fogTable->type;
+			wp->entries[group].fogStart = wp->entries[group].fogTable->start;
+			wp->entries[group].fogEnd = wp->entries[group].fogTable->end;
+			wp->entries[group].fogColor = wp->entries[group].fogTable->color;
+			if (wp->entries[group].fogEnable != 0) {
 				wp->entries[group].flags |= 1;
 			}
 		}
 		else {
-			wo->entries[group].fogEnable = 0;
+			wp->entries[group].fogEnable = 0;
 			wp->entries[group].fogType = 0;
 			wp->entries[group].fogStart = 0.0f;
 			wp->entries[group].fogEnd = 0.0f;
@@ -902,7 +904,7 @@ void _mapLoad(MapWork* wp, BOOL group, const char* map) {
 			camLoadRoad(4, str1);
 		}
 		camSetTypePersp(4);
-		mapBuildTexture(wp->entries[group].rootMapObj, wp->entries[group].tpl, (&wo->entries[group])->textureTable);
+		mapBuildTexture(wp->entries[group].rootMapObj, wp->entries[group].tpl, wp->entries[group].textureTable);
 		{
 			Vec mn;
 			Vec mx;
@@ -1172,7 +1174,7 @@ typedef struct MapAnimKeyCh {
 	f32 value;  // 0x0
 	f32 tanIn;  // 0x4
 	f32 tanOut; // 0x8
-	f32 unkC;   // 0xC
+	f32 extra;  // 0xC, map file value, never read
 	s32 step;   // 0x10
 } MapAnimKeyCh;
 
@@ -1182,9 +1184,9 @@ typedef struct MapAnimKey {
 } MapAnimKey;
 
 typedef struct MapAnimJoint {
-	u8 field_0x0[0x4 - 0x0];    // 0x0
+	u8 nameRef[0x4 - 0x0];      // 0x0, probably the joint name, not read
 	f32 base[9];                // 0x4
-	u8 field_0x28[0x58 - 0x28]; // 0x28
+	u8 baseRest[0x58 - 0x28];   // 0x28, base values of channels 9..20, not read
 	s32 keyCount;               // 0x58
 	MapAnimKey keys[];          // 0x5C
 } MapAnimJoint;
@@ -1444,7 +1446,7 @@ static inline void mapMainLight_ll(MapAnim* anim, LightEntry* lp, MapAnimLightDa
 	int n, c;
 	f32 cur;
 
-						
+
 						for (n = 1; n < d->keyCount; n++) {
 							MapAnimKey9* k0 = &d->keys[n - 1];
 							MapAnimKey9* k1 = &d->keys[n];
@@ -1478,7 +1480,7 @@ static inline void mapMainLight_lc(MapAnim* anim, LightEntry* lp, MapAnimLightDa
 	int n, c;
 	f32 cur;
 
-						
+
 						for (n = 1; n < d->keyCount; n++) {
 							MapAnimKey5* k0 = &d->keys[n - 1];
 							MapAnimKey5* k1 = &d->keys[n];
@@ -1613,7 +1615,7 @@ void mapMain(void) {
 			}
 			if (!(anim->flags & 0x10)) {
 				ms = OSTicksToMilliseconds(t);
-				cur = gp->framerate * (f32)(u64)(ms - anim->startTime) / 1000.0f;
+				cur = MAP_ANIM_FPS * (f32)(u64)(ms - anim->startTime) / 1000.0f;
 				if (cur < anim->time) {
 					anim->time = anim->time - (anim->time - cur);
 				}
@@ -1621,11 +1623,11 @@ void mapMain(void) {
 					anim->time = anim->time + anim->rate * (cur - anim->time);
 				}
 				anim->startTime = OSTicksToMilliseconds(t);
-				anim->startTime -= (u64)(1000.0f * anim->time / gp->framerate);
+				anim->startTime -= (u64)(1000.0f * anim->time / MAP_ANIM_FPS);
 			}
 			else if (anim->flags & 0x20) {
 				anim->startTime = OSTicksToMilliseconds(t);
-				anim->startTime -= (u64)(1000.0f * anim->time / gp->framerate);
+				anim->startTime -= (u64)(1000.0f * anim->time / MAP_ANIM_FPS);
 				anim->flags &= ~0x20;
 				anim->flags &= ~0x10;
 			}
@@ -1637,7 +1639,7 @@ void mapMain(void) {
 					}
 					anim->time = t2;
 					anim->startTime = OSTicksToMilliseconds(t);
-					anim->startTime -= (u64)(1000.0f * anim->time / gp->framerate);
+					anim->startTime -= (u64)(1000.0f * anim->time / MAP_ANIM_FPS);
 				}
 				else {
 					anim->time = anim->anim->length;
@@ -2182,7 +2184,7 @@ s32 mapSetLight(MapObject* obj, LightEntry** lights) {
 				light = lightNameToPtr(mapWork[activeGroup].entries[obj->groupIndex].lightTable->lights[i]->name);
 				if (!(light->flags & 0x8000)) {
 					lights[count] = light;
-						count++;
+					count++;
 					if (count >= 8) {
 						break;
 					}
@@ -2191,7 +2193,7 @@ s32 mapSetLight(MapObject* obj, LightEntry** lights) {
 		}
 	}
 	else {
-		count = 0; // FAKE: redundant (count is already 0); the target emits this else branch
+		count = 0;
 	}
 	return count;
 }
@@ -2229,7 +2231,7 @@ void mapSetMaterialTev(s32 texCount, s32 drawMode, s32 flags, Mtx mtx) {
 	map = (GXTexMapID)texCount;
 	coord = (GXTexCoordID)texCount;
 	indStages = 0;
-	
+
 	if ((s32)texCount > 0) {
 		switch (drawMode) {
 			case 0:
@@ -3841,10 +3843,6 @@ void mapSetProjMtx(Mtx mtx) {
 	MTXCopy(mtx, projMtx);
 }
 
-extern int __float_nan[];
-static inline s32 sp_fpclassifyf(f32 x) { switch (*(s32*)&x & 0x7F800000) { case 0x7F800000: if (*(s32*)&x & 0x007FFFFF) { return 1; } else { return 2; } break; case 0: if (*(s32*)&x & 0x007FFFFF) { return 5; } else { return 3; } break; default: return 4; } }
-static inline f32 sp_sqrtf(f32 x) { const f64 _half = .5; const f64 _three = 3.0; if (x > 0.0f) { f64 guess = __frsqrte(x); guess = _half * guess * (_three - guess * guess * x); guess = _half * guess * (_three - guess * guess * x); guess = _half * guess * (_three - guess * guess * x); return x * guess; } else if (x < 0.0) { return *(f32*)__float_nan; } else if (sp_fpclassifyf(x) == 1) { return *(f32*)__float_nan; } return x; }
-
 void spline_maketable(s32 n, Vec* pts, f32* t, Vec* out) {
 	f32* h;
 	Vec* w;
@@ -3859,7 +3857,7 @@ void spline_maketable(s32 n, Vec* pts, f32* t, Vec* out) {
 		dx = pts[i].x - pts[i - 1].x;
 		dy = pts[i].y - pts[i - 1].y;
 		dz = pts[i].z - pts[i - 1].z;
-		t[i] = t[i - 1] + sp_sqrtf(dx * dx + dy * dy + dz * dz);
+		t[i] = t[i - 1] + sqrtf(dx * dx + dy * dy + dz * dz);
 	}
 	for (i = 1; i < n; i++) {
 		t[i] /= t[n - 1];
@@ -3912,14 +3910,14 @@ void spline_getvalue(Vec* out, f32 t, s32 n, Vec* pts, f32* ts, Vec* tbl) {
 	s32 lo;
 	s32 hi;
 	s32 mid;
-	f32 new_var;
+	f32 y0;
 	f32 u;
 	f32 h;
 
 	if (n == 2) {
 		out->x = t * (pts[1].x - pts[0].x) + pts[0].x;
-		new_var = pts[0].y;
-		out->y = t * (pts[1].y - new_var) + new_var;
+		y0 = pts[0].y;
+		out->y = t * (pts[1].y - y0) + y0;
 		out->z = t * (pts[1].z - pts[0].z) + pts[0].z;
 		return;
 	}
@@ -4032,10 +4030,5 @@ static void mapStrippedPool(const char** str, f32* val) {
 	str[8] = "curve_table";
 }
 
-#pragma force_active on
-#pragma explicit_zero_data on
-__declspec(section ".sdata") u32 gap_07_8040F3F4_sdata[3] = {0};
-#pragma explicit_zero_data reset
-#pragma force_active reset
 
 

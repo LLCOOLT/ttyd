@@ -2,7 +2,6 @@
 #include "battle/battle_unit.h"
 #include "evt/evt_cmd.h"
 
-#pragma force_active on
 #include "driver/mapdrv.h"
 #include "dolphin/gx.h"
 #include "memory.h"
@@ -13,6 +12,7 @@
 #include "evt/evt_npc.h"
 #include "data_tables.h"
 #include "mario/mario_pouch.h"
+#include "manager/evtmgr_cmd.h"
 
 static u8* _ap;
 void puniMoveAtari(PuniData* puni, Vec pos, Vec dir, s32 flag, f32 speed);
@@ -141,75 +141,40 @@ static USER_FUNC(alpha_init_func);
 static USER_FUNC(alpha_set_func);
 void puniModeEventparent(PuniData* puni);
 
-f32 fd_mri_03_negone_one_374[2] __attribute__((aligned(8)));
-f32 fd_mri_03_neg_one_382;
-f32 fd_mri_03___local_PI_383;
-f32 fd_mri_03___local_3PIO2_385;
-f32 fd_mri_03_one_negone_373[2] __attribute__((aligned(8)));
-f32 fd_mri_03___local_PIO2_384;
-f32 fd_mri_03_one_381;
-f32 fd_mri_03_negone_one_360[2] __attribute__((aligned(8)));
-f32 fd_mri_03_neg_one_365;
-f32 fd_mri_03___local_PI_366;
-f32 fd_mri_03___local_3PIO2_368;
-f32 fd_mri_03_one_negone_359[2] __attribute__((aligned(8)));
-f32 fd_mri_03___local_PIO2_367;
-f32 fd_mri_03_one_364;
-EvtWord jail_alpha_mario_check[24];
-EvtWord jail_alpha[220];
-EvtWord after_2hours[73];
+extern EvtWord jail_alpha_mario_check[];
+extern EvtWord jail_alpha[];
+extern EvtWord after_2hours[];
 static f32 spline_dt[24];
 f32 spline_dt1[15];
-EvtWord elder_rescue[771];
-static EvtWord elder_init[13];
-static EvtWord elder_talk[13];
-static EvtWord sister_init[13];
-EvtWord sister_regl[21];
-static EvtWord sister_talk[8];
-static EvtWord guide_init[16];
-static EvtWord guide_talk[8];
-EvtWord puni_3_init[17];
-EvtWord puni_3_talk[20];
+extern EvtWord elder_rescue[];
+extern EvtWord sister_regl[];
+extern EvtWord puni_3_init[];
+extern EvtWord puni_3_talk[];
 static NpcSetupInfo npcEnt[5];
-EvtWord bero_custom_00[37];
+extern EvtWord bero_custom_00[];
 static BeroEntry bero_entry_data[3];
 static s16 puni_rand_position[178];
-EvtWord jail_init_00[52];
-EvtWord red_jail_open[63];
-EvtWord evt_opendoor00[19];
-static EvtWord evt_unlock00[6];
-EvtWord evt_unlock00_01[4];
+extern EvtWord jail_init_00[];
+extern EvtWord red_jail_open[];
+extern EvtWord evt_opendoor00[];
+extern EvtWord evt_unlock00_01[];
 s32 key_table00[2];
-EvtWord evt_check00[23];
-#ifdef VERSION_G8ME01
-EvtWord blue_jail_open[60];
-#else
-EvtWord blue_jail_open[65];
-#endif
-EvtWord evt_opendoor01[19];
-#ifdef VERSION_G8ME01
-static EvtWord evt_unlock01[9];
-#else
-static EvtWord evt_unlock01[8];
-#endif
+extern EvtWord evt_check00[];
+extern EvtWord blue_jail_open[];
+extern EvtWord evt_opendoor01[];
 s32 key_table01[3];
-EvtWord evt_check01[90];
-EvtWord bluejail_alpha[119];
-EvtWord bluejail_event[249];
-static EvtWord mario_kirimomi_event[50];
-EvtWord party_kirimomi_event[57];
+extern EvtWord evt_check01[];
+extern EvtWord bluejail_alpha[];
+extern EvtWord bluejail_event[];
+extern EvtWord party_kirimomi_event[];
 s32 JailAwayTable_New[15];
-EvtWord kinoko_small[35];
-#ifdef VERSION_G8ME01
-EvtWord guide_sister[769];
-#else
-EvtWord guide_sister[775];
-#endif
-EvtWord elder_shaberi[13];
-EvtWord toraware_elder[423];
-EvtWord guide_sister_before[128];
+extern EvtWord kinoko_small[];
+extern EvtWord guide_sister[];
+extern EvtWord elder_shaberi[];
+extern EvtWord toraware_elder[];
+extern EvtWord guide_sister_before[];
 static KusaAccess ueki_access_data[5];
-EvtWord mri_03_init_evt[206];
+extern EvtWord mri_03_init_evt[];
 
 static void alpha_tev(MapTevCallbackInfo* info) {
     s32 stage = info->tevStage;
@@ -234,34 +199,6 @@ static USER_FUNC(alpha_set_func) {
     *_ap = evtGetValue(event, event->args[0]);
     return EVT_RETURN_DONE;
 }
-
-f32 fd_mri_03_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
-
-f32 fd_mri_03_neg_one_382 = -1.0f;
-
-f32 fd_mri_03___local_PI_383 = 3.1415927f;
-
-f32 fd_mri_03___local_3PIO2_385 = 4.712389f;
-
-f32 fd_mri_03_one_negone_373[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
-
-f32 fd_mri_03___local_PIO2_384 = 1.5707964f;
-
-f32 fd_mri_03_one_381 = 1.0f;
-
-f32 fd_mri_03_negone_one_360[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
-
-f32 fd_mri_03_neg_one_365 = -1.0f;
-
-f32 fd_mri_03___local_PI_366 = 3.1415927f;
-
-f32 fd_mri_03___local_3PIO2_368 = 4.712389f;
-
-f32 fd_mri_03_one_negone_359[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
-
-f32 fd_mri_03___local_PIO2_367 = 1.5707964f;
-
-f32 fd_mri_03_one_364 = 1.0f;
 
 EVT_BEGIN(jail_alpha_mario_check)
     LOOP(0)
@@ -1019,9 +956,6 @@ EVT_BEGIN(bluejail_event)
     RETURN
 EVT_END()
 
-
-
-
 static EVT_BEGIN(mario_kirimomi_event)
     WAIT_MS(300)
     CALL(evt_mario_dispflag_onoff, 1, 256)
@@ -1616,7 +1550,7 @@ EVT_BEGIN(mri_03_init_evt)
     CALL(evt_map_playanim, STRING("mizu_02"), 1, 0)
     CALL(evt_map_playanim, STRING("awa_01"), 1, 0)
     CALL(evt_map_playanim, STRING("awa_02"), 1, 0)
-    CALL(evt_map_playanim, STRING("hikari_01\0\0"), 1, 0)
+    CALL(evt_map_playanim, STRING("hikari_01"), 1, 0)
     SWITCH(GSW(0))
         CASE_BETWEEN(90, 100)
         SPAWN_EVENT(PTR(jail_init_00))

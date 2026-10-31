@@ -35,8 +35,8 @@ typedef struct LogoWork {
 	s32 toggle; //0x1C
 } LogoWork;
 
-static inline s32* logoStoryTime(void);
 double cos(double);
+static inline s32 logoStoryAlpha(void);
 extern u32 seq_logo_zero_color;
 #endif
 //.sbss
@@ -44,7 +44,10 @@ static LogoWork work;
 
 //.sdata
 static LogoWork* wp = &work;
-u32 gap_07_804103FC_sdata[1] = {0};
+#ifdef VERSION_G8MP01
+// PAL: per-language logo screen textures {logo, story text}
+static s32 logoTexTbl[6][2] = { { 24, 25 }, { 24, 25 }, { 26, 27 }, { 28, 29 }, { 30, 31 }, { 32, 33 } };
+#endif
 
 #define OSIsRestart() ((OSGetResetCode() & 0x80000000) ? TRUE : FALSE)
 
@@ -61,7 +64,7 @@ static s32 logoAsyncFirst(void);
 #ifndef VERSION_G8ME01
 void seq_logoInit(SequenceWork* work) {
 	memset(wp, 0, sizeof(LogoWork));
-	wp->texture = fileAllocf(4, "%s/mariost.tpl\0", getMarioStDvdRoot());
+	wp->texture = fileAllocf(4, "%s/mariost.tpl", getMarioStDvdRoot());
 	if (!OSIsRestart() || OSGetResetCode() & OS_RESET_SHUTDOWN) {
 		if (VIGetDTVStatus()) {
 			if (OSGetProgressiveMode() == 1) {
@@ -117,6 +120,11 @@ void seq_logoInit(SequenceWork* work) {
 	wp->page = -1;
 	wp->texture = fileAllocf(4, "%s/mariost.tpl", getMarioStDvdRoot());
 	if (!OSIsRestart() || OSGetResetCode() & OS_RESET_SHUTDOWN) {
+#ifdef VERSION_G8MP01
+		// PAL: always ask for 50Hz / 60Hz; preselect 60Hz when EURGB60 is saved
+		wp->progressive = TRUE;
+		wp->toggle = OSGetEuRgb60Mode() != 1;
+#else
 		if (VIGetDTVStatus()) {
 			if (OSGetProgressiveMode() == 1) {
 				wp->progressive = TRUE;
@@ -136,6 +144,7 @@ void seq_logoInit(SequenceWork* work) {
 			}
 			wp->progressive = FALSE;
 		}
+#endif
 	}
 	if (!OSIsRestart() || OSGetResetCode() & OS_RESET_SHUTDOWN) {
 		VIConfigure(&sRMObjHReso);
@@ -394,8 +403,13 @@ void seq_logoMain(SequenceWork* work) {
 
 		case 9:
 			if (fadeIsFinish()) {
+#ifdef VERSION_G8MP01
+				work->state++;
+				time = gp->renderTime;
+#else
 				time = gp->renderTime;
 				work->state++;
+#endif
 			}
 			break;
 
@@ -705,12 +719,25 @@ void logoDisp(CameraId camId, void* param) {
 		GXGetProjectionv(projection);
 		GXGetViewportv(viewport);
 		GXGetScissor(&sciLeft, &sciTop, &sciWidth, &sciHeight);
+#ifdef VERSION_G8MP01
+		// PAL: 50Hz while the 50/60Hz question is up, then the chosen mode
+		if ((!OSIsRestart() || OSGetResetCode() & OS_RESET_SHUTDOWN) && ((SequenceWork*)param)->state < 3) {
+			rmode = &sRMObjHReso;
+		}
+		else if (OSGetEuRgb60Mode() != 1) {
+			rmode = &sRMObjHReso;
+		}
+		else {
+			rmode = &sRMObjHReso_prog;
+		}
+#else
 		if (OSGetProgressiveMode() != 1) {
 			rmode = &sRMObjHReso;
 		}
 		else {
 			rmode = &sRMObjHReso_prog;
 		}
+#endif
 		GXSetPixelFmt(GX_PF_RGB8_Z24, GX_ZC_LINEAR);
 		GXSetDispCopySrc(0, 0, rmode->fbWidth, rmode->efbHeight);
 		GXSetDispCopyDst(rmode->fbWidth, rmode->efbHeight);
@@ -726,7 +753,11 @@ void logoDisp(CameraId camId, void* param) {
 
 			case 0:
 			case 1:
+#ifdef VERSION_G8MP01
+				TEXGetGXTexObjFromPalette(*wp->texture->data, &texObj, logoTexTbl[gp->language][0]);
+#else
 				TEXGetGXTexObjFromPalette(*wp->texture->data, &texObj, 7);
+#endif
 				GXLoadTexObj(&texObj, GX_TEXMAP0);
 				GXSetNumChans(0);
 				GXSetTevColor(GX_TEVREG0, (GXColor){0, 0, 0, 0xFF});
@@ -769,16 +800,14 @@ void logoDisp(CameraId camId, void* param) {
 				GXTexCoord2f32(0.0f, 1.0f);
 				if (wp->page == 1) {
 					s32 alpha;
-					f32 c;
 
-					c = cos(1.5707964f * (f32)*logoStoryTime() / (f32)gp->framerate);
-					alpha = (s32)(255.0 * (1.0 - c) / 2.0);
-					*logoStoryTime() += 2;
-					if (alpha > 255) {
-						alpha = 255;
-					}
+					alpha = logoStoryAlpha();
 					GXSetTevColor(GX_TEVREG0, (GXColor){0, 0, 0, alpha});
+#ifdef VERSION_G8MP01
+					TEXGetGXTexObjFromPalette(*wp->texture->data, &texObj, logoTexTbl[gp->language][1]);
+#else
 					TEXGetGXTexObjFromPalette(*wp->texture->data, &texObj, 8);
+#endif
 					GXLoadTexObj(&texObj, GX_TEXMAP0);
 					GXBegin(GX_QUADS, GX_VTXFMT0, 4);
 
@@ -953,7 +982,11 @@ void dummy_draw(CameraId camId, void* param) {
 	f32 scale;
 	u16 height;
 
+#ifdef VERSION_G8MP01
+	if (OSGetEuRgb60Mode() != 1) {
+#else
 	if (OSGetProgressiveMode() != 1) {
+#endif
 		rmode = &GXNtsc480IntDfMarioSt;
 	} else {
 		rmode = &GXNtsc480ProgMarioSt;
@@ -1086,6 +1119,128 @@ void progDisp(CameraId camId, void* param) {
 	}
 }
 #else
+#ifdef VERSION_G8MP01
+// PAL: the 50Hz / 60Hz (EURGB60) selection screen
+void progDisp(CameraId camId, void* param) {
+	static OSTime time;
+	const char* msg;
+	f32 width;
+	u32 button;
+	s32 type;
+
+	camGetPtr(camId);
+	if (wp->progressive) {
+		switch (wp->progState) {
+			case 0:
+				wp->lastInput = OSGetTime();
+				wp->progState++;
+				break;
+
+			case 1:
+				button = keyGetButtonTrg(0);
+				if (gp->dirs[0] ||
+					gp->button[0] ||
+					gp->stickX[0] ||
+					gp->stickY[0] ||
+					gp->substickX[0] ||
+					gp->substickY[0] ||
+					gp->triggerLeft[0] ||
+					gp->triggerRight[0])
+				{
+					wp->lastInput = OSGetTime();
+				}
+				else {
+					if (OSTicksToSeconds(OSGetTime() - wp->lastInput) > 10) {
+						button = 0x100;
+					}
+				}
+				if (button & (PAD_BUTTON_LEFT | PAD_BUTTON_RIGHT) || keyGetDirTrg(0) & (DEMO_STICK_LEFT | DEMO_STICK_RIGHT)) {
+					wp->toggle = 1 - wp->toggle;
+				}
+				else if (button & PAD_BUTTON_A) {
+					time = gp->renderTime;
+					wp->progState++;
+				}
+
+				msg = romFontGetMessage(5);
+				width = (f32)romFontGetWidth(msg);
+				romFontPrintGX(
+					-width / 2.0f,
+					30.0f,
+					1.0f,
+					&(GXColor){0xFF, 0xFF, 0xFF, 0xFF},
+					msg);
+
+				msg = romFontGetMessage(6);
+				width = (f32)romFontGetWidth(msg);
+				romFontPrintGX(
+					-width / 2.0f,
+					-160.0f,
+					1.0f,
+					&(GXColor){0xFF, 0xFF, 0xFF, 0xFF},
+					msg);
+
+				msg = romFontGetMessage(7);
+				width = (f32)romFontGetWidth(msg);
+				romFontPrintGX(
+					(f32)(108 * ((2 * wp->toggle) - 1)) - width / 2.0f,
+					-160.0f,
+					1.0f,
+					&(GXColor){0xFF, 0xFF, 0xFF, 0xFF},
+					msg);
+				break;
+
+			case 2:
+				if (OSTicksToMilliseconds(gp->renderTime - time) > 2000) {
+					wp->progState++;
+				}
+				type = 8;
+				if (wp->toggle) {
+					type = 9;
+				}
+				msg = romFontGetMessage(type);
+				width = (f32)romFontGetWidth(msg);
+				romFontPrintGX(
+					-width / 2.0f,
+					-100.0f,
+					1.0f,
+					&(GXColor){0xFF, 0xFF, 0xFF, 0xFF},
+					msg);
+				break;
+
+			case 3:
+				if (!wp->toggle) {
+					VISetBlack(1);
+					OSSetEuRgb60Mode(1);
+					gp->framerate = 60;
+					VIConfigure(&sRMObjHReso_prog);
+					VIFlush();
+					VIWaitForRetrace();
+					VIWaitForRetrace();
+					time = gp->renderTime;
+					wp->progState++;
+					gp->flags |= 8;
+				}
+				else {
+					OSSetEuRgb60Mode(0);
+					gp->framerate = 50;
+					wp->progressive = 0;
+					gp->flags &= ~8;
+				}
+				gp->flags |= 4;
+				break;
+
+			case 4:
+				if (OSTicksToMilliseconds(gp->renderTime - time) > 2000) {
+					VISetBlack(FALSE);
+					wp->progressive = 0;
+				}
+				break;
+		}
+	}
+}
+
+#else
 void progDisp(CameraId camId, void* param) {
 	static OSTime time;
 	const char* msg;
@@ -1206,10 +1361,20 @@ void progDisp(CameraId camId, void* param) {
 	}
 }
 
-/* FAKE: the US build places this static first in .sbss, ahead of progDisp's; a static inside a
-   deferred-inline helper defined last gives that order */
-static inline s32* logoStoryTime(void) {
+#endif
+
+/* alpha of the story text fade-in: a cosine ease from 0 to 255 */
+static inline s32 logoStoryAlpha(void) {
 	static s32 time;
-	return &time;
+	s32 alpha;
+	f32 c;
+
+	c = cos(1.5707964f * (f32)time / (f32)gp->framerate);
+	alpha = (s32)(255.0 * (1.0 - c) / 2.0);
+	time += 2;
+	if (alpha > 255) {
+		alpha = 255;
+	}
+	return alpha;
 }
 #endif

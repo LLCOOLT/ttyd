@@ -14,7 +14,7 @@ typedef struct EffQueen2Work {
     f32 scale;           // 0x10
     f32 baseScale;       // 0x14
     s32 alpha;           // 0x18
-    s32 field_0x1C;      // 0x1C
+    s32 reserved_1C;     // 0x1C, never read or written
     s32 timer;           // 0x20
     s32 state;           // 0x24
     EffectEntry* charge; // 0x28
@@ -25,7 +25,7 @@ EffectEntry* effQueen2Entry(s32 type, f32 x, f32 y, f32 z) {
     EffectEntry* effect;
 
     effect = effEntry();
-    effect->type = "Queen2\0";
+    effect->type = "Queen2";
     effect->count = 1;
     work = __memAlloc(HEAP_EFFECT, sizeof(EffQueen2Work) * effect->count);
     effect->userdata = work;

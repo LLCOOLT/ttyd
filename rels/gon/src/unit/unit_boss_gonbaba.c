@@ -1,7 +1,6 @@
 #include "battle/battle_unit.h"
 #include "evt/evt_cmd.h"
 
-#pragma force_active on
 #include "battle/battle_unit.h"
 #include "manager/evtmgr_cmd.h"
 #include "system.h"
@@ -50,20 +49,6 @@ USER_FUNC(_btlgon_get_escape_param);
 USER_FUNC(_set_gonbaba_light);
 USER_FUNC(_wait_damage_event_end);
 
-f32 fd_boss_gonbaba_negone_one_374[2] __attribute__((aligned(8)));
-f32 fd_boss_gonbaba_neg_one_382;
-f32 fd_boss_gonbaba___local_PI_383;
-f32 fd_boss_gonbaba___local_3PIO2_385;
-f32 fd_boss_gonbaba_one_negone_373[2] __attribute__((aligned(8)));
-f32 fd_boss_gonbaba___local_PIO2_384;
-f32 fd_boss_gonbaba_one_381;
-f32 fd_boss_gonbaba_negone_one_360[2] __attribute__((aligned(8)));
-f32 fd_boss_gonbaba_neg_one_365;
-f32 fd_boss_gonbaba___local_PI_366;
-f32 fd_boss_gonbaba___local_3PIO2_368;
-f32 fd_boss_gonbaba_one_negone_359[2] __attribute__((aligned(8)));
-f32 fd_boss_gonbaba___local_PIO2_367;
-f32 fd_boss_gonbaba_one_364;
 BattleWeapon weapon_gonbaba_fumituke_attack;
 BattleWeapon weapon_gonbaba_firebreath_attack;
 BattleWeapon weapon_gonbaba_kamituki_attack;
@@ -75,17 +60,14 @@ static PoseTableEntry pose_table[9];
 static PoseTableEntry pose_table_weak[9];
 static BattleDataEntry data_table[3];
 static BattleUnitKindPart parts[3];
-static EvtWord battle_entry_event[375];
-EvtWord negotiation_event[1786];
-EvtWord gon_extra_eaten_event[389];
-static EvtWord damage_event[10];
-EvtWord gonbaba_damage_sub_event[574];
+extern EvtWord negotiation_event[];
+extern EvtWord gon_extra_eaten_event[];
+extern EvtWord gonbaba_damage_sub_event[];
 static EvtWord dead_event[283];
 static EvtWord init_event[160];
-static EvtWord phase_event[2];
 static EvtWord attack_event[56];
 static EvtWord fumituke_attack_event[386];
-EvtWord firebreath_attack_event[261];
+extern EvtWord firebreath_attack_event[];
 static EvtWord wait_event[6];
 
 s32 weaponGetPower_Gonbaba(BattleUnit* unit, s32* weapon) {
@@ -98,7 +80,7 @@ s32 weaponGetPower_Gonbaba(BattleUnit* unit, s32* weapon) {
     return power;
 }
 
-struct EffectEntry* effKemuri9N64Entry(s32 type, s32 arg1, s32 arg2, f32 x, f32 y, f32 z, f32 arg6, f32 arg7);
+struct EffectEntry* effKemuri9N64Entry(s32 type, s32 count, s32 life, f32 x, f32 y, f32 z, f32 radiusEnd, f32 angle);
 
 static USER_FUNC(_leg_smoke_effect) {
     EvtWord* args = event->args;
@@ -109,34 +91,6 @@ static USER_FUNC(_leg_smoke_effect) {
     effKemuri9N64Entry(1, 18, 90, x, y, z, 60.0f, 0.0f);
     return EVT_RETURN_DONE;
 }
-
-f32 fd_boss_gonbaba_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
-
-f32 fd_boss_gonbaba_neg_one_382 = -1.0f;
-
-f32 fd_boss_gonbaba___local_PI_383 = 3.1415927f;
-
-f32 fd_boss_gonbaba___local_3PIO2_385 = 4.712389f;
-
-f32 fd_boss_gonbaba_one_negone_373[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
-
-f32 fd_boss_gonbaba___local_PIO2_384 = 1.5707964f;
-
-f32 fd_boss_gonbaba_one_381 = 1.0f;
-
-f32 fd_boss_gonbaba_negone_one_360[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
-
-f32 fd_boss_gonbaba_neg_one_365 = -1.0f;
-
-f32 fd_boss_gonbaba___local_PI_366 = 3.1415927f;
-
-f32 fd_boss_gonbaba___local_3PIO2_368 = 4.712389f;
-
-f32 fd_boss_gonbaba_one_negone_359[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
-
-f32 fd_boss_gonbaba___local_PIO2_367 = 1.5707964f;
-
-f32 fd_boss_gonbaba_one_364 = 1.0f;
 
 BattleWeapon weapon_gonbaba_fumituke_attack = {
     NULL, 0, // name..icon
@@ -1548,7 +1502,7 @@ EVT_BEGIN(firebreath_attack_event)
         CALL(btlevtcmd_snd_se, -2, STRING("SFX_BOSS_GNB_BREATH_FIRE1"), -250000000, 0, -250000000)
         ADD(LW(11), 45)
         SUBTRACT(LW(8), 10)
-        CALL(evt_eff, 0, STRING("gonbaba_breath\0"), 0, LW(6), LW(7), LW(8), FLOAT(3.0f), LW(11), 0, 0, 0, 0, 0, 0)
+        CALL(evt_eff, 0, STRING("gonbaba_breath"), 0, LW(6), LW(7), LW(8), FLOAT(3.0f), LW(11), 0, 0, 0, 0, 0, 0)
     END_INLINE_EVENT
     CALL(btlevtcmd_GetHitPos, LW(3), LW(4), LW(12), -250000000, -250000000)
     SUBTRACT(LW(12), LW(6))

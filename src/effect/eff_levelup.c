@@ -34,16 +34,9 @@ static s32 texid_tbl[2][6] = { { 146, 147, 148, 149, 150, 151 }, { 146, 147, 148
 #ifdef VERSION_G8ME01
 u8 y_scale[] = { 0, 13, 40, 69, 98, 126, 149, 166, 175, 165, 136, 100, 67, 50, 73, 117, 130, 113, 100 };
 #else
-u8 y_scale[] = { 0, 13, 40, 69, 98, 126, 149, 166, 175, 165, 136, 100, 67, 50, 73, 117, 130, 113, 100, 0 };
+u8 y_scale[] = { 0, 13, 40, 69, 98, 126, 149, 166, 175, 165, 136, 100, 67, 50, 73, 117, 130, 113, 100};
 #endif
 
-#pragma force_active on
-#ifdef VERSION_G8ME01
-__declspec(section ".data") u32 gap_05_803B15C4_data[1] = {0};
-#else
-__declspec(section ".data") u32 gap_05_803AE0F4_data[1] = {0};
-#endif
-#pragma force_active reset
 
 static EVT_BEGIN(evt_shake)
     CALL(evt_cam_shake, 4, FLOAT(0.001953125f), FLOAT(0.001953125f), 50)
@@ -297,6 +290,3 @@ void effLevelupDisp(CameraId cameraId, EffectEntry* effect) {
     }
 }
 
-#pragma force_active on
-u32 gap_07_80415D84_sdata[1] = {0};
-#pragma force_active reset

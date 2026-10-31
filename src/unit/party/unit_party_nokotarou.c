@@ -77,22 +77,13 @@ USER_FUNC(_color_lv_set);
 USER_FUNC(_check_mario_move_count);
 static void __makeTechMenuFunc(BattleCommand* command, s32* count);
 
-__declspec(section ".data") f32 unit_party_nokotarou_negone_one_a[2];
-__declspec(section ".data") f32 nokotarou_negone_one_374[2];
-__declspec(section ".data") f32 unit_party_nokotarou_one_negone_a[2];
-__declspec(section ".data") f32 nokotarou_one_negone_373[2];
-__declspec(section ".data") f32 unit_party_nokotarou_negone_one_b[2];
-__declspec(section ".data") f32 nokotarou_negone_one_360[2];
-__declspec(section ".data") f32 unit_party_nokotarou_one_negone_b[2];
-__declspec(section ".data") f32 nokotarou_one_negone_359[2];
 PoseTableEntry pose_table_nokotarou_stay[26];
 PoseTableEntry pose_table_nokotarou_turn[12];
 static BattleDataEntry data_table[12];
 BattleUnitKindPart unitpartsdata_Party_Nokotarou[1];
 BattleUnitKind unitdata_Party_Nokotarou;
-static EvtWord battle_entry_event[59];
 static EvtWord init_event[78];
-EvtWord change_party_spawn_init_event[28];
+extern EvtWord change_party_spawn_init_event[];
 static EvtWord dmg_turn_event[65];
 static EvtWord wakeup_event[67];
 BattleWeapon partyWeapon_NokotarouFirstAttack;
@@ -100,20 +91,15 @@ BattleWeapon partyWeapon_NokotarouKouraAttack;
 BattleWeapon partyWeapon_NokotarouSyubibinKoura;
 BattleWeapon partyWeapon_NokotarouKouraGuard;
 BattleWeapon partyWeapon_NokotarouTsuranukiKoura;
-static EvtWord _change_koura_pose[34];
-static EvtWord _change_koura_pose_fast[78];
-static EvtWord _restore_koura_pose[47];
-static EvtWord _koura_rotate_start[199];
-static EvtWord _koura_rotate_stop[13];
-EvtWord partyNokotarouAttack_FirstAttack[236];
-EvtWord partyNokotarouAttack_NormalAttack[VERSION_PICK(793, 804)];
-EvtWord partyNokotarouAttack_SyubibinKoura[VERSION_PICK(691, 702)];
-EvtWord partyNokotarouAttack_KouraGuard[838];
-EvtWord partyNokotarouAttack_TsuranukiKoura[VERSION_PICK(931, 942)];
-EvtWord nokotarou_appeal_event[34];
+extern EvtWord partyNokotarouAttack_FirstAttack[];
+extern EvtWord partyNokotarouAttack_NormalAttack[];
+extern EvtWord partyNokotarouAttack_SyubibinKoura[];
+extern EvtWord partyNokotarouAttack_KouraGuard[];
+extern EvtWord partyNokotarouAttack_TsuranukiKoura[];
+extern EvtWord nokotarou_appeal_event[];
 static EvtWord party_win_reaction[16];
 static EvtWord attack_audience_event[263];
-EvtWord nokotarou_revive_event[16];
+extern EvtWord nokotarou_revive_event[];
 static BattleUnitDefense defence;
 static BattleUnitDefenseAttr defence_attr;
 static BattleUnitDefense defence_turn;
@@ -123,37 +109,13 @@ static EvtWord attack_event[2];
 static EvtWord wait_event[6];
 BattleUnitSetup entry_koura;
 
-__declspec(section ".data") f32 unit_party_nokotarou_negone_one_a[] = {
-    -1.0f, 1.0f,
-};
 
-__declspec(section ".data") f32 nokotarou_negone_one_374[] = {
-    -1.0f, 1.0f,
-};
 
-__declspec(section ".data") f32 unit_party_nokotarou_one_negone_a[] = {
-    1.0f, -1.0f,
-};
 
-__declspec(section ".data") f32 nokotarou_one_negone_373[] = {
-    1.0f, -1.0f,
-};
 
-__declspec(section ".data") f32 unit_party_nokotarou_negone_one_b[] = {
-    -1.0f, 1.0f,
-};
 
-__declspec(section ".data") f32 nokotarou_negone_one_360[] = {
-    -1.0f, 1.0f,
-};
 
-__declspec(section ".data") f32 unit_party_nokotarou_one_negone_b[] = {
-    1.0f, -1.0f,
-};
 
-__declspec(section ".data") f32 nokotarou_one_negone_359[] = {
-    1.0f, -1.0f,
-};
 
 PoseTableEntry pose_table_nokotarou_stay[] = {
     {9, "PNK_D_5"},
@@ -1709,6 +1671,9 @@ EVT_BEGIN(partyNokotarouAttack_KouraGuard)
     CALL(btlevtcmd_AcSetParamAll, 1, LW(10), LW(11), 30, LW(0), LW(1), -250000000, -250000000)
     CALL(btlevtcmd_AcSetFlag, 0)
     CALL(btlevtcmd_SetupAC, -2, 12, 1, 0)
+#ifdef VERSION_G8MP01
+    WAIT_FRAMES(2)
+#endif
     CALL(btlevtcmd_GetPos, LW(10), LW(0), LW(1), LW(2))
     SET_VALUE(LW(1), 125)
     CALL(btlevtcmd_DivePosition, LW(10), LW(0), LW(1), LW(2), 60, 0, 13, 0, -1)
@@ -1781,7 +1746,11 @@ EVT_BEGIN(partyNokotarouAttack_KouraGuard)
                 SET_VALUE(LW(0), -1)
             END_SWITCH
             IF_INT_GREATER_OR_EQUAL(LW(0), 0)
+#ifdef VERSION_G8MP01
+                CALL(btlevtcmd_GetResultPrizeLv, -1, LW(0), LW(7))
+#else
                 CALL(btlevtcmd_GetResultPrizeLv, LW(3), LW(0), LW(7))
+#endif
                 CALL(btlevtcmd_GetPos, LW(10), LW(0), LW(1), LW(2))
                 CALL(btlevtcmd_ACSuccessEffect, LW(7), LW(0), LW(1), LW(2))
                 CALL(btlevtcmd_AudienceDeclareACResult, LW(12), LW(7))

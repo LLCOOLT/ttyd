@@ -2,8 +2,6 @@
 #include "evt/evt_cmd.h"
 #include "evt/evt_bero.h"
 
-#pragma force_active on
-
 USER_FUNC(evt_bero_exec_get);
 USER_FUNC(evt_bero_get_info);
 USER_FUNC(evt_cam3d_evt_off);
@@ -62,56 +60,9 @@ USER_FUNC(evt_sub_countdown_get_status);
 USER_FUNC(evt_sub_countdown_start);
 USER_FUNC(evt_sub_rumble_onoff);
 
-f32 fd_gon_07_negone_one_374[2] __attribute__((aligned(8)));
-f32 fd_gon_07_neg_one_382;
-f32 fd_gon_07___local_PI_383;
-f32 fd_gon_07___local_3PIO2_385;
-f32 fd_gon_07_one_negone_373[2] __attribute__((aligned(8)));
-f32 fd_gon_07___local_PIO2_384;
-f32 fd_gon_07_one_381;
-f32 fd_gon_07_negone_one_360[2] __attribute__((aligned(8)));
-f32 fd_gon_07_neg_one_365;
-f32 fd_gon_07___local_PI_366;
-f32 fd_gon_07___local_3PIO2_368;
-f32 fd_gon_07_one_negone_359[2] __attribute__((aligned(8)));
-f32 fd_gon_07___local_PIO2_367;
-f32 fd_gon_07_one_364;
-static EvtWord door01_close[12];
-static EvtWord door01_open[12];
-EvtWord out_func[14];
+extern EvtWord out_func[];
 static BeroEntry bero_entry_data[3];
-static EvtWord shake_evt[150];
-static EvtWord item_evt[268];
-static EvtWord bomb_wall_evt[179];
-EvtWord gon_07_init_evt[86];
-
-f32 fd_gon_07_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
-
-f32 fd_gon_07_neg_one_382 = -1.0f;
-
-f32 fd_gon_07___local_PI_383 = 3.1415927f;
-
-f32 fd_gon_07___local_3PIO2_385 = 4.712389f;
-
-f32 fd_gon_07_one_negone_373[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
-
-f32 fd_gon_07___local_PIO2_384 = 1.5707964f;
-
-f32 fd_gon_07_one_381 = 1.0f;
-
-f32 fd_gon_07_negone_one_360[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
-
-f32 fd_gon_07_neg_one_365 = -1.0f;
-
-f32 fd_gon_07___local_PI_366 = 3.1415927f;
-
-f32 fd_gon_07___local_3PIO2_368 = 4.712389f;
-
-f32 fd_gon_07_one_negone_359[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
-
-f32 fd_gon_07___local_PIO2_367 = 1.5707964f;
-
-f32 fd_gon_07_one_364 = 1.0f;
+extern EvtWord gon_07_init_evt[];
 
 static EVT_BEGIN(door01_close)
     MULTIPLY_FLOAT(LW(0), FLOAT(0.44433594f))
@@ -359,7 +310,7 @@ EVT_BEGIN(gon_07_init_evt)
     CALL(evt_bero_get_info)
     CALL_CHILD(PTR(evt_bero_info_run))
     CALL(evt_snd_bgmon, 512, STRING("BGM_STG1_GON1"))
-    CALL(evt_snd_envon, 272, STRING("ENV_STG1_GON1\0\0"))
+    CALL(evt_snd_envon, 272, STRING("ENV_STG1_GON1"))
     CALL(evt_snd_set_rev_mode, 2)
     CALL(evt_snd_bgmoff, 18432)
     IF_INT_GREATER_OR_EQUAL(GSW(0), 43)

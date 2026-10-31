@@ -1,12 +1,12 @@
 #include "battle/battle_unit.h"
 #include "evt/evt_cmd.h"
 
-#pragma force_active on
 #include "mario/mario_pouch.h"
 #include "evt/evt_bero.h"
 #include "evt/evt_sub.h"
 #include "jin.h"
 #include "evt/evt_npc.h"
+#include "manager/evtmgr_cmd.h"
 
 USER_FUNC(L_evt_party_dokan);
 USER_FUNC(evt_bero_get_info);
@@ -93,64 +93,20 @@ USER_FUNC(evt_sub_intpl_msec_init);
 static USER_FUNC(getYoshiColor);
 USER_FUNC(vivian_away);
 
-f32 fd_jin_04_negone_one_374[2] __attribute__((aligned(8)));
-f32 fd_jin_04_neg_one_382;
-f32 fd_jin_04___local_PI_383;
-f32 fd_jin_04___local_3PIO2_385;
-f32 fd_jin_04_one_negone_373[2] __attribute__((aligned(8)));
-f32 fd_jin_04___local_PIO2_384;
-f32 fd_jin_04_one_381;
-f32 fd_jin_04_negone_one_360[2] __attribute__((aligned(8)));
-f32 fd_jin_04_neg_one_365;
-f32 fd_jin_04___local_PI_366;
-f32 fd_jin_04___local_3PIO2_368;
-f32 fd_jin_04_one_negone_359[2] __attribute__((aligned(8)));
-f32 fd_jin_04___local_PIO2_367;
-f32 fd_jin_04_one_364;
-static EvtWord s_close[12];
-static EvtWord s_open[12];
 static BeroEntry bero_entry_data[2];
-EvtWord ranperu_toujou[338];
-EvtWord starstone_jump_se[15];
-EvtWord irekawatta_mario_init[67];
-EvtWord irekawatta_mario[495];
-EvtWord yoshi_color[65];
-EvtWord ranperu_lastbattle[378];
-EvtWord hontonosugata_mario_init[125];
-EvtWord hontonosugata_mario[948];
-EvtWord ranperu_init[20];
-EvtWord nisemario_init[22];
+extern EvtWord ranperu_toujou[];
+extern EvtWord starstone_jump_se[];
+extern EvtWord irekawatta_mario_init[];
+extern EvtWord irekawatta_mario[];
+extern EvtWord yoshi_color[];
+extern EvtWord ranperu_lastbattle[];
+extern EvtWord hontonosugata_mario_init[];
+extern EvtWord hontonosugata_mario[];
+extern EvtWord ranperu_init[];
+extern EvtWord nisemario_init[];
 static NpcSetupInfo npcEnt[7];
-EvtWord jin_04_jumpstand[181];
-EvtWord jin_04_init_evt[103];
-
-f32 fd_jin_04_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
-
-f32 fd_jin_04_neg_one_382 = -1.0f;
-
-f32 fd_jin_04___local_PI_383 = 3.1415927f;
-
-f32 fd_jin_04___local_3PIO2_385 = 4.712389f;
-
-f32 fd_jin_04_one_negone_373[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
-
-f32 fd_jin_04___local_PIO2_384 = 1.5707964f;
-
-f32 fd_jin_04_one_381 = 1.0f;
-
-f32 fd_jin_04_negone_one_360[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
-
-f32 fd_jin_04_neg_one_365 = -1.0f;
-
-f32 fd_jin_04___local_PI_366 = 3.1415927f;
-
-f32 fd_jin_04___local_3PIO2_368 = 4.712389f;
-
-f32 fd_jin_04_one_negone_359[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
-
-f32 fd_jin_04___local_PIO2_367 = 1.5707964f;
-
-f32 fd_jin_04_one_364 = 1.0f;
+extern EvtWord jin_04_jumpstand[];
+extern EvtWord jin_04_init_evt[];
 
 static EVT_BEGIN(s_close)
     MULTIPLY_FLOAT(LW(0), FLOAT(0.44433594f))
@@ -991,10 +947,10 @@ EVT_BEGIN(jin_04_init_evt)
     CALL(evt_mobj_jumpstand_red, 0, STRING("mobj_jump"), -75, 450, 100, PTR(jin_04_jumpstand), 0)
     SWITCH(GSW(0))
         CASE_LESS(200)
-        CALL(evt_run_case_evt, 0, 1, STRING("a_yuka\0"), 0, PTR(ranperu_toujou), 0)
+        CALL(evt_run_case_evt, 0, 1, STRING("a_yuka"), 0, PTR(ranperu_toujou), 0)
         CASE_EQUAL(210)
         CALL_CHILD(PTR(yoshi_color))
-        CALL(evt_run_case_evt, 0, 1, STRING("a_yuka\0"), 0, PTR(ranperu_lastbattle), 0)
+        CALL(evt_run_case_evt, 0, 1, STRING("a_yuka"), 0, PTR(ranperu_lastbattle), 0)
         CASE_EQUAL(200)
         CALL_CHILD(PTR(yoshi_color))
         SET_VALUE(LW(0), 1)

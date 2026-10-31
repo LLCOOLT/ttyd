@@ -7,25 +7,9 @@
 #include "battle/battle_stage_object.h"
 #include "driver/npcdrv.h"
 
-#pragma force_active on
-
 USER_FUNC(evt_mapobj_flag_onoff);
 extern BattleUnitKind unit_barriern;
 
-f32 fd_battle_database_mri_negone_one_374[2] __attribute__((aligned(8)));
-f32 fd_battle_database_mri_neg_one_382;
-f32 fd_battle_database_mri___local_PI_383;
-f32 fd_battle_database_mri___local_3PIO2_385;
-f32 fd_battle_database_mri_one_negone_373[2] __attribute__((aligned(8)));
-f32 fd_battle_database_mri___local_PIO2_384;
-f32 fd_battle_database_mri_one_381;
-f32 fd_battle_database_mri_negone_one_360[2] __attribute__((aligned(8)));
-f32 fd_battle_database_mri_neg_one_365;
-f32 fd_battle_database_mri___local_PI_366;
-f32 fd_battle_database_mri___local_3PIO2_368;
-f32 fd_battle_database_mri_one_negone_359[2] __attribute__((aligned(8)));
-f32 fd_battle_database_mri___local_PIO2_367;
-f32 fd_battle_database_mri_one_364;
 BattleStageObjectData mri_btlobject_data[43];
 BattleStageData mri_btlstage_data[4];
 BattleUnitSetup btlparty_mri_mri_01_01[2];
@@ -85,35 +69,7 @@ NpcBattleSelect btlgrpsel_mri_btlno_mri_20_03_off[2];
 NpcBattleSelect btlgrpsel_mri_btlno_mri_mb_off[2];
 NpcSetupBattleInfo btlsetup_mri_tbl[22];
 NpcTerritoryInfo btl_mri_setup_no_tbl[22];
-EvtWord stg_02_1_init_evt[8];
-
-f32 fd_battle_database_mri_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
-
-f32 fd_battle_database_mri_neg_one_382 = -1.0f;
-
-f32 fd_battle_database_mri___local_PI_383 = 3.1415927f;
-
-f32 fd_battle_database_mri___local_3PIO2_385 = 4.712389f;
-
-f32 fd_battle_database_mri_one_negone_373[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
-
-f32 fd_battle_database_mri___local_PIO2_384 = 1.5707964f;
-
-f32 fd_battle_database_mri_one_381 = 1.0f;
-
-f32 fd_battle_database_mri_negone_one_360[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
-
-f32 fd_battle_database_mri_neg_one_365 = -1.0f;
-
-f32 fd_battle_database_mri___local_PI_366 = 3.1415927f;
-
-f32 fd_battle_database_mri___local_3PIO2_368 = 4.712389f;
-
-f32 fd_battle_database_mri_one_negone_359[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
-
-f32 fd_battle_database_mri___local_PIO2_367 = 1.5707964f;
-
-f32 fd_battle_database_mri_one_364 = 1.0f;
+extern EvtWord stg_02_1_init_evt[];
 
 BattleStageObjectData mri_btlobject_data[] = {
     {"S_isk_01", 2, 0, {19.0f, 0.0f, -55.0f}, 0, 60, {0}},
@@ -246,7 +202,7 @@ BattleGroupSetup btlgrp_mri_mri_01_01 = {
     100, // noItemWeight
     battle_heart_drop_param_default, // hpDropTable
     battle_flower_drop_param_default, // fpDropTable
-    5, // field_1C
+    5, // reserved_1C
 };
 
 BattleUnitSetup btlparty_mri_mri_04_01[] = {
@@ -269,7 +225,7 @@ BattleGroupSetup btlgrp_mri_mri_04_01 = {
     100, // noItemWeight
     battle_heart_drop_param_default, // hpDropTable
     battle_flower_drop_param_default, // fpDropTable
-    5, // field_1C
+    5, // reserved_1C
 };
 
 BattleUnitSetup btlparty_mri_mri_05_01[] = {
@@ -303,7 +259,7 @@ BattleGroupSetup btlgrp_mri_mri_05_01 = {
     50, // noItemWeight
     battle_heart_drop_param_default, // hpDropTable
     battle_flower_drop_param_default, // fpDropTable
-    5, // field_1C
+    5, // reserved_1C
 };
 
 BattleUnitSetup btlparty_mri_mri_06_2F_02[] = {
@@ -347,7 +303,7 @@ BattleGroupSetup btlgrp_mri_mri_06_2F_02 = {
     50, // noItemWeight
     battle_heart_drop_param_default, // hpDropTable
     battle_flower_drop_param_default, // fpDropTable
-    5, // field_1C
+    5, // reserved_1C
 };
 
 BattleUnitSetup btlparty_mri_mri_06_2F_03[] = {
@@ -401,7 +357,7 @@ BattleGroupSetup btlgrp_mri_mri_06_2F_03 = {
     50, // noItemWeight
     battle_heart_drop_param_default, // hpDropTable
     battle_flower_drop_param_default, // fpDropTable
-    5, // field_1C
+    5, // reserved_1C
 };
 
 BattleUnitSetup btlparty_mri_mri_12_01[] = {
@@ -435,7 +391,7 @@ BattleGroupSetup btlgrp_mri_mri_12_01 = {
     50, // noItemWeight
     battle_heart_drop_param_default, // hpDropTable
     battle_flower_drop_param_default2, // fpDropTable
-    5, // field_1C
+    5, // reserved_1C
 };
 
 BattleUnitSetup btlparty_mri_mri_12_02[] = {
@@ -489,7 +445,7 @@ BattleGroupSetup btlgrp_mri_mri_12_02 = {
     50, // noItemWeight
     battle_heart_drop_param_default, // hpDropTable
     battle_flower_drop_param_default2, // fpDropTable
-    5, // field_1C
+    5, // reserved_1C
 };
 
 BattleUnitSetup btlparty_mri_mri_15_01[] = {
@@ -522,7 +478,7 @@ BattleGroupSetup btlgrp_mri_mri_15_01 = {
     100, // noItemWeight
     battle_heart_drop_param_default, // hpDropTable
     battle_flower_drop_param_default, // fpDropTable
-    5, // field_1C
+    5, // reserved_1C
 };
 
 BattleUnitSetup btlparty_mri_mri_17_01[] = {
@@ -556,7 +512,7 @@ BattleGroupSetup btlgrp_mri_mri_17_01 = {
     50, // noItemWeight
     battle_heart_drop_param_default, // hpDropTable
     battle_flower_drop_param_default, // fpDropTable
-    5, // field_1C
+    5, // reserved_1C
 };
 
 BattleUnitSetup btlparty_mri_mri_18_02[] = {
@@ -600,7 +556,7 @@ BattleGroupSetup btlgrp_mri_mri_18_02 = {
     50, // noItemWeight
     battle_heart_drop_param_default, // hpDropTable
     battle_flower_drop_param_default, // fpDropTable
-    5, // field_1C
+    5, // reserved_1C
 };
 
 BattleUnitSetup btlparty_mri_mri_18_03[] = {
@@ -644,7 +600,7 @@ BattleGroupSetup btlgrp_mri_mri_18_03 = {
     50, // noItemWeight
     battle_heart_drop_param_default, // hpDropTable
     battle_flower_drop_param_default, // fpDropTable
-    5, // field_1C
+    5, // reserved_1C
 };
 
 BattleUnitSetup btlparty_mri_mri_19_01[] = {
@@ -678,7 +634,7 @@ BattleGroupSetup btlgrp_mri_mri_19_01 = {
     50, // noItemWeight
     battle_heart_drop_param_default, // hpDropTable
     battle_flower_drop_param_default, // fpDropTable
-    5, // field_1C
+    5, // reserved_1C
 };
 
 BattleUnitSetup btlparty_mri_mri_19_02[] = {
@@ -712,7 +668,7 @@ BattleGroupSetup btlgrp_mri_mri_19_02 = {
     50, // noItemWeight
     battle_heart_drop_param_default, // hpDropTable
     battle_flower_drop_param_default2, // fpDropTable
-    5, // field_1C
+    5, // reserved_1C
 };
 
 BattleUnitSetup btlparty_mri_mri_19_04[] = {
@@ -766,7 +722,7 @@ BattleGroupSetup btlgrp_mri_mri_19_04 = {
     50, // noItemWeight
     battle_heart_drop_param_default, // hpDropTable
     battle_flower_drop_param_default2, // fpDropTable
-    5, // field_1C
+    5, // reserved_1C
 };
 
 BattleUnitSetup btlparty_mri_mri_20_02[] = {
@@ -800,7 +756,7 @@ BattleGroupSetup btlgrp_mri_mri_20_02 = {
     50, // noItemWeight
     battle_heart_drop_param_default, // hpDropTable
     battle_flower_drop_param_default, // fpDropTable
-    5, // field_1C
+    5, // reserved_1C
 };
 
 BattleUnitSetup btlparty_mri_mri_20_03[] = {
@@ -844,7 +800,7 @@ BattleGroupSetup btlgrp_mri_mri_20_03 = {
     50, // noItemWeight
     battle_heart_drop_param_default, // hpDropTable
     battle_flower_drop_param_default, // fpDropTable
-    5, // field_1C
+    5, // reserved_1C
 };
 
 BattleUnitSetup btlparty_mri_mri_mb[] = {
@@ -867,7 +823,7 @@ BattleGroupSetup btlgrp_mri_mri_mb = {
     100, // noItemWeight
     battle_heart_drop_param_default, // hpDropTable
     battle_flower_drop_param_default, // fpDropTable
-    5, // field_1C
+    5, // reserved_1C
 };
 
 NpcBattleSelect btlgrpsel_mri_btlno_mri_test1_off[] = {
@@ -982,8 +938,8 @@ NpcSetupBattleInfo btlsetup_mri_tbl[] = {
         -1, // swFlag
         NULL, // altSelect
         btlgrpsel_mri_btlno_mri_test1_off, // select
-        0, 0, // battleFlags..field_1C
-        {{1, 1}, {1, 1}, {1, 1}, {1, 1}, {1, 1}, {1, 1}, {1, 1}, {1, 1}, {1, 1}, {1, 1}, {1, 1}, {1, 1}, {1, 1}, {1, 1}, {1, 1}, {1, 1}}, // field_20
+        0, 0, // battleFlags, randomMode
+        {{1, 1}, {1, 1}, {1, 1}, {1, 1}, {1, 1}, {1, 1}, {1, 1}, {1, 1}, {1, 1}, {1, 1}, {1, 1}, {1, 1}, {1, 1}, {1, 1}, {1, 1}, {1, 1}}, // randomRanges
         "BGM_ZAKO_BATTLE1", // bgmName
     },
     {
@@ -992,8 +948,8 @@ NpcSetupBattleInfo btlsetup_mri_tbl[] = {
         -1, // swFlag
         NULL, // altSelect
         btlgrpsel_mri_btlno_mri_test2_off, // select
-        0, 0, // battleFlags..field_1C
-        {{1, 1}, {1, 1}, {1, 1}, {1, 1}, {1, 1}, {1, 1}, {1, 1}, {1, 1}, {1, 1}, {1, 1}, {1, 1}, {1, 1}, {1, 1}, {1, 1}, {1, 1}, {1, 1}}, // field_20
+        0, 0, // battleFlags, randomMode
+        {{1, 1}, {1, 1}, {1, 1}, {1, 1}, {1, 1}, {1, 1}, {1, 1}, {1, 1}, {1, 1}, {1, 1}, {1, 1}, {1, 1}, {1, 1}, {1, 1}, {1, 1}, {1, 1}}, // randomRanges
         "BGM_ZAKO_BATTLE1", // bgmName
     },
     {
@@ -1002,8 +958,8 @@ NpcSetupBattleInfo btlsetup_mri_tbl[] = {
         -1, // swFlag
         NULL, // altSelect
         btlgrpsel_mri_btlno_mri_test3_off, // select
-        0, 0, // battleFlags..field_1C
-        {{1, 1}, {1, 1}, {1, 1}, {1, 1}, {1, 1}, {1, 1}, {1, 1}, {1, 1}, {1, 1}, {1, 1}, {1, 1}, {1, 1}, {1, 1}, {1, 1}, {1, 1}, {1, 1}}, // field_20
+        0, 0, // battleFlags, randomMode
+        {{1, 1}, {1, 1}, {1, 1}, {1, 1}, {1, 1}, {1, 1}, {1, 1}, {1, 1}, {1, 1}, {1, 1}, {1, 1}, {1, 1}, {1, 1}, {1, 1}, {1, 1}, {1, 1}}, // randomRanges
         "BGM_ZAKO_BATTLE1", // bgmName
     },
     {
@@ -1012,8 +968,8 @@ NpcSetupBattleInfo btlsetup_mri_tbl[] = {
         -1, // swFlag
         NULL, // altSelect
         btlgrpsel_mri_btlno_mri_test4_off, // select
-        0, 0, // battleFlags..field_1C
-        {{1, 1}, {1, 1}, {1, 1}, {1, 1}, {1, 1}, {1, 1}, {1, 1}, {1, 1}, {1, 1}, {1, 1}, {1, 1}, {1, 1}, {1, 1}, {1, 1}, {1, 1}, {1, 1}}, // field_20
+        0, 0, // battleFlags, randomMode
+        {{1, 1}, {1, 1}, {1, 1}, {1, 1}, {1, 1}, {1, 1}, {1, 1}, {1, 1}, {1, 1}, {1, 1}, {1, 1}, {1, 1}, {1, 1}, {1, 1}, {1, 1}, {1, 1}}, // randomRanges
         "BGM_ZAKO_BATTLE1", // bgmName
     },
     {
@@ -1023,8 +979,8 @@ NpcSetupBattleInfo btlsetup_mri_tbl[] = {
         NULL, // altSelect
         btlgrpsel_mri_btlno_mri_01_01_off, // select
         0x20000010, // battleFlags
-        0, // field_1C
-        {{5, 5}, {10, 10}, {0}, {0}, {5, 5}, {5, 5}, {0}, {0}, {5, 5}, {0}, {5, 5}, {5, 5}, {1, 1}, {1, 1}, {1, 1}, {1, 1}}, // field_20
+        0, // randomMode
+        {{5, 5}, {10, 10}, {0}, {0}, {5, 5}, {5, 5}, {0}, {0}, {5, 5}, {0}, {5, 5}, {5, 5}, {1, 1}, {1, 1}, {1, 1}, {1, 1}}, // randomRanges
         "BGM_KOBOSS_BATTLE1", // bgmName
     },
     {
@@ -1034,8 +990,8 @@ NpcSetupBattleInfo btlsetup_mri_tbl[] = {
         NULL, // altSelect
         btlgrpsel_mri_btlno_mri_04_01_off, // select
         0x20000010, // battleFlags
-        0, // field_1C
-        {{5, 5}, {10, 10}, {0}, {0}, {5, 5}, {5, 5}, {0}, {0}, {5, 5}, {0}, {5, 5}, {5, 5}, {1, 1}, {1, 1}, {1, 1}, {1, 1}}, // field_20
+        0, // randomMode
+        {{5, 5}, {10, 10}, {0}, {0}, {5, 5}, {5, 5}, {0}, {0}, {5, 5}, {0}, {5, 5}, {5, 5}, {1, 1}, {1, 1}, {1, 1}, {1, 1}}, // randomRanges
         "BGM_KOBOSS_BATTLE1", // bgmName
     },
     {
@@ -1044,8 +1000,8 @@ NpcSetupBattleInfo btlsetup_mri_tbl[] = {
         -1, // swFlag
         NULL, // altSelect
         btlgrpsel_mri_btlno_mri_05_01_off, // select
-        0, 0, // battleFlags..field_1C
-        {{5, 5}, {10, 10}, {0}, {0}, {5, 5}, {5, 5}, {0}, {0}, {5, 5}, {0}, {5, 5}, {5, 5}, {1, 1}, {1, 1}, {1, 1}, {1, 1}}, // field_20
+        0, 0, // battleFlags, randomMode
+        {{5, 5}, {10, 10}, {0}, {0}, {5, 5}, {5, 5}, {0}, {0}, {5, 5}, {0}, {5, 5}, {5, 5}, {1, 1}, {1, 1}, {1, 1}, {1, 1}}, // randomRanges
         "BGM_ZAKO_BATTLE1", // bgmName
     },
     {
@@ -1054,8 +1010,8 @@ NpcSetupBattleInfo btlsetup_mri_tbl[] = {
         -1, // swFlag
         NULL, // altSelect
         btlgrpsel_mri_btlno_mri_06_2f_02_off, // select
-        0, 0, // battleFlags..field_1C
-        {{5, 5}, {5, 5}, {0}, {0}, {5, 5}, {5, 5}, {0}, {0}, {5, 5}, {0}, {5, 5}, {5, 5}, {1, 1}, {1, 1}, {1, 1}, {1, 1}}, // field_20
+        0, 0, // battleFlags, randomMode
+        {{5, 5}, {5, 5}, {0}, {0}, {5, 5}, {5, 5}, {0}, {0}, {5, 5}, {0}, {5, 5}, {5, 5}, {1, 1}, {1, 1}, {1, 1}, {1, 1}}, // randomRanges
         "BGM_ZAKO_BATTLE1", // bgmName
     },
     {
@@ -1064,8 +1020,8 @@ NpcSetupBattleInfo btlsetup_mri_tbl[] = {
         -1, // swFlag
         NULL, // altSelect
         btlgrpsel_mri_btlno_mri_06_2f_03_off, // select
-        0, 0, // battleFlags..field_1C
-        {{5, 5}, {5, 5}, {0}, {0}, {5, 5}, {5, 5}, {0}, {0}, {5, 5}, {0}, {5, 5}, {5, 5}, {1, 1}, {1, 1}, {1, 1}, {1, 1}}, // field_20
+        0, 0, // battleFlags, randomMode
+        {{5, 5}, {5, 5}, {0}, {0}, {5, 5}, {5, 5}, {0}, {0}, {5, 5}, {0}, {5, 5}, {5, 5}, {1, 1}, {1, 1}, {1, 1}, {1, 1}}, // randomRanges
         "BGM_ZAKO_BATTLE1", // bgmName
     },
     {
@@ -1074,8 +1030,8 @@ NpcSetupBattleInfo btlsetup_mri_tbl[] = {
         -1, // swFlag
         NULL, // altSelect
         btlgrpsel_mri_btlno_mri_12_01_off, // select
-        0, 0, // battleFlags..field_1C
-        {{4, 4}, {4, 4}, {0}, {0}, {4, 4}, {4, 4}, {0}, {10, 10}, {4, 4}, {0}, {4, 4}, {4, 4}, {1, 1}, {1, 1}, {1, 1}, {1, 1}}, // field_20
+        0, 0, // battleFlags, randomMode
+        {{4, 4}, {4, 4}, {0}, {0}, {4, 4}, {4, 4}, {0}, {10, 10}, {4, 4}, {0}, {4, 4}, {4, 4}, {1, 1}, {1, 1}, {1, 1}, {1, 1}}, // randomRanges
         "BGM_ZAKO_BATTLE1", // bgmName
     },
     {
@@ -1084,8 +1040,8 @@ NpcSetupBattleInfo btlsetup_mri_tbl[] = {
         -1, // swFlag
         NULL, // altSelect
         btlgrpsel_mri_btlno_mri_12_02_off, // select
-        0, 0, // battleFlags..field_1C
-        {{4, 4}, {4, 4}, {0}, {0}, {4, 4}, {4, 4}, {0}, {10, 10}, {4, 4}, {0}, {4, 4}, {4, 4}, {1, 1}, {1, 1}, {1, 1}, {1, 1}}, // field_20
+        0, 0, // battleFlags, randomMode
+        {{4, 4}, {4, 4}, {0}, {0}, {4, 4}, {4, 4}, {0}, {10, 10}, {4, 4}, {0}, {4, 4}, {4, 4}, {1, 1}, {1, 1}, {1, 1}, {1, 1}}, // randomRanges
         "BGM_ZAKO_BATTLE1", // bgmName
     },
     {
@@ -1095,8 +1051,8 @@ NpcSetupBattleInfo btlsetup_mri_tbl[] = {
         NULL, // altSelect
         btlgrpsel_mri_btlno_mri_15_01_off, // select
         0x20000010, // battleFlags
-        0, // field_1C
-        {{4, 4}, {10, 10}, {0}, {0}, {4, 4}, {4, 4}, {0}, {10, 10}, {4, 4}, {0}, {4, 4}, {4, 4}, {1, 1}, {1, 1}, {1, 1}, {1, 1}}, // field_20
+        0, // randomMode
+        {{4, 4}, {10, 10}, {0}, {0}, {4, 4}, {4, 4}, {0}, {10, 10}, {4, 4}, {0}, {4, 4}, {4, 4}, {1, 1}, {1, 1}, {1, 1}, {1, 1}}, // randomRanges
         "BGM_KOBOSS_BATTLE1", // bgmName
     },
     {
@@ -1105,8 +1061,8 @@ NpcSetupBattleInfo btlsetup_mri_tbl[] = {
         -1, // swFlag
         NULL, // altSelect
         btlgrpsel_mri_btlno_mri_17_01_off, // select
-        0, 0, // battleFlags..field_1C
-        {{4, 4}, {4, 4}, {0}, {0}, {4, 4}, {4, 4}, {0}, {10, 10}, {4, 4}, {0}, {4, 4}, {4, 4}, {1, 1}, {1, 1}, {1, 1}, {1, 1}}, // field_20
+        0, 0, // battleFlags, randomMode
+        {{4, 4}, {4, 4}, {0}, {0}, {4, 4}, {4, 4}, {0}, {10, 10}, {4, 4}, {0}, {4, 4}, {4, 4}, {1, 1}, {1, 1}, {1, 1}, {1, 1}}, // randomRanges
         "BGM_ZAKO_BATTLE1", // bgmName
     },
     {
@@ -1115,8 +1071,8 @@ NpcSetupBattleInfo btlsetup_mri_tbl[] = {
         -1, // swFlag
         NULL, // altSelect
         btlgrpsel_mri_btlno_mri_18_02_off, // select
-        0, 0, // battleFlags..field_1C
-        {{4, 4}, {10, 10}, {0}, {0}, {4, 4}, {4, 4}, {0}, {10, 10}, {4, 4}, {0}, {4, 4}, {4, 4}, {1, 1}, {1, 1}, {1, 1}, {1, 1}}, // field_20
+        0, 0, // battleFlags, randomMode
+        {{4, 4}, {10, 10}, {0}, {0}, {4, 4}, {4, 4}, {0}, {10, 10}, {4, 4}, {0}, {4, 4}, {4, 4}, {1, 1}, {1, 1}, {1, 1}, {1, 1}}, // randomRanges
         "BGM_ZAKO_BATTLE1", // bgmName
     },
     {
@@ -1125,8 +1081,8 @@ NpcSetupBattleInfo btlsetup_mri_tbl[] = {
         -1, // swFlag
         NULL, // altSelect
         btlgrpsel_mri_btlno_mri_18_03_off, // select
-        0, 0, // battleFlags..field_1C
-        {{4, 4}, {10, 10}, {0}, {0}, {4, 4}, {4, 4}, {0}, {10, 10}, {4, 4}, {0}, {4, 4}, {4, 4}, {1, 1}, {1, 1}, {1, 1}, {1, 1}}, // field_20
+        0, 0, // battleFlags, randomMode
+        {{4, 4}, {10, 10}, {0}, {0}, {4, 4}, {4, 4}, {0}, {10, 10}, {4, 4}, {0}, {4, 4}, {4, 4}, {1, 1}, {1, 1}, {1, 1}, {1, 1}}, // randomRanges
         "BGM_ZAKO_BATTLE1", // bgmName
     },
     {
@@ -1135,8 +1091,8 @@ NpcSetupBattleInfo btlsetup_mri_tbl[] = {
         -1, // swFlag
         NULL, // altSelect
         btlgrpsel_mri_btlno_mri_19_01_off, // select
-        0, 0, // battleFlags..field_1C
-        {{5, 5}, {10, 10}, {0}, {0}, {5, 5}, {5, 5}, {0}, {0}, {5, 5}, {0}, {5, 5}, {5, 5}, {1, 1}, {1, 1}, {1, 1}, {1, 1}}, // field_20
+        0, 0, // battleFlags, randomMode
+        {{5, 5}, {10, 10}, {0}, {0}, {5, 5}, {5, 5}, {0}, {0}, {5, 5}, {0}, {5, 5}, {5, 5}, {1, 1}, {1, 1}, {1, 1}, {1, 1}}, // randomRanges
         "BGM_ZAKO_BATTLE1", // bgmName
     },
     {
@@ -1145,8 +1101,8 @@ NpcSetupBattleInfo btlsetup_mri_tbl[] = {
         -1, // swFlag
         NULL, // altSelect
         btlgrpsel_mri_btlno_mri_19_02_off, // select
-        0, 0, // battleFlags..field_1C
-        {{5, 5}, {5, 5}, {0}, {0}, {5, 5}, {5, 5}, {0}, {0}, {5, 5}, {0}, {5, 5}, {5, 5}, {1, 1}, {1, 1}, {1, 1}, {1, 1}}, // field_20
+        0, 0, // battleFlags, randomMode
+        {{5, 5}, {5, 5}, {0}, {0}, {5, 5}, {5, 5}, {0}, {0}, {5, 5}, {0}, {5, 5}, {5, 5}, {1, 1}, {1, 1}, {1, 1}, {1, 1}}, // randomRanges
         "BGM_ZAKO_BATTLE1", // bgmName
     },
     {
@@ -1155,8 +1111,8 @@ NpcSetupBattleInfo btlsetup_mri_tbl[] = {
         -1, // swFlag
         NULL, // altSelect
         btlgrpsel_mri_btlno_mri_19_04_off, // select
-        0, 0, // battleFlags..field_1C
-        {{5, 5}, {5, 5}, {0}, {0}, {5, 5}, {5, 5}, {0}, {0}, {5, 5}, {0}, {5, 5}, {5, 5}, {1, 1}, {1, 1}, {1, 1}, {1, 1}}, // field_20
+        0, 0, // battleFlags, randomMode
+        {{5, 5}, {5, 5}, {0}, {0}, {5, 5}, {5, 5}, {0}, {0}, {5, 5}, {0}, {5, 5}, {5, 5}, {1, 1}, {1, 1}, {1, 1}, {1, 1}}, // randomRanges
         "BGM_ZAKO_BATTLE1", // bgmName
     },
     {
@@ -1165,8 +1121,8 @@ NpcSetupBattleInfo btlsetup_mri_tbl[] = {
         -1, // swFlag
         NULL, // altSelect
         btlgrpsel_mri_btlno_mri_20_02_off, // select
-        0, 0, // battleFlags..field_1C
-        {{5, 5}, {10, 10}, {0}, {0}, {5, 5}, {5, 5}, {0}, {0}, {5, 5}, {0}, {5, 5}, {5, 5}, {1, 1}, {1, 1}, {1, 1}, {1, 1}}, // field_20
+        0, 0, // battleFlags, randomMode
+        {{5, 5}, {10, 10}, {0}, {0}, {5, 5}, {5, 5}, {0}, {0}, {5, 5}, {0}, {5, 5}, {5, 5}, {1, 1}, {1, 1}, {1, 1}, {1, 1}}, // randomRanges
         "BGM_ZAKO_BATTLE1", // bgmName
     },
     {
@@ -1175,8 +1131,8 @@ NpcSetupBattleInfo btlsetup_mri_tbl[] = {
         -1, // swFlag
         NULL, // altSelect
         btlgrpsel_mri_btlno_mri_20_03_off, // select
-        0, 0, // battleFlags..field_1C
-        {{5, 5}, {10, 10}, {0}, {0}, {5, 5}, {5, 5}, {0}, {0}, {5, 5}, {0}, {5, 5}, {5, 5}, {1, 1}, {1, 1}, {1, 1}, {1, 1}}, // field_20
+        0, 0, // battleFlags, randomMode
+        {{5, 5}, {10, 10}, {0}, {0}, {5, 5}, {5, 5}, {0}, {0}, {5, 5}, {0}, {5, 5}, {5, 5}, {1, 1}, {1, 1}, {1, 1}, {1, 1}}, // randomRanges
         "BGM_ZAKO_BATTLE1", // bgmName
     },
     {
@@ -1187,8 +1143,8 @@ NpcSetupBattleInfo btlsetup_mri_tbl[] = {
         NULL, // altSelect
         btlgrpsel_mri_btlno_mri_mb_off, // select
         0x20000010, // battleFlags
-        2, // field_1C
-        {{0}, {10, 10}, {0}, {0}, {0}, {0}, {0}, {10, 10}, {0}, {0}, {0}, {0}, {0}, {1, 1}, {1, 1}, {1, 1}}, // field_20
+        2, // randomMode
+        {{0}, {10, 10}, {0}, {0}, {0}, {0}, {0}, {10, 10}, {0}, {0}, {0}, {0}, {0}, {1, 1}, {1, 1}, {1, 1}}, // randomRanges
         "BGM_BOSS_STG3_3RDLEADER1", // bgmName
     },
     {0},
@@ -1220,7 +1176,7 @@ NpcTerritoryInfo btl_mri_setup_no_tbl[] = {
 };
 
 EVT_BEGIN(stg_02_1_init_evt)
-    CALL(evt_mapobj_flag_onoff, 1, 0, STRING("S_ueki\0"), 1)
+    CALL(evt_mapobj_flag_onoff, 1, 0, STRING("S_ueki"), 1)
     RETURN
 EVT_END()
 

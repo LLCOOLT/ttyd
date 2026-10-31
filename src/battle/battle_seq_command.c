@@ -19,6 +19,9 @@
 #include "battle/battle_event_default.h"
 #include "battle/battle_event_subset.h"
 #include "battle/battle_item_data.h"
+#include "battle/battle_ac_help.h"
+#include "battle/battle_menu_disp.h"
+#include "manager/fontmgr.h"
 
 
 void BattleMenuDisp_ActSelect_Init(BattleWork* wp, BattleCursor* cursor, BattleCommandAct* acts, s32 a);
@@ -113,7 +116,7 @@ void btlDispGXQuads2DRasta(f32 x0, f32 y0, f32 x1, f32 y1, u8 r, u8 g, u8 b, u8 
 void btlDispTexPlane(u32 id, GXColor color, f32 tX, f32 tY, f32 tZ, f32 sX, f32 sY);
 f32 iconNumberDispGx(Mtx mtx, s32 number, BOOL small, GXColor color);
 f32 intplGetValue(s32 mode, s32 currStep, s32 steps, f32 start, f32 end);
-#define PADREP(x) (((s32 (*)(s32))BattlePadCheckRepeat)(x))
+#define PADREP(x) (BattlePadCheckRepeat(x))
 void _btlcmd_MakeActClassTable(BattleWork* wp) {
 	PouchData* pouch;
 	BattleUnit* unit;
@@ -703,7 +706,6 @@ void _btlcmd_UpdateSelectWeaponTable(BattleWork* wp, s32 type) {
 	}
 }
 
-#pragma dont_inline on
 s32 _btlcmd_CheckWeaponTargetNum(BattleWork* wp, BattleUnit* unit, BattleWeapon* weapon) {
 	BattleWorkWeaponTargets targets;
 
@@ -723,7 +725,6 @@ s32 _btlcmd_CheckWeaponTargetNum(BattleWork* wp, BattleUnit* unit, BattleWeapon*
 	}
 	return targets.numTargets;
 }
-#pragma dont_inline reset
 
 void _btlcmd_MakeOperationTable(BattleWork* wp) {
 	PouchData* pouch;
@@ -1103,8 +1104,7 @@ void BattleAcHelpSetDispType(s32 type);
 void _btlcmd_SetAttackEvent(BattleUnit* unit, BattleCommand* cmd);
 
 
-#pragma dont_inline on
-s32 BattleCommandInput(BattleWork* work) {
+s32 BattleCommandInput(void* work) {
 	const char* sfxA;
 	const char* sfxB;
 	BattleUnit* unit;
@@ -1121,14 +1121,13 @@ s32 BattleCommandInput(BattleWork* work) {
 	s32 i;
 	BattleWorkTarget* t;
 
-	wp = (BattleWork*)(void*)work; // FAKE: the void* hop keeps wp its own copy of work (r24 as in the target)
-	unit = BattleGetUnitPtr(work, work->activeUnitId);
+	wp = work;
+	unit = BattleGetUnitPtr(wp, wp->activeUnitId);
 	cmd = &wp->commandMenu;
 	if (cmd == NULL) {
 		return 1;
 	}
 	_btlcmd_GetCursorPtr(cmd, 0xe, &cursor);
-#pragma dont_inline on
 	if (_check_present_item()) {
 		BattleAcHelpSetDispType(0);
 	}
@@ -1410,7 +1409,6 @@ s32 BattleCommandInput(BattleWork* work) {
 	}
 	return 0;
 }
-#pragma dont_inline reset
 
 #pragma dont_inline reset
 
@@ -1505,7 +1503,6 @@ s32 BattleCommandDisplay_ActMenuMain(BattleWork* wp) {
 	BattleCursor* cursor;
 
 	_btlcmd_GetCursorPtr(cmd, 14, &cursor);
-#pragma dont_inline on
 	if (BattlePadCheckTrigger(0x800) && BattleCommandCheckChangePositionEnable(wp)) {
 		psndSFXOn((const char*)0x9d8);
 		BattleCommandDisplay_ActMenuEnd(wp);
@@ -1536,7 +1533,7 @@ s32 BattleCommandDisplay_ActMenuMain(BattleWork* wp) {
 				break;
 			}
 		}
-		if (((s32 (*)(s32))BattlePadCheckNow)(-1)) {
+		if (BattlePadCheckNow(-1)) {
 			cmd->idleTimer = 0;
 			btl_camera_set_mode(0, 0);
 		} else if (++cmd->idleTimer >= 900) {
@@ -1626,7 +1623,6 @@ s32 BattleCommandDisplay_ActMenuMain(BattleWork* wp) {
 	BattleMenuDisp_ActSelect_Main(wp);
 	return ret;
 }
-#pragma dont_inline reset
 
 BOOL BattleCommandCheckChangePositionEnable(BattleWork* wp) {
 	BattleUnit* unit;
@@ -1805,7 +1801,7 @@ s32 BattleCommandDisplay_WeaponMultiItemCancelCheckMain(BattleWork* wp) {
 		return 0;
 	}
 	if (cursor->absPos < cursor->count - 1) {
-		if (((s32(*)(s32))BattlePadCheckRepeat)(0x20000)) {
+		if (BattlePadCheckRepeat(0x20000)) {
 			cursor->absPos++;
 			psndSFXOn("SFX_BTL_CURSOR_MOVE2");
 			goto check;
@@ -1818,7 +1814,7 @@ s32 BattleCommandDisplay_WeaponMultiItemCancelCheckMain(BattleWork* wp) {
 		}
 	}
 	if (cursor->absPos > 0) {
-		if (((s32(*)(s32))BattlePadCheckRepeat)(0x10000)) {
+		if (BattlePadCheckRepeat(0x10000)) {
 			cursor->absPos--;
 			psndSFXOn("SFX_BTL_CURSOR_MOVE2");
 		}
@@ -1860,8 +1856,13 @@ void BattleCommandDisplay_WeaponMultiItemCancelCheckDisp(CameraId camId, void* p
 
 	pouchGetPtr();
 	sprintf(buf, msgSearch("btl_msg_multi_item_cancel_check"));
+#ifdef VERSION_G8MP01
+	len = (f32)FontGetMessageWidth(buf);
+	((void (*)(f32, f32, f32, f32, f32, u16, GXColor))windowDispGX_Waku_col)(-30.0f - (w = 0.5f * (f32)len), 30.0f, 65.0f + (f32)len, 32.0f, 10.0f, 0, (GXColor){0xFF, 0xFF, 0xFF, 0xFF});
+#else
 	len = strlen(buf);
 	((void (*)(f32, f32, f32, f32, f32, u16, GXColor))windowDispGX_Waku_col)(-30.0f - (w = 6.25f * (f32)len), 30.0f, 12.5f * (f32)len + 65.0f, 32.0f, 10.0f, 0, (GXColor){0xFF, 0xFF, 0xFF, 0xFF});
+#endif
 	windowDispGX_Waku_col(0, (GXColor){0xFF, 0xFF, 0xFF, 0xFF}, -70.0f, -10.0f, 130.0f, 60.0f, 10.0f);
 	FontDrawStart();
 	x = 0.0f;
@@ -1870,8 +1871,8 @@ void BattleCommandDisplay_WeaponMultiItemCancelCheckDisp(CameraId camId, void* p
 	FontDrawString(-20.0f, -13.0f, msgSearch("btl_msg_lvup_yes"));
 	FontDrawString(-20.0f, -38.0f, msgSearch("btl_msg_lvup_no"));
 #else
-	FontDrawString(-20.0f, -13.0f, "\202\315\202\242\201@");
-	FontDrawString(-20.0f, -38.0f, "\202\242\202\242\202\246");
+	FontDrawString(-20.0f, -13.0f, "はい　");
+	FontDrawString(-20.0f, -38.0f, "いいえ");
 #endif
 	pos.x = -40.0f;
 	pos.y = -42 - wp->commandMenu.cursor[13].absPos * 25;
@@ -2082,12 +2083,10 @@ void BattleCommandDisplay_MultiItemMenuEnd(BattleWork* wp) {
 }
 #pragma dont_inline reset
 
-#pragma dont_inline on
 void BattleCommandDisplay_ChangePartySelectMenuSetup(BattleWork* wp) {
 	BattleMenuDisp_ChangePartySelect_Init(wp);
 	wp->commandMenu.flags |= 0x1001000;
 }
-#pragma dont_inline reset
 
 void BattleMenuDisp_ChangePartySelect_Main(BattleWork* wp);
 BOOL BattleMenuKeyOKInACT(BattleWork* wp);
@@ -2934,4 +2933,3 @@ s32 _check_weapon_type_attack(BattleWeapon* weapon) {
 	return 0;
 }
 
-__declspec(section ".sdata") u32 gap_07_8041102C_sdata[1] = {0};

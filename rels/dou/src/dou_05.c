@@ -1,7 +1,6 @@
 #include "battle/battle_unit.h"
 #include "evt/evt_cmd.h"
 
-#pragma force_active on
 #include "memory.h"
 #include "cam_road.h"
 #include "driver/mapdrv.h"
@@ -10,6 +9,7 @@
 #include "evt/evt_damage.h"
 #include "driver/hitdrv.h"
 #include "mario/mario_pouch.h"
+#include "manager/evtmgr_cmd.h"
 
 static u8* _ap;
 
@@ -56,34 +56,16 @@ USER_FUNC(evt_sub_intpl_msec_init);
 USER_FUNC(evt_win_item_select);
 static void alpha_tev(MapTevCallbackInfo* info);
 
-f32 fd_dou_05_negone_one_374[2] __attribute__((aligned(8)));
-f32 fd_dou_05_neg_one_382;
-f32 fd_dou_05___local_PI_383;
-f32 fd_dou_05___local_3PIO2_385;
-f32 fd_dou_05_one_negone_373[2] __attribute__((aligned(8)));
-f32 fd_dou_05___local_PIO2_384;
-f32 fd_dou_05_one_381;
-f32 fd_dou_05_negone_one_360[2] __attribute__((aligned(8)));
-f32 fd_dou_05_neg_one_365;
-f32 fd_dou_05___local_PI_366;
-f32 fd_dou_05___local_3PIO2_368;
-f32 fd_dou_05_one_negone_359[2] __attribute__((aligned(8)));
-f32 fd_dou_05___local_PIO2_367;
-f32 fd_dou_05_one_364;
 static BeroEntry bero_entry_data[5];
 static s32 key_tbl[2];
-static EvtWord evt_chk[23];
-static EvtWord evt_unlock[7];
-EvtWord bigdoor_event_init[36];
-EvtWord bigdoor_event[152];
+extern EvtWord bigdoor_event_init[];
+extern EvtWord bigdoor_event[];
 static HitDamageReturn hitDmgRetPoints[6];
-static EvtWord mobj_box00[28];
-EvtWord waterfall_main[30];
-EvtWord waterfall_init[25];
-EvtWord ride_waterfall[5];
-EvtWord nonride_waterfall[19];
-EvtWord dou_05_init_evt[136];
-
+extern EvtWord waterfall_main[];
+extern EvtWord waterfall_init[];
+extern EvtWord ride_waterfall[];
+extern EvtWord nonride_waterfall[];
+extern EvtWord dou_05_init_evt[];
 
 static void alpha_tev(MapTevCallbackInfo* info) {
     s32 stage = info->tevStage;
@@ -115,37 +97,6 @@ USER_FUNC(cam_displacement) {
     work->f_19c[10] = 1.7f;
     return EVT_RETURN_DONE;
 }
-
-
-
-
-f32 fd_dou_05_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
-
-f32 fd_dou_05_neg_one_382 = -1.0f;
-
-f32 fd_dou_05___local_PI_383 = 3.1415927f;
-
-f32 fd_dou_05___local_3PIO2_385 = 4.712389f;
-
-f32 fd_dou_05_one_negone_373[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
-
-f32 fd_dou_05___local_PIO2_384 = 1.5707964f;
-
-f32 fd_dou_05_one_381 = 1.0f;
-
-f32 fd_dou_05_negone_one_360[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
-
-f32 fd_dou_05_neg_one_365 = -1.0f;
-
-f32 fd_dou_05___local_PI_366 = 3.1415927f;
-
-f32 fd_dou_05___local_3PIO2_368 = 4.712389f;
-
-f32 fd_dou_05_one_negone_359[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
-
-f32 fd_dou_05___local_PIO2_367 = 1.5707964f;
-
-f32 fd_dou_05_one_364 = 1.0f;
 
 static BeroEntry bero_entry_data[] = {
     {

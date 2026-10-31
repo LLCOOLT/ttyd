@@ -22,9 +22,9 @@ typedef struct EffTimestampN64Work {
     Vec position;       // 0x4
     s32 lifetime;       // 0x10
     s32 frame;          // 0x14
-    s32 unk18;          // 0x18
-    s32 unk1C;          // 0x1C
-    s32 unk20;          // 0x20
+    s32 r;              // 0x18, color set at entry; never read
+    s32 g;              // 0x1C
+    s32 b;              // 0x20
     s32 bright;         // 0x24
     f32 scale;          // 0x28
     s32 alpha;          // 0x2C
@@ -46,9 +46,9 @@ static s32 pos_data[30] = {
 };
 
 static u8 scale_data[4] = {120, 80, 40, 60};
-static u8 colr[20] = {255, 255, 255, 198, 138, 130, 130, 130, 130, 130, 175, 215, 250, 255, 255, 255, 255, 0, 0, 0};
-static u8 colg[20] = {130, 130, 130, 130, 130, 165, 213, 255, 255, 255, 255, 255, 255, 225, 198, 159, 130, 0, 0, 0};
-static u8 colb[20] = {130, 196, 255, 255, 255, 255, 255, 255, 202, 144, 130, 130, 130, 130, 130, 130, 130, 0, 0, 0};
+static u8 colr[17] = {255, 255, 255, 198, 138, 130, 130, 130, 130, 130, 175, 215, 250, 255, 255, 255, 255};
+static u8 colg[17] = {130, 130, 130, 130, 130, 165, 213, 255, 255, 255, 255, 255, 255, 225, 198, 159, 130};
+static u8 colb[17] = {130, 196, 255, 255, 255, 255, 255, 255, 202, 144, 130, 130, 130, 130, 130, 130, 130};
 
 void effTimestampMain(EffectEntry* effect);
 void effTimestampDisp(CameraId cameraId, EffectEntry* effect);
@@ -60,7 +60,7 @@ EffectEntry* effTimestampN64Entry(s32 type, f32 x, f32 y, f32 z, f32 scale, s32 
     s32 i;
 
     effect = effEntry();
-    effect->type = "TimestampN64\0\0\0";
+    effect->type = "TimestampN64";
     effect->count = 1;
     work = __memAlloc(HEAP_EFFECT, sizeof(EffTimestampN64Work));
     effect->userdata = work;
@@ -78,9 +78,9 @@ EffectEntry* effTimestampN64Entry(s32 type, f32 x, f32 y, f32 z, f32 scale, s32 
     work->position.y = y;
     work->position.z = z;
     work->scale = scale;
-    work->unk18 = 70;
-    work->unk1C = 180;
-    work->unk20 = 120;
+    work->r = 70;
+    work->g = 180;
+    work->b = 120;
     work->alpha = 0;
     work->scale2 = 1.0f;
     p = pos_data;

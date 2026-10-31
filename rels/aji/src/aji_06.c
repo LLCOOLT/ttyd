@@ -1,7 +1,6 @@
 #include "battle/battle_unit.h"
 #include "evt/evt_cmd.h"
 
-#pragma force_active on
 #include "manager/evtmgr_cmd.h"
 #include "driver/mapdrv.h"
 #include "mario/mariost.h"
@@ -12,7 +11,7 @@
 #include "evt/evt_sub.h"
 #include "aji.h"
 
-typedef struct YukaAnimData { u16 flags; u8 field_0x2[6]; OSTime time; f32 frame; f32 speed; struct { u8 field_0x0[8]; f32 length; }* data; } YukaAnimData;
+typedef struct YukaAnimData { u16 flags; u8 pad_2[6]; OSTime time; f32 frame; f32 speed; struct { u8 header[8]; f32 length; }* data; } YukaAnimData; /* header: MapAnimHeader name + pad */
 typedef struct YukaAnim { YukaAnimData* anim; u32 flags; } YukaAnim;
 #define YUKA_NOW() OSTicksToMilliseconds(gp->inBattle ? gp->renderTime : gp->renderFieldTime)
 #define KUSURI_COL (*(GXColor*)g_Kusuri_Col)
@@ -77,6 +76,7 @@ USER_FUNC(evt_msg_select);
 USER_FUNC(evt_npc_check_delete);
 USER_FUNC(evt_npc_set_autotalkpose);
 USER_FUNC(evt_party_cont_onoff);
+USER_FUNC(evt_party_get_pos);
 USER_FUNC(evt_party_set_pos);
 USER_FUNC(evt_peach_set_condition);
 USER_FUNC(evt_pouch_check_item);
@@ -119,107 +119,58 @@ void kusuri_2_color_tev(MapTevCallbackInfo* info);
 void kusuri_1_color_tev(MapTevCallbackInfo* info);
 void kusuri_naka_color_tev(MapTevCallbackInfo* info);
 
-f32 fd_aji_06_negone_one_374[2] __attribute__((aligned(8)));
-f32 fd_aji_06_neg_one_382;
-f32 fd_aji_06___local_PI_383;
-f32 fd_aji_06___local_3PIO2_385;
-f32 fd_aji_06_one_negone_373[2] __attribute__((aligned(8)));
-f32 fd_aji_06___local_PIO2_384;
-f32 fd_aji_06_one_381;
-f32 fd_aji_06_negone_one_360[2] __attribute__((aligned(8)));
-f32 fd_aji_06_neg_one_365;
-f32 fd_aji_06___local_PI_366;
-f32 fd_aji_06___local_3PIO2_368;
-f32 fd_aji_06_one_negone_359[2] __attribute__((aligned(8)));
-f32 fd_aji_06___local_PIO2_367;
-f32 fd_aji_06_one_364;
-static EvtWord s_door_open[22];
-static EvtWord s_door_close[22];
 static BeroEntry bero_entry_data[2];
-static EvtWord bero_peach_evt[31];
 static BeroEntry bero_peach_data[2];
 s32 g_Kusuri_Col[1];
 s32 g_Kusuri_Src_Col[4];
-EvtWord g_Kusuri2_No[1];
+extern EvtWord g_Kusuri2_No[];
 s32 g_Kusuri3_No[1];
 s32 g_Kusuri4_No[1];
-EvtWord peach_evt_kaihei_open[51];
-EvtWord peach_evt_kaihei_open_all[28];
-EvtWord peach_evt_kaihei_close[46];
-EvtWord peach_evt_kaihei_close_all[28];
+extern EvtWord peach_evt_kaihei_open[];
+extern EvtWord peach_evt_kaihei_open_all[];
+extern EvtWord peach_evt_kaihei_close[];
+extern EvtWord peach_evt_kaihei_close_all[];
 s32 kusuri_tyogo_list[8];
 s32 kusuri_list[5];
 s32 kusuri_id[4];
-EvtWord peach_evt_kusuri_select[73];
-EvtWord peach_evt_pick_kusuri[55];
-EvtWord peach_evt_check_all_kusuri_set[72];
-EvtWord peach_evt_kusuri_dasu[141];
-EvtWord peach_evt_seikai_evt[33];
-EvtWord peach_evt_kaihei1[187];
-EvtWord peach_evt_kaihei2[174];
-EvtWord peach_evt_kaihei3[174];
-EvtWord peach_evt_kaihei4[174];
-EvtWord peach_evt_stop_renji[15];
-EvtWord peach_evt_pato_on[46];
-EvtWord peach_evt_pato_off[18];
-EvtWord peach_evt_hari_on[100];
-EvtWord peach_evt_hari_off[27];
-EvtWord peach_evt_sugata_modoru[85];
-EvtWord peach_evt_kusuri_nomu[435];
-EvtWord kusuri_color_seiko[52];
-EvtWord kusuri_color_sippai[93];
+extern EvtWord peach_evt_kusuri_select[];
+extern EvtWord peach_evt_pick_kusuri[];
+extern EvtWord peach_evt_check_all_kusuri_set[];
+extern EvtWord peach_evt_kusuri_dasu[];
+extern EvtWord peach_evt_seikai_evt[];
+extern EvtWord peach_evt_kaihei1[];
+extern EvtWord peach_evt_kaihei2[];
+extern EvtWord peach_evt_kaihei3[];
+extern EvtWord peach_evt_kaihei4[];
+extern EvtWord peach_evt_stop_renji[];
+extern EvtWord peach_evt_pato_on[];
+extern EvtWord peach_evt_pato_off[];
+extern EvtWord peach_evt_hari_on[];
+extern EvtWord peach_evt_hari_off[];
+extern EvtWord peach_evt_sugata_modoru[];
+extern EvtWord peach_evt_kusuri_nomu[];
+extern EvtWord kusuri_color_seiko[];
+extern EvtWord kusuri_color_sippai[];
 s32 peach_evt_bika_move_data[33];
-EvtWord peach_evt_tyogo_sub[432];
-EvtWord peach_evt_tyogo[557];
-EvtWord peach_evt_tyogo_entry[6];
-EvtWord peach_evt_kusuri_aka[19];
-EvtWord peach_evt_kusuri_ao[19];
-EvtWord peach_evt_kusuri_ki[19];
-EvtWord peach_evt_kusuri_mid[19];
-EvtWord peach_evt_wait_memo[18];
-EvtWord peach_evt_memo1[20];
-EvtWord peach_evt_memo2[20];
-EvtWord peach_evt_memo3[20];
-EvtWord peach_evt_memo4[20];
-static EvtWord peach_evt_stg5[385];
-EvtWord peach_evt_matigai_kusuri[14];
-EvtWord peach_evt_tadashii_kusuri[155];
-EvtWord peach_evt_door[75];
-static EvtWord peach_evt_stg5_1[258];
-EvtWord kikai_init[137];
-static EvtWord evt_memo1[14];
-static EvtWord evt_memo2[14];
-EvtWord evt_memo3[14];
-EvtWord evt_memo4[14];
-EvtWord aji_06_init_evt[232];
-
-f32 fd_aji_06_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
-
-f32 fd_aji_06_neg_one_382 = -1.0f;
-
-f32 fd_aji_06___local_PI_383 = 3.1415927f;
-
-f32 fd_aji_06___local_3PIO2_385 = 4.712389f;
-
-f32 fd_aji_06_one_negone_373[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
-
-f32 fd_aji_06___local_PIO2_384 = 1.5707964f;
-
-f32 fd_aji_06_one_381 = 1.0f;
-
-f32 fd_aji_06_negone_one_360[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
-
-f32 fd_aji_06_neg_one_365 = -1.0f;
-
-f32 fd_aji_06___local_PI_366 = 3.1415927f;
-
-f32 fd_aji_06___local_3PIO2_368 = 4.712389f;
-
-f32 fd_aji_06_one_negone_359[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
-
-f32 fd_aji_06___local_PIO2_367 = 1.5707964f;
-
-f32 fd_aji_06_one_364 = 1.0f;
+extern EvtWord peach_evt_tyogo_sub[];
+extern EvtWord peach_evt_tyogo[];
+extern EvtWord peach_evt_tyogo_entry[];
+extern EvtWord peach_evt_kusuri_aka[];
+extern EvtWord peach_evt_kusuri_ao[];
+extern EvtWord peach_evt_kusuri_ki[];
+extern EvtWord peach_evt_kusuri_mid[];
+extern EvtWord peach_evt_wait_memo[];
+extern EvtWord peach_evt_memo1[];
+extern EvtWord peach_evt_memo2[];
+extern EvtWord peach_evt_memo3[];
+extern EvtWord peach_evt_memo4[];
+extern EvtWord peach_evt_matigai_kusuri[];
+extern EvtWord peach_evt_tadashii_kusuri[];
+extern EvtWord peach_evt_door[];
+extern EvtWord kikai_init[];
+extern EvtWord evt_memo3[];
+extern EvtWord evt_memo4[];
+extern EvtWord aji_06_init_evt[];
 
 static EVT_BEGIN(s_door_open)
     MULTIPLY_FLOAT(LW(0), FLOAT(0.16601563f))
@@ -1815,6 +1766,20 @@ EVT_BEGIN(aji_06_init_evt)
             CALL(evt_party_cont_onoff, 0, 1)
             CALL(evt_party_cont_onoff, 1, 1)
             CALL(evt_mario_wait_landon)
+#ifdef VERSION_G8MP01
+            LOOP(30)
+                CALL(evt_mario_get_pos, 0, LW(0), LW(1), LW(2))
+                CALL(evt_party_get_pos, 0, LW(3), LW(4), LW(5))
+                ADD(LW(1), 20)
+                IF_INT_LESS(LW(1), LW(4))
+                    SUBTRACT(LW(4), 10)
+                    CALL(evt_party_set_pos, 0, LW(3), LW(4), LW(5))
+                ELSE
+                    BREAK_LOOP
+                END_IF
+                WAIT_FRAMES(1)
+            END_LOOP
+#endif
             CALL(evt_mario_key_onoff, 1)
             CALL(evt_cam_letter_box_disable, 0)
         END_INLINE_EVENT

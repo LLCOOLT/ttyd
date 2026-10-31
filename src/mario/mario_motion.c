@@ -12,7 +12,7 @@
 typedef struct MarioJumpData {
 	f32 jump[4];   // 0x0
 	f32 fall[4];   // 0x10
-	f32 unk20;     // 0x20
+	f32 height;    // 0x20, 32.0, never read (probably the jump height)
 	f32 minFall;   // 0x24
 } MarioJumpData;
 
@@ -23,7 +23,7 @@ typedef struct MarioMotTblEntry {
 } MarioMotTblEntry;
 
 typedef struct MotCaseEntry {
-	s32 unk0;
+	s32 flags; // CaseEntry flags word
 	s32 type;
 } MotCaseEntry;
 
@@ -92,8 +92,8 @@ f32 toMovedir(f32 angle);
 s32 psndSFXOn_3D(s32 id, Vec* position);
 void* marioChkLandon(f32* y, f32 spd);
 s16 pouchAddHP(s16 points);
-s16 pouchGetHP(void);
-#define PCHK(x) ((s32 (*)(s32))pouchCheckItem)(x)
+s32 pouchGetHP(void);
+#define PCHK(x) pouchCheckItem(x)
 void marioDmgRetQuakeOn(void);
 void marioUpdateCamPos(void);
 s32 kpaGetBodyStatus(void);
@@ -356,6 +356,11 @@ void marioBoots(void) {
 	if (!(flags & 0x80000)) {
 		return;
 	}
+#ifdef VERSION_G8MP01
+	if (mario->currMotionId == MARIO_MOTION_PLANE) {
+		return;
+	}
+#endif
 	if (!marioChkHipAttack()) {
 		return;
 	}
@@ -608,7 +613,7 @@ void marioFall(void) {
 	f32 y;
 	void* hit;
 
-	if (!strcmp(gp->currentMapName, "kpa_03\0") && mario->characterId == 2) {
+	if (!strcmp(gp->currentMapName, "kpa_03") && mario->characterId == 2) {
 		mario->hitobjStandOn = NULL;
 		kpaClearHitobjRide();
 		spd = marioGetFallSpd();
@@ -877,13 +882,19 @@ void mot_talk(void) {
 			return;
 		}
 		// BUG: fbatGetPointer()->npc is whichever NPC Mario last talked to or battled, from any map. If that
-		// NPC slot is unused on the current map, checkPose is not valid and marioChgPose can crash (seen in
-		// the Petalburg first-entry cutscene where Mario waves at the Koopa).
+		// NPC slot is unused on the current map, checkPose is not valid and marioChgPose can crash. Known case,
+		// all versions: talk to one of about twenty affected NPCs, then enter Petalburg for
+		// the first time without talking to another NPC, fighting an enemy, or saving and reloading in between;
+		// the first-entry cutscene (Mario waves at the Koopa) then crashes here.
 		fbat = fbatGetPointer()->npc;
 		if (fbat != NULL) {
 			marioChgPose(((NpcEntry*)fbat)->checkPose);
 		}
+#ifdef VERSION_G8MP01
+		if (!strcmp(mario->animName, "M_I_3")) {
+#else
 		if (!strcmp(mario->animName, "M_I_2")) {
+#endif
 			mario->multiTimer = 60;
 			mario->currSubMotionId = 10;
 		}
@@ -953,6 +964,11 @@ BOOL marioChkJump(void) {
 	if (fbatNpcTalkCheck()) {
 		return FALSE;
 	}
+#ifdef VERSION_G8MP01
+	if (mario->hitobjStandOn && (hitGetAttr(mario->hitobjStandOn) & 0x200)) {
+		return FALSE;
+	}
+#endif
 	marioChgMot(MARIO_MOTION_JUMP);
 	return TRUE;
 }
@@ -1216,7 +1232,7 @@ void mot_bottomless(void) {
 				break;
 			}
 			pouchAddHP(-1);
-			if (((s32 (*)(void))pouchGetHP)() <= 0) {
+			if (pouchGetHP() <= 0) {
 				mario->currSubMotionId = 13;
 				marioUpdateCamPos();
 				break;

@@ -1,7 +1,6 @@
 #include "battle/battle_unit.h"
 #include "evt/evt_cmd.h"
 
-#pragma force_active on
 #include "manager/evtmgr_cmd.h"
 #include "mario/mariost.h"
 #include "driver/mapdrv.h"
@@ -14,8 +13,8 @@
 #include "party/party_motion.h"
 #include "gor.h"
 #include "data_tables.h"
-typedef struct SharinData { const char* name; s32 field_0x4; s32 field_0x8; EvtFloat speed; } SharinData;
-typedef struct ClankData { const char* name; s32 field_0x4; s32 field_0x8; EvtFloat x; EvtFloat y; } ClankData;
+typedef struct SharinData { const char* name; s32 wheelType; s32 speedSource; EvtFloat speed; } SharinData;
+typedef struct ClankData { const char* name; s32 wheelType; s32 speedSource; EvtFloat x; EvtFloat y; } ClankData;
 
 USER_FUNC(N_evt_bero_set_mario_bottomless_respawn_pos_to_current_mario_pos);
 USER_FUNC(evt_bero_get_entername);
@@ -126,102 +125,29 @@ static USER_FUNC(ramp_r);
 static USER_FUNC(kpa_hikousen_yure);
 static void resha_tev(MapTevCallbackInfo* info);
 
-f32 fd_gor_04_negone_one_374[2] __attribute__((aligned(8)));
-f32 fd_gor_04_neg_one_382;
-f32 fd_gor_04___local_PI_383;
-f32 fd_gor_04___local_3PIO2_385;
-f32 fd_gor_04_one_negone_373[2] __attribute__((aligned(8)));
-f32 fd_gor_04___local_PIO2_384;
-f32 fd_gor_04_one_381;
-f32 fd_gor_04_negone_one_360[2] __attribute__((aligned(8)));
-f32 fd_gor_04_neg_one_365;
-f32 fd_gor_04___local_PI_366;
-f32 fd_gor_04___local_3PIO2_368;
-f32 fd_gor_04_one_negone_359[2] __attribute__((aligned(8)));
-f32 fd_gor_04___local_PIO2_367;
-f32 fd_gor_04_one_364;
 static SharinData sharinDt[29];
-static EvtWord evt_sharin_main[87];
-static EvtWord evt_sharin[19];
 static ClankData clankDt[9];
-static EvtWord evt_clank_main[104];
-static EvtWord evt_clank[21];
-static EvtWord evt_bg[81];
-static EvtWord evt_hoshi[88];
-static EvtWord hom_10_evt_resha_start[244];
-static EvtWord hom_10_evt_resha_start2[259];
-static EvtWord hom_10_evt_resha_start3[11];
-static EvtWord hom_10_evt_resha_start4[11];
-static EvtWord stop_1[90];
-static EvtWord stop_2[90];
-static EvtWord hom_10_evt_resha_stop[36];
-static EvtWord evt_ramp[33];
 static const char* pika_tbl[15];
 static const char* pika_tbl_rsh_06[10];
-static EvtWord hom_10_evt_resha_sub[102];
-static EvtWord hom_10_evt_resha_right[35];
-static EvtWord hom_10_evt_resha_left[28];
-static EvtWord hom_10_init_evt[140];
-static EvtWord evt_train[284];
-EvtWord evt_train2[287];
+extern EvtWord evt_train2[];
 static EvtWord peach_mail[235];
 static BeroEntry bero_entry_data[5];
-EvtWord hikosenkakari_init[5];
-EvtWord hikosenkakari_init_ship[16];
-EvtWord hikosenkakari_talk[211];
-EvtWord ekiin_init[28];
-EvtWord ekiin_talk[188];
-EvtWord jugemu_a_init[13];
-EvtWord jugemu_a_talk[68];
-static EvtWord kinopiko_b_init[8];
-static EvtWord kinopiko_b_talk[68];
-static EvtWord baba_init[7];
-static EvtWord hkoopa_init[7];
-static EvtWord luigi_init[18];
-static EvtWord luigi_talk[4];
+extern EvtWord hikosenkakari_init[];
+extern EvtWord hikosenkakari_init_ship[];
+extern EvtWord hikosenkakari_talk[];
+extern EvtWord ekiin_init[];
+extern EvtWord ekiin_talk[];
+extern EvtWord jugemu_a_init[];
+extern EvtWord jugemu_a_talk[];
 static NpcSetupInfo luigiEnt[2];
-static EvtWord luigi_npcEnt[30];
-EvtWord scream_init[12];
-EvtWord scream_talk[8];
+extern EvtWord scream_init[];
+extern EvtWord scream_talk[];
 NpcSetupInfo screamEnt[2];
 static NpcSetupInfo npcEnt[7];
-EvtWord evt_hikousen[224];
-static EvtWord evt_wing[97];
-EvtWord evt_hikousen_return[490];
-EvtWord gor_04_koopa_evt[1123];
-#ifdef VERSION_G8ME01
-EvtWord gor_04_init_evt[255];
-#else
-EvtWord gor_04_init_evt[253];
-#endif
-
-f32 fd_gor_04_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
-
-f32 fd_gor_04_neg_one_382 = -1.0f;
-
-f32 fd_gor_04___local_PI_383 = 3.1415927f;
-
-f32 fd_gor_04___local_3PIO2_385 = 4.712389f;
-
-f32 fd_gor_04_one_negone_373[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
-
-f32 fd_gor_04___local_PIO2_384 = 1.5707964f;
-
-f32 fd_gor_04_one_381 = 1.0f;
-
-f32 fd_gor_04_negone_one_360[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
-
-f32 fd_gor_04_neg_one_365 = -1.0f;
-
-f32 fd_gor_04___local_PI_366 = 3.1415927f;
-
-f32 fd_gor_04___local_3PIO2_368 = 4.712389f;
-
-f32 fd_gor_04_one_negone_359[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
-
-f32 fd_gor_04___local_PIO2_367 = 1.5707964f;
-
-f32 fd_gor_04_one_364 = 1.0f;
+extern EvtWord evt_hikousen[];
+extern EvtWord evt_hikousen_return[];
+extern EvtWord gor_04_koopa_evt[];
+extern EvtWord gor_04_init_evt[];
 
 static SharinData sharinDt[] = {
     {"sha_1_1", 0, 0, FLOAT(1.0f)},

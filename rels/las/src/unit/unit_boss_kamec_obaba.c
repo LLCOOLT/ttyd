@@ -2,7 +2,6 @@
 #include "eff/eff_magic1_n64.h"
 #include "evt/evt_cmd.h"
 
-#pragma force_active on
 #include "battle/battle.h"
 #include "battle/battle_unit.h"
 #include "battle/battle_sub.h"
@@ -16,7 +15,7 @@
 #include "battle/battle_database_common.h"
 
 EffectEntry* effStardustEntry(s32 type, s32 count, f32 x, f32 y, f32 z, f32 width, f32 height, s32 time);
-EffectEntry* effMagic1N64Entry(s32 type, s32 arg1, f32 x, f32 y, f32 z, f32 arg5, f32 arg6, f32 arg7);
+EffectEntry* effMagic1N64Entry(s32 type, s32 life, f32 x, f32 y, f32 z, f32 tx, f32 ty, f32 tz);
 EffectEntry* effThunderflareN64Entry(s32 type, f32 x, f32 y, f32 z, f32 scale, s32 lifetime);
 
 USER_FUNC(btlevtcmd_AnimeChangePose);
@@ -71,20 +70,6 @@ static USER_FUNC(eff_magic_get_posX);
 static USER_FUNC(eff_magic);
 static USER_FUNC(eff_staff);
 
-f32 fd_boss_kamec_obaba_negone_one_374[2] __attribute__((aligned(8)));
-f32 fd_boss_kamec_obaba_neg_one_382;
-f32 fd_boss_kamec_obaba___local_PI_383;
-f32 fd_boss_kamec_obaba___local_3PIO2_385;
-f32 fd_boss_kamec_obaba_one_negone_373[2] __attribute__((aligned(8)));
-f32 fd_boss_kamec_obaba___local_PIO2_384;
-f32 fd_boss_kamec_obaba_one_381;
-f32 fd_boss_kamec_obaba_negone_one_360[2] __attribute__((aligned(8)));
-f32 fd_boss_kamec_obaba_neg_one_365;
-f32 fd_boss_kamec_obaba___local_PI_366;
-f32 fd_boss_kamec_obaba___local_3PIO2_368;
-f32 fd_boss_kamec_obaba_one_negone_359[2] __attribute__((aligned(8)));
-f32 fd_boss_kamec_obaba___local_PIO2_367;
-f32 fd_boss_kamec_obaba_one_364;
 BattleWeapon weapon_kamec_obaba_attack_magic;
 BattleWeapon weapon_kamec_obaba_dekadeka_magic;
 BattleWeapon weapon_kamec_obaba_biribiri_magic;
@@ -100,56 +85,21 @@ static PoseTableEntry pose_table_sky[17];
 static PoseTableEntry pose_table_dead[3];
 static BattleDataEntry data_table[2];
 static BattleUnitKindPart parts[2];
-static EvtWord kamec_obaba_zoom[40];
 static EvtWord init_event[56];
 static EvtWord damage_event[74];
 static EvtWord dmg_fall_event[149];
 static EvtWord dead_event[155];
 static EvtWord phase_event[216];
 static EvtWord attack_event[352];
-static EvtWord ground_magic_common_event1[87];
-static EvtWord ground_magic_common_event2[76];
-static EvtWord sky_magic_common_event[76];
-static EvtWord magic_common_event1[27];
-static EvtWord magic_common_event2[16];
-static EvtWord start_avoid[26];
 static EvtWord attack_magic_event[269];
-EvtWord magic_select_pri_obaba[52];
-EvtWord magic_select_pri_koopa[52];
+extern EvtWord magic_select_pri_obaba[];
+extern EvtWord magic_select_pri_koopa[];
 static EvtWord dekadeka_magic_event[73];
 static EvtWord katikati_magic_event[4];
 static EvtWord biribiri_magic_event[4];
 static EvtWord trans_magic_event[4];
 static EvtWord recover_magic_event[90];
 static EvtWord wait_event[6];
-
-f32 fd_boss_kamec_obaba_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
-
-f32 fd_boss_kamec_obaba_neg_one_382 = -1.0f;
-
-f32 fd_boss_kamec_obaba___local_PI_383 = 3.1415927f;
-
-f32 fd_boss_kamec_obaba___local_3PIO2_385 = 4.712389f;
-
-f32 fd_boss_kamec_obaba_one_negone_373[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
-
-f32 fd_boss_kamec_obaba___local_PIO2_384 = 1.5707964f;
-
-f32 fd_boss_kamec_obaba_one_381 = 1.0f;
-
-f32 fd_boss_kamec_obaba_negone_one_360[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
-
-f32 fd_boss_kamec_obaba_neg_one_365 = -1.0f;
-
-f32 fd_boss_kamec_obaba___local_PI_366 = 3.1415927f;
-
-f32 fd_boss_kamec_obaba___local_3PIO2_368 = 4.712389f;
-
-f32 fd_boss_kamec_obaba_one_negone_359[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
-
-f32 fd_boss_kamec_obaba___local_PIO2_367 = 1.5707964f;
-
-f32 fd_boss_kamec_obaba_one_364 = 1.0f;
 
 BattleWeapon weapon_kamec_obaba_attack_magic = {
     NULL, 0, // name..icon

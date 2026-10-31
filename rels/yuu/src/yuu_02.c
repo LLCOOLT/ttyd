@@ -1,7 +1,6 @@
 #include "battle/battle_unit.h"
 #include "evt/evt_cmd.h"
 
-#pragma force_active on
 #include "manager/evtmgr_cmd.h"
 #include "driver/camdrv.h"
 #include "mario/mario.h"
@@ -20,8 +19,8 @@
 #include "yuu.h"
 
 typedef struct RollWork { u32 flags; s32 phase; s32 coins; s32 result; s32 index; EventEntry* jumpEvent; Vec pos; s32 monteCount; EventEntry* viewEvent; } RollWork;
-typedef struct MonteSub { s32 unk0; Vec pos; f32 scale; u8 unk14[0x38 - 0x14]; } MonteSub;
-typedef struct Monte { u8 hidden; u8 unk1; s16 num; u8 state; u8 unk5[3]; MonteSub sub; MiniGameWork* wp; } Monte;
+typedef struct MonteSub { s32 flags; Vec pos; f32 scale; u8 iconData[0x38 - 0x14]; } MonteSub; /* mirrors IconEntry */
+typedef struct Monte { u8 hidden; u8 pad_1; s16 num; u8 state; u8 pad_5[3]; MonteSub sub; MiniGameWork* wp; } Monte;
 typedef struct MonteTable { f32 x0; f32 x1; f32 z0; f32 z1; s32 num; s32 type; } MonteTable;
 static void* yuunpc_wp;
 static Monte* monte_p; /* monte_p */
@@ -113,72 +112,19 @@ USER_FUNC(yuu_02_icon_monte_onoff);
 void yuu_02_icon_monte_off(s32 idx);
 void yuu_02_icon_monte_on(s32 idx);
 
-f32 fd_yuu_02_negone_one_374[2] __attribute__((aligned(8)));
-f32 fd_yuu_02_neg_one_382;
-f32 fd_yuu_02___local_PI_383;
-f32 fd_yuu_02___local_3PIO2_385;
-f32 fd_yuu_02_one_negone_373[2] __attribute__((aligned(8)));
-f32 fd_yuu_02___local_PIO2_384;
-f32 fd_yuu_02_one_381;
-f32 fd_yuu_02_negone_one_360[2] __attribute__((aligned(8)));
-f32 fd_yuu_02_neg_one_365;
-f32 fd_yuu_02___local_PI_366;
-f32 fd_yuu_02___local_3PIO2_368;
-f32 fd_yuu_02_one_negone_359[2] __attribute__((aligned(8)));
-f32 fd_yuu_02___local_PIO2_367;
-f32 fd_yuu_02_one_364;
-f64 fd_yuu_02__three_localstatic4_sqrtf;
-f64 fd_yuu_02__half_localstatic3_sqrtf;
 Vec fukkipoint[15];
-EvtWord yuu_02_icon_monte_entry_evt[4];
+extern EvtWord yuu_02_icon_monte_entry_evt[];
 static MonteTable montetable[11];
-static EvtWord minigame_view_monte[4];
-EvtWord yuu_02_jumpret[164];
-EvtWord yuu_02_kaijo_init[12];
-EvtWord yuu_02_kaijo_init2[12];
-EvtWord minigame03_main[33];
-EvtWord minigame03_start_cam[40];
-EvtWord minigame03_start_cam_cancel[17];
-EvtWord minigame03_start[193];
-EvtWord minigame03_end[217];
-EvtWord s_en1_turn[30];
-#ifdef VERSION_G8ME01
-EvtWord yuu_02_init_evt[262];
-#else
-EvtWord yuu_02_init_evt[29];
-#endif
-
-f32 fd_yuu_02_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
-
-f32 fd_yuu_02_neg_one_382 = -1.0f;
-
-f32 fd_yuu_02___local_PI_383 = 3.1415927f;
-
-f32 fd_yuu_02___local_3PIO2_385 = 4.712389f;
-
-f32 fd_yuu_02_one_negone_373[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
-
-f32 fd_yuu_02___local_PIO2_384 = 1.5707964f;
-
-f32 fd_yuu_02_one_381 = 1.0f;
-
-f32 fd_yuu_02_negone_one_360[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
-
-f32 fd_yuu_02_neg_one_365 = -1.0f;
-
-f32 fd_yuu_02___local_PI_366 = 3.1415927f;
-
-f32 fd_yuu_02___local_3PIO2_368 = 4.712389f;
-
-f32 fd_yuu_02_one_negone_359[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
-
-f32 fd_yuu_02___local_PIO2_367 = 1.5707964f;
-
-f32 fd_yuu_02_one_364 = 1.0f;
-
-f64 fd_yuu_02__three_localstatic4_sqrtf = 3.0;
-
-f64 fd_yuu_02__half_localstatic3_sqrtf = 0.5;
+extern EvtWord yuu_02_jumpret[];
+extern EvtWord yuu_02_kaijo_init[];
+extern EvtWord yuu_02_kaijo_init2[];
+extern EvtWord minigame03_main[];
+extern EvtWord minigame03_start_cam[];
+extern EvtWord minigame03_start_cam_cancel[];
+extern EvtWord minigame03_start[];
+extern EvtWord minigame03_end[];
+extern EvtWord s_en1_turn[];
+extern EvtWord yuu_02_init_evt[];
 
 Vec fukkipoint[] = {
     {300.0f, 0.0f, 300.0f},
@@ -416,12 +362,26 @@ static USER_FUNC(fall_rtn) {
                 if (hitCheckVecFilter(qp, NULL) == NULL) {
                     continue;
                 }
+#ifdef VERSION_G8MP01
+                hit = query.hitPos;
+                query.targetPos.x -= 9.0f;
+#else
                 query.targetPos.x -= 9.0f;
                 hit = query.hitPos;
+#endif
                 if (hitCheckVecFilter(qp, NULL) != NULL && query.hitPos.y > hit.y + 1.0f) {
                     continue;
                 }
+#ifdef VERSION_G8MP01
+                // PAL also probes 2 units back in z and keeps the first floor height
+                query.targetPos.z -= 2.0f;
+                if (hitCheckVecFilter(qp, NULL) != NULL && query.hitPos.y > hit.y + 1.0f) {
+                    continue;
+                }
+                sub->pos.y = hit.y;
+#else
                 sub->pos.y = query.hitPos.y;
+#endif
                 break;
             }
             n++;

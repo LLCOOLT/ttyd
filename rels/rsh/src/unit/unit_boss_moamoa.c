@@ -2,7 +2,6 @@
 #include "battle/battle_unit.h"
 #include "evt/evt_cmd.h"
 
-#pragma force_active on
 #include "battle/battle.h"
 #include "battle/battle_sub.h"
 #include "battle/battle_unit.h"
@@ -24,10 +23,15 @@
 #include "driver/extdrv.h"
 
 typedef struct MoamoaGroup { char anim[16]; char pose[8]; f32 speed; s32 start; s32 num; } MoamoaGroup;
-typedef struct Moamoa { u16 flags; u8 field_0x2[2]; Vec pos; s16 group; u8 field_0x12[6]; OSTime time; s16 chain; s16 order; f32 t; s32 poseId; s32 type; EvtWord* owner; Vec vel; Vec pos2; u8 field_0x4c[4]; } Moamoa;
-typedef struct MoamoaWork { s32 field_0x0; s32 count; Moamoa* elems; s32 numGroups; MoamoaGroup groups[32]; s16 chainNum[128]; s16 chainIdx[128][2]; s32 poseId[5]; s32 unitId; Vec center; f32 angle; f32 radius; f32 targetScale; f32 scale; } MoamoaWork;
+typedef struct Moamoa { u16 flags; u8 pad_2[2]; Vec pos; s16 group; u8 pad_12[6]; OSTime time; s16 chain; s16 order; f32 t; s32 poseId; s32 type; EvtWord* owner; Vec vel; Vec pos2; u8 pad_4c[4]; } Moamoa;
+typedef struct MoamoaWork { s32 flags; s32 count; Moamoa* elems; s32 numGroups; MoamoaGroup groups[32]; s16 chainNum[128]; s16 chainIdx[128][2]; s32 poseId[5]; s32 unitId; Vec center; f32 angle; f32 radius; f32 targetScale; f32 scale; } MoamoaWork;
 typedef struct MoamoaExtData { const char* anim; const char* pose; f32 speed; } MoamoaExtData;
 static MoamoaWork* wp;
+#ifdef VERSION_G8MP01
+// PAL: a seeded generator for the swarm's start positions (moamoa_srand / moamoa_randf)
+static u32 moamoa_rand_prev;
+static u32 moamoa_rand_cur;
+#endif
 int rand(void);
 void moamoa_mainUnitIdClear(void);
 static f32 randf(f32 min, f32 max);
@@ -83,20 +87,6 @@ extern BattleUnitKind unit_boss_moamoa_tentacle_a;
 extern BattleUnitKind unit_boss_moamoa_tentacle_b;
 extern BattleUnitKind unit_boss_moamoa_tentacle_c;
 
-f32 fd_boss_moamoa_negone_one_374[2] __attribute__((aligned(8)));
-f32 fd_boss_moamoa_neg_one_382;
-f32 fd_boss_moamoa___local_PI_383;
-f32 fd_boss_moamoa___local_3PIO2_385;
-f32 fd_boss_moamoa_one_negone_373[2] __attribute__((aligned(8)));
-f32 fd_boss_moamoa___local_PIO2_384;
-f32 fd_boss_moamoa_one_381;
-f32 fd_boss_moamoa_negone_one_360[2] __attribute__((aligned(8)));
-f32 fd_boss_moamoa_neg_one_365;
-f32 fd_boss_moamoa___local_PI_366;
-f32 fd_boss_moamoa___local_3PIO2_368;
-f32 fd_boss_moamoa_one_negone_359[2] __attribute__((aligned(8)));
-f32 fd_boss_moamoa___local_PIO2_367;
-f32 fd_boss_moamoa_one_364;
 BattleUnitKind unit_boss_moamoa;
 BattleUnitDefense moamoa_defence;
 s32 moamoa_defence_no_parts[2];
@@ -112,21 +102,20 @@ BattleUnitSetup entry_boss_moamoa_tentacle_b;
 BattleUnitSetup entry_boss_moamoa_tentacle_c;
 BattleUnitSetup entry_boss_moamoa_mouth;
 BattleWeapon weapon_moamoa_tsunami_attack;
-EvtWord moamoa_zoom[34];
-static EvtWord mario_party_zoom[34];
+extern EvtWord moamoa_zoom[];
 static EvtWord init_event[159];
 static EvtWord damage_event[10];
 const char* MOAMOA_TAIJOU[4];
 static EvtWord dead_event[349];
 const char* moamoa2_change_tbl[7];
-EvtWord moamoa_tentacl_on[208];
-EvtWord moamoa_mouth_on[132];
+extern EvtWord moamoa_tentacl_on[];
+extern EvtWord moamoa_mouth_on[];
 static EvtWord phase_event[159];
 static EvtWord attack_event[19];
 static EvtWord wait_event[6];
 static ExtTexInfo ext_moamoa_data[89];
 static EvtWord evt_moamoa[151];
-EvtWord MOAMOA_SET_BODYSCALE[4];
+extern EvtWord MOAMOA_SET_BODYSCALE[];
 
 USER_FUNC(boss_moamoa_check_zenei_kouei) {
     BattleWork* btlwp = _battleWorkPointer;
@@ -156,37 +145,27 @@ static f32 randf(f32 min, f32 max) {
     return r * (max - min) + min;
 }
 
+#ifdef VERSION_G8MP01
+void moamoa_srand(u32 seed) {
+    moamoa_rand_prev = seed;
+    moamoa_rand_cur = seed + 0x37E35F7D;
+}
+
+f32 moamoa_randf(f32 min, f32 max) {
+    s32 cur = moamoa_rand_cur;
+    s32 next = moamoa_rand_prev + cur + 0x195B31B7;
+    f32 r;
+
+    moamoa_rand_prev = cur;
+    moamoa_rand_cur = next;
+    r = (next & 0x7FFF) / 32767.0f;
+    return r * (max - min) + min;
+}
+#endif
+
 void moamoa_mainUnitIdClear(void) {
     wp->unitId = -1;
 }
-
-f32 fd_boss_moamoa_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
-
-f32 fd_boss_moamoa_neg_one_382 = -1.0f;
-
-f32 fd_boss_moamoa___local_PI_383 = 3.1415927f;
-
-f32 fd_boss_moamoa___local_3PIO2_385 = 4.712389f;
-
-f32 fd_boss_moamoa_one_negone_373[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
-
-f32 fd_boss_moamoa___local_PIO2_384 = 1.5707964f;
-
-f32 fd_boss_moamoa_one_381 = 1.0f;
-
-f32 fd_boss_moamoa_negone_one_360[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
-
-f32 fd_boss_moamoa_neg_one_365 = -1.0f;
-
-f32 fd_boss_moamoa___local_PI_366 = 3.1415927f;
-
-f32 fd_boss_moamoa___local_3PIO2_368 = 4.712389f;
-
-f32 fd_boss_moamoa_one_negone_359[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
-
-f32 fd_boss_moamoa___local_PIO2_367 = 1.5707964f;
-
-f32 fd_boss_moamoa_one_364 = 1.0f;
 
 BattleUnitKind unit_boss_moamoa = {
     107,
@@ -1025,12 +1004,15 @@ USER_FUNC(moamoa2_on) {
 
 USER_FUNC(moamoa_on) {
     s32 i;
-    s32 j;
     Moamoa* elem;
     MoamoaExtData* d;
+    s32 j;
     AnimationPose* ap;
     Vec* p;
     s32 start;
+#ifdef VERSION_G8MP01
+    u32 seeds[4] = {0x3056, 0xF36, 0xF2A93, 0x17F57};
+#endif
     Vec v;
     char anim[32];
     char pose[32];
@@ -1041,12 +1023,18 @@ USER_FUNC(moamoa_on) {
     wp->elems = BTL_ALLOC(wp->count * sizeof(Moamoa));
     memset(wp->elems, 0, wp->count * sizeof(Moamoa));
     elem = wp->elems;
+#ifdef VERSION_G8MP01
+    moamoa_srand(seeds[rand() & 3]);
+#define MOAMOA_START_RANDF moamoa_randf
+#else
+#define MOAMOA_START_RANDF randf
+#endif
     for (i = 0; i < wp->count; i++, elem++) {
         elem->flags = 0;
         v = (Vec){0.0f, 0.0f, 0.0f};
-        v.x = randf(-10.0f, 10.0f);
-        v.y = randf(-10.0f, 10.0f);
-        v.z = randf(-10.0f, 10.0f);
+        v.x = MOAMOA_START_RANDF(-10.0f, 10.0f);
+        v.y = MOAMOA_START_RANDF(-10.0f, 10.0f);
+        v.z = MOAMOA_START_RANDF(-10.0f, 10.0f);
         elem->pos = v;
     }
     wp->unitId = BattleTransID(event, -2);

@@ -9,6 +9,8 @@
 #include "parse.h"
 #include <string.h>
 #include "libc_decls.h"
+#include "manager/evtmgr_cmd.h"
+#include "driver/animdrv.h"
 
 //.sbss
 void* ptr; //but why
@@ -21,7 +23,7 @@ void setupDataLoad(const char* mapName) {
 
 	ptr = NULL;
 	sprintf(path, "%s/m/%s/s", getMarioStDvdRoot(), mapName);
-	if (strcmp(mapName, "muj_20\0") || evtGetValue(NULL, (s32)0xF5DE0180) != 2) {
+	if (strcmp(mapName, "muj_20") || evtGetValue(NULL, (s32)0xF5DE0180) != 2) {
 		arcOpen(path, &ptr, &size);
 		if (!ptr) {
 			dvd = DVDMgrOpen(path, 2, 0);
@@ -418,4 +420,3 @@ MapAttrEntry _map_attr_data[] = {
 	{ NULL, -1, 0 },
 };
 
-__declspec(section ".data") u32 gap_05_8030E58C_data[1] = {0};

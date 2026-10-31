@@ -311,16 +311,14 @@ typedef enum BattleUnitType {
 } BattleUnitType;
 
 typedef struct BattleDataEntry {
-    s32 tag;    // 0x0, TODO: rename?
-    void* data; // 0x4, TODO: rename?
+    s32 tag;    // 0x0, lookup key for BtlUnit_GetData, 0 ends the table
+    void* data; // 0x4
 } BattleDataEntry;
 
-// TODO: move/rename?
 typedef struct BattleUnitDefense {
     s8 defenses[5]; // 0x0
 } BattleUnitDefense;
 
-// TODO: move/rename?
 typedef struct BattleUnitDefenseAttr {
     s8 defenseAttrs[5]; // 0x0
 } BattleUnitDefenseAttr;
@@ -359,8 +357,8 @@ typedef struct BattleUnitKindPart {
     s32 partNum;                                   // 0x0
     const char* partName;                          // 0x4
     const char* modelName;                         // 0x8
-    Vec positionOffset;                            // 0xC, TODO: shorter name?
-    Vec hitBaseOffset;                             // 0x18, TODO: better name?
+    Vec positionOffset;                            // 0xC
+    Vec hitBaseOffset;                             // 0x18
     Vec hitCursorBaseOffset;                       // 0x24
     s16 shadowSize;                                // 0x30, -> BattleWorkUnitPart.shadowSize
     s16 reserved_32;                               // 0x32, -> BattleWorkUnitPart.reserved_1A4, never read
@@ -471,7 +469,7 @@ typedef struct BattleWorkUnitPart {
     Vec mHitCursorOffset;                                  // 0x194
     s16 hitOffsetX;                                        // 0x1A0, target-cursor X offset (btl_hitoffsetx)
     s16 shadowSize;                                        // 0x1A2, from kind part 0x30; scales shadowEntry
-    s16 reserved_1A4;                                      // 0x1A4, copied from BattleUnitKindPart.reserved_32, never read
+    s16 reserved_1A4;                                      // 0x1A4, copied from BattleUnitKindPart.reserved_32; read only by PAL battle_ufo (half of it as hit height)
     u16 gravityTimer;                                      // 0x1A6, frame counter for the gravity bob offset
     u16 floatTimer;                                        // 0x1A8, frame counter for the floating offset
     u8 pad_1AA[0x1AC - 0x1AA];                             // 0x1AA, never accessed
@@ -728,6 +726,9 @@ typedef struct BattleUnit {
     s32 ceilFallEventId;                                // 0x2C0 (US 0x2C4)
     void* actEndEvent;                           // 0x2C4 (US 0x2C8), run when the unit's action ends (battle_seq)
     s32 actEndEventId;                                   // 0x2C8 (US 0x2CC)
+#ifdef VERSION_G8MP01
+    s32 slideReturnEventId; // PAL only (+4 from here): enemy_slide_return_evt of sac_enemy_slide_return, waited on by BattleWaitAllActiveEvtEnd_NoBgSetEndWait
+#endif
     void* hitEventCode;                          // 0x2CC (US 0x2D0), run on the attacker by BattleRunHitEventDirect
     s32 talkPartId;                                  // 0x2D0 (US 0x2D4)
     const char* talkPose;                        // 0x2D4 (US 0x2D8), pose type 0x41 (btlevtcmd talk anim)
@@ -918,3 +919,7 @@ void BtlUnit_SetParamFromPouch(BattleUnit* unit);
 s32 BtlUnit_snd_se(BattleUnit* unit, const char* sfxName, s32 volume, s32 pan);
 BattleUnit* BtlUnit_GetGuardKouraPtr(BattleUnit* unit);
 
+BOOL BtlUnit_CanActStatus(BattleUnit* unit);
+void BtlUnit_SetAnimType(BattleUnitPart* part, s32 type);
+void BtlUnit_SetBodyAnim(BattleUnit* unit, const char* name);
+void BtlUnit_SetBodyAnimType(BattleUnit* unit, s32 type);

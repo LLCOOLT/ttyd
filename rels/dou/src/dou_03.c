@@ -5,8 +5,6 @@
 #include "driver/hitdrv.h"
 #include "mario/mario_pouch.h"
 
-#pragma force_active on
-
 USER_FUNC(evt_bero_get_info);
 USER_FUNC(evt_cam3d_evt_off);
 USER_FUNC(evt_cam3d_evt_set);
@@ -46,64 +44,19 @@ USER_FUNC(evt_sub_intpl_msec_init);
 USER_FUNC(evt_sub_random);
 USER_FUNC(evt_win_item_select);
 
-f32 fd_dou_03_negone_one_374[2] __attribute__((aligned(8)));
-f32 fd_dou_03_neg_one_382;
-f32 fd_dou_03___local_PI_383;
-f32 fd_dou_03___local_3PIO2_385;
-f32 fd_dou_03_one_negone_373[2] __attribute__((aligned(8)));
-f32 fd_dou_03___local_PIO2_384;
-f32 fd_dou_03_one_381;
-f32 fd_dou_03_negone_one_360[2] __attribute__((aligned(8)));
-f32 fd_dou_03_neg_one_365;
-f32 fd_dou_03___local_PI_366;
-f32 fd_dou_03___local_3PIO2_368;
-f32 fd_dou_03_one_negone_359[2] __attribute__((aligned(8)));
-f32 fd_dou_03___local_PIO2_367;
-f32 fd_dou_03_one_364;
-EvtWord dou_03_custom[10];
+extern EvtWord dou_03_custom[];
 static BeroEntry bero_entry_data[8];
-EvtWord watergate_handle_init[34];
+extern EvtWord watergate_handle_init[];
 static s32 itemsel_table[2];
-EvtWord watergate_lever[20];
-EvtWord watergate_geer_small[20];
-EvtWord watergate_geer_large[20];
-EvtWord nagare_taru[38];
-EvtWord nagare_taru_se[45];
-EvtWord nagare_bin[33];
-EvtWord watergate_handle[251];
-static EvtWord dou_puka_event_main0[60];
-static EvtWord dou_puka_event_main1[60];
-static EvtWord dou_puka_event_main2[60];
+extern EvtWord watergate_lever[];
+extern EvtWord watergate_geer_small[];
+extern EvtWord watergate_geer_large[];
+extern EvtWord nagare_taru[];
+extern EvtWord nagare_taru_se[];
+extern EvtWord nagare_bin[];
+extern EvtWord watergate_handle[];
 static HitDamageReturn hitDmgRetPoints[18];
-EvtWord dou_03_init_evt[130];
-
-f32 fd_dou_03_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
-
-f32 fd_dou_03_neg_one_382 = -1.0f;
-
-f32 fd_dou_03___local_PI_383 = 3.1415927f;
-
-f32 fd_dou_03___local_3PIO2_385 = 4.712389f;
-
-f32 fd_dou_03_one_negone_373[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
-
-f32 fd_dou_03___local_PIO2_384 = 1.5707964f;
-
-f32 fd_dou_03_one_381 = 1.0f;
-
-f32 fd_dou_03_negone_one_360[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
-
-f32 fd_dou_03_neg_one_365 = -1.0f;
-
-f32 fd_dou_03___local_PI_366 = 3.1415927f;
-
-f32 fd_dou_03___local_3PIO2_368 = 4.712389f;
-
-f32 fd_dou_03_one_negone_359[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
-
-f32 fd_dou_03___local_PIO2_367 = 1.5707964f;
-
-f32 fd_dou_03_one_364 = 1.0f;
+extern EvtWord dou_03_init_evt[];
 
 EVT_BEGIN(dou_03_custom)
     CALL(evt_hitobj_onoff, STRING("on_off"), 1, 0)
@@ -521,7 +474,7 @@ EVT_BEGIN(dou_03_init_evt)
     SET_VALUE(LW(0), STRING("s03_fune"))
     SET_VALUE(LW(1), 0)
     SPAWN_EVENT_GET_ID(PTR(dou_puka_event_main2), LW(10))
-    CALL(evt_map_entry_airport_harbor, 1, STRING("S_Ship_Change\0\0"), STRING("Ship_Change"))
+    CALL(evt_map_entry_airport_harbor, 1, STRING("S_Ship_Change"), STRING("Ship_Change"))
     RETURN
 EVT_END()
 

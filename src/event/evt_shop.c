@@ -41,7 +41,6 @@ BOOL N_itemPickUpFromFieldCheck(void);
 BOOL winGhostDiaryChk(void);
 
 //.sbss
-static s32 gap_08_80418944_sbss;
 static ShopWork* _wp;
 char mapname[16];
 
@@ -118,15 +117,13 @@ static const GXColor shop_list_item_color = {0x00, 0x00, 0x00, 0xFF};
 static WinMgrDesc window_desc[3];
 ShopPoint shopPointList[11];
 WinMgrDesc list_desc[3];
-static EvtWord buy_evt[VERSION_PICK(326, 366)];
-EvtWord shopper_talk_evt[VERSION_PICK(352, 396)];
-EvtWord first_shopping_evt[86];
+extern EvtWord shopper_talk_evt[];
+extern EvtWord first_shopping_evt[];
 static EvtWord sell_evt[VERSION_PICK(196, 207)];
-EvtWord keep_evt[VERSION_PICK(148, 167)];
-EvtWord unkeep_evt[147];
-EvtWord point_evt[VERSION_PICK(15, 35)];
-EvtWord evt_shoplist[10];
-static EvtWord main_evt[4];
+extern EvtWord keep_evt[];
+extern EvtWord unkeep_evt[];
+extern EvtWord point_evt[];
+extern EvtWord evt_shoplist[];
 
 static WinMgrDesc window_desc[] = {
     {0, 0, 8, -150, 120, 300, 50, {0x2B, 0xA4, 0xFF, 0xFF}, NULL, name_disp},
@@ -497,10 +494,18 @@ EVT_BEGIN(shopper_talk_evt)
             CALL(evt_sub_get_language, LW(0))
             SWITCH(LW(0))
                 CASE_EQUAL(0)
+#ifdef VERSION_G8MP01
+                CALL(evt_msg_print_add_insert, 0, LW(14), LW(2))
+#else
                 CALL(evt_msg_print_insert, 0, LW(14), 0, 0, LW(2))
+#endif
                 CASE_DEFAULT
                 CALL(evt_msg_fmt_str, 0, LW(14), LW(14), LW(2))
+#ifdef VERSION_G8MP01
+                CALL(evt_msg_print_add, 1, LW(14))
+#else
                 CALL(evt_msg_print, 1, LW(14), 0, 0)
+#endif
             END_SWITCH
         END_IF
         IF_INT_EQUAL(GSWF(1), 0)
@@ -1135,7 +1140,7 @@ void title_disp(WinMgrEntry* entry) {
 		return;
 	}
 #ifdef VERSION_G8ME01
-	msg = msgSearch("msg_shop_point_list4\0\0\0");
+	msg = msgSearch("msg_shop_point_list4");
 	w = FontGetMessageWidth(msg);
 	FontDrawStart();
 	FontDrawEdge();
@@ -1151,7 +1156,7 @@ void title_disp(WinMgrEntry* entry) {
 	FontDrawMessageMtx(m, msg);
 	FontDrawEdgeOff();
 #else
-	msg = msgSearch("msg_shop_point_list4\0\0\0");
+	msg = msgSearch("msg_shop_point_list4");
 	FontDrawStart();
 	FontDrawEdge();
 	FontDrawColor(shop_title_color);
@@ -1367,22 +1372,22 @@ USER_FUNC(evt_shop_setup) {
 		iconSetPos(buf, pos.x, pos.y + 6.0f, pos.z);
 		iconFlagOn(buf, 0x40);
 		wp->itemFlags[i] = 0;
-		if (wp->items[i].id == 0x33 && ((s32 (*)(s32))pouchCheckItem)(0x33)) {
+		if (wp->items[i].id == 0x33 && pouchCheckItem(0x33)) {
 			wp->itemFlags[i] |= 1;
 		}
-		if (wp->items[i].id == 0x37 && ((s32 (*)(s32))pouchCheckItem)(0x37)) {
+		if (wp->items[i].id == 0x37 && pouchCheckItem(0x37)) {
 			wp->itemFlags[i] |= 1;
 		}
-		if (wp->items[i].id == 0x38 && ((s32 (*)(s32))pouchCheckItem)(0x38)) {
+		if (wp->items[i].id == 0x38 && pouchCheckItem(0x38)) {
 			wp->itemFlags[i] |= 1;
 		}
-		if (wp->items[i].id == 0x39 && ((s32 (*)(s32))pouchCheckItem)(0x39)) {
+		if (wp->items[i].id == 0x39 && pouchCheckItem(0x39)) {
 			wp->itemFlags[i] |= 1;
 		}
-		if (wp->items[i].id == 0x3A && ((s32 (*)(s32))pouchCheckItem)(0x3A)) {
+		if (wp->items[i].id == 0x3A && pouchCheckItem(0x3A)) {
 			wp->itemFlags[i] |= 1;
 		}
-		if (wp->items[i].id == 0x3B && ((s32 (*)(s32))pouchCheckItem)(0x3B)) {
+		if (wp->items[i].id == 0x3B && pouchCheckItem(0x3B)) {
 			wp->itemFlags[i] |= 1;
 		}
 	}

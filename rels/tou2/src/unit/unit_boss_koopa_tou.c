@@ -2,7 +2,6 @@
 #include "battle/battle_unit.h"
 #include "evt/evt_cmd.h"
 
-#pragma force_active on
 #include "driver/icondrv.h"
 #include "driver/camdrv.h"
 #include "battle/battle.h"
@@ -18,6 +17,7 @@
 #include "evt/evt_eff.h"
 #include "party/party_motion.h"
 #include "battle/battle_database_common.h"
+#include "battle/battle_sub.h"
 
 void btlMovePos(f32 speed, f32 angle, f32* x, f32* z);
 typedef struct IconJumpWork { Vec start; Vec pos; Vec end; s32 frames; f32 speed; f32 gravity; f32 vy; u8 pad[0x7C - 0x34]; } IconJumpWork;
@@ -56,20 +56,6 @@ static USER_FUNC(_icon_jump_icon);
 static USER_FUNC(party_cannot_use_command);
 static USER_FUNC(mario_cannot_use_command);
 
-f32 fd_boss_koopa_tou_negone_one_374[2] __attribute__((aligned(8)));
-f32 fd_boss_koopa_tou_neg_one_382;
-f32 fd_boss_koopa_tou___local_PI_383;
-f32 fd_boss_koopa_tou___local_3PIO2_385;
-f32 fd_boss_koopa_tou_one_negone_373[2] __attribute__((aligned(8)));
-f32 fd_boss_koopa_tou___local_PIO2_384;
-f32 fd_boss_koopa_tou_one_381;
-f32 fd_boss_koopa_tou_negone_one_360[2] __attribute__((aligned(8)));
-f32 fd_boss_koopa_tou_neg_one_365;
-f32 fd_boss_koopa_tou___local_PI_366;
-f32 fd_boss_koopa_tou___local_3PIO2_368;
-f32 fd_boss_koopa_tou_one_negone_359[2] __attribute__((aligned(8)));
-f32 fd_boss_koopa_tou___local_PIO2_367;
-f32 fd_boss_koopa_tou_one_364;
 BattleUnitKind unit_boss_koopa_tou;
 static BattleUnitDefense defence;
 static BattleUnitDefenseAttr defence_attr;
@@ -82,7 +68,6 @@ static BattleWeapon weapon_koopa_hip_attack;
 static BattleWeapon weapon_koopa_bite_attack;
 static BattleWeapon weapon_koopa_critical_bite_attack;
 static BattleWeapon weapon_koopa_fire_attack;
-static EvtWord koopa_zoom[25];
 static EvtWord init_event[72];
 static EvtWord entry_event[45];
 static EvtWord damage_event[10];
@@ -96,34 +81,6 @@ static EvtWord critical_bite_attack_event[250];
 static EvtWord fire_attack_event[345];
 static EvtWord wait_event[6];
 static const char* cmd_disable_string[5];
-
-f32 fd_boss_koopa_tou_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
-
-f32 fd_boss_koopa_tou_neg_one_382 = -1.0f;
-
-f32 fd_boss_koopa_tou___local_PI_383 = 3.1415927f;
-
-f32 fd_boss_koopa_tou___local_3PIO2_385 = 4.712389f;
-
-f32 fd_boss_koopa_tou_one_negone_373[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
-
-f32 fd_boss_koopa_tou___local_PIO2_384 = 1.5707964f;
-
-f32 fd_boss_koopa_tou_one_381 = 1.0f;
-
-f32 fd_boss_koopa_tou_negone_one_360[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
-
-f32 fd_boss_koopa_tou_neg_one_365 = -1.0f;
-
-f32 fd_boss_koopa_tou___local_PI_366 = 3.1415927f;
-
-f32 fd_boss_koopa_tou___local_3PIO2_368 = 4.712389f;
-
-f32 fd_boss_koopa_tou_one_negone_359[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
-
-f32 fd_boss_koopa_tou___local_PIO2_367 = 1.5707964f;
-
-f32 fd_boss_koopa_tou_one_364 = 1.0f;
 
 BattleUnitKind unit_boss_koopa_tou = {
     63,

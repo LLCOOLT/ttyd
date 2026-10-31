@@ -143,7 +143,7 @@ f32 cloudGetBreathPower(f32 param_1, Vec* param_2) {
     f32 breathPower;
     f32 dist;
     f32 angle;
-    f32 unk8;
+    f32 breathDist;
     f32 val;
 
     breathPower = 0.0f;
@@ -159,8 +159,8 @@ f32 cloudGetBreathPower(f32 param_1, Vec* param_2) {
         && ((fabs(party->position.y - param_2->y - 18.0f)) <= val)
     ) {
         PartyCloud* cloud = (PartyCloud*)party->useStruct;
-        unk8 = cloud->breathDist;
-        if (-((0.5f * param_1) - distABf(party->position.x, party->position.z, param_2->x, param_2->z)) <= unk8) {
+        breathDist = cloud->breathDist;
+        if (-((0.5f * param_1) - distABf(party->position.x, party->position.z, param_2->x, param_2->z)) <= breathDist) {
             PartyCloud* cloud = (PartyCloud*)party->useStruct;
             dist = toMovedir(cloud->breathDir);
             angle = angleABf(party->position.x, party->position.z, param_2->x, param_2->z);
@@ -433,7 +433,7 @@ void N__cloud_use(PartyEntry* party) {
 #ifdef VERSION_G8ME01
         if (mario->currMotionId == 0x1B)
 #endif
-        marioChgPose("M_A_2B\0");
+        marioChgPose("M_A_2B");
         party->useMotionId = 12;
     case 12:
         cloudCalcPos(party);

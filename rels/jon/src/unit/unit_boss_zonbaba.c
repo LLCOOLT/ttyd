@@ -1,7 +1,6 @@
 #include "battle/battle_unit.h"
 #include "evt/evt_cmd.h"
 
-#pragma force_active on
 #include "manager/evtmgr_cmd.h"
 #include "battle/battle_event_default.h"
 #include "battle/battle_event_cmd.h"
@@ -43,20 +42,6 @@ USER_FUNC(evt_msg_print);
 USER_FUNC(evt_snd_sfxon_3d);
 static USER_FUNC(_leg_smoke_effect);
 
-f32 fd_boss_zonbaba_negone_one_374[2] __attribute__((aligned(8)));
-f32 fd_boss_zonbaba_neg_one_382;
-f32 fd_boss_zonbaba___local_PI_383;
-f32 fd_boss_zonbaba___local_3PIO2_385;
-f32 fd_boss_zonbaba_one_negone_373[2] __attribute__((aligned(8)));
-f32 fd_boss_zonbaba___local_PIO2_384;
-f32 fd_boss_zonbaba_one_381;
-f32 fd_boss_zonbaba_negone_one_360[2] __attribute__((aligned(8)));
-f32 fd_boss_zonbaba_neg_one_365;
-f32 fd_boss_zonbaba___local_PI_366;
-f32 fd_boss_zonbaba___local_3PIO2_368;
-f32 fd_boss_zonbaba_one_negone_359[2] __attribute__((aligned(8)));
-f32 fd_boss_zonbaba___local_PIO2_367;
-f32 fd_boss_zonbaba_one_364;
 BattleUnitKind unit_boss_zonbaba;
 static BattleUnitDefense defence;
 static BattleUnitDefenseAttr defence_attr;
@@ -72,47 +57,16 @@ BattleWeapon weapon_zonbaba_confuze_attack;
 BattleWeapon weapon_zonbaba_sleep_attack;
 BattleWeapon weapon_zonbaba_minimini_attack;
 BattleWeapon weapon_zonbaba_recover;
-static EvtWord battle_entry_event[357];
 static EvtWord init_event[58];
 static EvtWord damage_event[10];
-EvtWord zonbaba_damage_sub_event[45];
+extern EvtWord zonbaba_damage_sub_event[];
 static EvtWord dead_event[264];
 static EvtWord phase_event[94];
-static EvtWord fumituke_attack_event[356];
-static EvtWord kamituki_attack_event[141];
-EvtWord breath1_attack_event[315];
-EvtWord breath2_attack_event[320];
-EvtWord recover_event[88];
+extern EvtWord breath1_attack_event[];
+extern EvtWord breath2_attack_event[];
+extern EvtWord recover_event[];
 static EvtWord attack_event[282];
 static EvtWord wait_event[6];
-
-f32 fd_boss_zonbaba_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
-
-f32 fd_boss_zonbaba_neg_one_382 = -1.0f;
-
-f32 fd_boss_zonbaba___local_PI_383 = 3.1415927f;
-
-f32 fd_boss_zonbaba___local_3PIO2_385 = 4.712389f;
-
-f32 fd_boss_zonbaba_one_negone_373[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
-
-f32 fd_boss_zonbaba___local_PIO2_384 = 1.5707964f;
-
-f32 fd_boss_zonbaba_one_381 = 1.0f;
-
-f32 fd_boss_zonbaba_negone_one_360[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
-
-f32 fd_boss_zonbaba_neg_one_365 = -1.0f;
-
-f32 fd_boss_zonbaba___local_PI_366 = 3.1415927f;
-
-f32 fd_boss_zonbaba___local_3PIO2_368 = 4.712389f;
-
-f32 fd_boss_zonbaba_one_negone_359[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
-
-f32 fd_boss_zonbaba___local_PIO2_367 = 1.5707964f;
-
-f32 fd_boss_zonbaba_one_364 = 1.0f;
 
 BattleUnitKind unit_boss_zonbaba = {
     171,
@@ -1223,7 +1177,7 @@ static EVT_BEGIN(wait_event)
     RETURN
 EVT_END()
 
-struct EffectEntry* effKemuri9N64Entry(s32 type, s32 arg1, s32 arg2, f32 x, f32 y, f32 z, f32 arg6, f32 arg7);
+struct EffectEntry* effKemuri9N64Entry(s32 type, s32 count, s32 life, f32 x, f32 y, f32 z, f32 radiusEnd, f32 angle);
 
 static USER_FUNC(_leg_smoke_effect) {
     EvtWord* args = event->args;

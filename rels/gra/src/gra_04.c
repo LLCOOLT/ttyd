@@ -2,8 +2,7 @@
 #include "evt/evt_cmd.h"
 #include "evt/evt_bero.h"
 #include "gra.h"
-
-#pragma force_active on
+#include "manager/evtmgr_cmd.h"
 
 USER_FUNC(N_evt_bero_set_mario_bottomless_respawn_pos_to_current_mario_pos);
 USER_FUNC(evt_bero_get_info);
@@ -41,55 +40,10 @@ USER_FUNC(evt_snd_bgmon);
 USER_FUNC(evt_snd_envon);
 USER_FUNC(roll_release_check);
 
-f32 fd_gra_04_negone_one_374[2] __attribute__((aligned(8)));
-f32 fd_gra_04_neg_one_382;
-f32 fd_gra_04___local_PI_383;
-f32 fd_gra_04___local_3PIO2_385;
-f32 fd_gra_04_one_negone_373[2] __attribute__((aligned(8)));
-f32 fd_gra_04___local_PIO2_384;
-f32 fd_gra_04_one_381;
-f32 fd_gra_04_negone_one_360[2] __attribute__((aligned(8)));
-f32 fd_gra_04_neg_one_365;
-f32 fd_gra_04___local_PI_366;
-f32 fd_gra_04___local_3PIO2_368;
-f32 fd_gra_04_one_negone_359[2] __attribute__((aligned(8)));
-f32 fd_gra_04___local_PIO2_367;
-f32 fd_gra_04_one_364;
-static EvtWord in_evt[5];
-static EvtWord out_evt[142];
-static EvtWord out_evt2[110];
 static BeroEntry bero_entry_data[5];
-EvtWord gra_04_tree_open_evt[41];
+extern EvtWord gra_04_tree_open_evt[];
 static const char* fukitobashi_tbl[6];
-EvtWord gra_04_init_evt[64];
-
-f32 fd_gra_04_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
-
-f32 fd_gra_04_neg_one_382 = -1.0f;
-
-f32 fd_gra_04___local_PI_383 = 3.1415927f;
-
-f32 fd_gra_04___local_3PIO2_385 = 4.712389f;
-
-f32 fd_gra_04_one_negone_373[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
-
-f32 fd_gra_04___local_PIO2_384 = 1.5707964f;
-
-f32 fd_gra_04_one_381 = 1.0f;
-
-f32 fd_gra_04_negone_one_360[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
-
-f32 fd_gra_04_neg_one_365 = -1.0f;
-
-f32 fd_gra_04___local_PI_366 = 3.1415927f;
-
-f32 fd_gra_04___local_3PIO2_368 = 4.712389f;
-
-f32 fd_gra_04_one_negone_359[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
-
-f32 fd_gra_04___local_PIO2_367 = 1.5707964f;
-
-f32 fd_gra_04_one_364 = 1.0f;
+extern EvtWord gra_04_init_evt[];
 
 static EVT_BEGIN(in_evt)
     SET_VALUE(LW(0), 1)
@@ -304,7 +258,7 @@ EVT_BEGIN(gra_04_init_evt)
         CALL(evt_mapobj_flag_onoff, 1, 1, STRING("S_futa"), 1)
         CALL(evt_hitobj_onoff, STRING("A_futa"), 0, 0)
     END_IF
-    CALL(evt_mobj_badgeblk, STRING("m\0\0"), 250, 60, -20, 249, 0, GSWF(2086), 1)
+    CALL(evt_mobj_badgeblk, STRING("m"), 250, 60, -20, 249, 0, GSWF(2086), 1)
     RETURN
 EVT_END()
 

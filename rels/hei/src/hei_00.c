@@ -1,7 +1,6 @@
 #include "battle/battle_unit.h"
 #include "evt/evt_cmd.h"
 
-#pragma force_active on
 #include "mario/mario.h"
 #include "mario/mario_party.h"
 #include "party.h"
@@ -18,13 +17,12 @@
 #include "evt/evt_npc.h"
 #include "data_tables.h"
 #include "mario/mario_pouch.h"
+#include "cam_road.h"
 
 typedef struct GonbabaProj { GXTexObj obj; smartEntry* tex; } GonbabaProj;
 void mapSetProjTexObj(GXTexObj* obj, smartEntry* tex);
 void make_gonbaba_projection(CameraId camera, void* param);
 void mapSetProjMtx(Mtx mtx);
-typedef struct CamRoadOut { Vec unk0; Vec target; Vec pos; } CamRoadOut;
-void camRoadMain(CamRoadOut* out, f32 a, f32 b, f32 c, f32 d, f32 e, f32 f, f32 g);
 
 USER_FUNC(cam_test);
 USER_FUNC(dist_check);
@@ -146,51 +144,24 @@ USER_FUNC(hei_00_mario_keyoff_check);
 USER_FUNC(cam_test2);
 void make_gonbaba_projection(CameraId camera, void* param);
 
-f32 fd_hei_00_negone_one_374[2] __attribute__((aligned(8)));
-f32 fd_hei_00_neg_one_382;
-f32 fd_hei_00___local_PI_383;
-f32 fd_hei_00___local_3PIO2_385;
-f32 fd_hei_00_one_negone_373[2] __attribute__((aligned(8)));
-f32 fd_hei_00___local_PIO2_384;
-f32 fd_hei_00_one_381;
-f32 fd_hei_00_negone_one_360[2] __attribute__((aligned(8)));
-f32 fd_hei_00_neg_one_365;
-f32 fd_hei_00___local_PI_366;
-f32 fd_hei_00___local_3PIO2_368;
-f32 fd_hei_00_one_negone_359[2] __attribute__((aligned(8)));
-f32 fd_hei_00___local_PIO2_367;
-f32 fd_hei_00_one_364;
-EvtWord make_proj_evt[4];
-EvtWord evt_gonbaba_shadow[161];
-static EvtWord first_evt[197];
-EvtWord gonbaba_evt[447];
-static EvtWord first_evt_dokan[18];
+extern EvtWord make_proj_evt[];
+extern EvtWord evt_gonbaba_shadow[];
+extern EvtWord gonbaba_evt[];
 static BeroEntry bero_entry_data[6];
 static BeroEntry e3_bero[2];
-static EvtWord cam_shake[33];
-static EvtWord cam_shake2[27];
-EvtWord evt_snd[234];
-EvtWord moji_msg[22];
-static EvtWord switch_evt[303];
-static EvtWord dokan_evt[345];
-EvtWord setting_sun_stone[43];
+extern EvtWord evt_snd[];
+extern EvtWord moji_msg[];
+extern EvtWord setting_sun_stone[];
 static s32 itemsel_table00[2];
-EvtWord sun_stone_set_event[68];
-EvtWord setting_moon_stone[43];
+extern EvtWord sun_stone_set_event[];
+extern EvtWord setting_moon_stone[];
 static s32 itemsel_table01[2];
-EvtWord moon_stone_set_event[68];
-static EvtWord ki_data_evt_01[20];
-EvtWord ki_data_evt_02[20];
+extern EvtWord moon_stone_set_event[];
+extern EvtWord ki_data_evt_02[];
 static TreeAccess ki_data[4];
 static NpcSetupInfo npcEnt[2];
-#ifdef VERSION_G8ME01
-EvtWord hei_00_koopa_evt[272];
-#else
-EvtWord hei_00_koopa_evt[269];
-#endif
-static EvtWord epilogue_npc_entry[30];
-static EvtWord epilogue_evt[90];
-EvtWord hei_00_init_evt[297];
+extern EvtWord hei_00_koopa_evt[];
+extern EvtWord hei_00_init_evt[];
 
 static USER_FUNC(proj_on) {
     animPoseSetMaterialFlagOn(marioGetPtr()->paperAnimGroupId[0], 0x400);
@@ -231,7 +202,7 @@ void make_gonbaba_projection(CameraId camera, void* param) {
     GXSetProjection(proj, GX_PERSPECTIVE);
     C_MTXLookAt(view, &(Vec){0.0f, 190.0f, 0.0f}, &(Vec){0.0f, 0.0f, -1.0f}, &(Vec){0.0f, 0.0f, 0.0f});
     saved = *camGetCurPtr();
-    npc = npcNameToPtr("\203S\203\223\203o\203o\211e");
+    npc = npcNameToPtr("ゴンババ影");
     PSMTXCopy(view, camGetCurPtr()->view);
     PSMTXIdentity(mtx);
     animPoseDrawMtx(npc->poseId, mtx, 1, 0.0f, 2.0f);
@@ -318,34 +289,6 @@ USER_FUNC(shake_reset) {
     return EVT_RETURN_DONE;
 }
 
-f32 fd_hei_00_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
-
-f32 fd_hei_00_neg_one_382 = -1.0f;
-
-f32 fd_hei_00___local_PI_383 = 3.1415927f;
-
-f32 fd_hei_00___local_3PIO2_385 = 4.712389f;
-
-f32 fd_hei_00_one_negone_373[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
-
-f32 fd_hei_00___local_PIO2_384 = 1.5707964f;
-
-f32 fd_hei_00_one_381 = 1.0f;
-
-f32 fd_hei_00_negone_one_360[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
-
-f32 fd_hei_00_neg_one_365 = -1.0f;
-
-f32 fd_hei_00___local_PI_366 = 3.1415927f;
-
-f32 fd_hei_00___local_3PIO2_368 = 4.712389f;
-
-f32 fd_hei_00_one_negone_359[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
-
-f32 fd_hei_00___local_PIO2_367 = 1.5707964f;
-
-f32 fd_hei_00_one_364 = 1.0f;
-
 EVT_BEGIN(make_proj_evt)
     CALL(make_gonbaba_projection_evt)
     RETURN
@@ -417,18 +360,18 @@ USER_FUNC(cam_test) {
     CameraEntry* camera = camGetPtr(4);
     f32 cx = (mario->position.x + party->position.x) / 2;
     f32 cz = (mario->position.z + party->position.z) / 2;
-    CamRoadOut road;
+    CameraParams road;
     Vec dir;
 
     camRoadMain(&road, 0.0f, 25.0f, 0.0f, 0.0f, 25.0f, 0.0f, 0.0f);
-    dir = (Vec){road.target.x - road.pos.x, road.target.y - road.pos.y, road.target.z - road.pos.z};
+    dir = (Vec){road.pos.x - road.at.x, road.pos.y - road.at.y, road.pos.z - road.at.z};
     PSVECNormalize(&dir, &dir);
-    event->lwData[0] = cx + road.pos.x + 250.0f * dir.x;
-    event->lwData[1] = road.pos.y + 250.0f * dir.y;
-    event->lwData[2] = cz + road.pos.z + 250.0f * dir.z;
-    event->lwData[3] = cx + road.pos.x;
-    event->lwData[4] = road.pos.y;
-    event->lwData[5] = cz + road.pos.z;
+    event->lwData[0] = cx + road.at.x + 250.0f * dir.x;
+    event->lwData[1] = road.at.y + 250.0f * dir.y;
+    event->lwData[2] = cz + road.at.z + 250.0f * dir.z;
+    event->lwData[3] = cx + road.at.x;
+    event->lwData[4] = road.at.y;
+    event->lwData[5] = cz + road.at.z;
     return EVT_RETURN_DONE;
 }
 
@@ -438,18 +381,18 @@ USER_FUNC(cam_test2) {
     CameraEntry* camera = camGetPtr(4);
     f32 cx = (mario->position.x + party->position.x) / 2;
     f32 cz = (mario->position.z + party->position.z) / 2;
-    CamRoadOut road;
+    CameraParams road;
     Vec dir;
 
     camRoadMain(&road, 0.0f, 75.0f, 0.0f, 0.0f, 75.0f, 0.0f, 0.0f);
-    dir = (Vec){road.target.x - road.pos.x, road.target.y - road.pos.y, road.target.z - road.pos.z};
+    dir = (Vec){road.pos.x - road.at.x, road.pos.y - road.at.y, road.pos.z - road.at.z};
     PSVECNormalize(&dir, &dir);
-    event->lwData[0] = cx + road.pos.x + 270.0f * dir.x;
-    event->lwData[1] = road.pos.y + 270.0f * dir.y;
-    event->lwData[2] = cz + road.pos.z + 270.0f * dir.z;
-    event->lwData[3] = cx + road.pos.x;
-    event->lwData[4] = road.pos.y;
-    event->lwData[5] = cz + road.pos.z;
+    event->lwData[0] = cx + road.at.x + 270.0f * dir.x;
+    event->lwData[1] = road.at.y + 270.0f * dir.y;
+    event->lwData[2] = cz + road.at.z + 270.0f * dir.z;
+    event->lwData[3] = cx + road.at.x;
+    event->lwData[4] = road.at.y;
+    event->lwData[5] = cz + road.at.z;
     return EVT_RETURN_DONE;
 }
 

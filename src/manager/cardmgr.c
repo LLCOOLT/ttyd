@@ -24,26 +24,37 @@
 #include "assets/_mariost_banner_tex.inc"
 #include "libc_decls.h"
 const char str_802CCC80[0x14] = "mariost_save_file";
-#ifdef VERSION_G8ME01
+#if defined(VERSION_G8MP01)
+// PAL: memory card comment per language (gp->language)
+const char card_title_jp[0x18] = "ペーパーマリオＲＰＧ";
+const char card_date_jp[0x20] = "%2d月%2d日のセーブデータです";
+const char str_802CCC94[0xC] = "Paper Mario";
+const char str_802CCCAC[0x12] = "%2d/%2d save data";
+const char card_date_de[0x18] = "Spielstand vom: %2d/%2d";
+const char card_date_fr[0x16] = "Sauvegarde du %2d/%2d";
+const char card_date_es[0x1B] = "Datos guardados el %2d/%2d";
+const char card_date_it[0x15] = "Salvataggio: %2d/%2d";
+#elif defined(VERSION_G8ME01)
 const char str_802CCC94[0xC] = "Paper Mario";
 const char str_802CCCAC[0x12] = "%2d/%2d save data";
 #else
 const char str_802CCC94[0x18] = "ペーパーマリオＲＰＧ";
 const char str_802CCCAC[0x20] = "%2d月%2d日のセーブデータです";
 #endif
-__declspec(section ".rodata") const u32 gap_04_802CCCCC_rodata[1] = {0};
 
 //.sbss
 static CardWork* wp;
-u32 gap_08_8041889C_sbss;
 
 //.sdata
 const char* version = VERSION_PICK("009", "010");
-u32 gap_07_80410584_sdata[1] = {0};
 
 //local prototypes
 static inline void check_sum(CardSaveSlot* save);
+#ifdef VERSION_G8MP01
+static void make_header(void);
+#else
 static inline void make_header(void);
+#endif
 static inline void make_data(void);
 
 static inline void memcard_probe(void);
@@ -171,7 +182,6 @@ s32 cardGetCode(void) {
 	return wp->result;
 }
 
-#pragma opt_propagation off //needed for memcard_probe
 void cardMain(void) {
 	s32 inserted;
 
@@ -292,7 +302,6 @@ void cardMain(void) {
 			break;
 	}
 }
-#pragma opt_propagation on
 
 void cardCopy2Main(s32 slot) {
 #ifdef VERSION_G8ME01
@@ -304,6 +313,9 @@ void cardCopy2Main(s32 slot) {
     s32 backup6;
     u32 backup3;
     s32 language;
+#ifdef VERSION_G8MP01
+    s32 framerate;
+#endif
 #else
     void* backup2;
     u32 backup3;
@@ -320,6 +332,9 @@ void cardCopy2Main(s32 slot) {
     backup3 = (u32)(gp->flags & 8);
 #ifdef VERSION_G8ME01
     language = gp->language;
+#endif
+#ifdef VERSION_G8MP01
+    framerate = gp->framerate;
 #endif
     backup4 = gp->soundMode;
     backup5 = gp->rumbleEnabled;
@@ -354,6 +369,10 @@ void cardCopy2Main(s32 slot) {
     }
 #ifdef VERSION_G8ME01
     gp->language = language;
+#endif
+#ifdef VERSION_G8MP01
+    // PAL: loading a save keeps the current 50/60 Hz frame rate
+    gp->framerate = framerate;
 #endif
 }
 
@@ -476,8 +495,6 @@ static inline void memcard_probe(void) {
     }
     wp->flags &= ~1;
 }
-#pragma opt_propagation on
-#pragma opt_propagation on //needed for memcard_probe? TODO fix
 void write_main(void) {
     if (wp->result) {
         wp->op = 8;
@@ -567,7 +584,6 @@ void write_main(void) {
         wp->flags &= ~1;
     }
 }
-#pragma opt_propagation on
 
 void cardWriteHeader(void) {
     if (!(wp->flags & 2)) {
@@ -582,7 +598,6 @@ void cardWriteHeader(void) {
     }
 }
 
-#pragma opt_propagation off
 void write_header_main(void) {
     if (wp->result) {
         wp->op = 8;
@@ -629,9 +644,7 @@ void write_header_main(void) {
         wp->flags &= ~1;
     }
 }
-#pragma opt_propagation on
 
-#pragma opt_propagation on //needed for memcard_probe? TODO fix
 void read_main(void) {
     s32 saveType; //invalid = -1, main = 0, backup = 1
 
@@ -720,7 +733,6 @@ void read_main(void) {
         wp->flags &= ~1;
     }
 }
-#pragma opt_propagation on
 
 void cardReadAll(void) {
     if (!(wp->flags & 2)) {
@@ -734,7 +746,6 @@ void cardReadAll(void) {
     }
 }
 
-#pragma opt_propagation on //needed for memcard_probe? TODO fix
 void read_all_main(void) {
     s32 saveType; //invalid = -1, main = 0, backup = 1
 
@@ -832,7 +843,6 @@ void read_all_main(void) {
         wp->flags &= ~1;
     }
 }
-#pragma opt_propagation on
 
 void cardCreate(void) {
     if (!(wp->flags & 2)) {
@@ -846,9 +856,6 @@ void cardCreate(void) {
     }
 }
 
-#pragma opt_propagation on //needed for memcard_probe? TODO fix
-#pragma push
-#pragma opt_dead_code off
 void create_main(void) {
     if (wp->result) {
         wp->op = 8;
@@ -919,8 +926,6 @@ void create_main(void) {
         wp->flags &= ~1;
     }
 }
-#pragma opt_propagation on
-#pragma pop
 
 void cardFormat(void) {
     if (!(wp->flags & 2)) {
@@ -1106,11 +1111,65 @@ static inline BOOL dataCheck(void) {
     }
 }
 
+static inline u32 header_sum(u8* data, s32 size) {
+	s32 i;
+	u32 sum;
+	sum = 0;
+	for (i = 0; i < size; i++) {
+		sum += data[i];
+	}
+	return sum;
+}
+
+#ifdef VERSION_G8MP01
+// PAL: not inlined; the comment and its date order follow gp->language
+static void make_header(void) {
+	CardMetadata* metadata;
+	OSCalendarTime td;
+	metadata = &cardGetFilePtr()->metadata;
+	memset(metadata, 0, sizeof(metadata->data));
+	OSTicksToCalendarTime(OSGetTime(), &td);
+	switch (gp->language) {
+		case 0:
+			strcpy(metadata->data.fileName, card_title_jp);
+			sprintf(metadata->data.dateString, card_date_jp, td.mon + 1, td.mday);
+			break;
+		case 1:
+		case 6:
+			strcpy(metadata->data.fileName, str_802CCC94);
+			sprintf(metadata->data.dateString, str_802CCCAC, td.mon + 1, td.mday);
+			break;
+		case 2:
+			strcpy(metadata->data.fileName, str_802CCC94);
+			sprintf(metadata->data.dateString, card_date_de, td.mday, td.mon + 1);
+			break;
+		case 3:
+			strcpy(metadata->data.fileName, str_802CCC94);
+			sprintf(metadata->data.dateString, card_date_fr, td.mday, td.mon + 1);
+			break;
+		case 4:
+			strcpy(metadata->data.fileName, str_802CCC94);
+			sprintf(metadata->data.dateString, card_date_es, td.mday, td.mon + 1);
+			break;
+		case 5:
+			strcpy(metadata->data.fileName, str_802CCC94);
+			sprintf(metadata->data.dateString, card_date_it, td.mday, td.mon + 1);
+			break;
+	}
+	memcpy(metadata->data.bannerTex, _mariost_banner_tex, sizeof(metadata->data.bannerTex));
+	memcpy(metadata->data.iconTex, _mariost_icon_tex, sizeof(metadata->data.iconTex));
+	memcpy(metadata->data.iconTlut, _mariost_icon_tlut, sizeof(metadata->data.iconTlut));
+	metadata->data.rumbleEnabled = (gp->rumbleEnabled != 0);
+	metadata->data.soundMode = (u16)gp->soundMode;
+	metadata->data.lastSlot = (u16)gp->lastSlot;
+	metadata->checksum1 = 0;
+	metadata->checksum2 = ~0u;
+	metadata->checksum1 = header_sum((u8*)&metadata->data, sizeof(metadata->data));
+	metadata->checksum2 = ~metadata->checksum1;
+}
+#else
 static inline void make_header(void) {
 	CardMetadata* metadata;
-	s32 i;
-	u8* temp;
-	u32 checksum;
 	OSCalendarTime td;
 	metadata = &cardGetFilePtr()->metadata;
 	memset(metadata, 0, sizeof(metadata->data));
@@ -1123,16 +1182,12 @@ static inline void make_header(void) {
 	metadata->data.rumbleEnabled = (gp->rumbleEnabled != 0);
 	metadata->data.soundMode = (u16)gp->soundMode;
 	metadata->data.lastSlot = (u16)gp->lastSlot;
-	metadata->checksum1 = (checksum = 0u);
+	metadata->checksum1 = 0;
 	metadata->checksum2 = ~0u;
-
-	temp = (u8*)&metadata->data;
-	for (i = 0; i < (s32)sizeof(metadata->data); i++) {
-		checksum += temp[i];
-	}
-	metadata->checksum1 = checksum;
+	metadata->checksum1 = header_sum((u8*)&metadata->data, sizeof(metadata->data));
 	metadata->checksum2 = ~metadata->checksum1;
 }
+#endif
 
 static inline void make_data(void) {
     CardSaveSlot* save;

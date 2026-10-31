@@ -2,7 +2,6 @@
 #include "battle/battle_unit.h"
 #include "evt/evt_cmd.h"
 
-#pragma force_active on
 #include "driver/animdrv.h"
 #include "driver/npcdrv.h"
 #include "driver/dispdrv.h"
@@ -18,6 +17,9 @@
 #include "mario/mariost.h"
 #include "memory.h"
 #include "string.h"
+#ifdef VERSION_G8MP01
+#include "evt/evt_pouch.h"
+#endif
 #include "stdio.h"
 #include "pmario_sound.h"
 #include "system.h"
@@ -28,14 +30,12 @@
 #include "evt/evt_memcard.h"
 #include "end.h"
 #include "driver/extdrv.h"
-#ifdef VERSION_G8ME01
-#endif
 
 #define ARRAY_SIZE(a) (sizeof(a) / sizeof((a)[0]))
 typedef struct EndMoa { Vec pos; s32 chain; s32 idx; } EndMoa;
 typedef struct EndExtData { const char* anim; const char* pose; f32 speed; } EndExtData;
-typedef struct EndWork { FileEntry* tpl; s32 mode; s32 alpha; s32 alpha2; s32 tevAlpha; s32 win1[3]; s32 win2[3]; s32 field_0x2c; s32 pos; EventEntry* evt; } EndWork;
-typedef struct CreditMsg { s32 field_0x0; s32 pos; s32 type; const char* msg1[3]; const char* msg2[3]; } CreditMsg;
+typedef struct EndWork { FileEntry* tpl; s32 mode; s32 alpha; s32 alpha2; s32 tevAlpha; s32 win1[3]; s32 win2[3]; s32 msgIdx; s32 pos; EventEntry* evt; } EndWork; /* msgIdx: never accessed (the roll index is a local) */
+typedef struct CreditMsg { s32 flags; s32 pos; s32 type; const char* msg1[3]; const char* msg2[3]; } CreditMsg; /* flags: always 0, never read */
 typedef struct CreditNpc { const char* agb; const char* anim; EvtWord* evt; } CreditNpc;
 typedef struct CreditActor { s32 state; s32 poseId; f32 angle; f32 limit; s32 pos; Mtx mtx; } CreditActor;
 EndWork end_work;
@@ -53,7 +53,7 @@ static inline f32 tanf(f32 x) { return tan(x); }
 s32 EXIGetType(s32 chan, u32 dev, u32* type);
 void L_animPoseWorldPositionEvalOff(s32 poseId);
 void animPoseVivianMain(s32 poseId, Vec* pos);
-s32 msgWindow_Entry(const char* msg, s32 a, s32 b);
+s32 msgWindow_Entry(const char* msg, s32 callback, s32 priority);
 void msgWindow_Continue(s32 id);
 void JUTFont_Free(void);
 void JUTFontSetup(s32 mode);
@@ -115,23 +115,23 @@ void _unresolved(void);
 void _epilog(void);
 void _prolog(void);
 
-EvtWord end_credit_npc_parade[44];
-EvtWord end_image_blend_loop[123];
+extern EvtWord end_credit_npc_parade[];
+extern EvtWord end_image_blend_loop[];
 #ifdef VERSION_G8ME01
 // US: "THE END" texture per language (indexed by gp->language)
 #endif
-EvtWord end_image_main_evt[187];
-EvtWord end_return_title_evt[49];
-EvtWord end_00_init_evt[63];
-EvtWord end_credit_gesso_evt[48];
-EvtWord end_credit_gonbaba_evt[89];
-EvtWord end_credit_batten2_evt[54];
-EvtWord end_credit_atomic_evt[60];
-EvtWord end_credit_korutesu_evt[81];
-EvtWord end_credit_para_evt[50];
-EvtWord end_credit_batten_evt[83];
-EvtWord end_credit_queen_evt[89];
-EvtWord end_credit_moamoa_evt[108];
+extern EvtWord end_image_main_evt[];
+extern EvtWord end_return_title_evt[];
+extern EvtWord end_00_init_evt[];
+extern EvtWord end_credit_gesso_evt[];
+extern EvtWord end_credit_gonbaba_evt[];
+extern EvtWord end_credit_batten2_evt[];
+extern EvtWord end_credit_atomic_evt[];
+extern EvtWord end_credit_korutesu_evt[];
+extern EvtWord end_credit_para_evt[];
+extern EvtWord end_credit_batten_evt[];
+extern EvtWord end_credit_queen_evt[];
+extern EvtWord end_credit_moamoa_evt[];
 f32 fd_end_00_negone_one_374[2] __attribute__((aligned(8)));
 f32 fd_end_00_neg_one_382;
 f32 fd_end_00___local_PI_383;
@@ -224,7 +224,68 @@ USER_FUNC(evt_end_credit_npc_get_wait_type) {
 
 EndWork* end_wp = &end_work;
 
-#ifdef VERSION_G8ME01
+#if defined(VERSION_G8MP01)
+// PAL credits: the European staff entries
+CreditMsg end_staff_roll_msg_tbl[] = {
+    0, 0, 0, 0, 0, 0, "a00", 0,
+    0, 0, 0, 1, 0, "a01", 0, "b00",
+    0, 0, 0, 0, 2, 0, "a02", 0,
+    "b01", 0, 0, 0, 0, 3, 0, 0,
+    0, "b02", "b03", 0, 0, 0, 4, 0,
+    "a03", 0, "b04", 0, 0, 0, 0, 5,
+    0, "a04", 0, "b05", 0, 0, 0, 0,
+    6, 0, "a05", 0, "b06", 0, 0, 0,
+    0, 7, 0, "a06", 0, "b07", 0, 0,
+    0, 0, 8, 0, "a07", 0, "b08", 0,
+    0, 0, 0, 9, 0, "a08", 0, "b09",
+    "b10", "b11", 0, 0, 10, 0, "a09", 0,
+    "b12", 0, 0, 0, 0, 11, 0, 0,
+    0, "b13", 0, 0, 0, 0, 12, 0,
+    0, 0, "b14", 0, 0, 0, 0, 13,
+    0, 0, 0, "b15", "b16", 0, 0, 1,
+    14, 0, "a10", 0, "b17", 0, 0, 0,
+    1, 15, 0, "a11", 0, "b18", 0, 0,
+    0, 1, 16, 0, "a12", 0, "b19", 0,
+    0, 0, 1, 17, 0, "a13", 0, "b20",
+    "b21", 0, 0, 1, 18, 0, "a14", 0,
+    "b22", "b23", 0, 0, 1, 19, 0, 0,
+    0, "b24", "b25", 0, 0, 1, 20, 0,
+    "a15", 0, "b26", "b27", 0, 0, 1, 21,
+    0, "a17", 0, "b28", 0, 0, 0, 1,
+    22, 0, 0, 0, "b29", 0, 0, 0,
+    1, 23, 0, "a18", 0, "b30", 0, 0,
+    0, 1, 24, 0, 0, 0, "b31", "b32",
+    0, 0, 2, 25, 0, "a19", 0, "b33",
+    0, 0, 0, 2, 26, 0, "a20", 0,
+    "b34", "b35", "b36", 0, 2, 27, 0, "a32",
+    0, "b65", "b66", 0, 0, 2, 28, 0,
+    "a33", 0, "b67", "b68", 0, 0, 2, 29,
+    0, "a34", 0, "b69", "b70", 0, 0, 2,
+    30, 0, "a35", 0, "b71", "b72", 0, 0,
+    3, 31, 0, "a31", 0, "b73", "b74", "b75",
+    0, 3, 32, 0, 0, 0, "b76", "b77",
+    "b81", 0, 3, 33, 0, "a36", 0, "b79",
+    0, 0, 0, 3, 34, 0, "a21", 0,
+    "b37", "b38", "b92", 0, 3, 35, 0, 0,
+    0, "b39", "b40", "b82", 0, 3, 36, 0,
+    0, 0, "b46", "b47", "b83", 0, 3, 37,
+    0, "a22", 0, "b48", "b49", 0, 0, 3,
+    38, 0, 0, 0, "b50", "b51", 0, 0,
+    3, 39, 0, "a23", 0, "b52", "b53", "b84",
+    0, 3, 40, 0, "a24", 0, "b85", 0,
+    0, 0, 3, 41, 0, "a25", 0, "b55",
+    "b86", "b87", 0, 0, 42, 0, "a38", 0,
+    "b90", "b91", 0, 0, 0, 43, 0, "a39",
+    0, "b56", 0, 0, 0, 0, 44, 0,
+    "a27", 0, "b57", 0, 0, 0, 0, 45,
+    0, "a28", 0, "b58", "b59", 0, 0, 0,
+    46, 0, 0, 0, "b60", "b61", 0, 0,
+    0, 47, 0, "a29", 0, "b62", "b63", 0,
+    0, 0, 48, 0, "a30", 0, "b64", 0,
+    0, 0, 4, 49, "c00", 0, 0, "c01",
+    0, 0,
+};
+#elif defined(VERSION_G8ME01)
 CreditMsg end_staff_roll_msg_tbl[] = {
     0, 0, 0, 0, 0, 0, "a00", 0,
     0, 0, 0, 1, 0, "a01", 0, "b00",
@@ -876,6 +937,10 @@ EVT_BEGIN(end_return_title_evt)
     SET_VALUE(GF(10), 1)
     CALL(evt_end_font_restore)
     SET_VALUE(GSW(0), 404)
+#ifdef VERSION_G8MP01
+    CALL(evt_pouch_mario_recovery) // PAL: the party is healed before the save
+    CALL(evt_pouch_all_party_recovery)
+#endif
     SET_VALUE(LF(10), 0)
     SET_VALUE(LW(0), 21)
     CALL_CHILD(PTR(evt_memcard_save_wrapper))
@@ -1164,12 +1229,15 @@ USER_FUNC(evt_end_staff_roll_msg_main) {
     s32 state = event->userdata[0];
     s32 idx = event->userdata[1];
     s32 i;
+    const char* msg;
+    const char* msg2;
     s32 x;
     s32 y;
     s32 wx;
+    s32 wx2;
     s32 wy;
+    s32 wy2;
     s32 n;
-    const char* msg;
     char buf1[0x400];
     char buf2[0x400];
 
@@ -1220,21 +1288,26 @@ USER_FUNC(evt_end_staff_roll_msg_main) {
                     } else if (x > 0) {
                         wx = x - 0.8f * FontGetMessageWidth(msg);
                     }
+#ifdef VERSION_G8MP01
+                    if (strcmp(end_staff_roll_msg_tbl[idx].msg1[i], "c00") == 0) {
+                        wx += 10;
+                    }
+#endif
                     sprintf(buf1, "<clear><dkey><wpos %d %d 400 200><col f0f0f0ff><speed 0><scale 0.8>%s</scale></speed></col><wait 500></dkey><once_stop>", wx - 62, wy, msg);
                     end_wp->win1[i] = msgWindow_Entry(buf1, 0, 0);
                 }
             }
             for (i = 0; i < 3; i++) {
                 if (end_staff_roll_msg_tbl[idx].msg2[i] != NULL) {
-                    msg = msgSearch(end_staff_roll_msg_tbl[idx].msg2[i]);
-                    wx = x;
-                    wy = y - i * 24 - 50;
+                    msg2 = msgSearch(end_staff_roll_msg_tbl[idx].msg2[i]);
+                    wx2 = x;
+                    wy2 = y - i * 24 - 50;
                     if (x == 0) {
-                        wx = x - FontGetMessageWidth(msg) / 2.0f;
+                        wx2 = x - FontGetMessageWidth(msg2) / 2.0f;
                     } else if (x > 0) {
-                        wx = x - FontGetMessageWidth(msg);
+                        wx2 = x - FontGetMessageWidth(msg2);
                     }
-                    sprintf(buf2, "<clear><dkey><wpos %d %d 400 200><col f0f0f0ff><speed 0>%s</speed></col><wait 5200></dkey><once_stop>", wx - 62, wy, msg);
+                    sprintf(buf2, "<clear><dkey><wpos %d %d 400 200><col f0f0f0ff><speed 0>%s</speed></col><wait 5200></dkey><once_stop>", wx2 - 62, wy2, msg2);
                     end_wp->win2[i] = msgWindow_Entry(buf2, 0, 0);
                 } else {
                     end_wp->win2[i] = -1;
@@ -1402,7 +1475,7 @@ void end_ext_moamoa_init(void) {
 }
 
 void end_ext_moamoa_main(void) {
-    NpcEntry* npc = npcNameToPtr("\203\202\203A\203\202\203A");
+    NpcEntry* npc = npcNameToPtr("モアモア");
     Vec* wpos = *animPoseGetAnimPosePtr(npc->poseId)->worldPositions;
     s32 i;
     ExtdrvPose* pose;
@@ -1470,7 +1543,7 @@ void end_ext_moamoa_dispent(void) {
 }
 
 USER_FUNC(evt_end_moamoa_init) {
-    NpcEntry* npc = npcNameToPtr("\203\202\203A\203\202\203A");
+    NpcEntry* npc = npcNameToPtr("モアモア");
     AnimationPose* ap;
     Vec* p;
     s32 n;
@@ -1505,7 +1578,7 @@ USER_FUNC(evt_end_moamoa_init) {
 }
 
 USER_FUNC(evt_end_moamoa_exit) {
-    NpcEntry* npc = npcNameToPtr("\203\202\203A\203\202\203A");
+    NpcEntry* npc = npcNameToPtr("モアモア");
 
     L_animPoseWorldPositionEvalOff(npc->poseId);
     _mapFree(end_moa_tbl);

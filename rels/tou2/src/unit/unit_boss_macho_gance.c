@@ -1,7 +1,6 @@
 #include "battle/battle_unit.h"
 #include "evt/evt_cmd.h"
 
-#pragma force_active on
 #include "manager/evtmgr_cmd.h"
 #include "battle/battle_event_default.h"
 #include "battle/battle_event_cmd.h"
@@ -54,20 +53,6 @@ static USER_FUNC(wariai_enzan_1f_intpl);
 static USER_FUNC(wariai_enzan_1f);
 static USER_FUNC(wariai_enzan_1);
 
-f32 fd_boss_macho_gance_negone_one_374[2] __attribute__((aligned(8)));
-f32 fd_boss_macho_gance_neg_one_382;
-f32 fd_boss_macho_gance___local_PI_383;
-f32 fd_boss_macho_gance___local_3PIO2_385;
-f32 fd_boss_macho_gance_one_negone_373[2] __attribute__((aligned(8)));
-f32 fd_boss_macho_gance___local_PIO2_384;
-f32 fd_boss_macho_gance_one_381;
-f32 fd_boss_macho_gance_negone_one_360[2] __attribute__((aligned(8)));
-f32 fd_boss_macho_gance_neg_one_365;
-f32 fd_boss_macho_gance___local_PI_366;
-f32 fd_boss_macho_gance___local_3PIO2_368;
-f32 fd_boss_macho_gance_one_negone_359[2] __attribute__((aligned(8)));
-f32 fd_boss_macho_gance___local_PIO2_367;
-f32 fd_boss_macho_gance_one_364;
 BattleUnitKind unit_boss_macho_gance;
 static BattleUnitDefense defence;
 static BattleUnitDefenseAttr defence_attr;
@@ -84,54 +69,25 @@ BattleWeapon weapon_gance_attack;
 BattleWeapon weapon_gance_posing;
 BattleWeapon weapon_gance_rariat_attack;
 BattleWeapon weapon_gance_body_attack;
-EvtWord macho_gance_zoom[65];
-EvtWord macho_gance_blur_zoom[46];
-static EvtWord mario_party_zoom[34];
+extern EvtWord macho_gance_zoom[];
+extern EvtWord macho_gance_blur_zoom[];
 static EvtWord init_event[79];
 static EvtWord entry_event[62];
 static EvtWord damage_event[97];
-EvtWord base_size_change[99];
+extern EvtWord base_size_change[];
 static EvtWord phase_event[482];
 static EvtWord dead_event[64];
-EvtWord macho_gance_damage_event[238];
+extern EvtWord macho_gance_damage_event[];
 static EvtWord attack_event[151];
-EvtWord gance_macho_speed_attack_event[119];
-EvtWord gance_build_up_attack_event[119];
-EvtWord gance_body_attack_event[126];
-EvtWord gance_footwork_attack_event[119];
-EvtWord gance_attack_attack_event[541];
-EvtWord gance_posing_attack_event[129];
-EvtWord gance_rariat_attack_attack_event[446];
-EvtWord gance_body_attack_attack_event[515];
+extern EvtWord gance_macho_speed_attack_event[];
+extern EvtWord gance_build_up_attack_event[];
+extern EvtWord gance_body_attack_event[];
+extern EvtWord gance_footwork_attack_event[];
+extern EvtWord gance_attack_attack_event[];
+extern EvtWord gance_posing_attack_event[];
+extern EvtWord gance_rariat_attack_attack_event[];
+extern EvtWord gance_body_attack_attack_event[];
 static EvtWord wait_event[6];
-
-f32 fd_boss_macho_gance_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
-
-f32 fd_boss_macho_gance_neg_one_382 = -1.0f;
-
-f32 fd_boss_macho_gance___local_PI_383 = 3.1415927f;
-
-f32 fd_boss_macho_gance___local_3PIO2_385 = 4.712389f;
-
-f32 fd_boss_macho_gance_one_negone_373[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
-
-f32 fd_boss_macho_gance___local_PIO2_384 = 1.5707964f;
-
-f32 fd_boss_macho_gance_one_381 = 1.0f;
-
-f32 fd_boss_macho_gance_negone_one_360[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
-
-f32 fd_boss_macho_gance_neg_one_365 = -1.0f;
-
-f32 fd_boss_macho_gance___local_PI_366 = 3.1415927f;
-
-f32 fd_boss_macho_gance___local_3PIO2_368 = 4.712389f;
-
-f32 fd_boss_macho_gance_one_negone_359[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
-
-f32 fd_boss_macho_gance___local_PIO2_367 = 1.5707964f;
-
-f32 fd_boss_macho_gance_one_364 = 1.0f;
 
 BattleUnitKind unit_boss_macho_gance = {
     65,

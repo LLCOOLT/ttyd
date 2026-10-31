@@ -9,8 +9,6 @@
 #include "driver/hitdrv.h"
 #include "data_tables.h"
 
-#pragma force_active on
-
 USER_FUNC(evt_bero_get_info);
 USER_FUNC(evt_bero_mapchange);
 USER_FUNC(evt_cam3d_evt_off);
@@ -96,96 +94,41 @@ USER_FUNC(evt_unitwin_free);
 USER_FUNC(unitwincoin_disp_onoff);
 USER_FUNC(unitwincoin_wait);
 
-f32 fd_pik_04_negone_one_374[2] __attribute__((aligned(8)));
-f32 fd_pik_04_neg_one_382;
-f32 fd_pik_04___local_PI_383;
-f32 fd_pik_04___local_3PIO2_385;
-f32 fd_pik_04_one_negone_373[2] __attribute__((aligned(8)));
-f32 fd_pik_04___local_PIO2_384;
-f32 fd_pik_04_one_381;
-f32 fd_pik_04_negone_one_360[2] __attribute__((aligned(8)));
-f32 fd_pik_04_neg_one_365;
-f32 fd_pik_04___local_PI_366;
-f32 fd_pik_04___local_3PIO2_368;
-f32 fd_pik_04_one_negone_359[2] __attribute__((aligned(8)));
-f32 fd_pik_04___local_PIO2_367;
-f32 fd_pik_04_one_364;
 static BeroEntry bero_data[3];
 static HitDamageReturn dmgReturnPt[9];
 static const char* name_tbl[6];
-static EvtWord evt_door[12];
-static EvtWord evt_door2[12];
-static EvtWord evt_wall[29];
 const char* ie_3_npc[3];
-static EvtWord door_1_open[12];
-static EvtWord door_1_close[14];
 static DoorParam door_1;
-EvtWord evt_door_h[22];
-EvtWord evt_door2_h[19];
-EvtWord evt_wall_h[12];
+extern EvtWord evt_door_h[];
+extern EvtWord evt_door2_h[];
+extern EvtWord evt_wall_h[];
 const char* hotel_npc[3];
-static EvtWord door_2_open[18];
-static EvtWord door_2_close[14];
 static DoorParam door_2;
-EvtWord imginit[46];
-EvtWord imgstart[107];
-EvtWord imgend[129];
-EvtWord evt_up[402];
-EvtWord evt_down[404];
-EvtWord init_miyage[8];
-EvtWord talk_miyage[2];
-static EvtWord talk_musume[20];
-EvtWord init_musume1[13];
-EvtWord talk_musume1[4];
-EvtWord init_musume2[13];
-EvtWord talk_musume2[4];
-EvtWord init_musume3[13];
-EvtWord talk_musume3[4];
-EvtWord init_takun1[2];
-EvtWord talk_takun1[28];
-EvtWord init_takun2[2];
-EvtWord talk_takun2[28];
-EvtWord init_takun3[7];
-EvtWord talk_takun3[28];
-static EvtWord init_kiza[13];
-static EvtWord talk_kiza[8];
+extern EvtWord imginit[];
+extern EvtWord imgstart[];
+extern EvtWord imgend[];
+extern EvtWord evt_up[];
+extern EvtWord evt_down[];
+extern EvtWord init_miyage[];
+extern EvtWord talk_miyage[];
+extern EvtWord init_musume1[];
+extern EvtWord talk_musume1[];
+extern EvtWord init_musume2[];
+extern EvtWord talk_musume2[];
+extern EvtWord init_musume3[];
+extern EvtWord talk_musume3[];
+extern EvtWord init_takun1[];
+extern EvtWord talk_takun1[];
+extern EvtWord init_takun2[];
+extern EvtWord talk_takun2[];
+extern EvtWord init_takun3[];
+extern EvtWord talk_takun3[];
 static NpcSetupInfo npc_data[9];
-EvtWord evt_roten[113];
-EvtWord evt_kinopio_to_bed[29];
-EvtWord evt_kinopio_from_bed[27];
+extern EvtWord evt_roten[];
+extern EvtWord evt_kinopio_to_bed[];
+extern EvtWord evt_kinopio_from_bed[];
 static KinopioData kino_dt;
-static EvtWord epilogue_npc_entry[169];
-static EvtWord epilogue_evt_sub[91];
-static EvtWord epilogue_evt[63];
-EvtWord pik_04_init_evt[166];
-
-f32 fd_pik_04_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
-
-f32 fd_pik_04_neg_one_382 = -1.0f;
-
-f32 fd_pik_04___local_PI_383 = 3.1415927f;
-
-f32 fd_pik_04___local_3PIO2_385 = 4.712389f;
-
-f32 fd_pik_04_one_negone_373[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
-
-f32 fd_pik_04___local_PIO2_384 = 1.5707964f;
-
-f32 fd_pik_04_one_381 = 1.0f;
-
-f32 fd_pik_04_negone_one_360[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
-
-f32 fd_pik_04_neg_one_365 = -1.0f;
-
-f32 fd_pik_04___local_PI_366 = 3.1415927f;
-
-f32 fd_pik_04___local_3PIO2_368 = 4.712389f;
-
-f32 fd_pik_04_one_negone_359[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
-
-f32 fd_pik_04___local_PIO2_367 = 1.5707964f;
-
-f32 fd_pik_04_one_364 = 1.0f;
+extern EvtWord pik_04_init_evt[];
 
 static BeroEntry bero_data[] = {
     {

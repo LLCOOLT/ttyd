@@ -13,7 +13,7 @@
 typedef struct PowerGaugeWork {
     s32 counter;   // 0x0
     f32 gauge;     // 0x4
-    s32 field_0x8; // 0x8
+    s32 presses;    // 0x8, never used (air gauge layout)
     s32 limit;     // 0xC
     s32 timer;     // 0x10
 } PowerGaugeWork;
@@ -135,38 +135,35 @@ s32 battleAcResult_PowerGaugeLv(BattleWork* work) {
 
 static void actionCommandDisp(f32 x, f32 y);
 
-#pragma opt_propagation off
 void battleAcDisp_PowerGaugeLv(CameraId cameraId, void* param) {
     BattleWork* work = (BattleWork*)param;
-    BattleACDispParams* disp = (BattleACDispParams*)&work->actionCommands.disp;
-    s32 i = 4;
-    switch (work->actionCommands.mAcState) {
+    BattleActions* ac = &work->actionCommands;
+    BattleACDispParams* disp = &ac->disp;
+    switch (ac->mAcState) {
         case 99:
-            disp->iconX = intplGetValue(4, 20 - AC_SLIDE_TIMER_AT(disp, i), 20, -300.0f, 30.0f);
+            disp->iconX = intplGetValue(4, 20 - disp->slideTimer, 20, -300.0f, 30.0f);
         case 100:
         case 1000:
         case 1002:
             actionCommandDisp(disp->iconX, disp->iconY);
-            if (AC_SLIDE_TIMER_AT(disp, i) > 0) {
-                (AC_SLIDE_TIMER_AT(disp, i))--;
+            if (disp->slideTimer > 0) {
+                disp->slideTimer--;
             }
             break;
         case 1003:
         case 1004:
-            if (AC_SLIDE_TIMER_AT(disp, i) >= 40) {
-                disp->iconX = intplGetValue(4, AC_SLIDE_TIMER_AT(disp, i) - 40, 20, 30.0f, -300.0f);
+            if (disp->slideTimer >= 40) {
+                disp->iconX = intplGetValue(4, disp->slideTimer - 40, 20, 30.0f, -300.0f);
             } else {
                 disp->iconX = 30.0f;
             }
             actionCommandDisp(disp->iconX, disp->iconY);
-            if (AC_SLIDE_TIMER_AT(disp, i) < 60) {
-                (AC_SLIDE_TIMER_AT(disp, i))++;
+            if (disp->slideTimer < 60) {
+                disp->slideTimer++;
             }
             break;
     }
 }
-
-#pragma opt_propagation reset
 void battleAcDelete_PowerGaugeLv(BattleWork* work) {
     if (work->actionCommands.doneFlags & 1) {
         return;
@@ -174,7 +171,6 @@ void battleAcDelete_PowerGaugeLv(BattleWork* work) {
     work->actionCommands.mAcState = 1003;
 }
 
-#pragma dont_inline on
 static void actionCommandDisp(f32 x, f32 y) {
     BattleWork* work = _battleWorkPointer;
     BattleActions* ac = &work->actionCommands;
@@ -247,4 +243,3 @@ Vec pos2 = {0.0f, 0.0f, 0.0f};
             break;
     }
 }
-#pragma dont_inline reset

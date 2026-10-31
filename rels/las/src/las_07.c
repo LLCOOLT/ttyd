@@ -2,8 +2,6 @@
 #include "evt/evt_cmd.h"
 #include "evt/evt_bero.h"
 
-#pragma force_active on
-
 USER_FUNC(evt_bero_get_info);
 USER_FUNC(evt_cam_road_reset);
 USER_FUNC(evt_mapobj_rotate);
@@ -14,59 +12,8 @@ USER_FUNC(evt_snd_envon);
 USER_FUNC(evt_snd_set_rev_mode);
 USER_FUNC(evt_snd_sfxon);
 
-f32 fd_las_07_negone_one_374[2] __attribute__((aligned(8)));
-f32 fd_las_07_neg_one_382;
-f32 fd_las_07___local_PI_383;
-f32 fd_las_07___local_3PIO2_385;
-f32 fd_las_07_one_negone_373[2] __attribute__((aligned(8)));
-f32 fd_las_07___local_PIO2_384;
-f32 fd_las_07_one_381;
-f32 fd_las_07_negone_one_360[2] __attribute__((aligned(8)));
-f32 fd_las_07_neg_one_365;
-f32 fd_las_07___local_PI_366;
-f32 fd_las_07___local_3PIO2_368;
-f32 fd_las_07_one_negone_359[2] __attribute__((aligned(8)));
-f32 fd_las_07___local_PIO2_367;
-f32 fd_las_07_one_364;
-static EvtWord w1_door_close[22];
-static EvtWord w1_door_open[22];
-static EvtWord w2_door_close[22];
-static EvtWord w2_door_open[22];
-static EvtWord e1_door_close[22];
-static EvtWord e1_door_open[22];
-static EvtWord e2_door_close[22];
-static EvtWord e2_door_open[22];
-static EvtWord door_matigai_evt[16];
 static BeroEntry bero_entry_data[5];
-EvtWord las_07_init_evt[57];
-
-f32 fd_las_07_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
-
-f32 fd_las_07_neg_one_382 = -1.0f;
-
-f32 fd_las_07___local_PI_383 = 3.1415927f;
-
-f32 fd_las_07___local_3PIO2_385 = 4.712389f;
-
-f32 fd_las_07_one_negone_373[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
-
-f32 fd_las_07___local_PIO2_384 = 1.5707964f;
-
-f32 fd_las_07_one_381 = 1.0f;
-
-f32 fd_las_07_negone_one_360[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
-
-f32 fd_las_07_neg_one_365 = -1.0f;
-
-f32 fd_las_07___local_PI_366 = 3.1415927f;
-
-f32 fd_las_07___local_3PIO2_368 = 4.712389f;
-
-f32 fd_las_07_one_negone_359[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
-
-f32 fd_las_07___local_PIO2_367 = 1.5707964f;
-
-f32 fd_las_07_one_364 = 1.0f;
+extern EvtWord las_07_init_evt[];
 
 static EVT_BEGIN(w1_door_close)
     MULTIPLY_FLOAT(LW(0), FLOAT(-0.38867188f))
@@ -230,7 +177,7 @@ EVT_BEGIN(las_07_init_evt)
     END_INLINE_EVENT
     CALL(evt_mobj_badgeblk, STRING("mobj00"), -100, 60, -300, 121, 0, GSWF(4373), 0)
     CALL(evt_mobj_badgeblk, STRING("mobj01"), 100, 60, -300, 156, 0, GSWF(4374), 0)
-    CALL(evt_mobj_badgeblk, STRING("mobj_badge_gat\0"), 0, 60, -300, 263, 0, GSWF(4376), 1)
+    CALL(evt_mobj_badgeblk, STRING("mobj_badge_gat"), 0, 60, -300, 263, 0, GSWF(4376), 1)
     RETURN
 EVT_END()
 

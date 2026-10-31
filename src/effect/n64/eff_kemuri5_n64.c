@@ -10,7 +10,7 @@
 
 typedef struct EffKemuri5N64Work {
     s32 active;    // 0x0
-    u16 field_4;   // 0x4
+    u16 type;      // 0x4, never read or written
     s16 timer;     // 0x6
     u8 alpha;      // 0x8
     u8 pad_9[3];   // 0x9
@@ -23,7 +23,7 @@ typedef struct EffKemuri5N64Work {
     f32 velY;      // 0x34
     f32 accelY;    // 0x38
     f32 accelY2;   // 0x3C
-    f32 field_40;  // 0x40
+    f32 reserved_40; // 0x40, only cleared at entry
     f32 dirX;      // 0x44
     f32 dirZ;      // 0x48
 } EffKemuri5N64Work;
@@ -48,12 +48,11 @@ static inline GXColor mkc(u8 a) {
 void effKemuri5Disp(CameraId cameraId, EffectEntry* effect);
 
 #pragma opt_propagation off
-#pragma opt_lifetimes off
 EffectEntry* effKemuri5N64Entry(f32 x, f32 y, f32 z, f32 angle) {
     s32 ang;
     EffectEntry* effect;
     EffKemuri5N64Work* work;
-    f32 new_var;
+    f32 angF;
     s32 i;
     f32 rad;
     f32 a = angle;
@@ -67,7 +66,7 @@ EffectEntry* effKemuri5N64Entry(f32 x, f32 y, f32 z, f32 angle) {
     for (i = 0, ang = 0; i < 8; i++, work++) {
 
         work->active = 1;
-        work->field_40 = 0.0f;
+        work->reserved_40 = 0.0f;
         work->position.x = x;
         work->position.y = y;
         work->position.z = z;
@@ -79,12 +78,12 @@ EffectEntry* effKemuri5N64Entry(f32 x, f32 y, f32 z, f32 angle) {
         work->baseScaleY = 0.03f * (f32)(rand() % 11) + 1.7f;
         work->angle = (f32)(rand() % 61);
         work->timer = 30;
-        new_var = (f32)ang; // FAKE: early float conversion temp; (f32)ang / implicit int at use both differ
+        angF = (f32)ang; // FAKE: early float conversion temp; (f32)ang / implicit int at use both differ
         work->velY = 0.5f;
         work->accelY = -0.02f;
         work->accelY2 = 0.00005f;
         work->speed = -3.9f;
-        rad = 6.2831855f * reviseAngle(a + new_var) / 360.0f;
+        rad = 6.2831855f * reviseAngle(a + angF) / 360.0f;
         work->dirX = (f32)sin(rad);
         work->dirZ = (f32)cos(rad);
         ang += 45;
@@ -138,7 +137,6 @@ void effKemuri5Main(EffectEntry* effect) {
 }
 
 #pragma opt_propagation reset
-#pragma opt_lifetimes reset
 
 void effKemuri5Disp(CameraId cameraId, EffectEntry* effect) {
     CameraEntry* camera = camGetPtr(cameraId);

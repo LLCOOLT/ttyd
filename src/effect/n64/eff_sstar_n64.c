@@ -12,60 +12,10 @@
 #include <stdlib.h>
 #include <string.h>
 #include "libc_decls.h"
+#include <math.h>
 
 double sin(double);
 double cos(double);
-
-#define NAN (*(f32*)__float_nan)
-
-#define FP_NAN 1
-#define FP_INFINITE 2
-#define FP_ZERO 3
-#define FP_NORMAL 4
-#define FP_SUBNORMAL 5
-
-static inline s32 __fpclassifyf(f32 x) {
-    switch (*(s32*)&x & 0x7F800000) {
-        case 0x7F800000:
-            if (*(s32*)&x & 0x007FFFFF) {
-                return FP_NAN;
-            } else {
-                return FP_INFINITE;
-            }
-            break;
-        case 0:
-            if (*(s32*)&x & 0x007FFFFF) {
-                return FP_SUBNORMAL;
-            } else {
-                return FP_ZERO;
-            }
-            break;
-        default:
-            return FP_NORMAL;
-    }
-}
-
-#define fpclassify(x) __fpclassifyf(x)
-#define isnan(x) (fpclassify(x) == FP_NAN)
-
-static inline f32 sqrtf(f32 x) {
-    const f64 _half = .5;
-    const f64 _three = 3.0;
-
-    if (x > 0.0f) {
-        f64 guess = __frsqrte(x);
-        guess = _half * guess * (_three - guess * guess * x);
-        guess = _half * guess * (_three - guess * guess * x);
-        guess = _half * guess * (_three - guess * guess * x);
-        return x * guess;
-    } else if (x < 0.0) {
-        return NAN;
-    } else if (isnan(x)) {
-        return NAN;
-    } else {
-        return x;
-    }
-}
 
 typedef struct effN64Vtx {
     s16 x, y, z;   // 0x0
@@ -84,10 +34,10 @@ typedef struct EffSstarN64Work {
     f32 bounce;        // 0x1c
     f32 rotZ;          // 0x20
     f32 rotZ2;         // 0x24
-    f32 unk28;         // 0x28
+    f32 reserved_28;   // 0x28, only cleared at entry
     f32 rotSpeed;      // 0x2c
     s32 life;          // 0x30
-    f32 unk34;         // 0x34
+    f32 screenSpeedX;  // 0x34, signed speed across the screen, sets the travel angle
     s32 subtype;       // 0x38
     s32 idx;           // 0x3c
     Mtx mtx[8];        // 0x40
@@ -97,10 +47,6 @@ typedef struct EffSstarN64Work {
     s32 c1cc;          // 0x1cc
     effN64Vtx vtx[10]; // 0x1d0
 } EffSstarN64Work;
-
-f32 unused_tbl[16] = {
-    -1.0f, 1.0f, -1.0f, 1.0f, 1.0f, -1.0f, 1.0f, -1.0f, -1.0f, 1.0f, -1.0f, 1.0f, 1.0f, -1.0f, 1.0f, -1.0f,
-};
 
 static effN64Vtx size64x64_tex64x64_vtx[] = {
     {-30, -30, 0, 0, 0, 0, 0, 0, 191},
@@ -117,7 +63,7 @@ effN64Vtx size128x128_tex32x32_vtx[] = {
     {0, 0, 0, 0, 0, 255, 255, 255, 255},
 };
 
-struct { effN64Vtx v[10]; u8 pad[4]; } shooting_dust_vtx = { { // FAKE: padded to the original symbol size (trailing zero bytes, never read)
+effN64Vtx shooting_dust_vtx[10] = {
     {0, 8, 0, 0, 0, 0, 0, 0, 191},
     {0, -8, 0, 0, 2048, 0, 0, 0, 191},
     {0, 9, 0, 512, 0, 0, 0, 0, 191},
@@ -128,7 +74,7 @@ struct { effN64Vtx v[10]; u8 pad[4]; } shooting_dust_vtx = { { // FAKE: padded t
     {0, -10, 0, 768, 2048, 0, 0, 0, 191},
     {0, 11, 0, 896, 0, 0, 0, 0, 191},
     {0, -11, 0, 896, 2048, 0, 0, 0, 191},
-}, {0} };
+};
 
 void effSstarMain(EffectEntry* effect);
 void effSstarDisp(CameraId cameraId, EffectEntry* effect);
@@ -142,7 +88,7 @@ EffectEntry* effSstarN64Entry(s32 type, f32 x, f32 y, f32 z, f32 tx, f32 ty, f32
     s32 i;
 
     effect = effEntry();
-    effect->type = "SstarN64\0\0\0";
+    effect->type = "SstarN64";
     effect->count = 1;
     w = __memAlloc(HEAP_EFFECT, sizeof(EffSstarN64Work));
     effect->userdata = w;
@@ -153,7 +99,7 @@ EffectEntry* effSstarN64Entry(s32 type, f32 x, f32 y, f32 z, f32 tx, f32 ty, f32
     w->position.z = z;
     w->bounce = 0.0f;
     w->rotZ2 = 0.0f;
-    w->unk28 = 0.0f;
+    w->reserved_28 = 0.0f;
     w->subtype = type;
     if (type == 3) {
         w->scale = 0.2f;
@@ -197,7 +143,7 @@ EffectEntry* effSstarN64Entry(s32 type, f32 x, f32 y, f32 z, f32 tx, f32 ty, f32
     ang = angleABf(0.0f, 0.0f, -w->velocity.y, sq);
     w->rotZ2 = ang;
     w->rotZ = ang;
-    w->unk34 = sq;
+    w->screenSpeedX = sq;
     w->life = (s32)(len / speed);
     for (i = 0; i < 8; i++) {
         PSMTXTrans(w->mtx[i], w->position.x, w->position.y, w->position.z);
@@ -233,7 +179,7 @@ void effSstarMain(EffectEntry* effect) {
             len < 42.0f) {
             w->velocity.y = 0.6f * -w->velocity.y;
             w->velocity.x *= 0.7f;
-            w->unk34 *= 0.7f;
+            w->screenSpeedX *= 0.7f;
             w->rotSpeed *= 0.7f;
             w->bounce += 1.0f;
             w->type = 0;
@@ -244,7 +190,7 @@ void effSstarMain(EffectEntry* effect) {
         if (w->bounce) {
             w->velocity.y += -0.5f;
             w->rotZ2 += w->rotSpeed;
-            w->rotZ = angleABf(0.0f, 0.0f, -w->velocity.y, w->unk34);
+            w->rotZ = angleABf(0.0f, 0.0f, -w->velocity.y, w->screenSpeedX);
         }
     }
     if (gp->inBattle == 0) {
@@ -367,7 +313,7 @@ void effSstarDisp(CameraId cameraId, EffectEntry* effect) {
         PSMTXRotRad(rot, 'z', 0.017453292f * w->rotZ);
         PSMTXConcat(mtx, rot, w->mtx[w->idx]);
         for (i = 0; i < 5; i++) {
-            memcpy(&w->vtx[i * 2], &shooting_dust_vtx.v[i * 2], sizeof(effN64Vtx));
+            memcpy(&w->vtx[i * 2], &shooting_dust_vtx[i * 2], sizeof(effN64Vtx));
             OSInitFastCast();
             OSs16tof32(&w->vtx[i * 2].x, &v0.x);
             OSs16tof32(&w->vtx[i * 2].y, &v0.y);
@@ -377,7 +323,7 @@ void effSstarDisp(CameraId cameraId, EffectEntry* effect) {
             OSf32tos16(&v0.x, &w->vtx[i * 2].x);
             OSf32tos16(&v0.y, &w->vtx[i * 2].y);
             OSf32tos16(&v0.z, &w->vtx[i * 2].z);
-            memcpy(&w->vtx[i * 2 + 1], &shooting_dust_vtx.v[i * 2 + 1], sizeof(effN64Vtx));
+            memcpy(&w->vtx[i * 2 + 1], &shooting_dust_vtx[i * 2 + 1], sizeof(effN64Vtx));
             OSInitFastCast();
             OSs16tof32((s16*)&w->vtx[i * 2 + 1], &v1.x);
             OSs16tof32((s16*)&w->vtx[i * 2 + 1] + 1, &v1.y);

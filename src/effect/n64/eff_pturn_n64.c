@@ -33,30 +33,6 @@ typedef struct PturnElem {
     s32 delay;  // 0x44
 } PturnElem;
 
-__declspec(section ".data") f32 eff_pturn_n64_negone_one_a[] = {
-    -1.0f, 1.0f,
-};
-__declspec(section ".data") f32 pturn_negone_one_374[] = {
-    -1.0f, 1.0f,
-};
-__declspec(section ".data") f32 eff_pturn_n64_one_negone_a[] = {
-    1.0f, -1.0f,
-};
-__declspec(section ".data") f32 pturn_one_negone_373[] = {
-    1.0f, -1.0f,
-};
-__declspec(section ".data") f32 eff_pturn_n64_negone_one_b[] = {
-    -1.0f, 1.0f,
-};
-__declspec(section ".data") f32 pturn_negone_one_360[] = {
-    -1.0f, 1.0f,
-};
-__declspec(section ".data") f32 eff_pturn_n64_one_negone_b[] = {
-    1.0f, -1.0f,
-};
-__declspec(section ".data") f32 pturn_one_negone_359[] = {
-    1.0f, -1.0f,
-};
 
 effN64Vtx size48x48_tex32x32_pturn_vtx[] = {
     {-24, -24, 0, -512, 512, 255, 255, 255, 255},
@@ -98,7 +74,7 @@ EffectEntry* effPturnN64Entry(s32 type, s32 lifetime, f32 x, f32 y, f32 z) {
     PturnElem* work;
 
     effect = effEntry();
-    effect->type = "PturnN64\0\0\0";
+    effect->type = "PturnN64";
     effect->count = 2;
     work = __memAlloc(HEAP_EFFECT, sizeof(PturnElem) * 2);
     effect->userdata = work;

@@ -3,8 +3,6 @@
 #include "evt/evt_bero.h"
 #include "las.h"
 
-#pragma force_active on
-
 USER_FUNC(evt_bero_get_entername);
 USER_FUNC(evt_bero_get_info);
 USER_FUNC(evt_bero_mapchange);
@@ -32,63 +30,11 @@ USER_FUNC(evt_snd_envon);
 USER_FUNC(evt_snd_set_rev_mode);
 USER_FUNC(evt_snd_sfxon);
 
-f32 fd_las_19_negone_one_374[2] __attribute__((aligned(8)));
-f32 fd_las_19_neg_one_382;
-f32 fd_las_19___local_PI_383;
-f32 fd_las_19___local_3PIO2_385;
-f32 fd_las_19_one_negone_373[2] __attribute__((aligned(8)));
-f32 fd_las_19___local_PIO2_384;
-f32 fd_las_19_one_381;
-f32 fd_las_19_negone_one_360[2] __attribute__((aligned(8)));
-f32 fd_las_19_neg_one_365;
-f32 fd_las_19___local_PI_366;
-f32 fd_las_19___local_3PIO2_368;
-f32 fd_las_19_one_negone_359[2] __attribute__((aligned(8)));
-f32 fd_las_19___local_PIO2_367;
-f32 fd_las_19_one_364;
-static EvtWord w_door_close[22];
-static EvtWord w_door_open[22];
-static EvtWord e1_door_close[22];
-static EvtWord e1_door_open[22];
-static EvtWord e2_door_close[22];
-static EvtWord e2_door_open[22];
 static BeroEntry bero_entry_data[5];
 const char* mapgrp_name_1[18];
 const char* mapgrp_name_2[5];
-static EvtWord cam_shake[8];
-EvtWord change_map_evt[359];
-static EvtWord switch1_evt[13];
-static EvtWord switch2_evt[13];
-static EvtWord cloud_evt[5];
-EvtWord las_19_init_evt[205];
-
-f32 fd_las_19_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
-
-f32 fd_las_19_neg_one_382 = -1.0f;
-
-f32 fd_las_19___local_PI_383 = 3.1415927f;
-
-f32 fd_las_19___local_3PIO2_385 = 4.712389f;
-
-f32 fd_las_19_one_negone_373[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
-
-f32 fd_las_19___local_PIO2_384 = 1.5707964f;
-
-f32 fd_las_19_one_381 = 1.0f;
-
-f32 fd_las_19_negone_one_360[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
-
-f32 fd_las_19_neg_one_365 = -1.0f;
-
-f32 fd_las_19___local_PI_366 = 3.1415927f;
-
-f32 fd_las_19___local_3PIO2_368 = 4.712389f;
-
-f32 fd_las_19_one_negone_359[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
-
-f32 fd_las_19___local_PIO2_367 = 1.5707964f;
-
-f32 fd_las_19_one_364 = 1.0f;
+extern EvtWord change_map_evt[];
+extern EvtWord las_19_init_evt[];
 
 static EVT_BEGIN(w_door_close)
     MULTIPLY_FLOAT(LW(0), FLOAT(-0.38867188f))

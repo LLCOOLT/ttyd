@@ -2,8 +2,6 @@
 #include "evt/evt_cmd.h"
 #include "evt/evt_bero.h"
 
-#pragma force_active on
-
 USER_FUNC(evt_bero_get_info);
 USER_FUNC(evt_map_playanim);
 USER_FUNC(evt_mapobj_rotate);
@@ -21,54 +19,8 @@ USER_FUNC(evt_snd_bgmon);
 USER_FUNC(evt_snd_envon);
 USER_FUNC(evt_snd_set_rev_mode);
 
-f32 fd_gon_02_negone_one_374[2] __attribute__((aligned(8)));
-f32 fd_gon_02_neg_one_382;
-f32 fd_gon_02___local_PI_383;
-f32 fd_gon_02___local_3PIO2_385;
-f32 fd_gon_02_one_negone_373[2] __attribute__((aligned(8)));
-f32 fd_gon_02___local_PIO2_384;
-f32 fd_gon_02_one_381;
-f32 fd_gon_02_negone_one_360[2] __attribute__((aligned(8)));
-f32 fd_gon_02_neg_one_365;
-f32 fd_gon_02___local_PI_366;
-f32 fd_gon_02___local_3PIO2_368;
-f32 fd_gon_02_one_negone_359[2] __attribute__((aligned(8)));
-f32 fd_gon_02___local_PIO2_367;
-f32 fd_gon_02_one_364;
-static EvtWord door01_close[22];
-static EvtWord door01_open[22];
-static EvtWord door02_close[12];
-static EvtWord door02_open[12];
 static BeroEntry bero_entry_data[4];
-EvtWord gon_02_init_evt[248];
-
-f32 fd_gon_02_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
-
-f32 fd_gon_02_neg_one_382 = -1.0f;
-
-f32 fd_gon_02___local_PI_383 = 3.1415927f;
-
-f32 fd_gon_02___local_3PIO2_385 = 4.712389f;
-
-f32 fd_gon_02_one_negone_373[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
-
-f32 fd_gon_02___local_PIO2_384 = 1.5707964f;
-
-f32 fd_gon_02_one_381 = 1.0f;
-
-f32 fd_gon_02_negone_one_360[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
-
-f32 fd_gon_02_neg_one_365 = -1.0f;
-
-f32 fd_gon_02___local_PI_366 = 3.1415927f;
-
-f32 fd_gon_02___local_3PIO2_368 = 4.712389f;
-
-f32 fd_gon_02_one_negone_359[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
-
-f32 fd_gon_02___local_PIO2_367 = 1.5707964f;
-
-f32 fd_gon_02_one_364 = 1.0f;
+extern EvtWord gon_02_init_evt[];
 
 static EVT_BEGIN(door01_close)
     MULTIPLY_FLOAT(LW(0), FLOAT(0.38867188f))
@@ -212,7 +164,7 @@ EVT_BEGIN(gon_02_init_evt)
     CALL(evt_npc_set_width, STRING("\"カロン04\""), 30)
     CALL(evt_npc_set_height, STRING("\"カロン04\""), 7)
     CALL(evt_map_playanim, STRING("hokori"), 1, 0)
-    CALL(evt_mobj_badgeblk, STRING("m\0\0"), 200, 60, -50, 242, 0, GSWF(1502), 1)
+    CALL(evt_mobj_badgeblk, STRING("m"), 200, 60, -50, 242, 0, GSWF(1502), 1)
     RETURN
 EVT_END()
 

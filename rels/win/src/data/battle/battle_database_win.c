@@ -7,24 +7,8 @@
 #include "battle/battle_stage_object.h"
 #include "driver/npcdrv.h"
 
-#pragma force_active on
-
 extern BattleUnitKind unit_boss_vivian;
 
-f32 fd_battle_database_win_negone_one_374[2] __attribute__((aligned(8)));
-f32 fd_battle_database_win_neg_one_382;
-f32 fd_battle_database_win___local_PI_383;
-f32 fd_battle_database_win___local_3PIO2_385;
-f32 fd_battle_database_win_one_negone_373[2] __attribute__((aligned(8)));
-f32 fd_battle_database_win___local_PIO2_384;
-f32 fd_battle_database_win_one_381;
-f32 fd_battle_database_win_negone_one_360[2] __attribute__((aligned(8)));
-f32 fd_battle_database_win_neg_one_365;
-f32 fd_battle_database_win___local_PI_366;
-f32 fd_battle_database_win___local_3PIO2_368;
-f32 fd_battle_database_win_one_negone_359[2] __attribute__((aligned(8)));
-f32 fd_battle_database_win___local_PIO2_367;
-f32 fd_battle_database_win_one_364;
 BattleStageObjectData win_btlobject_data[5];
 BattleStageData win_btlstage_data[1];
 BattleUnitSetup btlparty_win_win_00_01_off_1[2];
@@ -92,34 +76,6 @@ NpcBattleSelect btlgrpsel_win_btlno_win_03_01_off[2];
 NpcSetupBattleInfo btlsetup_win_tbl[9];
 NpcTerritoryInfo btl_win_setup_no_tbl[9];
 
-f32 fd_battle_database_win_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
-
-f32 fd_battle_database_win_neg_one_382 = -1.0f;
-
-f32 fd_battle_database_win___local_PI_383 = 3.1415927f;
-
-f32 fd_battle_database_win___local_3PIO2_385 = 4.712389f;
-
-f32 fd_battle_database_win_one_negone_373[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
-
-f32 fd_battle_database_win___local_PIO2_384 = 1.5707964f;
-
-f32 fd_battle_database_win_one_381 = 1.0f;
-
-f32 fd_battle_database_win_negone_one_360[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
-
-f32 fd_battle_database_win_neg_one_365 = -1.0f;
-
-f32 fd_battle_database_win___local_PI_366 = 3.1415927f;
-
-f32 fd_battle_database_win___local_3PIO2_368 = 4.712389f;
-
-f32 fd_battle_database_win_one_negone_359[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
-
-f32 fd_battle_database_win___local_PIO2_367 = 1.5707964f;
-
-f32 fd_battle_database_win_one_364 = 1.0f;
-
 BattleStageObjectData win_btlobject_data[] = {
     {"A1", 2, 0, {92.0f, 0.0f, -46.0f}, 0, 60, {0}},
     {"S_hana", 2, 1, {2.0f, 0.0f, -46.0f}, 0, 60, {0}},
@@ -172,7 +128,7 @@ BattleGroupSetup btlgrp_win_win_00_01_off_1 = {
     50, // noItemWeight
     battle_heart_drop_param_default, // hpDropTable
     battle_flower_drop_param_default, // fpDropTable
-    5, // field_1C
+    5, // reserved_1C
 };
 
 BattleUnitSetup btlparty_win_win_00_01_on_1[] = {
@@ -206,7 +162,7 @@ BattleGroupSetup btlgrp_win_win_00_01_on_1 = {
     50, // noItemWeight
     battle_heart_drop_param_default, // hpDropTable
     battle_flower_drop_param_default, // fpDropTable
-    5, // field_1C
+    5, // reserved_1C
 };
 
 BattleUnitSetup btlparty_win_win_00_01_on_2[] = {
@@ -250,7 +206,7 @@ BattleGroupSetup btlgrp_win_win_00_01_on_2 = {
     50, // noItemWeight
     battle_heart_drop_param_default, // hpDropTable
     battle_flower_drop_param_default, // fpDropTable
-    5, // field_1C
+    5, // reserved_1C
 };
 
 BattleUnitSetup btlparty_win_win_00_01_on_3[] = {
@@ -304,7 +260,7 @@ BattleGroupSetup btlgrp_win_win_00_01_on_3 = {
     50, // noItemWeight
     battle_heart_drop_param_default, // hpDropTable
     battle_flower_drop_param_default, // fpDropTable
-    5, // field_1C
+    5, // reserved_1C
 };
 
 BattleUnitSetup btlparty_win_win_00_02_off_1[] = {
@@ -338,7 +294,7 @@ BattleGroupSetup btlgrp_win_win_00_02_off_1 = {
     50, // noItemWeight
     battle_heart_drop_param_default2, // hpDropTable
     battle_flower_drop_param_default, // fpDropTable
-    5, // field_1C
+    5, // reserved_1C
 };
 
 BattleUnitSetup btlparty_win_win_00_02_on_1[] = {
@@ -372,7 +328,7 @@ BattleGroupSetup btlgrp_win_win_00_02_on_1 = {
     50, // noItemWeight
     battle_heart_drop_param_default2, // hpDropTable
     battle_flower_drop_param_default, // fpDropTable
-    5, // field_1C
+    5, // reserved_1C
 };
 
 BattleUnitSetup btlparty_win_win_00_02_on_2[] = {
@@ -416,7 +372,7 @@ BattleGroupSetup btlgrp_win_win_00_02_on_2 = {
     50, // noItemWeight
     battle_heart_drop_param_default2, // hpDropTable
     battle_flower_drop_param_default, // fpDropTable
-    5, // field_1C
+    5, // reserved_1C
 };
 
 BattleUnitSetup btlparty_win_win_00_03_off_1[] = {
@@ -460,7 +416,7 @@ BattleGroupSetup btlgrp_win_win_00_03_off_1 = {
     50, // noItemWeight
     battle_heart_drop_param_default, // hpDropTable
     battle_flower_drop_param_default, // fpDropTable
-    5, // field_1C
+    5, // reserved_1C
 };
 
 BattleUnitSetup btlparty_win_win_00_03_on_1[] = {
@@ -494,7 +450,7 @@ BattleGroupSetup btlgrp_win_win_00_03_on_1 = {
     50, // noItemWeight
     battle_heart_drop_param_default, // hpDropTable
     battle_flower_drop_param_default, // fpDropTable
-    5, // field_1C
+    5, // reserved_1C
 };
 
 BattleUnitSetup btlparty_win_win_00_03_on_2[] = {
@@ -528,7 +484,7 @@ BattleGroupSetup btlgrp_win_win_00_03_on_2 = {
     50, // noItemWeight
     battle_heart_drop_param_default, // hpDropTable
     battle_flower_drop_param_default, // fpDropTable
-    5, // field_1C
+    5, // reserved_1C
 };
 
 BattleUnitSetup btlparty_win_win_00_04_off_1[] = {
@@ -551,7 +507,7 @@ BattleGroupSetup btlgrp_win_win_00_04_off_1 = {
     100, // noItemWeight
     battle_heart_drop_param_default, // hpDropTable
     battle_flower_drop_param_default, // fpDropTable
-    5, // field_1C
+    5, // reserved_1C
 };
 
 BattleUnitSetup btlparty_win_win_02_01_off_1[] = {
@@ -585,7 +541,7 @@ BattleGroupSetup btlgrp_win_win_02_01_off_1 = {
     50, // noItemWeight
     battle_heart_drop_param_default2, // hpDropTable
     battle_flower_drop_param_default, // fpDropTable
-    5, // field_1C
+    5, // reserved_1C
 };
 
 BattleUnitSetup btlparty_win_win_02_01_on_1[] = {
@@ -619,7 +575,7 @@ BattleGroupSetup btlgrp_win_win_02_01_on_1 = {
     50, // noItemWeight
     battle_heart_drop_param_default2, // hpDropTable
     battle_flower_drop_param_default, // fpDropTable
-    5, // field_1C
+    5, // reserved_1C
 };
 
 BattleUnitSetup btlparty_win_win_02_01_on_2[] = {
@@ -663,7 +619,7 @@ BattleGroupSetup btlgrp_win_win_02_01_on_2 = {
     50, // noItemWeight
     battle_heart_drop_param_default2, // hpDropTable
     battle_flower_drop_param_default, // fpDropTable
-    5, // field_1C
+    5, // reserved_1C
 };
 
 BattleUnitSetup btlparty_win_win_02_01_on_3[] = {
@@ -707,7 +663,7 @@ BattleGroupSetup btlgrp_win_win_02_01_on_3 = {
     50, // noItemWeight
     battle_heart_drop_param_default2, // hpDropTable
     battle_flower_drop_param_default, // fpDropTable
-    5, // field_1C
+    5, // reserved_1C
 };
 
 BattleUnitSetup btlparty_win_win_02_02_off_1[] = {
@@ -741,7 +697,7 @@ BattleGroupSetup btlgrp_win_win_02_02_off_1 = {
     50, // noItemWeight
     battle_heart_drop_param_default, // hpDropTable
     battle_flower_drop_param_default2, // fpDropTable
-    5, // field_1C
+    5, // reserved_1C
 };
 
 BattleUnitSetup btlparty_win_win_02_02_on_1[] = {
@@ -775,7 +731,7 @@ BattleGroupSetup btlgrp_win_win_02_02_on_1 = {
     50, // noItemWeight
     battle_heart_drop_param_default, // hpDropTable
     battle_flower_drop_param_default2, // fpDropTable
-    5, // field_1C
+    5, // reserved_1C
 };
 
 BattleUnitSetup btlparty_win_win_02_02_on_2[] = {
@@ -819,7 +775,7 @@ BattleGroupSetup btlgrp_win_win_02_02_on_2 = {
     50, // noItemWeight
     battle_heart_drop_param_default, // hpDropTable
     battle_flower_drop_param_default2, // fpDropTable
-    5, // field_1C
+    5, // reserved_1C
 };
 
 BattleUnitSetup btlparty_win_win_02_02_on_3[] = {
@@ -863,7 +819,7 @@ BattleGroupSetup btlgrp_win_win_02_02_on_3 = {
     50, // noItemWeight
     battle_heart_drop_param_default, // hpDropTable
     battle_flower_drop_param_default2, // fpDropTable
-    5, // field_1C
+    5, // reserved_1C
 };
 
 BattleUnitSetup btlparty_win_win_03_01_off_1[] = {
@@ -917,7 +873,7 @@ BattleGroupSetup btlgrp_win_win_03_01_off_1 = {
     50, // noItemWeight
     battle_heart_drop_param_default, // hpDropTable
     battle_flower_drop_param_default2, // fpDropTable
-    5, // field_1C
+    5, // reserved_1C
 };
 
 BattleUnitSetup btlparty_win_win_03_01_on_1[] = {
@@ -951,7 +907,7 @@ BattleGroupSetup btlgrp_win_win_03_01_on_1 = {
     50, // noItemWeight
     battle_heart_drop_param_default, // hpDropTable
     battle_flower_drop_param_default2, // fpDropTable
-    5, // field_1C
+    5, // reserved_1C
 };
 
 BattleUnitSetup btlparty_win_win_03_01_on_2[] = {
@@ -995,7 +951,7 @@ BattleGroupSetup btlgrp_win_win_03_01_on_2 = {
     50, // noItemWeight
     battle_heart_drop_param_default, // hpDropTable
     battle_flower_drop_param_default2, // fpDropTable
-    5, // field_1C
+    5, // reserved_1C
 };
 
 BattleUnitSetup btlparty_win_win_03_01_on_3[] = {
@@ -1039,7 +995,7 @@ BattleGroupSetup btlgrp_win_win_03_01_on_3 = {
     50, // noItemWeight
     battle_heart_drop_param_default, // hpDropTable
     battle_flower_drop_param_default2, // fpDropTable
-    5, // field_1C
+    5, // reserved_1C
 };
 
 BattleUnitSetup btlparty_win_win_03_01_on_4[] = {
@@ -1093,7 +1049,7 @@ BattleGroupSetup btlgrp_win_win_03_01_on_4 = {
     50, // noItemWeight
     battle_heart_drop_param_default, // hpDropTable
     battle_flower_drop_param_default2, // fpDropTable
-    5, // field_1C
+    5, // reserved_1C
 };
 
 NpcBattleSelect btlgrpsel_win_btlno_win_test1_off[] = {
@@ -1184,8 +1140,8 @@ NpcSetupBattleInfo btlsetup_win_tbl[] = {
         -1, // swFlag
         NULL, // altSelect
         btlgrpsel_win_btlno_win_test1_off, // select
-        0, 0, // battleFlags..field_1C
-        {{1, 1}, {1, 1}, {1, 1}, {1, 1}, {1, 1}, {1, 1}, {1, 1}, {1, 1}, {1, 1}, {1, 1}, {1, 1}, {1, 1}, {1, 1}, {1, 1}, {1, 1}, {1, 1}}, // field_20
+        0, 0, // battleFlags, randomMode
+        {{1, 1}, {1, 1}, {1, 1}, {1, 1}, {1, 1}, {1, 1}, {1, 1}, {1, 1}, {1, 1}, {1, 1}, {1, 1}, {1, 1}, {1, 1}, {1, 1}, {1, 1}, {1, 1}}, // randomRanges
         "BGM_ZAKO_BATTLE1", // bgmName
     },
     {
@@ -1194,8 +1150,8 @@ NpcSetupBattleInfo btlsetup_win_tbl[] = {
         GSWF(2682), // swFlag
         btlgrpsel_win_btlno_win_00_01_on, // altSelect
         btlgrpsel_win_btlno_win_00_01_off, // select
-        0, 0, // battleFlags..field_1C
-        {{5, 5}, {0}, {0}, {0}, {5, 5}, {5, 5}, {0}, {0}, {5, 5}, {0}, {5, 5}, {5, 5}, {1, 1}, {1, 1}, {1, 1}, {1, 1}}, // field_20
+        0, 0, // battleFlags, randomMode
+        {{5, 5}, {0}, {0}, {0}, {5, 5}, {5, 5}, {0}, {0}, {5, 5}, {0}, {5, 5}, {5, 5}, {1, 1}, {1, 1}, {1, 1}, {1, 1}}, // randomRanges
         "BGM_ZAKO_BATTLE1", // bgmName
     },
     {
@@ -1204,8 +1160,8 @@ NpcSetupBattleInfo btlsetup_win_tbl[] = {
         GSWF(2682), // swFlag
         btlgrpsel_win_btlno_win_00_02_on, // altSelect
         btlgrpsel_win_btlno_win_00_02_off, // select
-        0, 0, // battleFlags..field_1C
-        {{5, 5}, {0}, {0}, {0}, {5, 5}, {5, 5}, {0}, {0}, {5, 5}, {0}, {5, 5}, {5, 5}, {1, 1}, {1, 1}, {1, 1}, {1, 1}}, // field_20
+        0, 0, // battleFlags, randomMode
+        {{5, 5}, {0}, {0}, {0}, {5, 5}, {5, 5}, {0}, {0}, {5, 5}, {0}, {5, 5}, {5, 5}, {1, 1}, {1, 1}, {1, 1}, {1, 1}}, // randomRanges
         "BGM_ZAKO_BATTLE1", // bgmName
     },
     {
@@ -1214,8 +1170,8 @@ NpcSetupBattleInfo btlsetup_win_tbl[] = {
         GSWF(2682), // swFlag
         btlgrpsel_win_btlno_win_00_03_on, // altSelect
         btlgrpsel_win_btlno_win_00_03_off, // select
-        0, 0, // battleFlags..field_1C
-        {{5, 5}, {0}, {0}, {0}, {5, 5}, {5, 5}, {0}, {0}, {5, 5}, {0}, {5, 5}, {5, 5}, {1, 1}, {1, 1}, {1, 1}, {1, 1}}, // field_20
+        0, 0, // battleFlags, randomMode
+        {{5, 5}, {0}, {0}, {0}, {5, 5}, {5, 5}, {0}, {0}, {5, 5}, {0}, {5, 5}, {5, 5}, {1, 1}, {1, 1}, {1, 1}, {1, 1}}, // randomRanges
         "BGM_ZAKO_BATTLE1", // bgmName
     },
     {
@@ -1226,8 +1182,8 @@ NpcSetupBattleInfo btlsetup_win_tbl[] = {
         NULL, // altSelect
         btlgrpsel_win_btlno_win_00_04_off, // select
         0x20000010, // battleFlags
-        0, // field_1C
-        {{5, 5}, {0}, {0}, {0}, {5, 5}, {5, 5}, {0}, {0}, {5, 5}, {0}, {5, 5}, {5, 5}, {1, 1}, {1, 1}, {1, 1}, {1, 1}}, // field_20
+        0, // randomMode
+        {{5, 5}, {0}, {0}, {0}, {5, 5}, {5, 5}, {0}, {0}, {5, 5}, {0}, {5, 5}, {5, 5}, {1, 1}, {1, 1}, {1, 1}, {1, 1}}, // randomRanges
         "BGM_BOSS_STG3_3WOMEN1", // bgmName
     },
     {
@@ -1236,8 +1192,8 @@ NpcSetupBattleInfo btlsetup_win_tbl[] = {
         GSWF(2680), // swFlag
         btlgrpsel_win_btlno_win_02_01_on, // altSelect
         btlgrpsel_win_btlno_win_02_01_off, // select
-        0, 0, // battleFlags..field_1C
-        {{5, 5}, {0}, {0}, {0}, {5, 5}, {5, 5}, {0}, {0}, {5, 5}, {0}, {5, 5}, {5, 5}, {1, 1}, {1, 1}, {1, 1}, {1, 1}}, // field_20
+        0, 0, // battleFlags, randomMode
+        {{5, 5}, {0}, {0}, {0}, {5, 5}, {5, 5}, {0}, {0}, {5, 5}, {0}, {5, 5}, {5, 5}, {1, 1}, {1, 1}, {1, 1}, {1, 1}}, // randomRanges
         "BGM_ZAKO_BATTLE1", // bgmName
     },
     {
@@ -1246,8 +1202,8 @@ NpcSetupBattleInfo btlsetup_win_tbl[] = {
         GSWF(2680), // swFlag
         btlgrpsel_win_btlno_win_02_02_on, // altSelect
         btlgrpsel_win_btlno_win_02_02_off, // select
-        0, 0, // battleFlags..field_1C
-        {{5, 5}, {0}, {0}, {0}, {5, 5}, {5, 5}, {0}, {0}, {5, 5}, {0}, {5, 5}, {10, 10}, {1, 1}, {1, 1}, {1, 1}, {1, 1}}, // field_20
+        0, 0, // battleFlags, randomMode
+        {{5, 5}, {0}, {0}, {0}, {5, 5}, {5, 5}, {0}, {0}, {5, 5}, {0}, {5, 5}, {10, 10}, {1, 1}, {1, 1}, {1, 1}, {1, 1}}, // randomRanges
         "BGM_ZAKO_BATTLE1", // bgmName
     },
     {
@@ -1256,8 +1212,8 @@ NpcSetupBattleInfo btlsetup_win_tbl[] = {
         GSWF(2681), // swFlag
         btlgrpsel_win_btlno_win_03_01_on, // altSelect
         btlgrpsel_win_btlno_win_03_01_off, // select
-        0, 0, // battleFlags..field_1C
-        {{5, 5}, {0}, {0}, {0}, {5, 5}, {5, 5}, {0}, {0}, {5, 5}, {0}, {5, 5}, {10, 10}, {1, 1}, {1, 1}, {1, 1}, {1, 1}}, // field_20
+        0, 0, // battleFlags, randomMode
+        {{5, 5}, {0}, {0}, {0}, {5, 5}, {5, 5}, {0}, {0}, {5, 5}, {0}, {5, 5}, {10, 10}, {1, 1}, {1, 1}, {1, 1}, {1, 1}}, // randomRanges
         "BGM_ZAKO_BATTLE1", // bgmName
     },
     {0},

@@ -15,6 +15,8 @@
 #include "system.h"
 #include <string.h>
 #include "evt/evt_mario.h"
+#include "party/party_vivian.h"
+#include "mario/mario_hit.h"
 
 
 void mario_plane_cancel(void);
@@ -48,7 +50,6 @@ void kpaAttackStart(void);
 BOOL marioChkSlitThrouhEnd(void);
 void marioBalloonOn(s32 type);
 void marioBalloonOff(void);
-void marioSetCamId(s32 id);
 void marioChgTalkMotion(void);
 void marioRollTryCancel(void);
 void marioSetForceMove(s32 frames, f32 dir, f32 spd);
@@ -140,14 +141,10 @@ void marioRollCancel(void);
 void motSlitCancel2(void);
 BOOL marioGetMotSlitCancel3(void);
 
-void* marioSearchGroundRoll(f32* y, f32* a, f32* b, f32 h, f32 vy);
-void* marioSearchGround(f32* y, f32* a, f32* b, f32 h, f32 vy);
 void marioClearJumpPara(void);
-void marioMakeJumpPara(void);
 void quake_kpaHipAttack(void);
 void kpaChgPose(const char* a, const char* b);
 
-void* searchUnder2(f32 x, f32 y, f32 z, f32* out);
 void rollEvtJumpSetup(void);
 void setRollEvtFlag(void);
 void clrRollEvtFlag(void);
@@ -400,7 +397,11 @@ const char* a_mario_group[] = {
     "M_H_8", "M_H_9", "M_H_9A", "M_H_9B", "M_O_1", "M_O_2", "M_B_1", "M_B_2", "M_D_1", "M_D_2",
     "M_U_3", "M_D_6", "M_P_1", "M_P_2", "M_I_1", "M_I_2", "M_I_S", "M_X_1", "M_I_U", "M_A_1A",
     "M_A_1B", "M_U_2", "M_W_7", "M_C_1", "M_C_2", "M_Y_1", "M_Y_2", "M_Y_3", "M_A_2A", "M_A_2B",
+#ifdef VERSION_G8MP01
+    "M_A_2C", "M_B_3", "M_B_4", "M_J_5A", "M_J_5B", "M_S_4", "M_W_6", "M_V_2", "M_I_Y", "M_I_3", NULL,
+#else
     "M_A_2C", "M_B_3", "M_B_4", "M_J_5A", "M_J_5B", "M_S_4", "M_W_6", "M_V_2", "M_I_Y", NULL,
+#endif
 };
 
 USER_FUNC(evt_mario_dokan_end) {
@@ -715,6 +716,11 @@ USER_FUNC(evt_mario_set_pose) {
         return EVT_RETURN_DONE;
     }
     name = (const char*)evtGetValue(event, args[0]);
+#ifdef VERSION_G8MP01
+    if (strcmp(name, "M_I_2") == 0) {
+        name = "M_I_3";
+    }
+#endif
     SETPOSE_BODY
 }
 
@@ -1294,7 +1300,7 @@ USER_FUNC(evt_mario_jump_pos) {
                     } else {
                         dy = 0.5f * mp->wPlayerCollisionBox.y + dy;
                     }
-                } else if (searchUnder2(x, y, z, &tmp)) {
+                } else if (searchUnder2(&tmp, x, y, z)) {
                     dy = h;
                 } else {
                     dy = h;
@@ -2087,7 +2093,7 @@ USER_FUNC(evt_mario_check_key_item) {
     EvtWord* args = event->args;
     s32 item = evtGetValue(event, args[0]);
     s32 id = args[1];
-    if (((s32(*)(s32))pouchCheckItem)(item)) {
+    if (pouchCheckItem(item)) {
         evtSetValue(event, id, 1);
     } else {
         evtSetValue(event, id, 0);

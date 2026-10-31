@@ -100,7 +100,7 @@ HitEntry* _hitEnt(MapFileJoint* joint, HitEntry* parent, Mtx parentMtx, s32 mapI
 */
 
 s32 unk_8041840C;
-HitEntry* hitActiveListTop; // TODO: proper name
+HitEntry* hitActiveListTop; // head of the active hit list (linked through nextActive)
 
 // local prototypes
 void hitReCalcMatrix2(HitEntry* hit, Mtx mtx, BOOL recursion);
@@ -286,14 +286,14 @@ inline void hitPreCheck(void) {
                     hitActiveListTop = hit;
                     prev = hit;
                 } else {
-                    prev->siblingActive = hit;
+                    prev->nextActive = hit;
                     prev = hit;
                 }
             }
         }
     }
     if (prev != NULL) {
-        prev->siblingActive = NULL;
+        prev->nextActive = NULL;
     }
 }
 inline HitEntry* hitNameToPtrNoChk(const char* name) {
@@ -550,7 +550,6 @@ static inline f32 hitDequant(s16* base, s32 idx) {
     return __OSs16tof32(base + idx);
 }
 
-#pragma dont_inline on
 s32 hitCalcVtxPosition(HitEntry* hit) {
     s32 i;
     Vec a;
@@ -669,7 +668,6 @@ s32 hitCalcVtxPosition(HitEntry* hit) {
     }
     return count;
 }
-#pragma dont_inline reset
 
 inline BOOL tempfunc(HitCheckQuery* query, HitVector* vector) {
     Vec toV0;
@@ -900,7 +898,7 @@ HitEntry* hitCheckVecFilter(HitCheckQuery* query, HitFilterCallback callback) { 
                     }
                 }
             }
-            entry = entry->siblingActive;
+            entry = entry->nextActive;
         }
     } else if (query->targetDir.x == 0.0f && query->targetDir.z == 0.0f) {
         if (query->targetDir.y == -1.0f) {
@@ -926,7 +924,7 @@ HitEntry* hitCheckVecFilter(HitCheckQuery* query, HitFilterCallback callback) { 
                         }
                     }
                 }
-                entry = entry->siblingActive;
+                entry = entry->nextActive;
             }
         } else if (query->targetDir.y == 1.0f) {
             while (entry != NULL) {
@@ -951,7 +949,7 @@ HitEntry* hitCheckVecFilter(HitCheckQuery* query, HitFilterCallback callback) { 
                         }
                     }
                 }
-                entry = entry->siblingActive;
+                entry = entry->nextActive;
             }
         } else {
             goto label_235;
@@ -980,7 +978,7 @@ HitEntry* hitCheckVecFilter(HitCheckQuery* query, HitFilterCallback callback) { 
                     }
                 }
             }
-            entry = entry->siblingActive;
+            entry = entry->nextActive;
         }
     }
     if (closest == NULL) {
@@ -1226,8 +1224,6 @@ HitEntry* hitNameToPtr(const char* name) { // 1:1
     MapEntry* map;
     MapWork* wp = mapGetWork();
     int j;
-    MapEntry* new_var;
-    MapEntry* new_var2;
     int i;
     HitEntry* hit;
 

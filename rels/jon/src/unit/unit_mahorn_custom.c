@@ -3,7 +3,6 @@
 #include "battle/battle_unit.h"
 #include "evt/evt_cmd.h"
 
-#pragma force_active on
 #include "battle/battle.h"
 #include "battle/battle_unit.h"
 #include "battle/battle_sub.h"
@@ -83,20 +82,6 @@ static USER_FUNC(eff_magic);
 static USER_FUNC(mahorn_shuffle);
 static USER_FUNC(hand_end);
 
-f32 fd_mahorn_custom_negone_one_374[2] __attribute__((aligned(8)));
-f32 fd_mahorn_custom_neg_one_382;
-f32 fd_mahorn_custom___local_PI_383;
-f32 fd_mahorn_custom___local_3PIO2_385;
-f32 fd_mahorn_custom_one_negone_373[2] __attribute__((aligned(8)));
-f32 fd_mahorn_custom___local_PIO2_384;
-f32 fd_mahorn_custom_one_381;
-f32 fd_mahorn_custom_negone_one_360[2] __attribute__((aligned(8)));
-f32 fd_mahorn_custom_neg_one_365;
-f32 fd_mahorn_custom___local_PI_366;
-f32 fd_mahorn_custom___local_3PIO2_368;
-f32 fd_mahorn_custom_one_negone_359[2] __attribute__((aligned(8)));
-f32 fd_mahorn_custom___local_PIO2_367;
-f32 fd_mahorn_custom_one_364;
 BattleUnitKind unit_mahorn_custom;
 BattleUnitKind unit_mahorn_custom_bunsin;
 static BattleUnitDefense defence;
@@ -113,14 +98,10 @@ static BattleWeapon weapon_mahorn_dekadeka_magic;
 static BattleWeapon weapon_mahorn_katikati_magic;
 static BattleWeapon weapon_mahorn_recover_magic;
 static BattleUnitSetup entry_mahorn;
-static EvtWord attack_event[239];
-static EvtWord attack_event_bunsin[7];
 static PoseTableEntry pose_table[17];
 static BattleDataEntry data_table[5];
 static BattleDataEntry data_table_bunsin[3];
 static EvtWord init_event[88];
-static EvtWord alpha_down_event[98];
-static EvtWord alpha_up_event[118];
 static EvtWord hand_ctrl_event[23];
 static EvtWord damage_event[66];
 static EvtWord mahorn_subset_bunsin_all_kill[68];
@@ -129,17 +110,12 @@ static EvtWord mahorn_subset_blow_dead_event[78];
 static EvtWord avoid_miss_event[16];
 static EvtWord bunsin_kill_event[37];
 static EvtWord attack_punch_event[429];
-static EvtWord start_avoid[26];
-static EvtWord attack_enemy_common_event[299];
-static EvtWord attack_enemy_all_common_event[189];
 static EvtWord attack_enemy_common_event_sub1[90];
 static EvtWord attack_enemy_common_event_sub2[231];
 static EvtWord attack_enemy_common_event_sub_no_hit[65];
 static EvtWord attack_enemy_common_event_sub_hit[50];
 static EvtWord attack_magic_event[54];
-static EvtWord confuse_magic_event[41];
 static EvtWord all_attack_magic_event[41];
-static EvtWord support_friend_common_event[227];
 static EvtWord dekadeka_magic_event[49];
 static EvtWord katikati_magic_event[49];
 static EvtWord trans_magic_event[49];
@@ -148,34 +124,6 @@ static EvtWord recover_magic_event[70];
 static EvtWord bunsin_event[152];
 static EvtWord spawn_event[76];
 static EvtWord wait_event[386];
-
-f32 fd_mahorn_custom_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
-
-f32 fd_mahorn_custom_neg_one_382 = -1.0f;
-
-f32 fd_mahorn_custom___local_PI_383 = 3.1415927f;
-
-f32 fd_mahorn_custom___local_3PIO2_385 = 4.712389f;
-
-f32 fd_mahorn_custom_one_negone_373[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
-
-f32 fd_mahorn_custom___local_PIO2_384 = 1.5707964f;
-
-f32 fd_mahorn_custom_one_381 = 1.0f;
-
-f32 fd_mahorn_custom_negone_one_360[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
-
-f32 fd_mahorn_custom_neg_one_365 = -1.0f;
-
-f32 fd_mahorn_custom___local_PI_366 = 3.1415927f;
-
-f32 fd_mahorn_custom___local_3PIO2_368 = 4.712389f;
-
-f32 fd_mahorn_custom_one_negone_359[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
-
-f32 fd_mahorn_custom___local_PIO2_367 = 1.5707964f;
-
-f32 fd_mahorn_custom_one_364 = 1.0f;
 
 BattleUnitKind unit_mahorn_custom = {
     169,

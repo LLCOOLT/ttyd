@@ -595,7 +595,7 @@ EffectEntry* effThunderN64Entry(s32 type, f32 x, f32 y, f32 z, f32 a, f32 b) {
     EffThunderN64Work* work;
 
     effect = effEntry();
-    effect->type = "ThunderN64\0";
+    effect->type = "ThunderN64";
     effect->count = 1;
     work = __memAlloc(HEAP_EFFECT, sizeof(EffThunderN64Work));
     effect->userdata = work;
@@ -850,7 +850,7 @@ void effThunderDisp(CameraId cameraId, EffectEntry* effect) {
     switch (type) {
         case 0:
             GXBegin(144, 0, 156);
-            ((void (*)())tri2)(0, 1, 2, 0, 0, 2, 3, 0);
+            tri2(0, 1, 2, 0, 0, 2, 3, 0);
             tri2(4, 5, 5, 0, 4, 5, 4, 0);
             tri2(6, 7, 8, 0, 6, 8, 9, 0);
             tri2(10, 11, 12, 0, 10, 12, 13, 0);

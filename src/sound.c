@@ -850,8 +850,18 @@ u8 SoundSongGetVolCh(s32 chan) {
     return (u8)song->vol;
 }
 
-BOOL SoundSongCheck(s32 chan) {
+u32 SoundSongCheck(s32 chan) {
     return sndSeqGetValid(sound.songs[chan].seqId) != 0;
+}
+
+// the live voice of an effect channel (its emitter's voice for 3D effects), or -1
+inline SND_VOICEID SoundEfxGetVoiceID(s32 chan) {
+    SoundEffect* sfx = &sound.effects[chan];
+    if (sfx->flags & 0x10) {
+        return sndFXCheck(sndEmitterVoiceID(&sfx->emitter));
+    } else {
+        return sndFXCheck(sfx->voiceId);
+    }
 }
 
 inline void SoundEfxMuteCh(s32 chan) {
@@ -963,15 +973,9 @@ void SoundEfxStop(s32 chan) {
 }
 
 void SoundEfxSetPitch(s32 chan, u16 pitch) {
-    SoundEffect* sfx;
     SND_VOICEID vid;
 
-    sfx = &sound.effects[chan];
-    if (sfx->flags & 0x10) {
-        vid = sndFXCheck(sndEmitterVoiceID(&sfx->emitter));
-    } else {
-        vid = sndFXCheck(sfx->voiceId);
-    }
+    vid = SoundEfxGetVoiceID(chan);
     if (vid != -1) {
         sndFXPitchBend(vid, (u16)(pitch + 0x2000));
     }
@@ -982,11 +986,7 @@ void SoundEfxSetVolume(s32 chan, u8 vol) {
     SND_VOICEID vid;
 
     sfx = &sound.effects[chan];
-    if (sfx->flags & 0x10) {
-        vid = sndFXCheck(sndEmitterVoiceID(&sfx->emitter));
-    } else {
-        vid = sndFXCheck(sfx->voiceId);
-    }
+    vid = SoundEfxGetVoiceID(chan);
     if (vid != -1) {
         sfx->vol = vol;
         sndFXVolume(vid, vol);
@@ -997,20 +997,14 @@ void SoundEfxSetVolume(s32 chan, u8 vol) {
 }
 
 u8 SoundEfxGetVolume(s32 chan) {
-    s32 off = chan * sizeof(SoundEffect);
-    return (u8)*(u16*)((u8*)sound.effects + off + offsetof(SoundEffect, vol)); // FAKE: byte-offset load from the chan * sizeof offset (sound.effects[chan].vol schedules differently)
+    SoundEffect* sfx = &sound.effects[chan];
+    return sfx->vol;
 }
 
 void SoundEfxSetAux1(s32 chan, u8 reverb) {
-    SoundEffect* sfx;
     SND_VOICEID vid;
 
-    sfx = &sound.effects[chan];
-    if (sfx->flags & 0x10) {
-        vid = sndFXCheck(sndEmitterVoiceID(&sfx->emitter));
-    } else {
-        vid = sndFXCheck(sfx->voiceId);
-    }
+    vid = SoundEfxGetVoiceID(chan);
     if (vid != -1) {
         sndFXReverb(vid, reverb);
     }
@@ -1019,15 +1013,10 @@ void SoundEfxSetAux1(s32 chan, u8 reverb) {
 void SoundEfxSetPan(s32 chan, u8 pan) {
     SoundEffect* sfx;
     SND_VOICEID vid;
-    s32 off = chan * sizeof(SoundEffect);
 
-    *(u16*)((u8*)sound.effects + off + offsetof(SoundEffect, pan)) = pan; // FAKE: byte-offset store, then sfx from the same offset (sfx = &sound.effects[chan]; sfx->pan = pan does not match)
-    sfx = (SoundEffect*)((u8*)sound.effects + off);
-    if (sfx->flags & 0x10) {
-        vid = sndFXCheck(sndEmitterVoiceID(&sfx->emitter));
-    } else {
-        vid = sndFXCheck(sfx->voiceId);
-    }
+    sfx = &sound.effects[chan];
+    sfx->pan = pan;
+    vid = SoundEfxGetVoiceID(chan);
     if (vid != -1) {
         sndFXPanning(vid, pan);
     }
@@ -1037,12 +1026,10 @@ void SoundEfxSetSrndPan(s32 chan, u8 span) {
     SoundEffect* sfx;
     SND_VOICEID vid;
     s32 doppler;
-    s32 off = chan * sizeof(SoundEffect);
 
-    *(u16*)((u8*)sound.effects + off + offsetof(SoundEffect, span)) = span; // FAKE: byte-offset store, then sfx from the same offset (sfx = &sound.effects[chan]; sfx->span = span does not match)
-    sfx = (SoundEffect*)((u8*)sound.effects + off);
-    vid = (sfx->flags & 0x10) ? sndFXCheck(sndEmitterVoiceID(&sfx->emitter))
-                              : sndFXCheck(sfx->voiceId);
+    sfx = &sound.effects[chan];
+    sfx->span = span;
+    vid = SoundEfxGetVoiceID(chan);
     if (vid != -1) {
         sndFXSurroundPanning(vid, span);
         if (span == 0) {
@@ -1103,15 +1090,9 @@ BOOL SoundEfxCheck(s32 chan) {
 }
 
 inline void SoundEfxCheckCh(s32 chan) {
-    SoundEffect* effect;
     SND_VOICEID vid;
 
-    effect = &sound.effects[chan];
-    if (effect->flags & 0x10) {
-        vid = sndFXCheck(sndEmitterVoiceID(&effect->emitter));
-    } else {
-        vid = sndFXCheck(effect->voiceId);
-    }
+    vid = SoundEfxGetVoiceID(chan);
     if (sndFXCheck(vid) == -1) {
         SoundEfxMuteCh(chan);
     }
@@ -1786,7 +1767,7 @@ void SoundSSPlayCh(s32 chan, const char* name) {
 void SoundSSPlayChEx(s32 chan, const char* name, s32 aram) {
     SoundStream* stream;
     int i;
-    const char* new_var2 [2]; // FAKE: alias array needed for 100% (a plain str/root form is 5 rows off)
+    const char* path;
 
     stream = &sound.streams[chan];
     if (stream->flags) {
@@ -1814,13 +1795,14 @@ void SoundSSPlayChEx(s32 chan, const char* name, s32 aram) {
     if (aram) {
         stream->flags |= 0x400;
     }
-    new_var2 [1] = getMarioStDvdRoot ();
-    sprintf(str, "%s/%s%s", new_var2 [1], name, ".stm");
-    if (!(stream->entries[0].dvd = DVDMgrOpen(new_var2 [0] = str, 0, 0))) {
+    path = getMarioStDvdRoot();
+    sprintf(str, "%s/%s%s", path, name, ".stm");
+    path = str;
+    if (!(stream->entries[0].dvd = DVDMgrOpen(path, 0, 0))) {
         stream->flags = 0;
         return;
     }
-    if (!(stream->entries[1].dvd = DVDMgrOpen(new_var2 [0], 0, 0))) {
+    if (!(stream->entries[1].dvd = DVDMgrOpen(path, 0, 0))) {
         stream->flags = 0;
         return;
     }
@@ -2076,7 +2058,7 @@ void SoundSSSetPlayFreqCh(s32 chan, u16 freq) {
     }
 }
 
-u16 SoundSSCheck(s32 chan) {
+u32 SoundSSCheck(s32 chan) {
     return sound.streams[chan].flags;
 }
 

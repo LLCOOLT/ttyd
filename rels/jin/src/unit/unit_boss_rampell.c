@@ -2,7 +2,6 @@
 #include "eff/eff_scanning.h"
 #include "evt/evt_cmd.h"
 
-#pragma force_active on
 #include "battle/battle.h"
 #include "battle/battle_sub.h"
 #include "driver/animdrv.h"
@@ -57,20 +56,6 @@ USER_FUNC(evt_msg_print);
 static USER_FUNC(vivian_comeback);
 static USER_FUNC(eff_scanning);
 
-f32 fd_boss_rampell_negone_one_374[2] __attribute__((aligned(8)));
-f32 fd_boss_rampell_neg_one_382;
-f32 fd_boss_rampell___local_PI_383;
-f32 fd_boss_rampell___local_3PIO2_385;
-f32 fd_boss_rampell_one_negone_373[2] __attribute__((aligned(8)));
-f32 fd_boss_rampell___local_PIO2_384;
-f32 fd_boss_rampell_one_381;
-f32 fd_boss_rampell_negone_one_360[2] __attribute__((aligned(8)));
-f32 fd_boss_rampell_neg_one_365;
-f32 fd_boss_rampell___local_PI_366;
-f32 fd_boss_rampell___local_3PIO2_368;
-f32 fd_boss_rampell_one_negone_359[2] __attribute__((aligned(8)));
-f32 fd_boss_rampell___local_PIO2_367;
-f32 fd_boss_rampell_one_364;
 BattleUnitKind unit_boss_rampell;
 static BattleUnitDefense defence;
 static BattleUnitDefenseAttr defence_attr;
@@ -79,8 +64,8 @@ static PoseTableEntry pose_table[18];
 static BattleDataEntry data_table[2];
 static BattleUnitKindPart parts[1];
 static BattleWeapon weapon_rampell_attack;
-EvtWord rampell_zoom[19];
-EvtWord to_faker_mario[339];
+extern EvtWord rampell_zoom[];
+extern EvtWord to_faker_mario[];
 static EvtWord init_event[61];
 static EvtWord damage_event[10];
 static EvtWord dead_event[74];
@@ -98,15 +83,10 @@ static BattleWeapon weapon_masao_jump;
 static BattleWeapon weapon_masao_hammer;
 static BattleWeapon weapon_masao_kururin_jump;
 static BattleWeapon weapon_masao_kaiten_hammer;
-static EvtWord mario_zoom[19];
-static EvtWord enemy_zoom[19];
-static EvtWord fmario_zoom[19];
-static EvtWord gparty_zoom[19];
 static EvtWord init_event_fmario[73];
 static EvtWord dead_event_fmario[93];
 static EvtWord damage_event_fmario[10];
 static EvtWord attack_event_fmario[58];
-static EvtWord jump_attack_voice[36];
 static EvtWord marioAttackEvent_NormalJump[344];
 static EvtWord marioAttackEvent_KururinJump[469];
 static EvtWord marioAttackEvent_NormalHammer[299];
@@ -158,37 +138,9 @@ static USER_FUNC(eff_scanning) {
     BattleUnit* unit = BattleGetUnitPtr(_battleWorkPointer, id);
     EffectEntry* eff = effScanningEntry(0, x, y, z);
 
-    ((effScanningData*)eff->userdata)->field_0x10 = unit->mSizeMultiplier;
+    ((effScanningData*)eff->userdata)->scale = unit->mSizeMultiplier;
     return EVT_RETURN_DONE;
 }
-
-f32 fd_boss_rampell_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
-
-f32 fd_boss_rampell_neg_one_382 = -1.0f;
-
-f32 fd_boss_rampell___local_PI_383 = 3.1415927f;
-
-f32 fd_boss_rampell___local_3PIO2_385 = 4.712389f;
-
-f32 fd_boss_rampell_one_negone_373[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
-
-f32 fd_boss_rampell___local_PIO2_384 = 1.5707964f;
-
-f32 fd_boss_rampell_one_381 = 1.0f;
-
-f32 fd_boss_rampell_negone_one_360[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
-
-f32 fd_boss_rampell_neg_one_365 = -1.0f;
-
-f32 fd_boss_rampell___local_PI_366 = 3.1415927f;
-
-f32 fd_boss_rampell___local_3PIO2_368 = 4.712389f;
-
-f32 fd_boss_rampell_one_negone_359[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
-
-f32 fd_boss_rampell___local_PIO2_367 = 1.5707964f;
-
-f32 fd_boss_rampell_one_364 = 1.0f;
 
 BattleUnitKind unit_boss_rampell = {
     77,

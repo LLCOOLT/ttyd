@@ -123,13 +123,13 @@ s32 battleAcMain_TimingWide(BattleWork* work) {
                         }
                         break;
                     case -1:
-                        if (((s32(*)(s32))BattlePadCheckUp)(tw->button)) {
+                        if (BattlePadCheckUp(tw->button)) {
                             pressed = 1;
                         }
                         break;
                     case 0:
                     default:
-                        if (!((s32(*)(s32))BattlePadCheckNow)(tw->button)) {
+                        if (!BattlePadCheckNow(tw->button)) {
                             pressed = 1;
                         }
                         break;
@@ -262,7 +262,6 @@ void battleAcDelete_TimingWide(BattleWork* work) {
     work->actionCommands.mAcState = 0x3EC;
 }
 
-#pragma dont_inline on
 #define ICON(id)                            \
     {                                       \
         Vec pos = {0.0f, 0.0f, 0.0f};       \

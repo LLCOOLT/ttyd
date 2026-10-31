@@ -2,7 +2,6 @@
 #include "evt/evt_cmd.h"
 #include "manager/evtmgr_cmd.h"
 
-#pragma force_active on
 #include "stdio.h"
 #include "string.h"
 #include "evt/evt_npc.h"
@@ -81,31 +80,15 @@ void _unresolved(void);
 void _epilog(void);
 void _prolog(void);
 
-f32 fd_rsh_negone_one_374[2] __attribute__((aligned(8)));
-f32 fd_rsh_neg_one_382;
-f32 fd_rsh___local_PI_383;
-f32 fd_rsh___local_3PIO2_385;
-f32 fd_rsh_one_negone_373[2] __attribute__((aligned(8)));
-f32 fd_rsh___local_PIO2_384;
-f32 fd_rsh_one_381;
-f32 fd_rsh_negone_one_360[2] __attribute__((aligned(8)));
-f32 fd_rsh_neg_one_365;
-f32 fd_rsh___local_PI_366;
-f32 fd_rsh___local_3PIO2_368;
-f32 fd_rsh_one_negone_359[2] __attribute__((aligned(8)));
-f32 fd_rsh___local_PIO2_367;
-f32 fd_rsh_one_364;
-f64 fd_rsh__three_localstatic4_sqrtf;
-f64 fd_rsh__half_localstatic3_sqrtf;
-EvtWord simi_check[57];
-EvtWord simi_offscreen_check[41];
-EvtWord kami_check[85];
-EvtWord kami_offscreen_check[41];
-EvtWord evt_rsh_door_init[23];
-EvtWord evt_rsh_door_entry[46];
-EvtWord evt_rsh_door_open[548];
-EvtWord evt_rsh_door_close[404];
-EvtWord evt_rsh_window[30];
+extern EvtWord simi_check[];
+extern EvtWord simi_offscreen_check[];
+extern EvtWord kami_check[];
+extern EvtWord kami_offscreen_check[];
+extern EvtWord evt_rsh_door_init[];
+extern EvtWord evt_rsh_door_entry[];
+extern EvtWord evt_rsh_door_open[];
+extern EvtWord evt_rsh_door_close[];
+extern EvtWord evt_rsh_window[];
 RshRndNpc rsh_01_rnd_npc_1[5];
 RshRndNpc rsh_01_rnd_npc_2[3];
 RshRndNpc rsh_01_rnd_npc_3[2];
@@ -115,46 +98,46 @@ RshRndNpc rsh_04_rnd_npc_1[2];
 RshRndNpc rsh_04_rnd_npc_2[2];
 RshRndNpc rsh_04_rnd_npc_3[2];
 RshRndNpc rsh_04_rnd_npc_4[4];
-EvtWord evt_rsh_rnd_npc_2_1_talk[8];
-EvtWord evt_rsh_rnd_npc_2_2_talk[16];
-EvtWord evt_rsh_rnd_npc_2_3_talk[16];
-EvtWord evt_rsh_rnd_npc_2_4_talk[8];
-EvtWord evt_rsh_rnd_npc_2_5_talk[8];
-EvtWord evt_rsh_rnd_npc_2_6_talk[8];
-EvtWord evt_rsh_rnd_npc_2_7_talk[8];
-EvtWord evt_rsh_rnd_npc_2_8_talk[8];
-EvtWord evt_rsh_rnd_npc_2_9_talk[8];
-EvtWord evt_rsh_rnd_npc_2_10_talk[8];
-EvtWord evt_rsh_rnd_npc_3_1_talk[8];
-EvtWord evt_rsh_rnd_npc_3_2_talk[8];
-EvtWord evt_rsh_rnd_npc_3_3_talk[8];
-EvtWord evt_rsh_rnd_npc_3_4_talk[8];
-EvtWord evt_rsh_rnd_npc_3_5_talk[25];
-EvtWord evt_rsh_rnd_npc_3_6_talk[8];
-EvtWord evt_rsh_rnd_npc_3_7_talk[8];
-EvtWord evt_rsh_rnd_npc_3_8_talk[8];
-EvtWord evt_rsh_rnd_npc_3_9_talk[8];
-EvtWord evt_rsh_rnd_npc_3_10_talk[8];
-EvtWord evt_rsh_rnd_npc_4_1_talk[8];
-EvtWord evt_rsh_rnd_npc_4_2_talk[8];
-EvtWord evt_rsh_rnd_npc_4_3_talk[16];
-EvtWord evt_rsh_rnd_npc_4_4_talk[8];
-EvtWord evt_rsh_rnd_npc_4_5_talk[8];
-EvtWord evt_rsh_rnd_npc_4_6_talk[8];
-EvtWord evt_rsh_rnd_npc_4_7_talk[8];
-EvtWord evt_rsh_rnd_npc_4_8_talk[39];
-EvtWord evt_rsh_rnd_npc_4_9_talk[8];
-EvtWord evt_rsh_rnd_npc_4_10_talk[8];
-EvtWord evt_rsh_rnd_npc_5_1_talk[8];
-EvtWord evt_rsh_rnd_npc_5_2_talk[8];
-EvtWord evt_rsh_rnd_npc_5_3_talk[47];
-EvtWord evt_rsh_rnd_npc_5_4_talk[8];
-EvtWord evt_rsh_rnd_npc_5_5_talk[8];
-EvtWord evt_rsh_rnd_npc_5_6_talk[8];
-EvtWord evt_rsh_rnd_npc_5_7_talk[8];
-EvtWord evt_rsh_rnd_npc_5_8_talk[8];
-EvtWord evt_rsh_rnd_npc_5_9_talk[8];
-EvtWord evt_rsh_rnd_npc_5_10_talk[8];
+extern EvtWord evt_rsh_rnd_npc_2_1_talk[];
+extern EvtWord evt_rsh_rnd_npc_2_2_talk[];
+extern EvtWord evt_rsh_rnd_npc_2_3_talk[];
+extern EvtWord evt_rsh_rnd_npc_2_4_talk[];
+extern EvtWord evt_rsh_rnd_npc_2_5_talk[];
+extern EvtWord evt_rsh_rnd_npc_2_6_talk[];
+extern EvtWord evt_rsh_rnd_npc_2_7_talk[];
+extern EvtWord evt_rsh_rnd_npc_2_8_talk[];
+extern EvtWord evt_rsh_rnd_npc_2_9_talk[];
+extern EvtWord evt_rsh_rnd_npc_2_10_talk[];
+extern EvtWord evt_rsh_rnd_npc_3_1_talk[];
+extern EvtWord evt_rsh_rnd_npc_3_2_talk[];
+extern EvtWord evt_rsh_rnd_npc_3_3_talk[];
+extern EvtWord evt_rsh_rnd_npc_3_4_talk[];
+extern EvtWord evt_rsh_rnd_npc_3_5_talk[];
+extern EvtWord evt_rsh_rnd_npc_3_6_talk[];
+extern EvtWord evt_rsh_rnd_npc_3_7_talk[];
+extern EvtWord evt_rsh_rnd_npc_3_8_talk[];
+extern EvtWord evt_rsh_rnd_npc_3_9_talk[];
+extern EvtWord evt_rsh_rnd_npc_3_10_talk[];
+extern EvtWord evt_rsh_rnd_npc_4_1_talk[];
+extern EvtWord evt_rsh_rnd_npc_4_2_talk[];
+extern EvtWord evt_rsh_rnd_npc_4_3_talk[];
+extern EvtWord evt_rsh_rnd_npc_4_4_talk[];
+extern EvtWord evt_rsh_rnd_npc_4_5_talk[];
+extern EvtWord evt_rsh_rnd_npc_4_6_talk[];
+extern EvtWord evt_rsh_rnd_npc_4_7_talk[];
+extern EvtWord evt_rsh_rnd_npc_4_8_talk[];
+extern EvtWord evt_rsh_rnd_npc_4_9_talk[];
+extern EvtWord evt_rsh_rnd_npc_4_10_talk[];
+extern EvtWord evt_rsh_rnd_npc_5_1_talk[];
+extern EvtWord evt_rsh_rnd_npc_5_2_talk[];
+extern EvtWord evt_rsh_rnd_npc_5_3_talk[];
+extern EvtWord evt_rsh_rnd_npc_5_4_talk[];
+extern EvtWord evt_rsh_rnd_npc_5_5_talk[];
+extern EvtWord evt_rsh_rnd_npc_5_6_talk[];
+extern EvtWord evt_rsh_rnd_npc_5_7_talk[];
+extern EvtWord evt_rsh_rnd_npc_5_8_talk[];
+extern EvtWord evt_rsh_rnd_npc_5_9_talk[];
+extern EvtWord evt_rsh_rnd_npc_5_10_talk[];
 const char* rsh_01_rnd_npc_1_list[5];
 const char* rsh_01_rnd_npc_2_list[3];
 const char* rsh_01_rnd_npc_3_list[2];
@@ -164,45 +147,13 @@ const char* rsh_04_rnd_npc_1_list[2];
 const char* rsh_04_rnd_npc_2_list[2];
 const char* rsh_04_rnd_npc_3_list[2];
 const char* rsh_04_rnd_npc_4_list[4];
-EvtWord debug_print_rnd_npc[61];
-EvtWord evt_rsh_rnd_npc_init[94];
-EvtWord evt_rsh_01_rnd_npc_entry[137];
+extern EvtWord debug_print_rnd_npc[];
+extern EvtWord evt_rsh_rnd_npc_init[];
+extern EvtWord evt_rsh_01_rnd_npc_entry[];
 NpcSetupInfo rsh_03_rnd_npc_2_ent[2];
-EvtWord evt_rsh_03_rnd_npc_entry[95];
+extern EvtWord evt_rsh_03_rnd_npc_entry[];
 NpcSetupInfo rsh_04_rnd_npc_3_ent[2];
-EvtWord evt_rsh_04_rnd_npc_entry[185];
-
-f32 fd_rsh_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
-
-f32 fd_rsh_neg_one_382 = -1.0f;
-
-f32 fd_rsh___local_PI_383 = 3.1415927f;
-
-f32 fd_rsh___local_3PIO2_385 = 4.712389f;
-
-f32 fd_rsh_one_negone_373[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
-
-f32 fd_rsh___local_PIO2_384 = 1.5707964f;
-
-f32 fd_rsh_one_381 = 1.0f;
-
-f32 fd_rsh_negone_one_360[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
-
-f32 fd_rsh_neg_one_365 = -1.0f;
-
-f32 fd_rsh___local_PI_366 = 3.1415927f;
-
-f32 fd_rsh___local_3PIO2_368 = 4.712389f;
-
-f32 fd_rsh_one_negone_359[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
-
-f32 fd_rsh___local_PIO2_367 = 1.5707964f;
-
-f32 fd_rsh_one_364 = 1.0f;
-
-f64 fd_rsh__three_localstatic4_sqrtf = 3.0;
-
-f64 fd_rsh__half_localstatic3_sqrtf = 0.5;
+extern EvtWord evt_rsh_04_rnd_npc_entry[];
 
 EVT_BEGIN(simi_check)
     SET_VALUE(LF(0), 0)
@@ -449,6 +400,14 @@ EVT_BEGIN(evt_rsh_door_open)
                 CALL(evt_img_wait_animend, STRING("capture_img"))
                 CALL(evt_mario_key_onoff, 1)
             END_SWITCH
+#ifdef VERSION_G8MP01
+            IF_INT_EQUAL(GSW(0), 308)
+                CALL(evt_npc_check, STRING("トロン"), LW(10))
+                IF_INT_EQUAL(LW(10), 1)
+                    CALL(evt_npc_flag_onoff, 0, STRING("トロン"), 32)
+                END_IF
+            END_IF
+#endif
         END_IF
     END_IF
     SET_VALUE(LF(0), 0)
@@ -470,6 +429,14 @@ EVT_BEGIN(evt_rsh_door_open)
             IF_INT_EQUAL(GSWF(3445), 1)
                 CALL(evt_snd_bgmoff, 2048)
             END_IF
+#ifdef VERSION_G8MP01
+            IF_INT_EQUAL(GSW(0), 308)
+                CALL(evt_npc_check, STRING("トロン"), LW(10))
+                IF_INT_EQUAL(LW(10), 1)
+                    CALL(evt_npc_flag_onoff, 1, STRING("トロン"), 32)
+                END_IF
+            END_IF
+#endif
             SET_VALUE(GSWF(3459), 1)
         END_IF
     END_IF
@@ -1477,7 +1444,7 @@ void rsh_window_tev(MapTevCallbackInfo* info) {
     GXTevStageID tevStage;
     GXTexMapID texMap;
     GXTexCoordID texCoord;
-    int field_0x18;
+    int indStage;
     u16 x0, y0, x1, y1;
     s32 height, width;
     s32 halfHeight, halfWidth;
@@ -1490,7 +1457,7 @@ void rsh_window_tev(MapTevCallbackInfo* info) {
     tevStage = info->tevStage;
     texMap = info->texCoord;
     texCoord = info->texMap;
-    field_0x18 = info->indStage;
+    indStage = info->indStage;
     flags = p->flags;
     if (flags & 0x20) {
         while ((p = p->parent) != NULL) {
@@ -1566,7 +1533,7 @@ void rsh_window_tev(MapTevCallbackInfo* info) {
     texMap++;
     info->tevStage = tevStage;
     info->texMap = texCoord;
-    info->indStage = field_0x18;
+    info->indStage = indStage;
     info->texCoord = texMap;
 }
 
@@ -1644,6 +1611,3 @@ void _prolog(void) {
     relSetBtlAddr("rsh", btlsetup_rsh_tbl, btl_rsh_setup_no_tbl);
 }
 
-
-#pragma force_active on
-#pragma force_active reset

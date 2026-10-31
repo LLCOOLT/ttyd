@@ -1,0 +1,2700 @@
+// tst.rel battle setups: the BTLNO_TEST_* enemy groups and the test stages (bti_01..bti_04), plus the
+// background-set wave offset user function that moves stage object "B".
+#include "battle/battle_unit.h"
+#include "evt/evt_cmd.h"
+#include "manager/evtmgr_cmd.h"
+
+#include "battle/battle_stage_object.h"
+#include "system.h"
+#include "battle/battle_weapon_power.h"
+#include "battle/battle_database_common.h"
+#include "battle/battle_stage.h"
+#include "driver/npcdrv.h"
+#include "tst.h"
+
+f32 sinfd(f32 degrees);
+
+static USER_FUNC(_wave_offset);
+extern EvtWord bgset_tst_wave_event[];
+
+BattleStageObjectData tst_btlobject_data[] = {
+    {"ki_1", 0, 0, {136.0f, 0.0f, -63.0f}, 50, 40, {0}},
+    {"ki_2", 0, 0, {86.0f, 0.0f, -30.0f}, 0, 90, {0}},
+    {"ki_3", 0, 0, {40.0f, 0.0f, -50.0f}, 30, 60, {0}},
+    {"saku_1", 0, 1, {-19.0f, 0.0f, -49.0f}, 0, 90, {0}},
+    {"B", 2, 2, {0}, 0, 90, {0}},
+    {"C", 2, 3, {0}, 0, 90, {0}},
+    {"if_wire", 5, 6, {0.0f, 130.0f, 0.0f}, 0, 0, {0}},
+    {"if_body", 5, 6, {0.0f, 130.0f, 0.0f}, 0, 0, {0}},
+    {"ki_1", 0, 0, {136.0f, 0.0f, -63.0f}, 50, 30, {0}},
+    {"ki_2", 0, 0, {40.0f, 0.0f, -50.0f}, 0, 90, {0}},
+    {"saku_1", 0, 1, {-50.0f, 0.0f, -50.0f}, 0, 90, {0}},
+    {"B", 2, 2, {0}, 0, 90, {0}},
+    {"C", 2, 3, {0}, 0, 90, {0}},
+    {"ki_1", 0, 0, {136.0f, 0.0f, -63.0f}, 50, 40, {0}},
+    {"ki_2", 0, 0, {86.0f, 0.0f, -30.0f}, 0, 90, {0}},
+    {"ki_3", 0, 0, {40.0f, 0.0f, -50.0f}, 30, 60, {0}},
+    {"saku_1", 0, 1, {-19.0f, 0.0f, -49.0f}, 0, 90, {0}},
+    {"B", 2, 2, {0}, 0, 90, {0}},
+    {"C", 2, 3, {0}, 0, 90, {0}},
+};
+
+BattleStageData tst_btlstage_data[] = {
+    {
+        "bti_01", // mGlobalStageDataDir
+        "stg_01_0", // mSpecificStageDataDir
+        0, // mNumObjects
+        NULL, // mObjects
+        {NULL, 0, {0}, 0, NULL, 100, 0, 0, 2, 0.0f, 0, 0, 0, 0, NULL, {0}, NULL, {0}, 0x2100060, 0x20000000, 0, 26, 3, 2, NULL, 0, 0x7FF, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, {0}, NULL, {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}}, // bgAWeapon
+        {NULL, 0, {0}, 0, NULL, 100, 0, 0, 2, 0.0f, 0, 0, 0, 0, NULL, {0}, NULL, {0}, 0x2100060, 0x20000000, 0, 26, 3, 2, NULL, 0, 0x7FF, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, {0}, NULL, {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}}, // bgBWeapon
+        NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, // initEvt..bgCEvt
+        0, 0, 0, 0, // reserved_1B0..disableBgBDestroy
+    },
+    {
+        "bti_01", // mGlobalStageDataDir
+        "stg_01_0", // mSpecificStageDataDir
+        6, // mNumObjects
+        tst_btlobject_data, // mObjects
+        {NULL, 0, {0}, 0, NULL, 100, 0, 0, 2, 0.0f, 0, 0, 0, 0, weaponGetPowerDefault, {1, 0, 0, 0, 0, 0, 0, 0}, NULL, {0}, 0x210006F, 0x20000000, 0, 26, 3, 2, NULL, 0, 0x7FF, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, {0}, NULL, {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}}, // bgAWeapon
+        {NULL, 0, {0}, 0, NULL, 100, 0, 0, 2, 0.0f, 0, 0, 0, 0, weaponGetPowerDefault, {1, 0, 0, 0, 0, 0, 0, 0}, NULL, {0}, 0x2100060, 0x20000000, 0, 26, 3, 2, NULL, 0, 0x7FF, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, {0}, NULL, {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}}, // bgBWeapon
+        NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, // initEvt..bgCEvt
+        0, 0, 0, 0, // reserved_1B0..disableBgBDestroy
+    },
+    {
+        "bti_02", // mGlobalStageDataDir
+        "stg_01_1", // mSpecificStageDataDir
+        6, // mNumObjects
+        tst_btlobject_data, // mObjects
+        {NULL, 0, {0}, 0, NULL, 100, 0, 0, 2, 0.0f, 0, 0, 0, 0, NULL, {0}, NULL, {0}, 0x2100060, 0x20000000, 0, 26, 3, 2, NULL, 0, 0x7FF, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, {0}, NULL, {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}}, // bgAWeapon
+        {NULL, 0, {0}, 0, NULL, 100, 0, 0, 2, 0.0f, 0, 0, 0, 0, NULL, {0}, NULL, {0}, 0x2100060, 0x20000000, 0, 26, 3, 2, NULL, 0, 0x7FF, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, {0}, NULL, {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}}, // bgBWeapon
+        NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, // initEvt..bgCEvt
+        0, 0, 0, 0, // reserved_1B0..disableBgBDestroy
+    },
+    {
+        "bti_03", // mGlobalStageDataDir
+        "stg_01_2", // mSpecificStageDataDir
+        6, // mNumObjects
+        tst_btlobject_data, // mObjects
+        {NULL, 0, {0}, 0, NULL, 100, 0, 0, 2, 0.0f, 0, 0, 0, 0, NULL, {0}, NULL, {0}, 0x2100060, 0x20000000, 0, 26, 3, 2, NULL, 0, 0x7FF, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, {0}, NULL, {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}}, // bgAWeapon
+        {NULL, 0, {0}, 0, NULL, 100, 0, 0, 2, 0.0f, 0, 0, 0, 0, NULL, {0}, NULL, {0}, 0x2100060, 0x20000000, 0, 26, 3, 2, NULL, 0, 0x7FF, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, {0}, NULL, {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}}, // bgBWeapon
+        NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, // initEvt..bgCEvt
+        0, 0, 0, 0, // reserved_1B0..disableBgBDestroy
+    },
+    {
+        "bti_04", // mGlobalStageDataDir
+        "stg_01_3", // mSpecificStageDataDir
+        6, // mNumObjects
+        tst_btlobject_data, // mObjects
+        {NULL, 0, {0}, 0, NULL, 100, 0, 0, 2, 0.0f, 0, 0, 0, 0, NULL, {0}, NULL, {0}, 0x2100060, 0x20000000, 0, 26, 3, 2, NULL, 0, 0x7FF, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, {0}, NULL, {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}}, // bgAWeapon
+        {NULL, 0, {0}, 0, NULL, 100, 0, 0, 2, 0.0f, 0, 0, 0, 0, NULL, {0}, NULL, {0}, 0x2100060, 0x20000000, 0, 26, 3, 2, NULL, 0, 0x7FF, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, {0}, NULL, {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}}, // bgBWeapon
+        NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, // initEvt..bgCEvt
+        0, 0, 0, 0, // reserved_1B0..disableBgBDestroy
+    },
+    {
+        "bti_01", // mGlobalStageDataDir
+        "stg_01_0", // mSpecificStageDataDir
+        6, // mNumObjects
+        &tst_btlobject_data[13], // mObjects
+        {NULL, 0, {0}, 0, NULL, 100, 0, 0, 2, 0.0f, 0, 0, 0, 0, weaponGetPowerDefault, {1, 0, 0, 0, 0, 0, 0, 0}, NULL, {0}, 0x210006F, 0x20000000, 0, 26, 3, 2, NULL, 0, 0x7FF, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, {0}, NULL, {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}}, // bgAWeapon
+        {NULL, 0, {0}, 0, NULL, 100, 0, 0, 2, 0.0f, 0, 0, 0, 0, weaponGetPowerDefault, {1, 0, 0, 0, 0, 0, 0, 0}, NULL, {0}, 0x2100060, 0x20000000, 0, 26, 3, 2, NULL, 0, 0x7FF, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, {0}, NULL, {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}}, // bgBWeapon
+        NULL, NULL, NULL, NULL, NULL, NULL, bgset_tst_wave_event, NULL, // initEvt..bgCEvt
+        0, 0, 0, 0, // reserved_1B0..disableBgBDestroy
+    },
+    {
+        "bti_01", // mGlobalStageDataDir
+        "stg_01_0", // mSpecificStageDataDir
+        8, // mNumObjects
+        tst_btlobject_data, // mObjects
+        {NULL, 0, {0}, 0, NULL, 100, 0, 0, 2, 0.0f, 0, 0, 0, 0, weaponGetPowerDefault, {1, 0, 0, 0, 0, 0, 0, 0}, NULL, {0}, 0x210006F, 0x20000000, 0, 26, 3, 2, NULL, 0, 0x7FF, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, {0}, NULL, {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}}, // bgAWeapon
+        {NULL, 0, {0}, 0, NULL, 100, 0, 0, 2, 0.0f, 0, 0, 0, 0, weaponGetPowerDefault, {1, 0, 0, 0, 0, 0, 0, 0}, NULL, {0}, 0x2100060, 0x20000000, 0, 26, 3, 2, NULL, 0, 0x7FF, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, {0}, NULL, {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}}, // bgBWeapon
+        NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, // initEvt..bgCEvt
+        0, 0, 0, 0, // reserved_1B0..disableBgBDestroy
+    },
+};
+
+BattleUnitSetup btlparty_test_kuriboo_1[] = {
+    {
+        &unit_kuriboo, // mUnitKindParams
+        1, // alliance
+        {0}, // pad_05
+        0x4000004, // attackPhase
+        {90.0f, 0.0f, 0.0f}, // position
+        0, // hitOffsetX
+        {0}, // unitWork
+        battle_item_test_kuriboo, // itemDropTable
+    },
+};
+
+BattleGroupSetup btlgrp_test_kuriboo_1 = {
+    1, // numEnemies
+    btlparty_test_kuriboo_1, // enemyData
+    0, // heldItemWeight
+    0, // randomItemWeight
+    100, // noItemWeight
+    battle_heart_drop_param_default, // hpDropTable
+    battle_heart_drop_param_default, // fpDropTable
+    5, // reserved_1C
+};
+
+BattleUnitSetup btlparty_test_kuriboo[] = {
+    {
+        &unit_kuriboo, // mUnitKindParams
+        1, // alliance
+        {0}, // pad_05
+        0x4000004, // attackPhase
+        {50.0f, 0.0f, -10.0f}, // position
+        0, // hitOffsetX
+        {0}, // unitWork
+        battle_item_test_kuriboo, // itemDropTable
+    },
+    {
+        &unit_togekuri, // mUnitKindParams
+        1, // alliance
+        {0}, // pad_05
+        0x4000004, // attackPhase
+        {90.0f, 0.0f, 0.0f}, // position
+        0, // hitOffsetX
+        {0}, // unitWork
+        battle_item_test_togekuri, // itemDropTable
+    },
+    {
+        &unit_patakuri, // mUnitKindParams
+        1, // alliance
+        {0}, // pad_05
+        0x4000004, // attackPhase
+        {130.0f, 40.0f, 10.0f}, // position
+        0, // hitOffsetX
+        {0}, // unitWork
+        battle_item_test_patakuri, // itemDropTable
+    },
+};
+
+BattleGroupSetup btlgrp_test_kuriboo = {
+    3, // numEnemies
+    btlparty_test_kuriboo, // enemyData
+    0, // heldItemWeight
+    0, // randomItemWeight
+    100, // noItemWeight
+    battle_heart_drop_param_default, // hpDropTable
+    battle_heart_drop_param_default, // fpDropTable
+    5, // reserved_1C
+};
+
+BattleUnitSetup btlparty_test_hyper_kuriboo[] = {
+    {
+        &unit_hyper_kuriboo, // mUnitKindParams
+        1, // alliance
+        {0}, // pad_05
+        0x4000004, // attackPhase
+        {50.0f, 0.0f, -10.0f}, // position
+        0, // hitOffsetX
+        {0}, // unitWork
+        battle_item_test_hyper_kuriboo, // itemDropTable
+    },
+    {
+        &unit_hyper_togekuri, // mUnitKindParams
+        1, // alliance
+        {0}, // pad_05
+        0x4000004, // attackPhase
+        {90.0f, 0.0f, 0.0f}, // position
+        0, // hitOffsetX
+        {0}, // unitWork
+        battle_item_test_hyper_togekuri, // itemDropTable
+    },
+    {
+        &unit_hyper_patakuri, // mUnitKindParams
+        1, // alliance
+        {0}, // pad_05
+        0x4000004, // attackPhase
+        {130.0f, 40.0f, 10.0f}, // position
+        0, // hitOffsetX
+        {0}, // unitWork
+        battle_item_test_hyper_patakuri, // itemDropTable
+    },
+};
+
+BattleGroupSetup btlgrp_test_hyper_kuriboo = {
+    3, // numEnemies
+    btlparty_test_hyper_kuriboo, // enemyData
+    0, // heldItemWeight
+    0, // randomItemWeight
+    100, // noItemWeight
+    battle_heart_drop_param_default, // hpDropTable
+    battle_heart_drop_param_default, // fpDropTable
+    5, // reserved_1C
+};
+
+BattleUnitSetup btlparty_test_yamikuriboo[] = {
+    {
+        &unit_yami_kuriboo, // mUnitKindParams
+        1, // alliance
+        {0}, // pad_05
+        0x4000004, // attackPhase
+        {50.0f, 0.0f, -10.0f}, // position
+        0, // hitOffsetX
+        {0}, // unitWork
+        battle_item_test_yami_kuriboo, // itemDropTable
+    },
+    {
+        &unit_yami_togekuri, // mUnitKindParams
+        1, // alliance
+        {0}, // pad_05
+        0x4000004, // attackPhase
+        {90.0f, 0.0f, 0.0f}, // position
+        0, // hitOffsetX
+        {0}, // unitWork
+        battle_item_NONE, // itemDropTable
+    },
+    {
+        &unit_yami_patakuri, // mUnitKindParams
+        1, // alliance
+        {0}, // pad_05
+        0x4000004, // attackPhase
+        {130.0f, 40.0f, 10.0f}, // position
+        0, // hitOffsetX
+        {0}, // unitWork
+        battle_item_NONE, // itemDropTable
+    },
+};
+
+BattleGroupSetup btlgrp_test_yamikuriboo = {
+    3, // numEnemies
+    btlparty_test_yamikuriboo, // enemyData
+    0, // heldItemWeight
+    0, // randomItemWeight
+    100, // noItemWeight
+    battle_heart_drop_param_default, // hpDropTable
+    battle_heart_drop_param_default, // fpDropTable
+    5, // reserved_1C
+};
+
+BattleUnitSetup btlparty_test_nokonoko_yaminoko[] = {
+    {
+        &unit_nokonoko, // mUnitKindParams
+        1, // alliance
+        {0}, // pad_05
+        0x4000004, // attackPhase
+        {30.0f, 0.0f, -10.0f}, // position
+        0, // hitOffsetX
+        {0}, // unitWork
+        battle_item_NONE, // itemDropTable
+    },
+    {
+        &unit_patapata, // mUnitKindParams
+        1, // alliance
+        {0}, // pad_05
+        0x4000004, // attackPhase
+        {70.0f, 40.0f, 0.0f}, // position
+        0, // hitOffsetX
+        {0}, // unitWork
+        battle_item_NONE, // itemDropTable
+    },
+    {
+        &unit_yami_noko, // mUnitKindParams
+        1, // alliance
+        {0}, // pad_05
+        0x4000004, // attackPhase
+        {110.0f, 0.0f, 10.0f}, // position
+        0, // hitOffsetX
+        {0}, // unitWork
+        battle_item_test_yami_noko, // itemDropTable
+    },
+    {
+        &unit_yami_pata, // mUnitKindParams
+        1, // alliance
+        {0}, // pad_05
+        0x4000004, // attackPhase
+        {150.0f, 40.0f, 20.0f}, // position
+        0, // hitOffsetX
+        {0}, // unitWork
+        battle_item_test_yami_pata, // itemDropTable
+    },
+};
+
+BattleGroupSetup btlgrp_test_nokonoko_yaminoko = {
+    4, // numEnemies
+    btlparty_test_nokonoko_yaminoko, // enemyData
+    0, // heldItemWeight
+    0, // randomItemWeight
+    100, // noItemWeight
+    battle_heart_drop_param_default, // hpDropTable
+    battle_heart_drop_param_default, // fpDropTable
+    5, // reserved_1C
+};
+
+BattleUnitSetup btlparty_test_ura_noko_toge_noko[] = {
+    {
+        &unit_ura_noko, // mUnitKindParams
+        1, // alliance
+        {0}, // pad_05
+        0x4000004, // attackPhase
+        {30.0f, 0.0f, -10.0f}, // position
+        0, // hitOffsetX
+        {0}, // unitWork
+        battle_item_NONE, // itemDropTable
+    },
+    {
+        &unit_ura_pata, // mUnitKindParams
+        1, // alliance
+        {0}, // pad_05
+        0x4000004, // attackPhase
+        {70.0f, 40.0f, 0.0f}, // position
+        0, // hitOffsetX
+        {0}, // unitWork
+        battle_item_NONE, // itemDropTable
+    },
+    {
+        &unit_togenoko, // mUnitKindParams
+        1, // alliance
+        {0}, // pad_05
+        0x4000004, // attackPhase
+        {110.0f, 0.0f, 10.0f}, // position
+        0, // hitOffsetX
+        {0}, // unitWork
+        battle_item_NONE, // itemDropTable
+    },
+    {
+        &unit_togenoko_ace, // mUnitKindParams
+        1, // alliance
+        {0}, // pad_05
+        0x4000004, // attackPhase
+        {150.0f, 0.0f, 20.0f}, // position
+        0, // hitOffsetX
+        {0}, // unitWork
+        battle_item_NONE, // itemDropTable
+    },
+};
+
+BattleGroupSetup btlgrp_test_ura_noko_toge_noko = {
+    4, // numEnemies
+    btlparty_test_ura_noko_toge_noko, // enemyData
+    0, // heldItemWeight
+    0, // randomItemWeight
+    100, // noItemWeight
+    battle_heart_drop_param_default, // hpDropTable
+    battle_heart_drop_param_default, // fpDropTable
+    5, // reserved_1C
+};
+
+BattleUnitSetup btlparty_test_honenoko_fighter[] = {
+    {
+        &unit_honenoko, // mUnitKindParams
+        1, // alliance
+        {0}, // pad_05
+        0x4000004, // attackPhase
+        {30.0f, 0.0f, -10.0f}, // position
+        0, // hitOffsetX
+        {0}, // unitWork
+        battle_item_NONE, // itemDropTable
+    },
+    {
+        &unit_karon, // mUnitKindParams
+        1, // alliance
+        {0}, // pad_05
+        0x4000004, // attackPhase
+        {70.0f, 0.0f, 0.0f}, // position
+        0, // hitOffsetX
+        {0}, // unitWork
+        battle_item_NONE, // itemDropTable
+    },
+    {
+        &unit_nokonoko_fighter, // mUnitKindParams
+        1, // alliance
+        {0}, // pad_05
+        0x4000004, // attackPhase
+        {110.0f, 0.0f, 10.0f}, // position
+        0, // hitOffsetX
+        {0}, // unitWork
+        NULL, // itemDropTable
+    },
+    {
+        &unit_patapata_fighter, // mUnitKindParams
+        1, // alliance
+        {0}, // pad_05
+        0x4000004, // attackPhase
+        {150.0f, 40.0f, 20.0f}, // position
+        0, // hitOffsetX
+        {0}, // unitWork
+        NULL, // itemDropTable
+    },
+};
+
+BattleGroupSetup btlgrp_test_honenoko_fighter = {
+    4, // numEnemies
+    btlparty_test_honenoko_fighter, // enemyData
+    0, // heldItemWeight
+    0, // randomItemWeight
+    100, // noItemWeight
+    battle_heart_drop_param_default, // hpDropTable
+    battle_heart_drop_param_default, // fpDropTable
+    5, // reserved_1C
+};
+
+BattleUnitSetup btlparty_test_basabasa[] = {
+    {
+        &unit_basabasa, // mUnitKindParams
+        1, // alliance
+        {0}, // pad_05
+        0x4000004, // attackPhase
+        {10.0f, 130.0f, -20.0f}, // position
+        0, // hitOffsetX
+        {0}, // unitWork
+        battle_item_NONE, // itemDropTable
+    },
+    {
+        &unit_basabasa, // mUnitKindParams
+        1, // alliance
+        {0}, // pad_05
+        0x4000004, // attackPhase
+        {50.0f, 130.0f, -10.0f}, // position
+        0, // hitOffsetX
+        {1, 0, 0, 0}, // unitWork
+        battle_item_NONE, // itemDropTable
+    },
+    {
+        &unit_basabasa_chururu, // mUnitKindParams
+        1, // alliance
+        {0}, // pad_05
+        0x4000004, // attackPhase
+        {90.0f, 130.0f, 0.0f}, // position
+        0, // hitOffsetX
+        {0}, // unitWork
+        battle_item_NONE, // itemDropTable
+    },
+    {
+        &unit_basabasa_chururu, // mUnitKindParams
+        1, // alliance
+        {0}, // pad_05
+        0x4000004, // attackPhase
+        {130.0f, 130.0f, 10.0f}, // position
+        0, // hitOffsetX
+        {1, 0, 0, 0}, // unitWork
+        battle_item_NONE, // itemDropTable
+    },
+    {
+        &unit_basabasa_green, // mUnitKindParams
+        1, // alliance
+        {0}, // pad_05
+        0x4000004, // attackPhase
+        {170.0f, 130.0f, 20.0f}, // position
+        0, // hitOffsetX
+        {1, 0, 0, 0}, // unitWork
+        battle_item_NONE, // itemDropTable
+    },
+};
+
+BattleGroupSetup btlgrp_test_basabasa = {
+    5, // numEnemies
+    btlparty_test_basabasa, // enemyData
+    0, // heldItemWeight
+    0, // randomItemWeight
+    100, // noItemWeight
+    battle_heart_drop_param_default, // hpDropTable
+    battle_heart_drop_param_default, // fpDropTable
+    5, // reserved_1C
+};
+
+BattleUnitSetup btlparty_test_chorobon[] = {
+    {
+        &unit_chorobon, // mUnitKindParams
+        1, // alliance
+        {0}, // pad_05
+        0x4000004, // attackPhase
+        {30.0f, 0.0f, -10.0f}, // position
+        0, // hitOffsetX
+        {0}, // unitWork
+        battle_item_NONE, // itemDropTable
+    },
+    {
+        &unit_green_chorobon, // mUnitKindParams
+        1, // alliance
+        {0}, // pad_05
+        0x4000004, // attackPhase
+        {70.0f, 0.0f, 0.0f}, // position
+        0, // hitOffsetX
+        {0}, // unitWork
+        battle_item_NONE, // itemDropTable
+    },
+    {
+        &unit_flower_chorobon, // mUnitKindParams
+        1, // alliance
+        {0}, // pad_05
+        0x4000004, // attackPhase
+        {110.0f, 0.0f, 10.0f}, // position
+        0, // hitOffsetX
+        {0}, // unitWork
+        battle_item_NONE, // itemDropTable
+    },
+    {
+        &unit_flower_chorobon, // mUnitKindParams
+        1, // alliance
+        {0}, // pad_05
+        0x4000004, // attackPhase
+        {150.0f, 0.0f, 20.0f}, // position
+        0, // hitOffsetX
+        {0}, // unitWork
+        battle_item_NONE, // itemDropTable
+    },
+};
+
+BattleGroupSetup btlgrp_test_chorobon = {
+    4, // numEnemies
+    btlparty_test_chorobon, // enemyData
+    0, // heldItemWeight
+    0, // randomItemWeight
+    100, // noItemWeight
+    battle_heart_drop_param_default, // hpDropTable
+    battle_heart_drop_param_default, // fpDropTable
+    5, // reserved_1C
+};
+
+BattleUnitSetup btlparty_test_sinemon[] = {
+    {
+        &unit_sinnosuke, // mUnitKindParams
+        1, // alliance
+        {0}, // pad_05
+        0x4000004, // attackPhase
+        {10.0f, 0.0f, -20.0f}, // position
+        0, // hitOffsetX
+        {0}, // unitWork
+        battle_item_NONE, // itemDropTable
+    },
+    {
+        &unit_sinemon, // mUnitKindParams
+        1, // alliance
+        {0}, // pad_05
+        0x4000004, // attackPhase
+        {50.0f, 0.0f, -10.0f}, // position
+        0, // hitOffsetX
+        {0}, // unitWork
+        battle_item_NONE, // itemDropTable
+    },
+    {
+        &unit_monochrome_sinemon, // mUnitKindParams
+        1, // alliance
+        {0}, // pad_05
+        0x4000004, // attackPhase
+        {90.0f, 0.0f, 0.0f}, // position
+        0, // hitOffsetX
+        {0}, // unitWork
+        battle_item_NONE, // itemDropTable
+    },
+    {
+        &unit_hyper_sinnosuke, // mUnitKindParams
+        1, // alliance
+        {0}, // pad_05
+        0x4000004, // attackPhase
+        {130.0f, 0.0f, 10.0f}, // position
+        0, // hitOffsetX
+        {0}, // unitWork
+        battle_item_NONE, // itemDropTable
+    },
+    {
+        &unit_hyper_sinemon, // mUnitKindParams
+        1, // alliance
+        {0}, // pad_05
+        0x4000004, // attackPhase
+        {170.0f, 0.0f, 20.0f}, // position
+        0, // hitOffsetX
+        {0}, // unitWork
+        battle_item_NONE, // itemDropTable
+    },
+};
+
+BattleGroupSetup btlgrp_test_sinemon = {
+    5, // numEnemies
+    btlparty_test_sinemon, // enemyData
+    0, // heldItemWeight
+    0, // randomItemWeight
+    100, // noItemWeight
+    battle_heart_drop_param_default, // hpDropTable
+    battle_heart_drop_param_default, // fpDropTable
+    5, // reserved_1C
+};
+
+BattleUnitSetup btlparty_test_met[] = {
+    {
+        &unit_met, // mUnitKindParams
+        1, // alliance
+        {0}, // pad_05
+        0x4000004, // attackPhase
+        {30.0f, 0.0f, -10.0f}, // position
+        0, // hitOffsetX
+        {1, 0, 0, 0}, // unitWork
+        battle_item_NONE, // itemDropTable
+    },
+    {
+        &unit_togemet, // mUnitKindParams
+        1, // alliance
+        {0}, // pad_05
+        0x4000004, // attackPhase
+        {70.0f, 0.0f, 0.0f}, // position
+        0, // hitOffsetX
+        {1, 0, 0, 0}, // unitWork
+        battle_item_NONE, // itemDropTable
+    },
+    {
+        &unit_patamet, // mUnitKindParams
+        1, // alliance
+        {0}, // pad_05
+        0x4000004, // attackPhase
+        {110.0f, 40.0f, 10.0f}, // position
+        0, // hitOffsetX
+        {0}, // unitWork
+        battle_item_NONE, // itemDropTable
+    },
+    {
+        &unit_patatogemet, // mUnitKindParams
+        1, // alliance
+        {0}, // pad_05
+        0x4000004, // attackPhase
+        {150.0f, 40.0f, 20.0f}, // position
+        0, // hitOffsetX
+        {0}, // unitWork
+        NULL, // itemDropTable
+    },
+};
+
+BattleGroupSetup btlgrp_test_met = {
+    4, // numEnemies
+    btlparty_test_met, // enemyData
+    0, // heldItemWeight
+    0, // randomItemWeight
+    100, // noItemWeight
+    battle_heart_drop_param_default, // hpDropTable
+    battle_heart_drop_param_default, // fpDropTable
+    5, // reserved_1C
+};
+
+BattleUnitSetup btlparty_test_crimson_met[] = {
+    {
+        &unit_crimson_met, // mUnitKindParams
+        1, // alliance
+        {0}, // pad_05
+        0x4000004, // attackPhase
+        {30.0f, 0.0f, -10.0f}, // position
+        0, // hitOffsetX
+        {1, 0, 0, 0}, // unitWork
+        battle_item_NONE, // itemDropTable
+    },
+    {
+        &unit_crimson_togemet, // mUnitKindParams
+        1, // alliance
+        {0}, // pad_05
+        0x4000004, // attackPhase
+        {70.0f, 0.0f, 0.0f}, // position
+        0, // hitOffsetX
+        {1, 0, 0, 0}, // unitWork
+        battle_item_NONE, // itemDropTable
+    },
+    {
+        &unit_crimson_patamet, // mUnitKindParams
+        1, // alliance
+        {0}, // pad_05
+        0x4000004, // attackPhase
+        {110.0f, 40.0f, 10.0f}, // position
+        0, // hitOffsetX
+        {0}, // unitWork
+        battle_item_NONE, // itemDropTable
+    },
+    {
+        &unit_crimson_patatogemet, // mUnitKindParams
+        1, // alliance
+        {0}, // pad_05
+        0x4000004, // attackPhase
+        {150.0f, 40.0f, 20.0f}, // position
+        0, // hitOffsetX
+        {0}, // unitWork
+        NULL, // itemDropTable
+    },
+};
+
+BattleGroupSetup btlgrp_test_crimson_met = {
+    4, // numEnemies
+    btlparty_test_crimson_met, // enemyData
+    0, // heldItemWeight
+    0, // randomItemWeight
+    100, // noItemWeight
+    battle_heart_drop_param_default, // hpDropTable
+    battle_heart_drop_param_default, // fpDropTable
+    5, // reserved_1C
+};
+
+BattleUnitSetup btlparty_test_pansy[] = {
+    {
+        &unit_pansy, // mUnitKindParams
+        1, // alliance
+        {0}, // pad_05
+        0x4000004, // attackPhase
+        {30.0f, 0.0f, -10.0f}, // position
+        0, // hitOffsetX
+        {0}, // unitWork
+        battle_item_NONE, // itemDropTable
+    },
+    {
+        &unit_pansy, // mUnitKindParams
+        1, // alliance
+        {0}, // pad_05
+        0x4000004, // attackPhase
+        {70.0f, 0.0f, 0.0f}, // position
+        0, // hitOffsetX
+        {0}, // unitWork
+        battle_item_NONE, // itemDropTable
+    },
+    {
+        &unit_twinkling_pansy, // mUnitKindParams
+        1, // alliance
+        {0}, // pad_05
+        0x4000004, // attackPhase
+        {110.0f, 0.0f, 10.0f}, // position
+        0, // hitOffsetX
+        {0}, // unitWork
+        battle_item_NONE, // itemDropTable
+    },
+    {
+        &unit_twinkling_pansy, // mUnitKindParams
+        1, // alliance
+        {0}, // pad_05
+        0x4000004, // attackPhase
+        {150.0f, 0.0f, 20.0f}, // position
+        0, // hitOffsetX
+        {0}, // unitWork
+        battle_item_NONE, // itemDropTable
+    },
+};
+
+BattleGroupSetup btlgrp_test_pansy = {
+    4, // numEnemies
+    btlparty_test_pansy, // enemyData
+    0, // heldItemWeight
+    0, // randomItemWeight
+    100, // noItemWeight
+    battle_heart_drop_param_default, // hpDropTable
+    battle_heart_drop_param_default, // fpDropTable
+    5, // reserved_1C
+};
+
+BattleUnitSetup btlparty_test_bomhei[] = {
+    {
+        &unit_bomhei, // mUnitKindParams
+        1, // alliance
+        {0}, // pad_05
+        0x4000004, // attackPhase
+        {30.0f, 0.0f, -10.0f}, // position
+        0, // hitOffsetX
+        {0}, // unitWork
+        battle_item_NONE, // itemDropTable
+    },
+    {
+        &unit_bomhei, // mUnitKindParams
+        1, // alliance
+        {0}, // pad_05
+        0x4000004, // attackPhase
+        {70.0f, 0.0f, 0.0f}, // position
+        0, // hitOffsetX
+        {0}, // unitWork
+        battle_item_NONE, // itemDropTable
+    },
+    {
+        &unit_bomhei, // mUnitKindParams
+        1, // alliance
+        {0}, // pad_05
+        0x4000004, // attackPhase
+        {110.0f, 0.0f, 10.0f}, // position
+        0, // hitOffsetX
+        {0}, // unitWork
+        battle_item_NONE, // itemDropTable
+    },
+    {
+        &unit_bomhei, // mUnitKindParams
+        1, // alliance
+        {0}, // pad_05
+        0x4000004, // attackPhase
+        {150.0f, 0.0f, 20.0f}, // position
+        0, // hitOffsetX
+        {0}, // unitWork
+        battle_item_NONE, // itemDropTable
+    },
+};
+
+BattleGroupSetup btlgrp_test_bomhei = {
+    4, // numEnemies
+    btlparty_test_bomhei, // enemyData
+    0, // heldItemWeight
+    0, // randomItemWeight
+    100, // noItemWeight
+    battle_heart_drop_param_default, // hpDropTable
+    battle_heart_drop_param_default, // fpDropTable
+    5, // reserved_1C
+};
+
+BattleUnitSetup btlparty_test_heaby_bomb[] = {
+    {
+        &unit_heavy_bom, // mUnitKindParams
+        1, // alliance
+        {0}, // pad_05
+        0x4000004, // attackPhase
+        {30.0f, 0.0f, -10.0f}, // position
+        0, // hitOffsetX
+        {0}, // unitWork
+        battle_item_NONE, // itemDropTable
+    },
+    {
+        &unit_heavy_bom, // mUnitKindParams
+        1, // alliance
+        {0}, // pad_05
+        0x4000004, // attackPhase
+        {70.0f, 0.0f, 0.0f}, // position
+        0, // hitOffsetX
+        {0}, // unitWork
+        battle_item_NONE, // itemDropTable
+    },
+    {
+        &unit_giant_bomb, // mUnitKindParams
+        1, // alliance
+        {0}, // pad_05
+        0x4000004, // attackPhase
+        {110.0f, 0.0f, 10.0f}, // position
+        0, // hitOffsetX
+        {0}, // unitWork
+        battle_item_NONE, // itemDropTable
+    },
+    {
+        &unit_giant_bomb, // mUnitKindParams
+        1, // alliance
+        {0}, // pad_05
+        0x4000004, // attackPhase
+        {150.0f, 0.0f, 20.0f}, // position
+        0, // hitOffsetX
+        {0}, // unitWork
+        battle_item_NONE, // itemDropTable
+    },
+};
+
+BattleGroupSetup btlgrp_test_heaby_bomb = {
+    4, // numEnemies
+    btlparty_test_heaby_bomb, // enemyData
+    0, // heldItemWeight
+    0, // randomItemWeight
+    100, // noItemWeight
+    battle_heart_drop_param_default, // hpDropTable
+    battle_heart_drop_param_default, // fpDropTable
+    5, // reserved_1C
+};
+
+BattleUnitSetup btlparty_test_killer[] = {
+    {
+        &unit_killer, // mUnitKindParams
+        1, // alliance
+        {0}, // pad_05
+        0x4000004, // attackPhase
+        {30.0f, 40.0f, -10.0f}, // position
+        0, // hitOffsetX
+        {0}, // unitWork
+        battle_item_NONE, // itemDropTable
+    },
+    {
+        &unit_super_killer, // mUnitKindParams
+        1, // alliance
+        {0}, // pad_05
+        0x4000004, // attackPhase
+        {70.0f, 40.0f, 0.0f}, // position
+        0, // hitOffsetX
+        {0}, // unitWork
+        battle_item_NONE, // itemDropTable
+    },
+    {
+        &unit_killer_cannon, // mUnitKindParams
+        1, // alliance
+        {0}, // pad_05
+        0x4000004, // attackPhase
+        {110.0f, 0.0f, 10.0f}, // position
+        0, // hitOffsetX
+        {0}, // unitWork
+        battle_item_test_killer_cannon, // itemDropTable
+    },
+    {
+        &unit_super_killer_cannon, // mUnitKindParams
+        1, // alliance
+        {0}, // pad_05
+        0x4000004, // attackPhase
+        {150.0f, 0.0f, 20.0f}, // position
+        0, // hitOffsetX
+        {0}, // unitWork
+        battle_item_test_killer_cannon, // itemDropTable
+    },
+};
+
+BattleGroupSetup btlgrp_test_killer = {
+    4, // numEnemies
+    btlparty_test_killer, // enemyData
+    0, // heldItemWeight
+    0, // randomItemWeight
+    100, // noItemWeight
+    battle_heart_drop_param_default, // hpDropTable
+    battle_heart_drop_param_default, // fpDropTable
+    5, // reserved_1C
+};
+
+BattleUnitSetup btlparty_test_pakkun_flower[] = {
+    {
+        &unit_pakkun_flower, // mUnitKindParams
+        1, // alliance
+        {0}, // pad_05
+        0x4000004, // attackPhase
+        {10.0f, 0.0f, -20.0f}, // position
+        0, // hitOffsetX
+        {0}, // unitWork
+        battle_item_NONE, // itemDropTable
+    },
+    {
+        &unit_pakkun_flower, // mUnitKindParams
+        1, // alliance
+        {0}, // pad_05
+        0x4000004, // attackPhase
+        {50.0f, 0.0f, -10.0f}, // position
+        0, // hitOffsetX
+        {0}, // unitWork
+        battle_item_NONE, // itemDropTable
+    },
+    {
+        &unit_poison_pakkun, // mUnitKindParams
+        1, // alliance
+        {0}, // pad_05
+        0x4000004, // attackPhase
+        {90.0f, 0.0f, 0.0f}, // position
+        0, // hitOffsetX
+        {0}, // unitWork
+        battle_item_NONE, // itemDropTable
+    },
+    {
+        &unit_poison_pakkun, // mUnitKindParams
+        1, // alliance
+        {0}, // pad_05
+        0x4000004, // attackPhase
+        {130.0f, 0.0f, 10.0f}, // position
+        0, // hitOffsetX
+        {0}, // unitWork
+        battle_item_NONE, // itemDropTable
+    },
+    {
+        &unit_ice_pakkun, // mUnitKindParams
+        1, // alliance
+        {0}, // pad_05
+        0x4000004, // attackPhase
+        {170.0f, 0.0f, 20.0f}, // position
+        0, // hitOffsetX
+        {0}, // unitWork
+        battle_item_NONE, // itemDropTable
+    },
+};
+
+BattleGroupSetup btlgrp_test_pakkun_flower = {
+    5, // numEnemies
+    btlparty_test_pakkun_flower, // enemyData
+    0, // heldItemWeight
+    0, // randomItemWeight
+    100, // noItemWeight
+    battle_heart_drop_param_default, // hpDropTable
+    battle_heart_drop_param_default, // fpDropTable
+    5, // reserved_1C
+};
+
+BattleUnitSetup btlparty_test_togedaruma[] = {
+    {
+        &unit_togedaruma, // mUnitKindParams
+        1, // alliance
+        {0}, // pad_05
+        0x4000004, // attackPhase
+        {30.0f, 0.0f, -10.0f}, // position
+        0, // hitOffsetX
+        {0}, // unitWork
+        battle_item_NONE, // itemDropTable
+    },
+    {
+        &unit_togedaruma, // mUnitKindParams
+        1, // alliance
+        {0}, // pad_05
+        0x4000004, // attackPhase
+        {70.0f, 0.0f, 0.0f}, // position
+        0, // hitOffsetX
+        {0}, // unitWork
+        battle_item_NONE, // itemDropTable
+    },
+    {
+        &unit_yamitogedaruma, // mUnitKindParams
+        1, // alliance
+        {0}, // pad_05
+        0x4000004, // attackPhase
+        {110.0f, 0.0f, 10.0f}, // position
+        0, // hitOffsetX
+        {0}, // unitWork
+        battle_item_NONE, // itemDropTable
+    },
+    {
+        &unit_yamitogedaruma, // mUnitKindParams
+        1, // alliance
+        {0}, // pad_05
+        0x4000004, // attackPhase
+        {150.0f, 0.0f, 20.0f}, // position
+        0, // hitOffsetX
+        {0}, // unitWork
+        battle_item_NONE, // itemDropTable
+    },
+};
+
+BattleGroupSetup btlgrp_test_togedaruma = {
+    4, // numEnemies
+    btlparty_test_togedaruma, // enemyData
+    0, // heldItemWeight
+    0, // randomItemWeight
+    100, // noItemWeight
+    battle_heart_drop_param_default, // hpDropTable
+    battle_heart_drop_param_default, // fpDropTable
+    5, // reserved_1C
+};
+
+BattleUnitSetup btlparty_test_hannya[] = {
+    {
+        &unit_hinnya, // mUnitKindParams
+        1, // alliance
+        {0}, // pad_05
+        0x4000004, // attackPhase
+        {30.0f, 0.0f, -10.0f}, // position
+        0, // hitOffsetX
+        {0}, // unitWork
+        battle_item_NONE, // itemDropTable
+    },
+    {
+        &unit_hannya, // mUnitKindParams
+        1, // alliance
+        {0}, // pad_05
+        0x4000004, // attackPhase
+        {70.0f, 0.0f, 0.0f}, // position
+        0, // hitOffsetX
+        {0}, // unitWork
+        battle_item_NONE, // itemDropTable
+    },
+    {
+        &unit_hannya, // mUnitKindParams
+        1, // alliance
+        {0}, // pad_05
+        0x4000004, // attackPhase
+        {110.0f, 0.0f, 10.0f}, // position
+        0, // hitOffsetX
+        {0}, // unitWork
+        battle_item_NONE, // itemDropTable
+    },
+    {
+        &unit_hennya, // mUnitKindParams
+        1, // alliance
+        {0}, // pad_05
+        0x4000004, // attackPhase
+        {150.0f, 0.0f, 20.0f}, // position
+        0, // hitOffsetX
+        {0}, // unitWork
+        battle_item_NONE, // itemDropTable
+    },
+};
+
+BattleGroupSetup btlgrp_test_hannya = {
+    4, // numEnemies
+    btlparty_test_hannya, // enemyData
+    0, // heldItemWeight
+    0, // randomItemWeight
+    100, // noItemWeight
+    battle_heart_drop_param_default, // hpDropTable
+    battle_heart_drop_param_default, // fpDropTable
+    5, // reserved_1C
+};
+
+BattleUnitSetup btlparty_test_sambo[] = {
+    {
+        &unit_sambo, // mUnitKindParams
+        1, // alliance
+        {0}, // pad_05
+        0x4000004, // attackPhase
+        {30.0f, 0.0f, -10.0f}, // position
+        0, // hitOffsetX
+        {0}, // unitWork
+        battle_item_NONE, // itemDropTable
+    },
+    {
+        &unit_sambo, // mUnitKindParams
+        1, // alliance
+        {0}, // pad_05
+        0x4000004, // attackPhase
+        {70.0f, 0.0f, 0.0f}, // position
+        0, // hitOffsetX
+        {0}, // unitWork
+        battle_item_NONE, // itemDropTable
+    },
+    {
+        &unit_sambo_mummy, // mUnitKindParams
+        1, // alliance
+        {0}, // pad_05
+        0x4000004, // attackPhase
+        {110.0f, 0.0f, 10.0f}, // position
+        0, // hitOffsetX
+        {0}, // unitWork
+        battle_item_NONE, // itemDropTable
+    },
+    {
+        &unit_sambo_mummy, // mUnitKindParams
+        1, // alliance
+        {0}, // pad_05
+        0x4000004, // attackPhase
+        {150.0f, 0.0f, 20.0f}, // position
+        0, // hitOffsetX
+        {0}, // unitWork
+        battle_item_NONE, // itemDropTable
+    },
+};
+
+BattleGroupSetup btlgrp_test_sambo = {
+    4, // numEnemies
+    btlparty_test_sambo, // enemyData
+    0, // heldItemWeight
+    0, // randomItemWeight
+    100, // noItemWeight
+    battle_heart_drop_param_default, // hpDropTable
+    battle_heart_drop_param_default, // fpDropTable
+    5, // reserved_1C
+};
+
+BattleUnitSetup btlparty_test_bros[] = {
+    {
+        &unit_hammer_bros, // mUnitKindParams
+        1, // alliance
+        {0}, // pad_05
+        0x4000004, // attackPhase
+        {30.0f, 0.0f, -10.0f}, // position
+        0, // hitOffsetX
+        {0}, // unitWork
+        battle_item_NONE, // itemDropTable
+    },
+    {
+        &unit_boomerang_bros, // mUnitKindParams
+        1, // alliance
+        {0}, // pad_05
+        0x4000004, // attackPhase
+        {70.0f, 0.0f, 0.0f}, // position
+        0, // hitOffsetX
+        {0}, // unitWork
+        battle_item_NONE, // itemDropTable
+    },
+    {
+        &unit_fire_bros, // mUnitKindParams
+        1, // alliance
+        {0}, // pad_05
+        0x4000004, // attackPhase
+        {110.0f, 0.0f, 10.0f}, // position
+        0, // hitOffsetX
+        {0}, // unitWork
+        battle_item_NONE, // itemDropTable
+    },
+    {
+        &unit_bomhei, // mUnitKindParams
+        1, // alliance
+        {0}, // pad_05
+        0x4000004, // attackPhase
+        {150.0f, 0.0f, 20.0f}, // position
+        0, // hitOffsetX
+        {0}, // unitWork
+        NULL, // itemDropTable
+    },
+};
+
+BattleGroupSetup btlgrp_test_bros = {
+    4, // numEnemies
+    btlparty_test_bros, // enemyData
+    0, // heldItemWeight
+    0, // randomItemWeight
+    100, // noItemWeight
+    battle_heart_drop_param_default, // hpDropTable
+    battle_heart_drop_param_default, // fpDropTable
+    5, // reserved_1C
+};
+
+BattleUnitSetup btlparty_test_togezo_jyugem[] = {
+    {
+        &unit_togezo, // mUnitKindParams
+        1, // alliance
+        {0}, // pad_05
+        0x4000004, // attackPhase
+        {30.0f, 0.0f, -10.0f}, // position
+        0, // hitOffsetX
+        {0}, // unitWork
+        battle_item_NONE, // itemDropTable
+    },
+    {
+        &unit_jyugem, // mUnitKindParams
+        1, // alliance
+        {0}, // pad_05
+        0x4000004, // attackPhase
+        {70.0f, 40.0f, 0.0f}, // position
+        0, // hitOffsetX
+        {0}, // unitWork
+        battle_item_NONE, // itemDropTable
+    },
+    {
+        &unit_hyper_togezo, // mUnitKindParams
+        1, // alliance
+        {0}, // pad_05
+        0x4000004, // attackPhase
+        {110.0f, 0.0f, 10.0f}, // position
+        0, // hitOffsetX
+        {0}, // unitWork
+        battle_item_NONE, // itemDropTable
+    },
+    {
+        &unit_hyper_jyugem, // mUnitKindParams
+        1, // alliance
+        {0}, // pad_05
+        0x4000004, // attackPhase
+        {150.0f, 40.0f, 20.0f}, // position
+        0, // hitOffsetX
+        {0}, // unitWork
+        battle_item_NONE, // itemDropTable
+    },
+};
+
+BattleGroupSetup btlgrp_test_togezo_jyugem = {
+    4, // numEnemies
+    btlparty_test_togezo_jyugem, // enemyData
+    0, // heldItemWeight
+    0, // randomItemWeight
+    100, // noItemWeight
+    battle_heart_drop_param_default, // hpDropTable
+    battle_heart_drop_param_default, // fpDropTable
+    5, // reserved_1C
+};
+
+BattleUnitSetup btlparty_test_wanwan[] = {
+    {
+        &unit_wanwan, // mUnitKindParams
+        1, // alliance
+        {0}, // pad_05
+        0x4000004, // attackPhase
+        {30.0f, 0.0f, -10.0f}, // position
+        0, // hitOffsetX
+        {0}, // unitWork
+        battle_item_NONE, // itemDropTable
+    },
+    {
+        &unit_wanwan, // mUnitKindParams
+        1, // alliance
+        {0}, // pad_05
+        0x4000004, // attackPhase
+        {70.0f, 0.0f, 0.0f}, // position
+        0, // hitOffsetX
+        {0}, // unitWork
+        battle_item_NONE, // itemDropTable
+    },
+    {
+        &unit_wanwan, // mUnitKindParams
+        1, // alliance
+        {0}, // pad_05
+        0x4000004, // attackPhase
+        {110.0f, 0.0f, 10.0f}, // position
+        0, // hitOffsetX
+        {0}, // unitWork
+        battle_item_NONE, // itemDropTable
+    },
+    {
+        &unit_wanwan, // mUnitKindParams
+        1, // alliance
+        {0}, // pad_05
+        0x4000004, // attackPhase
+        {150.0f, 0.0f, 20.0f}, // position
+        0, // hitOffsetX
+        {0}, // unitWork
+        battle_item_NONE, // itemDropTable
+    },
+};
+
+BattleGroupSetup btlgrp_test_wanwan = {
+    4, // numEnemies
+    btlparty_test_wanwan, // enemyData
+    0, // heldItemWeight
+    0, // randomItemWeight
+    100, // noItemWeight
+    battle_heart_drop_param_default, // hpDropTable
+    battle_heart_drop_param_default, // fpDropTable
+    5, // reserved_1C
+};
+
+BattleUnitSetup btlparty_test_kurokumorn[] = {
+    {
+        &unit_kurokumorn, // mUnitKindParams
+        1, // alliance
+        {0}, // pad_05
+        0x4000004, // attackPhase
+        {30.0f, 40.0f, -10.0f}, // position
+        0, // hitOffsetX
+        {0}, // unitWork
+        battle_item_NONE, // itemDropTable
+    },
+    {
+        &unit_dokugassun, // mUnitKindParams
+        1, // alliance
+        {0}, // pad_05
+        0x4000004, // attackPhase
+        {70.0f, 40.0f, 0.0f}, // position
+        0, // hitOffsetX
+        {0}, // unitWork
+        battle_item_NONE, // itemDropTable
+    },
+    {
+        &unit_bllizard, // mUnitKindParams
+        1, // alliance
+        {0}, // pad_05
+        0x4000004, // attackPhase
+        {110.0f, 40.0f, 10.0f}, // position
+        0, // hitOffsetX
+        {0}, // unitWork
+        battle_item_NONE, // itemDropTable
+    },
+    {
+        &unit_monochrome_kurokumorn, // mUnitKindParams
+        1, // alliance
+        {0}, // pad_05
+        0x4000004, // attackPhase
+        {150.0f, 40.0f, 20.0f}, // position
+        0, // hitOffsetX
+        {0}, // unitWork
+        battle_item_NONE, // itemDropTable
+    },
+};
+
+BattleGroupSetup btlgrp_test_kurokumorn = {
+    4, // numEnemies
+    btlparty_test_kurokumorn, // enemyData
+    0, // heldItemWeight
+    0, // randomItemWeight
+    100, // noItemWeight
+    battle_heart_drop_param_default, // hpDropTable
+    battle_heart_drop_param_default, // fpDropTable
+    5, // reserved_1C
+};
+
+BattleUnitSetup btlparty_test_piders[] = {
+    {
+        &unit_piders, // mUnitKindParams
+        1, // alliance
+        {0}, // pad_05
+        0x4000004, // attackPhase
+        {30.0f, 40.0f, -10.0f}, // position
+        0, // hitOffsetX
+        {0}, // unitWork
+        battle_item_NONE, // itemDropTable
+    },
+    {
+        &unit_piders, // mUnitKindParams
+        1, // alliance
+        {0}, // pad_05
+        0x4000004, // attackPhase
+        {70.0f, 40.0f, 0.0f}, // position
+        0, // hitOffsetX
+        {0}, // unitWork
+        battle_item_NONE, // itemDropTable
+    },
+    {
+        &unit_churantalar, // mUnitKindParams
+        1, // alliance
+        {0}, // pad_05
+        0x4000004, // attackPhase
+        {110.0f, 40.0f, 10.0f}, // position
+        0, // hitOffsetX
+        {0}, // unitWork
+        battle_item_NONE, // itemDropTable
+    },
+    {
+        &unit_churantalar, // mUnitKindParams
+        1, // alliance
+        {0}, // pad_05
+        0x4000004, // attackPhase
+        {150.0f, 40.0f, 20.0f}, // position
+        0, // hitOffsetX
+        {0}, // unitWork
+        battle_item_NONE, // itemDropTable
+    },
+};
+
+BattleGroupSetup btlgrp_test_piders = {
+    4, // numEnemies
+    btlparty_test_piders, // enemyData
+    0, // heldItemWeight
+    0, // randomItemWeight
+    100, // noItemWeight
+    battle_heart_drop_param_default, // hpDropTable
+    battle_heart_drop_param_default, // fpDropTable
+    5, // reserved_1C
+};
+
+BattleUnitSetup btlparty_test_bubble[] = {
+    {
+        &unit_bubble, // mUnitKindParams
+        1, // alliance
+        {0}, // pad_05
+        0x4000004, // attackPhase
+        {50.0f, 40.0f, -10.0f}, // position
+        0, // hitOffsetX
+        {0}, // unitWork
+        battle_item_NONE, // itemDropTable
+    },
+    {
+        &unit_hermos, // mUnitKindParams
+        1, // alliance
+        {0}, // pad_05
+        0x4000004, // attackPhase
+        {90.0f, 40.0f, 0.0f}, // position
+        0, // hitOffsetX
+        {0}, // unitWork
+        battle_item_NONE, // itemDropTable
+    },
+    {
+        &unit_phantom, // mUnitKindParams
+        1, // alliance
+        {0}, // pad_05
+        0x4000004, // attackPhase
+        {130.0f, 0.0f, 10.0f}, // position
+        0, // hitOffsetX
+        {0}, // unitWork
+        battle_item_NONE, // itemDropTable
+    },
+};
+
+BattleGroupSetup btlgrp_test_bubble = {
+    3, // numEnemies
+    btlparty_test_bubble, // enemyData
+    0, // heldItemWeight
+    0, // randomItemWeight
+    100, // noItemWeight
+    battle_heart_drop_param_default, // hpDropTable
+    battle_heart_drop_param_default, // fpDropTable
+    5, // reserved_1C
+};
+
+BattleUnitSetup btlparty_test_monban[] = {
+    {
+        &unit_basabasa, // mUnitKindParams
+        1, // alliance
+        {0}, // pad_05
+        0x4000004, // attackPhase
+        {30.0f, 130.0f, -10.0f}, // position
+        0, // hitOffsetX
+        {0}, // unitWork
+        battle_item_NONE, // itemDropTable
+    },
+    {
+        &unit_monban, // mUnitKindParams
+        1, // alliance
+        {0}, // pad_05
+        0x4000004, // attackPhase
+        {70.0f, 0.0f, 0.0f}, // position
+        0, // hitOffsetX
+        {0}, // unitWork
+        battle_item_NONE, // itemDropTable
+    },
+    {
+        &unit_patapata, // mUnitKindParams
+        1, // alliance
+        {0}, // pad_05
+        0x4000004, // attackPhase
+        {110.0f, 40.0f, 10.0f}, // position
+        0, // hitOffsetX
+        {0}, // unitWork
+        battle_item_NONE, // itemDropTable
+    },
+    {
+        &unit_dark_keeper, // mUnitKindParams
+        1, // alliance
+        {0}, // pad_05
+        0x4000004, // attackPhase
+        {150.0f, 0.0f, 20.0f}, // position
+        0, // hitOffsetX
+        {0}, // unitWork
+        battle_item_NONE, // itemDropTable
+    },
+};
+
+BattleGroupSetup btlgrp_test_monban = {
+    4, // numEnemies
+    btlparty_test_monban, // enemyData
+    0, // heldItemWeight
+    0, // randomItemWeight
+    100, // noItemWeight
+    battle_heart_drop_param_default, // hpDropTable
+    battle_heart_drop_param_default, // fpDropTable
+    5, // reserved_1C
+};
+
+BattleUnitSetup btlparty_test_borodo[] = {
+    {
+        &unit_borodo, // mUnitKindParams
+        1, // alliance
+        {0}, // pad_05
+        0x4000004, // attackPhase
+        {50.0f, 0.0f, -10.0f}, // position
+        0, // hitOffsetX
+        {0}, // unitWork
+        battle_item_NONE, // itemDropTable
+    },
+    {
+        &unit_badge_borodo, // mUnitKindParams
+        1, // alliance
+        {0}, // pad_05
+        0x4000004, // attackPhase
+        {90.0f, 0.0f, 0.0f}, // position
+        0, // hitOffsetX
+        {0}, // unitWork
+        battle_item_NONE, // itemDropTable
+    },
+    {
+        &unit_borodo_king, // mUnitKindParams
+        1, // alliance
+        {0}, // pad_05
+        0x4000004, // attackPhase
+        {130.0f, 0.0f, 10.0f}, // position
+        0, // hitOffsetX
+        {0}, // unitWork
+        NULL, // itemDropTable
+    },
+};
+
+BattleGroupSetup btlgrp_test_borodo = {
+    3, // numEnemies
+    btlparty_test_borodo, // enemyData
+    0, // heldItemWeight
+    0, // randomItemWeight
+    100, // noItemWeight
+    battle_heart_drop_param_default, // hpDropTable
+    battle_heart_drop_param_default, // fpDropTable
+    5, // reserved_1C
+};
+
+BattleUnitSetup btlparty_test_tamura[] = {
+    {
+        &unit_barriern, // mUnitKindParams
+        1, // alliance
+        {0}, // pad_05
+        0x4000004, // attackPhase
+        {10.0f, 40.0f, -20.0f}, // position
+        0, // hitOffsetX
+        {2, 0, 0, 0}, // unitWork
+        battle_item_NONE, // itemDropTable
+    },
+    {
+        &unit_sambo, // mUnitKindParams
+        1, // alliance
+        {0}, // pad_05
+        0x4000004, // attackPhase
+        {50.0f, 0.0f, -10.0f}, // position
+        0, // hitOffsetX
+        {0}, // unitWork
+        battle_item_NONE, // itemDropTable
+    },
+    {
+        &unit_hyper_sinemon, // mUnitKindParams
+        1, // alliance
+        {0}, // pad_05
+        0x4000004, // attackPhase
+        {90.0f, 0.0f, 0.0f}, // position
+        0, // hitOffsetX
+        {0}, // unitWork
+        battle_item_NONE, // itemDropTable
+    },
+    {
+        &unit_hyper_sinemon, // mUnitKindParams
+        1, // alliance
+        {0}, // pad_05
+        0x4000004, // attackPhase
+        {130.0f, 0.0f, 10.0f}, // position
+        0, // hitOffsetX
+        {0}, // unitWork
+        battle_item_NONE, // itemDropTable
+    },
+    {
+        &unit_super_killer_cannon, // mUnitKindParams
+        1, // alliance
+        {0}, // pad_05
+        0x4000004, // attackPhase
+        {170.0f, 0.0f, 20.0f}, // position
+        0, // hitOffsetX
+        {0}, // unitWork
+        battle_item_NONE, // itemDropTable
+    },
+};
+
+BattleGroupSetup btlgrp_test_tamura = {
+    5, // numEnemies
+    btlparty_test_tamura, // enemyData
+    0, // heldItemWeight
+    0, // randomItemWeight
+    100, // noItemWeight
+    battle_heart_drop_param_default, // hpDropTable
+    battle_heart_drop_param_default, // fpDropTable
+    5, // reserved_1C
+};
+
+BattleUnitSetup btlparty_test_kishi[] = {
+    {
+        &unit_monochrome_pakkun, // mUnitKindParams
+        1, // alliance
+        {0}, // pad_05
+        0x4000004, // attackPhase
+        {70.0f, 0.0f, 0.0f}, // position
+        0, // hitOffsetX
+        {2, 0, 0, 0}, // unitWork
+        battle_item_NONE, // itemDropTable
+    },
+    {
+        &unit_monochrome_pakkun, // mUnitKindParams
+        1, // alliance
+        {0}, // pad_05
+        0x4000004, // attackPhase
+        {110.0f, 0.0f, 10.0f}, // position
+        0, // hitOffsetX
+        {0}, // unitWork
+        battle_item_NONE, // itemDropTable
+    },
+};
+
+BattleGroupSetup btlgrp_test_kishi = {
+    2, // numEnemies
+    btlparty_test_kishi, // enemyData
+    0, // heldItemWeight
+    0, // randomItemWeight
+    100, // noItemWeight
+    battle_heart_drop_param_default, // hpDropTable
+    battle_heart_drop_param_default, // fpDropTable
+    5, // reserved_1C
+};
+
+BattleUnitSetup btlparty_test_tamura2[] = {
+    {
+        &unit_powan, // mUnitKindParams
+        1, // alliance
+        {0}, // pad_05
+        0x4000004, // attackPhase
+        {90.0f, 0.0f, 0.0f}, // position
+        0, // hitOffsetX
+        {0}, // unitWork
+        battle_item_NONE, // itemDropTable
+    },
+};
+
+BattleGroupSetup btlgrp_test_tamura2 = {
+    1, // numEnemies
+    btlparty_test_tamura2, // enemyData
+    0, // heldItemWeight
+    0, // randomItemWeight
+    100, // noItemWeight
+    battle_heart_drop_param_default, // hpDropTable
+    battle_heart_drop_param_default, // fpDropTable
+    5, // reserved_1C
+};
+
+BattleUnitSetup btlparty_test_nakayama[] = {
+    {
+        &unit_wanawana, // mUnitKindParams
+        1, // alliance
+        {0}, // pad_05
+        0x4000004, // attackPhase
+        {50.0f, 0.0f, -10.0f}, // position
+        0, // hitOffsetX
+        {0}, // unitWork
+        battle_item_NONE, // itemDropTable
+    },
+    {
+        &unit_wanawana, // mUnitKindParams
+        1, // alliance
+        {0}, // pad_05
+        0x4000004, // attackPhase
+        {90.0f, 0.0f, 0.0f}, // position
+        0, // hitOffsetX
+        {0}, // unitWork
+        battle_item_NONE, // itemDropTable
+    },
+    {
+        &unit_wanawana, // mUnitKindParams
+        1, // alliance
+        {0}, // pad_05
+        0x4000004, // attackPhase
+        {130.0f, 0.0f, 10.0f}, // position
+        0, // hitOffsetX
+        {0}, // unitWork
+        battle_item_NONE, // itemDropTable
+    },
+};
+
+BattleGroupSetup btlgrp_test_nakayama = {
+    3, // numEnemies
+    btlparty_test_nakayama, // enemyData
+    0, // heldItemWeight
+    0, // randomItemWeight
+    100, // noItemWeight
+    battle_heart_drop_param_default, // hpDropTable
+    battle_heart_drop_param_default, // fpDropTable
+    5, // reserved_1C
+};
+
+BattleUnitSetup btlparty_test_barriern[] = {
+    {
+        &unit_barriern_z, // mUnitKindParams
+        1, // alliance
+        {0}, // pad_05
+        0x4000004, // attackPhase
+        {50.0f, 40.0f, -10.0f}, // position
+        0, // hitOffsetX
+        {4, 0, 0, 0}, // unitWork
+        battle_item_NONE, // itemDropTable
+    },
+    {
+        &unit_barriern_custom, // mUnitKindParams
+        1, // alliance
+        {0}, // pad_05
+        0x4000004, // attackPhase
+        {130.0f, 40.0f, 10.0f}, // position
+        0, // hitOffsetX
+        {4, 0, 0, 0}, // unitWork
+        battle_item_NONE, // itemDropTable
+    },
+};
+
+BattleGroupSetup btlgrp_test_barriern = {
+    2, // numEnemies
+    btlparty_test_barriern, // enemyData
+    0, // heldItemWeight
+    0, // randomItemWeight
+    100, // noItemWeight
+    battle_heart_drop_param_default, // hpDropTable
+    battle_heart_drop_param_default, // fpDropTable
+    5, // reserved_1C
+};
+
+BattleUnitSetup btlparty_test_vriety_height[] = {
+    {
+        &unit_met, // mUnitKindParams
+        1, // alliance
+        {0}, // pad_05
+        0x4000004, // attackPhase
+        {10.0f, 0.0f, -20.0f}, // position
+        0, // hitOffsetX
+        {0}, // unitWork
+        battle_item_NONE, // itemDropTable
+    },
+    {
+        &unit_bubble, // mUnitKindParams
+        1, // alliance
+        {0}, // pad_05
+        0x4000004, // attackPhase
+        {50.0f, 40.0f, -10.0f}, // position
+        0, // hitOffsetX
+        {0}, // unitWork
+        battle_item_NONE, // itemDropTable
+    },
+    {
+        &unit_kurokumorn, // mUnitKindParams
+        1, // alliance
+        {0}, // pad_05
+        0x4000004, // attackPhase
+        {90.0f, 40.0f, 0.0f}, // position
+        0, // hitOffsetX
+        {0}, // unitWork
+        battle_item_NONE, // itemDropTable
+    },
+    {
+        &unit_yami_patakuri, // mUnitKindParams
+        1, // alliance
+        {0}, // pad_05
+        0x4000004, // attackPhase
+        {130.0f, 40.0f, 10.0f}, // position
+        0, // hitOffsetX
+        {0}, // unitWork
+        battle_item_NONE, // itemDropTable
+    },
+    {
+        &unit_basabasa, // mUnitKindParams
+        1, // alliance
+        {0}, // pad_05
+        0x4000004, // attackPhase
+        {170.0f, 130.0f, 20.0f}, // position
+        0, // hitOffsetX
+        {0}, // unitWork
+        battle_item_NONE, // itemDropTable
+    },
+};
+
+BattleGroupSetup btlgrp_test_vriety_height = {
+    5, // numEnemies
+    btlparty_test_vriety_height, // enemyData
+    0, // heldItemWeight
+    0, // randomItemWeight
+    100, // noItemWeight
+    battle_heart_drop_param_default, // hpDropTable
+    battle_heart_drop_param_default, // fpDropTable
+    5, // reserved_1C
+};
+
+BattleUnitSetup btlparty_test_teresa[] = {
+    {
+        &unit_teresa, // mUnitKindParams
+        1, // alliance
+        {0}, // pad_05
+        0x4000004, // attackPhase
+        {30.0f, 0.0f, -10.0f}, // position
+        0, // hitOffsetX
+        {0}, // unitWork
+        battle_item_NONE, // itemDropTable
+    },
+    {
+        &unit_teresa, // mUnitKindParams
+        1, // alliance
+        {0}, // pad_05
+        0x4000004, // attackPhase
+        {70.0f, 0.0f, 0.0f}, // position
+        0, // hitOffsetX
+        {0}, // unitWork
+        battle_item_NONE, // itemDropTable
+    },
+    {
+        &unit_purple_teresa, // mUnitKindParams
+        1, // alliance
+        {0}, // pad_05
+        0x4000004, // attackPhase
+        {110.0f, 0.0f, 10.0f}, // position
+        0, // hitOffsetX
+        {0}, // unitWork
+        battle_item_NONE, // itemDropTable
+    },
+    {
+        &unit_kuriboo, // mUnitKindParams
+        1, // alliance
+        {0}, // pad_05
+        0x4000004, // attackPhase
+        {150.0f, 0.0f, 20.0f}, // position
+        0, // hitOffsetX
+        {0}, // unitWork
+        battle_item_NONE, // itemDropTable
+    },
+};
+
+BattleGroupSetup btlgrp_test_teresa = {
+    4, // numEnemies
+    btlparty_test_teresa, // enemyData
+    0, // heldItemWeight
+    0, // randomItemWeight
+    100, // noItemWeight
+    battle_heart_drop_param_default, // hpDropTable
+    battle_heart_drop_param_default, // fpDropTable
+    5, // reserved_1C
+};
+
+BattleUnitSetup btlparty_test_daisan[] = {
+    {
+        &unit_gundan_zako, // mUnitKindParams
+        1, // alliance
+        {0}, // pad_05
+        0x4000004, // attackPhase
+        {50.0f, 0.0f, -10.0f}, // position
+        0, // hitOffsetX
+        {0}, // unitWork
+        battle_item_NONE, // itemDropTable
+    },
+    {
+        &unit_gundan_zako_magician, // mUnitKindParams
+        1, // alliance
+        {0}, // pad_05
+        0x4000004, // attackPhase
+        {90.0f, 0.0f, 0.0f}, // position
+        0, // hitOffsetX
+        {0}, // unitWork
+        battle_item_NONE, // itemDropTable
+    },
+    {
+        &unit_gundan_zako_elite, // mUnitKindParams
+        1, // alliance
+        {0}, // pad_05
+        0x4000004, // attackPhase
+        {130.0f, 0.0f, 10.0f}, // position
+        0, // hitOffsetX
+        {0}, // unitWork
+        battle_item_NONE, // itemDropTable
+    },
+};
+
+BattleGroupSetup btlgrp_test_daisan = {
+    3, // numEnemies
+    btlparty_test_daisan, // enemyData
+    0, // heldItemWeight
+    0, // randomItemWeight
+    100, // noItemWeight
+    battle_heart_drop_param_default, // hpDropTable
+    battle_heart_drop_param_default, // fpDropTable
+    5, // reserved_1C
+};
+
+BattleUnitSetup btlparty_test_mahorn[] = {
+    {
+        &unit_mahorn, // mUnitKindParams
+        1, // alliance
+        {0}, // pad_05
+        0x4000004, // attackPhase
+        {40.0f, 0.0f, 0.0f}, // position
+        0, // hitOffsetX
+        {0}, // unitWork
+        battle_item_NONE, // itemDropTable
+    },
+    {
+        &unit_super_mahorn, // mUnitKindParams
+        1, // alliance
+        {0}, // pad_05
+        0x4000004, // attackPhase
+        {100.0f, 0.0f, 0.0f}, // position
+        0, // hitOffsetX
+        {0}, // unitWork
+        battle_item_NONE, // itemDropTable
+    },
+    {
+        &unit_mahorn_custom, // mUnitKindParams
+        1, // alliance
+        {0}, // pad_05
+        0x4000004, // attackPhase
+        {130.0f, 0.0f, 10.0f}, // position
+        0, // hitOffsetX
+        {0}, // unitWork
+        battle_item_NONE, // itemDropTable
+    },
+};
+
+BattleGroupSetup btlgrp_test_mahorn = {
+    3, // numEnemies
+    btlparty_test_mahorn, // enemyData
+    0, // heldItemWeight
+    0, // randomItemWeight
+    100, // noItemWeight
+    battle_heart_drop_param_default, // hpDropTable
+    battle_heart_drop_param_default, // fpDropTable
+    5, // reserved_1C
+};
+
+BattleUnitSetup btlparty_test_kamec[] = {
+    {
+        &unit_kamec, // mUnitKindParams
+        1, // alliance
+        {0}, // pad_05
+        0x4000004, // attackPhase
+        {30.0f, 0.0f, -10.0f}, // position
+        0, // hitOffsetX
+        {0}, // unitWork
+        battle_item_NONE, // itemDropTable
+    },
+    {
+        &unit_kamec_red, // mUnitKindParams
+        1, // alliance
+        {0}, // pad_05
+        0x4000004, // attackPhase
+        {70.0f, 0.0f, 0.0f}, // position
+        0, // hitOffsetX
+        {1, 0, 0, 0}, // unitWork
+        battle_item_NONE, // itemDropTable
+    },
+    {
+        &unit_kamec_white, // mUnitKindParams
+        1, // alliance
+        {0}, // pad_05
+        0x4000004, // attackPhase
+        {110.0f, 0.0f, 10.0f}, // position
+        0, // hitOffsetX
+        {0}, // unitWork
+        battle_item_NONE, // itemDropTable
+    },
+    {
+        &unit_kamec_green, // mUnitKindParams
+        1, // alliance
+        {0}, // pad_05
+        0x4000004, // attackPhase
+        {150.0f, 0.0f, 20.0f}, // position
+        0, // hitOffsetX
+        {1, 0, 0, 0}, // unitWork
+        battle_item_NONE, // itemDropTable
+    },
+};
+
+BattleGroupSetup btlgrp_test_kamec = {
+    4, // numEnemies
+    btlparty_test_kamec, // enemyData
+    0, // heldItemWeight
+    0, // randomItemWeight
+    100, // noItemWeight
+    battle_heart_drop_param_default, // hpDropTable
+    battle_heart_drop_param_default, // fpDropTable
+    5, // reserved_1C
+};
+
+NpcBattleSelect btlgrpsel_test_kuriboo_1[] = {
+    {10, &btlgrp_test_kuriboo_1, &tst_btlstage_data[5]},
+    {0},
+};
+
+NpcBattleSelect btlgrpsel_test_kuriboo[] = {
+    {10, &btlgrp_test_kuriboo, &tst_btlstage_data[5]},
+    {0},
+};
+
+NpcBattleSelect btlgrpsel_test_hyper_kuriboo[] = {
+    {10, &btlgrp_test_hyper_kuriboo, &tst_btlstage_data[1]},
+    {0},
+};
+
+NpcBattleSelect btlgrpsel_test_yamikuriboo[] = {
+    {10, &btlgrp_test_yamikuriboo, &tst_btlstage_data[1]},
+    {0},
+};
+
+NpcBattleSelect btlgrpsel_test_nokonoko_yaminoko[] = {
+    {10, &btlgrp_test_nokonoko_yaminoko, &tst_btlstage_data[1]},
+    {0},
+};
+
+NpcBattleSelect btlgrpsel_test_ura_noko_toge_noko[] = {
+    {10, &btlgrp_test_ura_noko_toge_noko, &tst_btlstage_data[1]},
+    {0},
+};
+
+NpcBattleSelect btlgrpsel_test_honenoko_fighter[] = {
+    {10, &btlgrp_test_honenoko_fighter, &tst_btlstage_data[1]},
+    {0},
+};
+
+NpcBattleSelect btlgrpsel_test_basabasa[] = {
+    {10, &btlgrp_test_basabasa, &tst_btlstage_data[6]},
+    {0},
+};
+
+NpcBattleSelect btlgrpsel_test_chorobon[] = {
+    {10, &btlgrp_test_chorobon, &tst_btlstage_data[1]},
+    {0},
+};
+
+NpcBattleSelect btlgrpsel_test_sinemon[] = {
+    {10, &btlgrp_test_sinemon, &tst_btlstage_data[1]},
+    {0},
+};
+
+NpcBattleSelect btlgrpsel_test_met[] = {
+    {10, &btlgrp_test_met, &tst_btlstage_data[6]},
+    {0},
+};
+
+NpcBattleSelect btlgrpsel_test_crimson_met[] = {
+    {10, &btlgrp_test_crimson_met, &tst_btlstage_data[6]},
+    {0},
+};
+
+NpcBattleSelect btlgrpsel_test_pansy[] = {
+    {10, &btlgrp_test_pansy, &tst_btlstage_data[1]},
+    {0},
+};
+
+NpcBattleSelect btlgrpsel_test_bomhei[] = {
+    {10, &btlgrp_test_bomhei, &tst_btlstage_data[1]},
+    {0},
+};
+
+NpcBattleSelect btlgrpsel_test_heaby_bomb[] = {
+    {10, &btlgrp_test_heaby_bomb, &tst_btlstage_data[1]},
+    {0},
+};
+
+NpcBattleSelect btlgrpsel_test_killer[] = {
+    {10, &btlgrp_test_killer, &tst_btlstage_data[1]},
+    {0},
+};
+
+NpcBattleSelect btlgrpsel_test_pakkun_flower[] = {
+    {10, &btlgrp_test_pakkun_flower, &tst_btlstage_data[6]},
+    {0},
+};
+
+NpcBattleSelect btlgrpsel_test_togedaruma[] = {
+    {10, &btlgrp_test_togedaruma, &tst_btlstage_data[1]},
+    {0},
+};
+
+NpcBattleSelect btlgrpsel_test_hannya[] = {
+    {10, &btlgrp_test_hannya, &tst_btlstage_data[1]},
+    {0},
+};
+
+NpcBattleSelect btlgrpsel_test_sambo[] = {
+    {10, &btlgrp_test_sambo, &tst_btlstage_data[1]},
+    {0},
+};
+
+NpcBattleSelect btlgrpsel_test_bros[] = {
+    {10, &btlgrp_test_bros, &tst_btlstage_data[1]},
+    {0},
+};
+
+NpcBattleSelect btlgrpsel_test_togezo_jyugem[] = {
+    {10, &btlgrp_test_togezo_jyugem, &tst_btlstage_data[1]},
+    {0},
+};
+
+NpcBattleSelect btlgrpsel_test_wanwan[] = {
+    {10, &btlgrp_test_wanwan, &tst_btlstage_data[1]},
+    {0},
+};
+
+NpcBattleSelect btlgrpsel_test_kurokumorn[] = {
+    {10, &btlgrp_test_kurokumorn, &tst_btlstage_data[1]},
+    {0},
+};
+
+NpcBattleSelect btlgrpsel_test_piders[] = {
+    {10, &btlgrp_test_piders, &tst_btlstage_data[1]},
+    {0},
+};
+
+NpcBattleSelect btlgrpsel_test_bubble[] = {
+    {10, &btlgrp_test_bubble, &tst_btlstage_data[1]},
+    {0},
+};
+
+NpcBattleSelect btlgrpsel_test_barriern[] = {
+    {10, &btlgrp_test_barriern, &tst_btlstage_data[1]},
+    {0},
+};
+
+NpcBattleSelect btlgrpsel_test_vriety_height[] = {
+    {10, &btlgrp_test_vriety_height, &tst_btlstage_data[1]},
+    {0},
+};
+
+NpcBattleSelect btlgrpsel_test_teresa[] = {
+    {10, &btlgrp_test_teresa, &tst_btlstage_data[1]},
+    {0},
+};
+
+NpcBattleSelect btlgrpsel_test_daisan[] = {
+    {10, &btlgrp_test_daisan, &tst_btlstage_data[1]},
+    {0},
+};
+
+NpcBattleSelect btlgrpsel_test_mahorn[] = {
+    {10, &btlgrp_test_mahorn, &tst_btlstage_data[1]},
+    {0},
+};
+
+NpcBattleSelect btlgrpsel_test_kamec[] = {
+    {10, &btlgrp_test_kamec, &tst_btlstage_data[1]},
+    {0},
+};
+
+NpcBattleSelect btlgrpsel_test_monban[] = {
+    {10, &btlgrp_test_monban, &tst_btlstage_data[1]},
+    {0},
+};
+
+NpcBattleSelect btlgrpsel_test_borodo[] = {
+    {10, &btlgrp_test_borodo, &tst_btlstage_data[1]},
+    {0},
+};
+
+NpcBattleSelect btlgrpsel_test_tamura[] = {
+    {10, &btlgrp_test_tamura, &tst_btlstage_data[1]},
+    {0},
+};
+
+NpcBattleSelect btlgrpsel_test_tamura2[] = {
+    {10, &btlgrp_test_tamura2, &tst_btlstage_data[1]},
+    {0},
+};
+
+NpcBattleSelect btlgrpsel_test_nakayama[] = {
+    {10, &btlgrp_test_nakayama, &tst_btlstage_data[1]},
+    {0},
+};
+
+NpcBattleSelect btlgrpsel_test_kishi[] = {
+    {10, &btlgrp_test_kishi, &tst_btlstage_data[1]},
+    {0},
+};
+
+NpcSetupBattleInfo btlsetup_tst_tbl[] = {
+    {
+        /*"クリボー"*/"\x83\x4E\x83\x8A\x83\x7B\x81\x5B", // name
+        NULL, 0, // mapName..fixedItem
+        -1, // swFlag
+        NULL, // altSelect
+        btlgrpsel_test_kuriboo_1, // select
+        0, 0, // battleFlags, randomMode
+        {{1, 1}, {1, 1}, {1, 1}, {1, 1}, {1, 1}, {1, 1}, {1, 1}, {1, 1}, {1, 1}, {1, 1}, {1, 1}, {1, 1}, {1, 1}, {1, 1}, {1, 1}, {1, 1}}, // randomRanges
+        "BGM_ZAKO_BATTLE1", // bgmName
+    },
+    {
+        /*"クリボーけい"*/"\x83\x4E\x83\x8A\x83\x7B\x81\x5B\x82\xAF\x82\xA2", // name
+        NULL, 0, // mapName..fixedItem
+        -1, // swFlag
+        NULL, // altSelect
+        btlgrpsel_test_kuriboo, // select
+        0, 0, // battleFlags, randomMode
+        {{1, 1}, {1, 1}, {1, 1}, {1, 1}, {1, 1}, {1, 1}, {1, 1}, {1, 1}, {1, 1}, {1, 1}, {1, 1}, {1, 1}, {1, 1}, {1, 1}, {1, 1}, {1, 1}}, // randomRanges
+        "BGM_ZAKO_BATTLE1", // bgmName
+    },
+    {
+        /*"ハイパークリボーけい"*/"\x83\x6E\x83\x43\x83\x70\x81\x5B\x83\x4E\x83\x8A\x83\x7B\x81\x5B\x82\xAF\x82\xA2", // name
+        NULL, 0, // mapName..fixedItem
+        -1, // swFlag
+        NULL, // altSelect
+        btlgrpsel_test_hyper_kuriboo, // select
+        0, 0, // battleFlags, randomMode
+        {{1, 1}, {1, 1}, {1, 1}, {1, 1}, {1, 1}, {1, 1}, {1, 1}, {1, 1}, {1, 1}, {1, 1}, {1, 1}, {1, 1}, {1, 1}, {1, 1}, {1, 1}, {1, 1}}, // randomRanges
+        "BGM_ZAKO_BATTLE1", // bgmName
+    },
+    {
+        /*"ヤミクリボーけい"*/"\x83\x84\x83\x7E\x83\x4E\x83\x8A\x83\x7B\x81\x5B\x82\xAF\x82\xA2", // name
+        NULL, 0, // mapName..fixedItem
+        -1, // swFlag
+        NULL, // altSelect
+        btlgrpsel_test_yamikuriboo, // select
+        0, 0, // battleFlags, randomMode
+        {{1, 1}, {1, 1}, {1, 1}, {1, 1}, {1, 1}, {1, 1}, {1, 1}, {1, 1}, {1, 1}, {1, 1}, {1, 1}, {1, 1}, {1, 1}, {1, 1}, {1, 1}, {1, 1}}, // randomRanges
+        "BGM_ZAKO_BATTLE1", // bgmName
+    },
+    {
+        /*"ノコノコけいとヤミノコけい"*/"\x83\x6D\x83\x52\x83\x6D\x83\x52\x82\xAF\x82\xA2\x82\xC6\x83\x84\x83\x7E\x83\x6D\x83\x52\x82\xAF\x82\xA2", // name
+        NULL, 0, // mapName..fixedItem
+        -1, // swFlag
+        NULL, // altSelect
+        btlgrpsel_test_nokonoko_yaminoko, // select
+        0, 0, // battleFlags, randomMode
+        {{1, 1}, {1, 1}, {1, 1}, {1, 1}, {1, 1}, {1, 1}, {1, 1}, {1, 1}, {1, 1}, {1, 1}, {1, 1}, {1, 1}, {1, 1}, {1, 1}, {1, 1}, {1, 1}}, // randomRanges
+        "BGM_ZAKO_BATTLE1", // bgmName
+    },
+    {
+        /*"ウラノコけいとトゲノコ"*/"\x83\x45\x83\x89\x83\x6D\x83\x52\x82\xAF\x82\xA2\x82\xC6\x83\x67\x83\x51\x83\x6D\x83\x52", // name
+        NULL, 0, // mapName..fixedItem
+        -1, // swFlag
+        NULL, // altSelect
+        btlgrpsel_test_ura_noko_toge_noko, // select
+        0, 0, // battleFlags, randomMode
+        {{1, 1}, {1, 1}, {1, 1}, {1, 1}, {1, 1}, {1, 1}, {1, 1}, {1, 1}, {1, 1}, {1, 1}, {1, 1}, {1, 1}, {1, 1}, {1, 1}, {1, 1}, {1, 1}}, // randomRanges
+        "BGM_ZAKO_BATTLE1", // bgmName
+    },
+    {
+        /*"ホネノコけいとファイターなノコノコけい"*/"\x83\x7A\x83\x6C\x83\x6D\x83\x52\x82\xAF\x82\xA2\x82\xC6\x83\x74\x83\x40\x83\x43\x83\x5E\x81\x5B\x82\xC8\x83\x6D\x83\x52\x83\x6D\x83\x52\x82\xAF\x82\xA2", // name
+        NULL, 0, // mapName..fixedItem
+        -1, // swFlag
+        NULL, // altSelect
+        btlgrpsel_test_honenoko_fighter, // select
+        0, 0, // battleFlags, randomMode
+        {{1, 1}, {1, 1}, {1, 1}, {1, 1}, {1, 1}, {1, 1}, {1, 1}, {1, 1}, {1, 1}, {1, 1}, {1, 1}, {1, 1}, {1, 1}, {1, 1}, {1, 1}, {1, 1}}, // randomRanges
+        "BGM_ZAKO_BATTLE1", // bgmName
+    },
+    {
+        /*"バサバサけい"*/"\x83\x6F\x83\x54\x83\x6F\x83\x54\x82\xAF\x82\xA2", // name
+        NULL, 0, // mapName..fixedItem
+        -1, // swFlag
+        NULL, // altSelect
+        btlgrpsel_test_basabasa, // select
+        0, 0, // battleFlags, randomMode
+        {{1, 1}, {1, 1}, {1, 1}, {1, 1}, {1, 1}, {1, 1}, {1, 1}, {1, 1}, {1, 1}, {1, 1}, {1, 1}, {1, 1}, {1, 1}, {1, 1}, {1, 1}, {1, 1}}, // randomRanges
+        "BGM_ZAKO_BATTLE1", // bgmName
+    },
+    {
+        /*"チョロボンけい"*/"\x83\x60\x83\x87\x83\x8D\x83\x7B\x83\x93\x82\xAF\x82\xA2", // name
+        NULL, 0, // mapName..fixedItem
+        -1, // swFlag
+        NULL, // altSelect
+        btlgrpsel_test_chorobon, // select
+        0, 0, // battleFlags, randomMode
+        {{1, 1}, {1, 1}, {1, 1}, {1, 1}, {1, 1}, {1, 1}, {1, 1}, {1, 1}, {1, 1}, {1, 1}, {1, 1}, {1, 1}, {1, 1}, {1, 1}, {1, 1}, {1, 1}}, // randomRanges
+        "BGM_ZAKO_BATTLE1", // bgmName
+    },
+    {
+        /*"シンエモンけい"*/"\x83\x56\x83\x93\x83\x47\x83\x82\x83\x93\x82\xAF\x82\xA2", // name
+        NULL, 0, // mapName..fixedItem
+        -1, // swFlag
+        NULL, // altSelect
+        btlgrpsel_test_sinemon, // select
+        0, 0, // battleFlags, randomMode
+        {{1, 1}, {1, 1}, {1, 1}, {1, 1}, {1, 1}, {1, 1}, {1, 1}, {1, 1}, {1, 1}, {1, 1}, {1, 1}, {1, 1}, {1, 1}, {1, 1}, {1, 1}, {1, 1}}, // randomRanges
+        "BGM_ZAKO_BATTLE1", // bgmName
+    },
+    {
+        /*"メットけい"*/"\x83\x81\x83\x62\x83\x67\x82\xAF\x82\xA2", // name
+        NULL, 0, // mapName..fixedItem
+        -1, // swFlag
+        NULL, // altSelect
+        btlgrpsel_test_met, // select
+        0, 0, // battleFlags, randomMode
+        {{1, 1}, {1, 1}, {1, 1}, {1, 1}, {1, 1}, {1, 1}, {1, 1}, {1, 1}, {1, 1}, {1, 1}, {1, 1}, {1, 1}, {1, 1}, {1, 1}, {1, 1}, {1, 1}}, // randomRanges
+        "BGM_ZAKO_BATTLE1", // bgmName
+    },
+    {
+        /*"クリムゾンメットけい"*/"\x83\x4E\x83\x8A\x83\x80\x83\x5D\x83\x93\x83\x81\x83\x62\x83\x67\x82\xAF\x82\xA2", // name
+        NULL, 0, // mapName..fixedItem
+        -1, // swFlag
+        NULL, // altSelect
+        btlgrpsel_test_crimson_met, // select
+        0, 0, // battleFlags, randomMode
+        {{1, 1}, {1, 1}, {1, 1}, {1, 1}, {1, 1}, {1, 1}, {1, 1}, {1, 1}, {1, 1}, {1, 1}, {1, 1}, {1, 1}, {1, 1}, {1, 1}, {1, 1}, {1, 1}}, // randomRanges
+        "BGM_ZAKO_BATTLE1", // bgmName
+    },
+    {
+        /*"パンジーさんけい"*/"\x83\x70\x83\x93\x83\x57\x81\x5B\x82\xB3\x82\xF1\x82\xAF\x82\xA2", // name
+        NULL, 0, // mapName..fixedItem
+        -1, // swFlag
+        NULL, // altSelect
+        btlgrpsel_test_pansy, // select
+        0, 0, // battleFlags, randomMode
+        {{1, 1}, {1, 1}, {1, 1}, {1, 1}, {1, 1}, {1, 1}, {1, 1}, {1, 1}, {1, 1}, {1, 1}, {1, 1}, {1, 1}, {1, 1}, {1, 1}, {1, 1}, {1, 1}}, // randomRanges
+        "BGM_ZAKO_BATTLE1", // bgmName
+    },
+    {
+        /*"ボムへい"*/"\x83\x7B\x83\x80\x82\xD6\x82\xA2", // name
+        NULL, 0, // mapName..fixedItem
+        -1, // swFlag
+        NULL, // altSelect
+        btlgrpsel_test_bomhei, // select
+        0, 0, // battleFlags, randomMode
+        {{1, 1}, {1, 1}, {1, 1}, {1, 1}, {1, 1}, {1, 1}, {1, 1}, {1, 1}, {1, 1}, {1, 1}, {1, 1}, {1, 1}, {1, 1}, {1, 1}, {1, 1}, {1, 1}}, // randomRanges
+        "BGM_ZAKO_BATTLE1", // bgmName
+    },
+    {
+        /*"ヘビーボム"*/"\x83\x77\x83\x72\x81\x5B\x83\x7B\x83\x80", // name
+        NULL, 0, // mapName..fixedItem
+        -1, // swFlag
+        NULL, // altSelect
+        btlgrpsel_test_heaby_bomb, // select
+        0, 0, // battleFlags, randomMode
+        {{1, 1}, {1, 1}, {1, 1}, {1, 1}, {1, 1}, {1, 1}, {1, 1}, {1, 1}, {1, 1}, {1, 1}, {1, 1}, {1, 1}, {1, 1}, {1, 1}, {1, 1}, {1, 1}}, // randomRanges
+        "BGM_ZAKO_BATTLE1", // bgmName
+    },
+    {
+        /*"キラーとたいほう"*/"\x83\x4C\x83\x89\x81\x5B\x82\xC6\x82\xBD\x82\xA2\x82\xD9\x82\xA4", // name
+        NULL, 0, // mapName..fixedItem
+        -1, // swFlag
+        NULL, // altSelect
+        btlgrpsel_test_killer, // select
+        0, 0, // battleFlags, randomMode
+        {{1, 1}, {1, 1}, {1, 1}, {1, 1}, {1, 1}, {1, 1}, {1, 1}, {1, 1}, {1, 1}, {1, 1}, {1, 1}, {1, 1}, {1, 1}, {1, 1}, {1, 1}, {1, 1}}, // randomRanges
+        "BGM_ZAKO_BATTLE1", // bgmName
+    },
+    {
+        /*"パックンフラワーけい"*/"\x83\x70\x83\x62\x83\x4E\x83\x93\x83\x74\x83\x89\x83\x8F\x81\x5B\x82\xAF\x82\xA2", // name
+        NULL, 0, // mapName..fixedItem
+        -1, // swFlag
+        NULL, // altSelect
+        btlgrpsel_test_pakkun_flower, // select
+        0, 0, // battleFlags, randomMode
+        {{1, 1}, {1, 1}, {1, 1}, {1, 1}, {1, 1}, {1, 1}, {1, 1}, {1, 1}, {1, 1}, {1, 1}, {1, 1}, {1, 1}, {1, 1}, {1, 1}, {1, 1}, {1, 1}}, // randomRanges
+        "BGM_ZAKO_BATTLE1", // bgmName
+    },
+    {
+        /*"トゲダルマーけい"*/"\x83\x67\x83\x51\x83\x5F\x83\x8B\x83\x7D\x81\x5B\x82\xAF\x82\xA2", // name
+        NULL, 0, // mapName..fixedItem
+        -1, // swFlag
+        NULL, // altSelect
+        btlgrpsel_test_togedaruma, // select
+        0, 0, // battleFlags, randomMode
+        {{1, 1}, {1, 1}, {1, 1}, {1, 1}, {1, 1}, {1, 1}, {1, 1}, {1, 1}, {1, 1}, {1, 1}, {1, 1}, {1, 1}, {1, 1}, {1, 1}, {1, 1}, {1, 1}}, // randomRanges
+        "BGM_ZAKO_BATTLE1", // bgmName
+    },
+    {
+        /*"ハンニャーけい"*/"\x83\x6E\x83\x93\x83\x6A\x83\x83\x81\x5B\x82\xAF\x82\xA2", // name
+        NULL, 0, // mapName..fixedItem
+        -1, // swFlag
+        NULL, // altSelect
+        btlgrpsel_test_hannya, // select
+        0, 0, // battleFlags, randomMode
+        {{1, 1}, {1, 1}, {1, 1}, {1, 1}, {1, 1}, {1, 1}, {1, 1}, {1, 1}, {1, 1}, {1, 1}, {1, 1}, {1, 1}, {1, 1}, {1, 1}, {1, 1}, {1, 1}}, // randomRanges
+        "BGM_ZAKO_BATTLE1", // bgmName
+    },
+    {
+        /*"サンボけい"*/"\x83\x54\x83\x93\x83\x7B\x82\xAF\x82\xA2", // name
+        NULL, 0, // mapName..fixedItem
+        -1, // swFlag
+        NULL, // altSelect
+        btlgrpsel_test_sambo, // select
+        0, 0, // battleFlags, randomMode
+        {{1, 1}, {1, 1}, {1, 1}, {1, 1}, {1, 1}, {1, 1}, {1, 1}, {1, 1}, {1, 1}, {1, 1}, {1, 1}, {1, 1}, {1, 1}, {1, 1}, {1, 1}, {1, 1}}, // randomRanges
+        "BGM_ZAKO_BATTLE1", // bgmName
+    },
+    {
+        /*"ブロスけい"*/"\x83\x75\x83\x8D\x83\x58\x82\xAF\x82\xA2", // name
+        NULL, 0, // mapName..fixedItem
+        -1, // swFlag
+        NULL, // altSelect
+        btlgrpsel_test_bros, // select
+        0, 0, // battleFlags, randomMode
+        {{1, 1}, {1, 1}, {1, 1}, {1, 1}, {1, 1}, {1, 1}, {1, 1}, {1, 1}, {1, 1}, {1, 1}, {1, 1}, {1, 1}, {1, 1}, {1, 1}, {1, 1}, {1, 1}}, // randomRanges
+        "BGM_ZAKO_BATTLE1", // bgmName
+    },
+    {
+        /*"トゲゾーとジュゲム"*/"\x83\x67\x83\x51\x83\x5D\x81\x5B\x82\xC6\x83\x57\x83\x85\x83\x51\x83\x80", // name
+        NULL, 0, // mapName..fixedItem
+        -1, // swFlag
+        NULL, // altSelect
+        btlgrpsel_test_togezo_jyugem, // select
+        0, 0, // battleFlags, randomMode
+        {{1, 1}, {1, 1}, {1, 1}, {1, 1}, {1, 1}, {1, 1}, {1, 1}, {1, 1}, {1, 1}, {1, 1}, {1, 1}, {1, 1}, {1, 1}, {1, 1}, {1, 1}, {1, 1}}, // randomRanges
+        "BGM_ZAKO_BATTLE1", // bgmName
+    },
+    {
+        /*"ワンワン"*/"\x83\x8F\x83\x93\x83\x8F\x83\x93", // name
+        NULL, 0, // mapName..fixedItem
+        -1, // swFlag
+        NULL, // altSelect
+        btlgrpsel_test_wanwan, // select
+        0, 0, // battleFlags, randomMode
+        {{1, 1}, {1, 1}, {1, 1}, {1, 1}, {1, 1}, {1, 1}, {1, 1}, {1, 1}, {1, 1}, {1, 1}, {1, 1}, {1, 1}, {1, 1}, {1, 1}, {1, 1}, {1, 1}}, // randomRanges
+        "BGM_ZAKO_BATTLE1", // bgmName
+    },
+    {
+        /*"クモクモーンけい"*/"\x83\x4E\x83\x82\x83\x4E\x83\x82\x81\x5B\x83\x93\x82\xAF\x82\xA2", // name
+        NULL, 0, // mapName..fixedItem
+        -1, // swFlag
+        NULL, // altSelect
+        btlgrpsel_test_kurokumorn, // select
+        0, 0, // battleFlags, randomMode
+        {{1, 1}, {1, 1}, {1, 1}, {1, 1}, {1, 1}, {1, 1}, {1, 1}, {1, 1}, {1, 1}, {1, 1}, {1, 1}, {1, 1}, {1, 1}, {1, 1}, {1, 1}, {1, 1}}, // randomRanges
+        "BGM_ZAKO_BATTLE1", // bgmName
+    },
+    {
+        /*"パイダースけい"*/"\x83\x70\x83\x43\x83\x5F\x81\x5B\x83\x58\x82\xAF\x82\xA2", // name
+        NULL, 0, // mapName..fixedItem
+        -1, // swFlag
+        NULL, // altSelect
+        btlgrpsel_test_piders, // select
+        0, 0, // battleFlags, randomMode
+        {{1, 1}, {1, 1}, {1, 1}, {1, 1}, {1, 1}, {1, 1}, {1, 1}, {1, 1}, {1, 1}, {1, 1}, {1, 1}, {1, 1}, {1, 1}, {1, 1}, {1, 1}, {1, 1}}, // randomRanges
+        "BGM_ZAKO_BATTLE1", // bgmName
+    },
+    {
+        /*"バブルけい"*/"\x83\x6F\x83\x75\x83\x8B\x82\xAF\x82\xA2", // name
+        NULL, 0, // mapName..fixedItem
+        -1, // swFlag
+        NULL, // altSelect
+        btlgrpsel_test_bubble, // select
+        0, 0, // battleFlags, randomMode
+        {{1, 1}, {1, 1}, {1, 1}, {1, 1}, {1, 1}, {1, 1}, {1, 1}, {1, 1}, {1, 1}, {1, 1}, {1, 1}, {1, 1}, {1, 1}, {1, 1}, {1, 1}, {1, 1}}, // randomRanges
+        "BGM_ZAKO_BATTLE1", // bgmName
+    },
+    {
+        /*"バリアーンけい"*/"\x83\x6F\x83\x8A\x83\x41\x81\x5B\x83\x93\x82\xAF\x82\xA2", // name
+        NULL, 0, // mapName..fixedItem
+        -1, // swFlag
+        NULL, // altSelect
+        btlgrpsel_test_barriern, // select
+        0, 0, // battleFlags, randomMode
+        {{1, 1}, {1, 1}, {1, 1}, {1, 1}, {1, 1}, {1, 1}, {1, 1}, {1, 1}, {1, 1}, {1, 1}, {1, 1}, {1, 1}, {1, 1}, {1, 1}, {1, 1}, {1, 1}}, // randomRanges
+        "BGM_ZAKO_BATTLE1", // bgmName
+    },
+    {
+        /*"さまざまな高さ"*/"\x82\xB3\x82\xDC\x82\xB4\x82\xDC\x82\xC8\x8D\x82\x82\xB3", // name
+        NULL, 0, // mapName..fixedItem
+        -1, // swFlag
+        NULL, // altSelect
+        btlgrpsel_test_vriety_height, // select
+        0, 0, // battleFlags, randomMode
+        {{1, 1}, {1, 1}, {1, 1}, {1, 1}, {1, 1}, {1, 1}, {1, 1}, {1, 1}, {1, 1}, {1, 1}, {1, 1}, {1, 1}, {1, 1}, {1, 1}, {1, 1}, {1, 1}}, // randomRanges
+        "BGM_ZAKO_BATTLE1", // bgmName
+    },
+    {
+        /*"テレサけい"*/"\x83\x65\x83\x8C\x83\x54\x82\xAF\x82\xA2", // name
+        NULL, 0, // mapName..fixedItem
+        -1, // swFlag
+        NULL, // altSelect
+        btlgrpsel_test_teresa, // select
+        0, 0, // battleFlags, randomMode
+        {{1, 1}, {1, 1}, {1, 1}, {1, 1}, {1, 1}, {1, 1}, {1, 1}, {1, 1}, {1, 1}, {1, 1}, {1, 1}, {1, 1}, {1, 1}, {1, 1}, {1, 1}, {1, 1}}, // randomRanges
+        "BGM_ZAKO_BATTLE1", // bgmName
+    },
+    {
+        /*"第三勢力けい"*/"\x91\xE6\x8E\x4F\x90\xA8\x97\xCD\x82\xAF\x82\xA2", // name
+        NULL, 0, // mapName..fixedItem
+        -1, // swFlag
+        NULL, // altSelect
+        btlgrpsel_test_daisan, // select
+        0, 0, // battleFlags, randomMode
+        {{1, 1}, {1, 1}, {1, 1}, {1, 1}, {1, 1}, {1, 1}, {1, 1}, {1, 1}, {1, 1}, {1, 1}, {1, 1}, {1, 1}, {1, 1}, {1, 1}, {1, 1}, {1, 1}}, // randomRanges
+        "BGM_ZAKO_BATTLE1", // bgmName
+    },
+    {
+        /*"マホーンけい"*/"\x83\x7D\x83\x7A\x81\x5B\x83\x93\x82\xAF\x82\xA2", // name
+        NULL, 0, // mapName..fixedItem
+        -1, // swFlag
+        NULL, // altSelect
+        btlgrpsel_test_mahorn, // select
+        0, 0, // battleFlags, randomMode
+        {{1, 1}, {1, 1}, {1, 1}, {1, 1}, {1, 1}, {1, 1}, {1, 1}, {1, 1}, {1, 1}, {1, 1}, {1, 1}, {1, 1}, {1, 1}, {1, 1}, {1, 1}, {1, 1}}, // randomRanges
+        "BGM_ZAKO_BATTLE1", // bgmName
+    },
+    {
+        /*"カメックけい"*/"\x83\x4A\x83\x81\x83\x62\x83\x4E\x82\xAF\x82\xA2", // name
+        NULL, 0, // mapName..fixedItem
+        -1, // swFlag
+        NULL, // altSelect
+        btlgrpsel_test_kamec, // select
+        0, 0, // battleFlags, randomMode
+        {{1, 1}, {1, 1}, {1, 1}, {1, 1}, {1, 1}, {1, 1}, {1, 1}, {1, 1}, {1, 1}, {1, 1}, {1, 1}, {1, 1}, {1, 1}, {1, 1}, {1, 1}, {1, 1}}, // randomRanges
+        "BGM_ZAKO_BATTLE1", // bgmName
+    },
+    {
+        /*"もんばんけい"*/"\x82\xE0\x82\xF1\x82\xCE\x82\xF1\x82\xAF\x82\xA2", // name
+        NULL, 0, // mapName..fixedItem
+        -1, // swFlag
+        NULL, // altSelect
+        btlgrpsel_test_monban, // select
+        0, 0, // battleFlags, randomMode
+        {{1, 1}, {1, 1}, {1, 1}, {1, 1}, {1, 1}, {1, 1}, {1, 1}, {1, 1}, {1, 1}, {1, 1}, {1, 1}, {1, 1}, {1, 1}, {1, 1}, {1, 1}, {1, 1}}, // randomRanges
+        "BGM_ZAKO_BATTLE1", // bgmName
+    },
+    {
+        /*"ボロドーけい"*/"\x83\x7B\x83\x8D\x83\x68\x81\x5B\x82\xAF\x82\xA2", // name
+        NULL, 0, // mapName..fixedItem
+        -1, // swFlag
+        NULL, // altSelect
+        btlgrpsel_test_borodo, // select
+        0, 0, // battleFlags, randomMode
+        {{1, 1}, {1, 1}, {1, 1}, {1, 1}, {1, 1}, {1, 1}, {1, 1}, {1, 1}, {1, 1}, {1, 1}, {1, 1}, {1, 1}, {1, 1}, {1, 1}, {1, 1}, {1, 1}}, // randomRanges
+        "BGM_ZAKO_BATTLE1", // bgmName
+    },
+    {
+        /*"たむらてすと"*/"\x82\xBD\x82\xDE\x82\xE7\x82\xC4\x82\xB7\x82\xC6", // name
+        NULL, 0, // mapName..fixedItem
+        -1, // swFlag
+        NULL, // altSelect
+        btlgrpsel_test_tamura, // select
+        0, 0, // battleFlags, randomMode
+        {{1, 1}, {1, 1}, {1, 1}, {1, 1}, {1, 1}, {1, 1}, {1, 1}, {1, 1}, {1, 1}, {1, 1}, {1, 1}, {1, 1}, {1, 1}, {1, 1}, {1, 1}, {1, 1}}, // randomRanges
+        "BGM_ZAKO_BATTLE1", // bgmName
+    },
+    {
+        /*"たむらてすと連戦テスト"*/"\x82\xBD\x82\xDE\x82\xE7\x82\xC4\x82\xB7\x82\xC6\x98\x41\x90\xED\x83\x65\x83\x58\x83\x67", // name
+        NULL, 0, // mapName..fixedItem
+        -1, // swFlag
+        NULL, // altSelect
+        btlgrpsel_test_tamura2, // select
+        0, 0, // battleFlags, randomMode
+        {{1, 1}, {1, 1}, {1, 1}, {1, 1}, {1, 1}, {1, 1}, {1, 1}, {1, 1}, {1, 1}, {1, 1}, {1, 1}, {1, 1}, {1, 1}, {1, 1}, {1, 1}, {1, 1}}, // randomRanges
+        "BGM_ZAKO_BATTLE1", // bgmName
+    },
+    {
+        /*"なかやまテスト"*/"\x82\xC8\x82\xA9\x82\xE2\x82\xDC\x83\x65\x83\x58\x83\x67", // name
+        NULL, 0, // mapName..fixedItem
+        -1, // swFlag
+        NULL, // altSelect
+        btlgrpsel_test_nakayama, // select
+        0, 0, // battleFlags, randomMode
+        {{1, 1}, {1, 1}, {1, 1}, {1, 1}, {1, 1}, {1, 1}, {1, 1}, {1, 1}, {1, 1}, {1, 1}, {1, 1}, {1, 1}, {1, 1}, {1, 1}, {1, 1}, {1, 1}}, // randomRanges
+        "BGM_ZAKO_BATTLE1", // bgmName
+    },
+    {
+        /*"きしてすと"*/"\x82\xAB\x82\xB5\x82\xC4\x82\xB7\x82\xC6", // name
+        NULL, 0, // mapName..fixedItem
+        -1, // swFlag
+        NULL, // altSelect
+        btlgrpsel_test_kishi, // select
+        0, 0, // battleFlags, randomMode
+        {{1, 1}, {1, 1}, {1, 1}, {1, 1}, {1, 1}, {1, 1}, {1, 1}, {1, 1}, {1, 1}, {1, 1}, {1, 1}, {1, 1}, {1, 1}, {1, 1}, {1, 1}, {1, 1}}, // randomRanges
+        "BGM_ZAKO_BATTLE1", // bgmName
+    },
+    {0},
+};
+
+NpcTerritoryInfo btl_tst_setup_no_tbl[] = {
+    {"BTLNO_TEST_KURIBOO_1", 0},
+    {"BTLNO_TEST_KURIBOO", 1},
+    {"BTLNO_TEST_HYPER_KURIBOO", 2},
+    {"BTLNO_TEST_YAMIKURIBOO", 3},
+    {"BTLNO_TEST_NOKONOKO_YAMINOKO", 4},
+    {"BTLNO_TEST_URA_NOKO_TOGE_NOKO", 5},
+    {"BTLNO_TEST_HONENOKO_FIGHTER", 6},
+    {"BTLNO_TEST_BASABASA", 7},
+    {"BTLNO_TEST_CHOROBON", 8},
+    {"BTLNO_TEST_SINEMON", 9},
+    {"BTLNO_TEST_MET", 10},
+    {"BTLNO_TEST_CRIMSON_MET", 11},
+    {"BTLNO_TEST_PANSY", 12},
+    {"BTLNO_TEST_BOMHEI", 13},
+    {"BTLNO_TEST_HEABY_BOMB", 14},
+    {"BTLNO_TEST_KILLER", 15},
+    {"BTLNO_TEST_PAKKUN_FLOWER", 16},
+    {"BTLNO_TEST_TOGEDARUMA", 17},
+    {"BTLNO_TEST_HANNYA", 18},
+    {"BTLNO_TEST_SAMBO", 19},
+    {"BTLNO_TEST_BROS", 20},
+    {"BTLNO_TEST_TOGEZO_JYUGEM", 21},
+    {"BTLNO_TEST_WANWAN", 22},
+    {"BTLNO_TEST_KUROKUMORN", 23},
+    {"BTLNO_TEST_PIDERS", 24},
+    {"BTLNO_TEST_BUBBLE", 25},
+    {"BTLNO_TEST_BARRIERN", 26},
+    {"BTLNO_TEST_VRIETY_HEIGHT", 27},
+    {"BTLNO_TEST_TERESA", 28},
+    {"BTLNO_TEST_DAISAN", 29},
+    {"BTLNO_TEST_MAHORN", 30},
+    {"BTLNO_TEST_KAMEC", 31},
+    {"BTLNO_TEST_MONBAN", 32},
+    {"BTLNO_TEST_BORODO", 33},
+    {"BTLNO_TEST_TAMURA", 34},
+    {"BTLNO_TEST_TAMURA2", 35},
+    {"BTLNO_TEST_NAKAYAMA", 36},
+    {"BTLNO_TEST_KISHI", 37},
+    {0},
+};
+
+// Moves a stage object along two sine waves: x = ampX * sin(stepX / periodX), y = ampY * (1 + sin(...)).
+// Args: object name, x step var, x period, x amplitude, y step var, y period, y amplitude.
+static USER_FUNC(_wave_offset) {
+    EvtWord* args = event->args;
+    const char* name = (const char*)evtGetValue(event, args[0]);
+    s32 varX = args[1];
+    s32 stepX = evtGetValue(event, varX);
+    s32 periodX = evtGetValue(event, args[2]);
+    s32 ampX = evtGetValue(event, args[3]);
+    s32 varY = args[4];
+    s32 stepY = evtGetValue(event, varY);
+    s32 periodY = evtGetValue(event, args[5]);
+    s32 ampY = evtGetValue(event, args[6]);
+    BattleStageObject* pObject = BattleSearchObjectPtr(name);
+
+    if (!pObject) {
+        __assert2("battle_bgset_test.c", 102, "pObject",
+                  /*"制御しようとする背景セットBの%sは存在しない"*/
+                  "\x90\xA7\x8C\xE4\x82\xB5\x82\xE6\x82\xA4\x82\xC6\x82\xB7\x82\xE9\x94\x77\x8C\x69\x83\x5A\x83\x62"
+                  "\x83\x67\x42\x82\xCC\x25\x73\x82\xCD\x91\xB6\x8D\xDD\x82\xB5\x82\xC8\x82\xA2",
+                  name);
+    }
+    pObject->positionOffset.x = ampX * sinfd(stepX * 360 / periodX);
+    pObject->positionOffset.y = ampY * sinfd(stepY * 360 / periodY + 270) + ampY;
+    stepX++;
+    if (stepX >= periodX) {
+        stepX = 0;
+    }
+    evtSetValue(event, varX, stepX);
+    stepY++;
+    if (stepY >= periodY) {
+        stepY = 0;
+    }
+    evtSetValue(event, varY, stepY);
+    return EVT_RETURN_DONE;
+}
+
+EVT_BEGIN(bgset_tst_wave_event)
+    SET_VALUE(LW(0), 0)
+    SET_VALUE(LW(1), 0)
+    SET_VALUE(LW(2), 0)
+    SET_VALUE(LW(3), 0)
+    LABEL(0)
+    CALL(_wave_offset, STRING("B"), LW(0), 800, 30, LW(1), 300, 10)
+    WAIT_FRAMES(1)
+    GOTO(0)
+    RETURN
+EVT_END()

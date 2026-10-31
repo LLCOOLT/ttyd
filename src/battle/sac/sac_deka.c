@@ -42,12 +42,12 @@ int rand(void);
 double tan(double);
 
 #define INTPL(mode, cur, steps, a, b) (((f32(*)(f32, f32, s32, s32, s32))intplGetValue)(a, b, mode, cur, steps))
-#define SFXON(name) (((s32(*)(const char*))psndSFXOn)(name))
+#define SFXON(name) (psndSFXOn(name))
 #define TEXPLANE(m, id, col) (((void (*)(Mtx, u32, GXColor, s32))btlDispTexPlane2)(m, id, col, 0))
 
 typedef struct DekaTiming {
     s32 state;  // 0x0
-    s32 unk4;   // 0x4
+    s32 timer;  // 0x4, cleared when shown, never read
     s32 type;   // 0x8
     f32 pos;    // 0xC
     Vec off;    // 0x10
@@ -98,9 +98,9 @@ typedef struct DekaWork {
     /* 0x3FC */ Vec starPos;
     /* 0x408 */ Vec from;
     /* 0x414 */ Vec to;
-    /* 0x420 */ f32 unk420;
+    /* 0x420 */ f32 velX; // unused; only velY is used
     /* 0x424 */ f32 velY;
-    /* 0x428 */ f32 unk428;
+    /* 0x428 */ f32 velZ; // unused
     /* 0x42C */ Vec scale;
     /* 0x438 */ Vec rot;
     /* 0x444 */ f32 sclFrom;
@@ -202,14 +202,14 @@ USER_FUNC(main_deka) {
 
 static void yuka_init(void) {
     DekaWork* w = get_ptr();
-    MapObject* mo = mapGetMapObj("stg_b_yuka\0");
+    MapObject* mo = mapGetMapObj("stg_b_yuka");
     YukaMesh* m;
     s32 i;
     s32 r;
     f32 x;
     f32 z;
 
-    mapGrpFlagOn("stg_b_yuka\0", 0x400001);
+    mapGrpFlagOn("stg_b_yuka", 0x400001);
     PSMTXMultVec(mo->modelWorldMtx, &mo->joints->bboxMin, &w->min);
     PSMTXMultVec(mo->modelWorldMtx, &mo->joints->bboxMax, &w->max);
     w->w0 = w->texW = w->max.x - w->min.x;
@@ -331,7 +331,7 @@ USER_FUNC(yuka_end) {
     w->tex->address = NULL;
     smartFree(w->mesh);
     w->mesh->address = NULL;
-    mapGrpFlagOff("stg_b_yuka\0", 0x400001);
+    mapGrpFlagOff("stg_b_yuka", 0x400001);
     return 2;
 }
 
@@ -537,7 +537,7 @@ void main_timing(s32 idx) {
     case 3:
         t->state = 4;
         t->alpha = 255;
-        t->unk4 = 0;
+        t->timer = 0;
         break;
     case 4:
         break;
@@ -910,7 +910,7 @@ static void disp_2D(CameraId cam, void* param) {
                     PSMTXTrans(tr, x, w->offsetY + (w->gaugePos.y - 18.0f + t->off.y), w->gaugePos.z + t->off.z);
                     PSMTXConcat(tr, sc, m);
                     {
-                        s32 id;
+                        u16 id;
                         if (w->cursor >= t->pos - 7.0f) {
                             id = ICON_095;
                         } else {

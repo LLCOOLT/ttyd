@@ -61,39 +61,35 @@ USER_FUNC(_add_star_point_disp_offset);
 USER_FUNC(_check_at_dm_event_wait);
 USER_FUNC(_disable_restore_command_cursor);
 
-#ifdef VERSION_G8ME01
-EvtWord subsetevt_dead[612];
-#else
-EvtWord subsetevt_dead[608];
-#endif
-EvtWord subsetevt_dead_core[193];
-EvtWord subsetevt_dead_core_nospin_norotate[125];
-EvtWord btldefaultevt_avoid_guard[92];
-EvtWord subsetevt_damage[979];
-EvtWord subsetevt_counter_damage[174];
-EvtWord btldefaultevt_ChangePosition[186];
-EvtWord subsetevt_happy_heart[53];
-EvtWord subsetevt_happy_flower[53];
-EvtWord subsetevt_terror[51];
-EvtWord subsetevt_blow_damage[69];
-EvtWord subsetevt_blow_dead[76];
-EvtWord subsetevt_shot_damage[31];
-EvtWord subsetevt_shot_damage_kaiten[288];
-EvtWord subsetevt_shot_damage_ultra[429];
-EvtWord subsetevt_swallow_failed_damage[55];
-EvtWord subsetevt_swallow_spew_damage[55];
-EvtWord subsetevt_swallow_shot_damage[342];
-EvtWord subset_ultra_hammer_acrobat_damage_event[63];
-EvtWord subsetevt_confuse_flustered[43];
-EvtWord subsetevt_binta_damage_left[48];
-EvtWord subsetevt_binta_damage_right[48];
-EvtWord subsetevt_binta_damage_left_last[69];
-EvtWord subsetevt_binta_damage_right_last[69];
-EvtWord subsetevt_status_recovery[48];
-EvtWord subsetevt_check_target_movable[57];
-EvtWord subsetevt_nodamage_motion[6];
-EvtWord subsetevt_regeneration[4];
-EvtWord subset_attack_ready_jump_event[2];
+extern EvtWord subsetevt_dead[];
+extern EvtWord subsetevt_dead_core[];
+extern EvtWord subsetevt_dead_core_nospin_norotate[];
+extern EvtWord btldefaultevt_avoid_guard[];
+extern EvtWord subsetevt_damage[];
+extern EvtWord subsetevt_counter_damage[];
+extern EvtWord btldefaultevt_ChangePosition[];
+extern EvtWord subsetevt_happy_heart[];
+extern EvtWord subsetevt_happy_flower[];
+extern EvtWord subsetevt_terror[];
+extern EvtWord subsetevt_blow_damage[];
+extern EvtWord subsetevt_blow_dead[];
+extern EvtWord subsetevt_shot_damage[];
+extern EvtWord subsetevt_shot_damage_kaiten[];
+extern EvtWord subsetevt_shot_damage_ultra[];
+extern EvtWord subsetevt_swallow_failed_damage[];
+extern EvtWord subsetevt_swallow_spew_damage[];
+extern EvtWord subsetevt_swallow_shot_damage[];
+extern EvtWord subset_ultra_hammer_acrobat_damage_event[];
+extern EvtWord subsetevt_confuse_flustered[];
+extern EvtWord subsetevt_binta_damage_left[];
+extern EvtWord subsetevt_binta_damage_right[];
+extern EvtWord subsetevt_binta_damage_left_last[];
+extern EvtWord subsetevt_binta_damage_right_last[];
+extern EvtWord subsetevt_status_recovery[];
+extern EvtWord subsetevt_check_target_movable[];
+extern EvtWord subsetevt_nodamage_motion[];
+extern EvtWord subsetevt_regeneration[];
+extern EvtWord subset_attack_ready_jump_event[];
 
 #ifdef VERSION_G8ME01
 EVT_BEGIN(subsetevt_dead)

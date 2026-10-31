@@ -5,8 +5,6 @@
 #include "las.h"
 #include "driver/hitdrv.h"
 
-#pragma force_active on
-
 USER_FUNC(evt_bero_get_info);
 USER_FUNC(evt_bero_overwrite);
 USER_FUNC(evt_hit_damage_return_set);
@@ -17,62 +15,10 @@ USER_FUNC(evt_snd_bgmon);
 USER_FUNC(evt_snd_envon);
 USER_FUNC(evt_snd_set_rev_mode);
 
-f32 fd_las_23_negone_one_374[2] __attribute__((aligned(8)));
-f32 fd_las_23_neg_one_382;
-f32 fd_las_23___local_PI_383;
-f32 fd_las_23___local_3PIO2_385;
-f32 fd_las_23_one_negone_373[2] __attribute__((aligned(8)));
-f32 fd_las_23___local_PIO2_384;
-f32 fd_las_23_one_381;
-f32 fd_las_23_negone_one_360[2] __attribute__((aligned(8)));
-f32 fd_las_23_neg_one_365;
-f32 fd_las_23___local_PI_366;
-f32 fd_las_23___local_3PIO2_368;
-f32 fd_las_23_one_negone_359[2] __attribute__((aligned(8)));
-f32 fd_las_23___local_PIO2_367;
-f32 fd_las_23_one_364;
-static EvtWord w_door_close[22];
-static EvtWord w_door_open[22];
-static EvtWord e1_door_close[22];
-static EvtWord e1_door_open[22];
-static EvtWord e2_door_close[22];
-static EvtWord e2_door_open[22];
 static BeroEntry bero_entry_data[6];
 static BeroEntry w_bero_mapchg[1];
 static HitDamageReturn dmgRetPoint[6];
-#ifdef VERSION_G8ME01
-EvtWord las_23_init_evt[98];
-#else
-EvtWord las_23_init_evt[93];
-#endif
-
-f32 fd_las_23_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
-
-f32 fd_las_23_neg_one_382 = -1.0f;
-
-f32 fd_las_23___local_PI_383 = 3.1415927f;
-
-f32 fd_las_23___local_3PIO2_385 = 4.712389f;
-
-f32 fd_las_23_one_negone_373[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
-
-f32 fd_las_23___local_PIO2_384 = 1.5707964f;
-
-f32 fd_las_23_one_381 = 1.0f;
-
-f32 fd_las_23_negone_one_360[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
-
-f32 fd_las_23_neg_one_365 = -1.0f;
-
-f32 fd_las_23___local_PI_366 = 3.1415927f;
-
-f32 fd_las_23___local_3PIO2_368 = 4.712389f;
-
-f32 fd_las_23_one_negone_359[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
-
-f32 fd_las_23___local_PIO2_367 = 1.5707964f;
-
-f32 fd_las_23_one_364 = 1.0f;
+extern EvtWord las_23_init_evt[];
 
 static EVT_BEGIN(w_door_close)
     MULTIPLY_FLOAT(LW(0), FLOAT(-0.38867188f))
@@ -264,7 +210,7 @@ EVT_BEGIN(las_23_init_evt)
 #endif
         ELSE
         CALL(evt_mapobj_flag_onoff, 1, 1, STRING("S_yuka"), 1)
-        CALL(evt_hitobj_onoff, STRING("A_be\0\0\0"), 1, 0)
+        CALL(evt_hitobj_onoff, STRING("A_be"), 1, 0)
         SET_VALUE(LW(0), STRING("w_bero"))
         CALL_CHILD(PTR(bero_case_switch_off))
         CALL(evt_bero_overwrite, STRING("w_bero"), PTR(w_bero_mapchg))

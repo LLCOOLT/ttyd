@@ -151,12 +151,12 @@ USER_FUNC(memcard_write) {
     return EVT_RETURN_DONE;
 }
 
-EvtWord evt_memcard_nosave[19];
-EvtWord evt_memcard_check[322];
-EvtWord evt_memcard_start[32];
-EvtWord evt_memcard_delete[80];
-EvtWord evt_memcard_copy[126];
-EvtWord evt_memcard_save[510];
+extern EvtWord evt_memcard_nosave[];
+extern EvtWord evt_memcard_check[];
+extern EvtWord evt_memcard_start[];
+extern EvtWord evt_memcard_delete[];
+extern EvtWord evt_memcard_copy[];
+extern EvtWord evt_memcard_save[];
 
 EVT_BEGIN(evt_memcard_nosave)
     CALL(evt_msg_print_add, 0, STRING("msg_nosave_start"))
@@ -575,7 +575,7 @@ EVT_BEGIN(evt_memcard_save)
     IF_INT_EQUAL(LW(10), 21)
         CALL(evt_msg_select, 0, STRING("msg_mcard_yesno_ending"))
         ELSE
-        CALL(evt_msg_select, 0, STRING("msg_mcard_yesno3\0\0\0"))
+        CALL(evt_msg_select, 0, STRING("msg_mcard_yesno3"))
     END_IF
     IF_INT_EQUAL(LW(0), 0)
         IF_INT_EQUAL(LW(10), 23)
@@ -599,13 +599,4 @@ EVT_BEGIN(evt_memcard_save_wrapper)
     RETURN
 EVT_END()
 
-// trailing 16-byte padding before eff_ultra_hammer .data
-#pragma force_active on
-__declspec(section ".data") u32 gap_05_803BAC70_data[4] = {0, 0, 0, 0};
-#pragma force_active reset
-#else
-// trailing 12-byte padding before eff_ultra_hammer .data (keep active so the linker does not strip it)
-#pragma force_active on
-__declspec(section ".data") u32 gap_05_803B70B4_data[3] = {0, 0, 0};
-#pragma force_active reset
 #endif

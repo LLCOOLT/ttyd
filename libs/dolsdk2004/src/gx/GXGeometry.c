@@ -124,18 +124,17 @@ void GXSetCullMode(GXCullMode mode) {
 }
 
 void GXGetCullMode(GXCullMode* mode) {
-#if DEBUG
     GXCullMode hwMode = GET_REG_FIELD(__GXData->genMode, 2, 14);
 
+#if DEBUG
     switch (hwMode) {
     case GX_CULL_FRONT: *mode = GX_CULL_BACK;  break;
     case GX_CULL_BACK:  *mode = GX_CULL_FRONT; break;
     default:            *mode = hwMode;        break;
     }
 #else
-    // fake match?
-    GXCullMode hwMode = __GXData->genMode;
-    *mode = ((hwMode >> 0xD) & 0x2) | (((((int)hwMode >> 0xE) & 0x2) >> 0x1));
+    // the hardware encodes front and back the other way round: swap the two bits
+    *mode = ((hwMode & 1) << 1) | ((hwMode & 2) >> 1);
 #endif
 }
 

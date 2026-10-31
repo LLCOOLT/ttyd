@@ -1,7 +1,6 @@
 #include "battle/battle_unit.h"
 #include "evt/evt_cmd.h"
 
-#pragma force_active on
 #include "battle/battle_unit.h"
 #include "driver/animdrv.h"
 #include "driver/camdrv.h"
@@ -13,6 +12,7 @@
 #include "battle/battle.h"
 #include "driver/dispdrv.h"
 #include "battle/battle_event_default.h"
+#include "battle/battle_sub.h"
 
 double tan(double x);
 typedef struct WanaWork { s32 ready; s32 poseId; Mtx mtx; GXTexObj obj; BattleUnitPart* part; smartEntry* tex; } WanaWork;
@@ -34,20 +34,6 @@ void replace_callback(BattleUnitPart* part, s32 type);
 void replace_disp(CameraId camera, void* param);
 static f32 tanf(f32 x);
 
-f32 fd_wanawana_negone_one_374[2] __attribute__((aligned(8)));
-f32 fd_wanawana_neg_one_382;
-f32 fd_wanawana___local_PI_383;
-f32 fd_wanawana___local_3PIO2_385;
-f32 fd_wanawana_one_negone_373[2] __attribute__((aligned(8)));
-f32 fd_wanawana___local_PIO2_384;
-f32 fd_wanawana_one_381;
-f32 fd_wanawana_negone_one_360[2] __attribute__((aligned(8)));
-f32 fd_wanawana_neg_one_365;
-f32 fd_wanawana___local_PI_366;
-f32 fd_wanawana___local_3PIO2_368;
-f32 fd_wanawana_one_negone_359[2] __attribute__((aligned(8)));
-f32 fd_wanawana___local_PIO2_367;
-f32 fd_wanawana_one_364;
 BattleUnitKind unit_wanawana;
 static BattleUnitDefense defence;
 static BattleUnitDefenseAttr defence_attr;
@@ -57,41 +43,12 @@ static BattleDataEntry data_table[1];
 static BattleUnitKindPart parts[1];
 static EvtWord init_event[29];
 static EvtWord damage_event[10];
-static EvtWord phase_event[2];
 static EvtWord attack_event[19];
 static EvtWord wait_event[6];
 
 static f32 tanf(f32 x) {
     return tan(x);
 }
-
-f32 fd_wanawana_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
-
-f32 fd_wanawana_neg_one_382 = -1.0f;
-
-f32 fd_wanawana___local_PI_383 = 3.1415927f;
-
-f32 fd_wanawana___local_3PIO2_385 = 4.712389f;
-
-f32 fd_wanawana_one_negone_373[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
-
-f32 fd_wanawana___local_PIO2_384 = 1.5707964f;
-
-f32 fd_wanawana_one_381 = 1.0f;
-
-f32 fd_wanawana_negone_one_360[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
-
-f32 fd_wanawana_neg_one_365 = -1.0f;
-
-f32 fd_wanawana___local_PI_366 = 3.1415927f;
-
-f32 fd_wanawana___local_3PIO2_368 = 4.712389f;
-
-f32 fd_wanawana_one_negone_359[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
-
-f32 fd_wanawana___local_PIO2_367 = 1.5707964f;
-
-f32 fd_wanawana_one_364 = 1.0f;
 
 BattleUnitKind unit_wanawana = {
     199,

@@ -3,8 +3,6 @@
 #include "evt/evt_bero.h"
 #include "mario/mario_pouch.h"
 
-#pragma force_active on
-
 USER_FUNC(evt_bero_get_info);
 USER_FUNC(evt_cam_shake);
 USER_FUNC(evt_item_entry);
@@ -44,79 +42,18 @@ USER_FUNC(evt_sub_intpl_init);
 USER_FUNC(evt_sub_rumble_onoff);
 USER_FUNC(evt_win_item_select);
 
-f32 fd_gon_05_negone_one_374[2] __attribute__((aligned(8)));
-f32 fd_gon_05_neg_one_382;
-f32 fd_gon_05___local_PI_383;
-f32 fd_gon_05___local_3PIO2_385;
-f32 fd_gon_05_one_negone_373[2] __attribute__((aligned(8)));
-f32 fd_gon_05___local_PIO2_384;
-f32 fd_gon_05_one_381;
-f32 fd_gon_05_negone_one_360[2] __attribute__((aligned(8)));
-f32 fd_gon_05_neg_one_365;
-f32 fd_gon_05___local_PI_366;
-f32 fd_gon_05___local_3PIO2_368;
-f32 fd_gon_05_one_negone_359[2] __attribute__((aligned(8)));
-f32 fd_gon_05___local_PIO2_367;
-f32 fd_gon_05_one_364;
-static EvtWord door01_close[12];
-static EvtWord door01_open[12];
-static EvtWord door02_close[12];
-static EvtWord door02_open[12];
-static EvtWord door03_close[12];
-static EvtWord door03_open[12];
-EvtWord door04_close[22];
-EvtWord door04_open[22];
-EvtWord door05_close[12];
-EvtWord door05_open[12];
+extern EvtWord door04_close[];
+extern EvtWord door04_open[];
+extern EvtWord door05_close[];
+extern EvtWord door05_open[];
 static BeroEntry bero_entry_data[7];
-static EvtWord init_0[37];
-#ifdef VERSION_G8ME01
-static EvtWord main_0[465];
-#else
-static EvtWord main_0[491];
-#endif
-EvtWord init_1[37];
-#ifdef VERSION_G8ME01
-EvtWord main_1[465];
-#else
-EvtWord main_1[491];
-#endif
+extern EvtWord init_1[];
+extern EvtWord main_1[];
 s32 key_tbl00[2];
-EvtWord evt_chk00[23];
-static EvtWord evt_unlock00[10];
+extern EvtWord evt_chk00[];
 s32 key_tbl01[2];
-EvtWord evt_chk01[23];
-static EvtWord evt_unlock01[10];
-static EvtWord key_get[5];
-EvtWord gon_05_init_evt[338];
-
-f32 fd_gon_05_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
-
-f32 fd_gon_05_neg_one_382 = -1.0f;
-
-f32 fd_gon_05___local_PI_383 = 3.1415927f;
-
-f32 fd_gon_05___local_3PIO2_385 = 4.712389f;
-
-f32 fd_gon_05_one_negone_373[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
-
-f32 fd_gon_05___local_PIO2_384 = 1.5707964f;
-
-f32 fd_gon_05_one_381 = 1.0f;
-
-f32 fd_gon_05_negone_one_360[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
-
-f32 fd_gon_05_neg_one_365 = -1.0f;
-
-f32 fd_gon_05___local_PI_366 = 3.1415927f;
-
-f32 fd_gon_05___local_3PIO2_368 = 4.712389f;
-
-f32 fd_gon_05_one_negone_359[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
-
-f32 fd_gon_05___local_PIO2_367 = 1.5707964f;
-
-f32 fd_gon_05_one_364 = 1.0f;
+extern EvtWord evt_chk01[];
+extern EvtWord gon_05_init_evt[];
 
 static EVT_BEGIN(door01_close)
     MULTIPLY_FLOAT(LW(0), FLOAT(0.44433594f))
@@ -865,7 +802,7 @@ EVT_BEGIN(gon_05_init_evt)
     END_IF
     CALL(evt_mobj_save_blk, STRING("mobj_save"), 0, 60, 0, 0, 0)
     CALL(evt_mobj_powerupblk, STRING("pblk00"), -200, 1950, -150, 0, GSWF(5539), 0)
-    CALL(evt_map_playanim, STRING("hokori\0"), 1, 0)
+    CALL(evt_map_playanim, STRING("hokori"), 1, 0)
     RETURN
 EVT_END()
 

@@ -3,8 +3,6 @@
 #include "evt/evt_bero.h"
 #include "win.h"
 
-#pragma force_active on
-
 USER_FUNC(evt_bero_get_info);
 USER_FUNC(evt_bero_mapchange);
 USER_FUNC(evt_cam3d_evt_set);
@@ -33,54 +31,10 @@ USER_FUNC(evt_snd_envon);
 USER_FUNC(evt_sub_intpl_msec_get_value);
 USER_FUNC(evt_sub_intpl_msec_init);
 
-f32 fd_win_05_negone_one_374[2] __attribute__((aligned(8)));
-f32 fd_win_05_neg_one_382;
-f32 fd_win_05___local_PI_383;
-f32 fd_win_05___local_3PIO2_385;
-f32 fd_win_05_one_negone_373[2] __attribute__((aligned(8)));
-f32 fd_win_05___local_PIO2_384;
-f32 fd_win_05_one_381;
-f32 fd_win_05_negone_one_360[2] __attribute__((aligned(8)));
-f32 fd_win_05_neg_one_365;
-f32 fd_win_05___local_PI_366;
-f32 fd_win_05___local_3PIO2_368;
-f32 fd_win_05_one_negone_359[2] __attribute__((aligned(8)));
-f32 fd_win_05___local_PIO2_367;
-f32 fd_win_05_one_364;
-EvtWord win_05_door_open[10];
-EvtWord win_05_door_close[10];
+extern EvtWord win_05_door_open[];
+extern EvtWord win_05_door_close[];
 static BeroEntry bero_entry_data[2];
-static EvtWord item_get00[34];
-static EvtWord cloud_toujou[126];
-EvtWord win_05_init_evt[42];
-
-f32 fd_win_05_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
-
-f32 fd_win_05_neg_one_382 = -1.0f;
-
-f32 fd_win_05___local_PI_383 = 3.1415927f;
-
-f32 fd_win_05___local_3PIO2_385 = 4.712389f;
-
-f32 fd_win_05_one_negone_373[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
-
-f32 fd_win_05___local_PIO2_384 = 1.5707964f;
-
-f32 fd_win_05_one_381 = 1.0f;
-
-f32 fd_win_05_negone_one_360[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
-
-f32 fd_win_05_neg_one_365 = -1.0f;
-
-f32 fd_win_05___local_PI_366 = 3.1415927f;
-
-f32 fd_win_05___local_3PIO2_368 = 4.712389f;
-
-f32 fd_win_05_one_negone_359[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
-
-f32 fd_win_05___local_PIO2_367 = 1.5707964f;
-
-f32 fd_win_05_one_364 = 1.0f;
+extern EvtWord win_05_init_evt[];
 
 EVT_BEGIN(win_05_door_open)
     SET_VALUE(LW(8), STRING("S_doa_e_l"))
@@ -170,7 +124,7 @@ EVT_BEGIN(win_05_init_evt)
     CALL(evt_mobj_itembox, STRING("mobj_box00"), -45, 0, -75, 0, 0, PTR(item_get00), GSWF(2684))
     CALL(evt_mobj_kururing_floor, STRING("kururin1"), 64, 0, 118, STRING("S_yukaA"), 125, GSWF(5611))
     CALL(evt_snd_bgmon, 512, STRING("BGM_STG2_WIN1"))
-    CALL(evt_snd_envon, 272, STRING("ENV_STG2_WIN2\0\0"))
+    CALL(evt_snd_envon, 272, STRING("ENV_STG2_WIN2"))
     IF_INT_EQUAL(GSW(0), 76)
         SPAWN_EVENT(PTR(cloud_toujou))
     END_IF

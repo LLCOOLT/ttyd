@@ -4,7 +4,6 @@
 #include "battle/battle_unit.h"
 #include "evt/evt_cmd.h"
 
-#pragma force_active on
 #include "driver/imgdrv.h"
 #include "driver/animdrv.h"
 #include "mario/mariost.h"
@@ -25,8 +24,10 @@
 #include "evt/evt_npc.h"
 #include "mario/mario_pouch.h"
 #include "data_tables.h"
-typedef struct SharinData { const char* name; s32 field_0x4; s32 field_0x8; EvtFloat speed; } SharinData;
-typedef struct ClankData { const char* name; s32 field_0x4; s32 field_0x8; EvtFloat x; EvtFloat y; } ClankData;
+#include "cam_road.h"
+#include "cam_shift.h"
+typedef struct SharinData { const char* name; s32 wheelType; s32 speedSource; EvtFloat speed; } SharinData;
+typedef struct ClankData { const char* name; s32 wheelType; s32 speedSource; EvtFloat x; EvtFloat y; } ClankData;
 
 HitEntry* marioSearchUnder(void);
 void mapGrpFlagOn(const char* name, u32 flags);
@@ -145,114 +146,31 @@ USER_FUNC(pik_00_statuswin_force_off);
 void irai_29_15_cb(s32 type, smartEntry* smart);
 static void resha_tev(MapTevCallbackInfo* info);
 
-f32 fd_pik_00_negone_one_374[2] __attribute__((aligned(8)));
-f32 fd_pik_00_neg_one_382;
-f32 fd_pik_00___local_PI_383;
-f32 fd_pik_00___local_3PIO2_385;
-f32 fd_pik_00_one_negone_373[2] __attribute__((aligned(8)));
-f32 fd_pik_00___local_PIO2_384;
-f32 fd_pik_00_one_381;
-f32 fd_pik_00_negone_one_360[2] __attribute__((aligned(8)));
-f32 fd_pik_00_neg_one_365;
-f32 fd_pik_00___local_PI_366;
-f32 fd_pik_00___local_3PIO2_368;
-f32 fd_pik_00_one_negone_359[2] __attribute__((aligned(8)));
-f32 fd_pik_00___local_PIO2_367;
-f32 fd_pik_00_one_364;
 static HitDamageReturn dmgReturnPt[2];
 static SharinData sharinDt[29];
-static EvtWord evt_sharin_main[87];
-static EvtWord evt_sharin[19];
 static ClankData clankDt[9];
-static EvtWord evt_clank_main[104];
-static EvtWord evt_clank[21];
-static EvtWord evt_bg[81];
-static EvtWord evt_hoshi[88];
-static EvtWord hom_10_evt_resha_start[244];
-static EvtWord hom_10_evt_resha_start2[259];
-static EvtWord hom_10_evt_resha_start3[11];
-static EvtWord hom_10_evt_resha_start4[11];
-static EvtWord stop_1[90];
-static EvtWord stop_2[90];
-static EvtWord hom_10_evt_resha_stop[36];
-static EvtWord evt_ramp[33];
 static const char* pika_tbl[15];
 static const char* pika_tbl_rsh_06[10];
-static EvtWord hom_10_evt_resha_sub[102];
-static EvtWord hom_10_evt_resha_right[35];
-static EvtWord hom_10_evt_resha_left[28];
-static EvtWord hom_10_init_evt[140];
-EvtWord resha_noru[8];
+extern EvtWord resha_noru[];
 static BeroEntry bero_data[3];
 static const char* name_tbl[6];
-EvtWord evt_pik_yajirushi[71];
-static EvtWord evt_train[295];
-EvtWord init_ekiin[8];
-EvtWord talk_ekiin[146];
-static EvtWord init_papa[8];
-EvtWord talk_papa_taihou_kyoka[VERSION_PICK(403, 405)];
-static EvtWord talk_papa[141];
-static EvtWord init_mama[8];
+extern EvtWord evt_pik_yajirushi[];
+extern EvtWord init_ekiin[];
+extern EvtWord talk_ekiin[];
+extern EvtWord talk_papa_taihou_kyoka[];
 s32 iri_29_item_tbl[2];
-static EvtWord talk_mama[318];
-static EvtWord init_konari[13];
-static EvtWord talk_konari[58];
-static EvtWord init_madam[8];
 static s32 item_tbl_madam[2];
-static EvtWord talk_madam_ring_return[54];
 s32 iri_23_item_tbl[2];
-static EvtWord talk_madam[185];
-static EvtWord init_sarary[12];
-static EvtWord talk_sarary[8];
 static NpcSetupInfo npc_data[7];
-static EvtWord evt_door[15];
-static EvtWord evt_door2[12];
-static EvtWord evt_wall[22];
 const char* ie1_mobj[2];
-static EvtWord door_1_open[12];
-static EvtWord door_1_close[14];
 static DoorParam door_1;
-static EvtWord evt_door_2[12];
-static EvtWord evt_door2_2[12];
-static EvtWord evt_wall_2[29];
 const char* door_2_npc[2];
-static EvtWord door_2_open[12];
-static EvtWord door_2_close[14];
 static DoorParam door_2;
-EvtWord evt_rot_door_sub[63];
-EvtWord evt_rot_door[9];
-EvtWord evt_pik_00_arrival[86];
-EvtWord evt_seacret[131];
-static EvtWord mobj_box00[34];
-EvtWord pik_00_init_evt[410];
-
-f32 fd_pik_00_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
-
-f32 fd_pik_00_neg_one_382 = -1.0f;
-
-f32 fd_pik_00___local_PI_383 = 3.1415927f;
-
-f32 fd_pik_00___local_3PIO2_385 = 4.712389f;
-
-f32 fd_pik_00_one_negone_373[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
-
-f32 fd_pik_00___local_PIO2_384 = 1.5707964f;
-
-f32 fd_pik_00_one_381 = 1.0f;
-
-f32 fd_pik_00_negone_one_360[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
-
-f32 fd_pik_00_neg_one_365 = -1.0f;
-
-f32 fd_pik_00___local_PI_366 = 3.1415927f;
-
-f32 fd_pik_00___local_3PIO2_368 = 4.712389f;
-
-f32 fd_pik_00_one_negone_359[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
-
-f32 fd_pik_00___local_PIO2_367 = 1.5707964f;
-
-f32 fd_pik_00_one_364 = 1.0f;
+extern EvtWord evt_rot_door_sub[];
+extern EvtWord evt_rot_door[];
+extern EvtWord evt_pik_00_arrival[];
+extern EvtWord evt_seacret[];
+extern EvtWord pik_00_init_evt[];
 
 static HitDamageReturn dmgReturnPt[] = {
     {"mod_1", {0.0f, -1000.0f, 0.0f}},
@@ -2197,11 +2115,6 @@ USER_FUNC(pik_00_statuswin_force_off) {
 }
 #endif
 
-#ifdef VERSION_G8ME01
-typedef struct CamRoadOutUS { Vec f_0; Vec pos; Vec at; } CamRoadOutUS;
-void camShiftMain(CameraEntry* camera, MarioWork* mario, f32* out);
-void camRoadMain(CamRoadOutUS* out, f32 a, f32 b, f32 c, f32 d, f32 e, f32 f, f32 g);
-#endif
 static USER_FUNC(zoom) {
     EvtWord* args = event->args;
     // ナリキンパパ
@@ -2210,7 +2123,7 @@ static USER_FUNC(zoom) {
     CameraEntry* cam = camGetPtr(CAMERA_3D);
     Vec v;
 #ifdef VERSION_G8ME01
-    CamRoadOutUS out;
+    CameraParams out;
     f32 bank = 0.0f;
 
     camShiftMain(cam, mario, &bank);

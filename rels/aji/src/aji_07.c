@@ -1,7 +1,6 @@
 #include "battle/battle_unit.h"
 #include "evt/evt_cmd.h"
 
-#pragma force_active on
 #include "manager/evtmgr_cmd.h"
 #include "mario/mario.h"
 #include "party.h"
@@ -52,57 +51,12 @@ USER_FUNC(evt_sub_intpl_msec_get_value);
 USER_FUNC(evt_sub_intpl_msec_init);
 static USER_FUNC(scale_func);
 
-f32 fd_aji_07_negone_one_374[2] __attribute__((aligned(8)));
-f32 fd_aji_07_neg_one_382;
-f32 fd_aji_07___local_PI_383;
-f32 fd_aji_07___local_3PIO2_385;
-f32 fd_aji_07_one_negone_373[2] __attribute__((aligned(8)));
-f32 fd_aji_07___local_PIO2_384;
-f32 fd_aji_07_one_381;
-f32 fd_aji_07_negone_one_360[2] __attribute__((aligned(8)));
-f32 fd_aji_07_neg_one_365;
-f32 fd_aji_07___local_PI_366;
-f32 fd_aji_07___local_3PIO2_368;
-f32 fd_aji_07_one_negone_359[2] __attribute__((aligned(8)));
-f32 fd_aji_07___local_PIO2_367;
-f32 fd_aji_07_one_364;
-static EvtWord s_door_open[22];
-static EvtWord s_door_close[22];
 static BeroEntry bero_entry_data[2];
-EvtWord tensou_ride[245];
-EvtWord tensou_switch[62];
-EvtWord evt_tensou2[216];
-EvtWord tensou_init[69];
-static EvtWord evt_haguruma[5];
-EvtWord aji_07_init_evt[118];
-
-f32 fd_aji_07_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
-
-f32 fd_aji_07_neg_one_382 = -1.0f;
-
-f32 fd_aji_07___local_PI_383 = 3.1415927f;
-
-f32 fd_aji_07___local_3PIO2_385 = 4.712389f;
-
-f32 fd_aji_07_one_negone_373[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
-
-f32 fd_aji_07___local_PIO2_384 = 1.5707964f;
-
-f32 fd_aji_07_one_381 = 1.0f;
-
-f32 fd_aji_07_negone_one_360[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
-
-f32 fd_aji_07_neg_one_365 = -1.0f;
-
-f32 fd_aji_07___local_PI_366 = 3.1415927f;
-
-f32 fd_aji_07___local_3PIO2_368 = 4.712389f;
-
-f32 fd_aji_07_one_negone_359[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
-
-f32 fd_aji_07___local_PIO2_367 = 1.5707964f;
-
-f32 fd_aji_07_one_364 = 1.0f;
+extern EvtWord tensou_ride[];
+extern EvtWord tensou_switch[];
+extern EvtWord evt_tensou2[];
+extern EvtWord tensou_init[];
+extern EvtWord aji_07_init_evt[];
 
 static EVT_BEGIN(s_door_open)
     MULTIPLY_FLOAT(LW(0), FLOAT(0.16601563f))
@@ -368,7 +322,7 @@ EVT_BEGIN(aji_07_init_evt)
         CALL(evt_item_entry, STRING("haguruma"), 85, -65, 100, -120, 16, -1, PTR(evt_haguruma))
     END_IF
     CALL(evt_bero_get_entername, LW(0))
-    IF_STR_EQUAL(LW(0), STRING("tenjo\0\0"))
+    IF_STR_EQUAL(LW(0), STRING("tenjo"))
         CALL(evt_cam_letter_box_disable, 1)
         CALL(evt_mario_key_onoff, 0)
         CALL(evt_mario_cont_onoff, 0)
@@ -383,6 +337,20 @@ EVT_BEGIN(aji_07_init_evt)
             CALL(evt_party_cont_onoff, 0, 1)
             CALL(evt_party_cont_onoff, 1, 1)
             CALL(evt_mario_wait_landon)
+#ifdef VERSION_G8MP01
+            LOOP(30)
+                CALL(evt_mario_get_pos, 0, LW(0), LW(1), LW(2))
+                CALL(evt_party_get_pos, 0, LW(3), LW(4), LW(5))
+                ADD(LW(1), 20)
+                IF_INT_LESS(LW(1), LW(4))
+                    SUBTRACT(LW(4), 10)
+                    CALL(evt_party_set_pos, 0, LW(3), LW(4), LW(5))
+                ELSE
+                    BREAK_LOOP
+                END_IF
+                WAIT_FRAMES(1)
+            END_LOOP
+#endif
             CALL(evt_mario_key_onoff, 1)
             CALL(evt_cam_letter_box_disable, 0)
         END_INLINE_EVENT

@@ -484,7 +484,7 @@ TattleEntry monosiriMessageTable[] = {
 	{"btl_un_clauda", NULL, "menu_enemy_165", "c_kuribo", "KUR_Z_2", "KUR_Z_2"}, //0xE3 (227)
 	{"btl_un_vivian", "btl_hlp_vivian_party", "menu_enemy_166", "c_kuribo", "KUR_Z_2", "KUR_Z_2"}, //0xE4 (228)
 	{"btl_un_sanders", NULL, "menu_enemy_167", "c_kuribo", "KUR_Z_2", "KUR_Z_2"}, //0xE5 (229)
-	{"btl_un_chuchurina", NULL, "menu_enemy_168\0", "c_kuribo", "KUR_Z_2", "KUR_Z_2"}, //0xE6 (230)
+	{"btl_un_chuchurina", NULL, "menu_enemy_168", "c_kuribo", "KUR_Z_2", "KUR_Z_2"}, //0xE6 (230)
 };
 
 BattleUnitType same_tbl_rampell_1[] = {
@@ -778,10 +778,3 @@ void battleSetUnitMonosiriFlag(BattleUnitType kind) {
 	swSet(kind + 0x117A);
 	wp->tattledUnitTypeFlags[kind / 32] |= 1 << (kind % 32);
 }
-#pragma force_active on
-#ifdef VERSION_G8ME01
-__declspec(section ".data") u32 gap_05_8036BE94_data[1] = {0};
-#else
-__declspec(section ".data") u32 gap_05_8036BE94_data[3] = {0, 0, 0};
-#endif
-#pragma force_active reset

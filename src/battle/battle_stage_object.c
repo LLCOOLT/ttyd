@@ -37,7 +37,7 @@ void mapGrpFlagOff(const char* name, u32 flags);
 void mapObjTranslate(const char* name, f32 x, f32 y, f32 z);
 void mapObjRotate(const char* name, f32 x, f32 y, f32 z);
 void mapGrpSetColor(const char* name, GXColor color);
-void mapPlayAnimationLv(const char* name, s32 a, s32 b);
+void mapPlayAnimationLv(const char* name, s32 mode, s32 level);
 f32 intpl_sub(s32 type, f32 start, f32 end, s32 cur, s32 max);
 f32 sinfd(f32 degrees);
 f32 cosfd(f32 degrees);
@@ -48,7 +48,7 @@ void BattleAudience_Case_HaikeiSet(void);
 void BattleAudience_Case_FallObject_Aud(s32 index, u8 type);
 void BattleAudience_Case_FallObject_Stage(void);
 EffectEntry* effNozleEntry(s32 type, f32 x, f32 y, f32 z, f32 rx, f32 ry, s32 lifetime);
-EffectEntry* effFallEntry(s32 type, f32 x, f32 y, f32 z, f32 arg4, f32 arg5, f32 arg6, s32 arg7, s32 arg8);
+EffectEntry* effFallEntry(s32 type, f32 x, f32 y, f32 z, f32 width, f32 drop, f32 dir, s32 num, s32 duration);
 BOOL effFallCheckHit(EffectEntry* effect);
 void BattleSamplingEnemy(BattleWorkWeaponTargets* targets, BattleWeapon* weapon, s32 unitId, s8 belong, u32 classFlags, u32 propFlags, s8 direction);
 void BattleChoiceSamplingEnemy(BattleWorkWeaponTargets* targets, u32 flags, s32* unitId, s32* partId);
@@ -532,14 +532,6 @@ void BattleStage_DestroyB(void) {
 	}
 }
 
-__declspec(section ".data") f32 battle_stage_object_negone_one_a[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
-__declspec(section ".data") f32 fd_battle_stage_object_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
-__declspec(section ".data") f32 battle_stage_object_one_negone_a[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
-__declspec(section ".data") f32 fd_battle_stage_object_one_negone_373[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
-__declspec(section ".data") f32 battle_stage_object_negone_one_b[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
-__declspec(section ".data") f32 fd_battle_stage_object_negone_one_360[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
-__declspec(section ".data") f32 battle_stage_object_one_negone_b[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
-__declspec(section ".data") f32 fd_battle_stage_object_one_negone_359[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
 
 BattleWeaponData _nozzle_at_base_mario = {{
 	NULL, 0, // name..icon
@@ -3665,15 +3657,15 @@ USER_FUNC(_object_fall_wait) {
 typedef struct FallObjectEntry {
 	s8 index; //0x0
 	s8 type; //0x1
-	u8 field_0x2[0x4 - 0x2]; //0x2
+	u8 pad_02[0x4 - 0x2]; //0x2
 	s32 kind; //0x4, 0 = unit, 1 = audience
 	s32 unitId; //0x8
 	s32 partId; //0xC
 	s16 delay; //0x10
-	s16 field_0x12; //0x12
+	s16 timer; //0x12, cleared at entry, never read
 	u8 noAc; //0x14
-	u8 field_0x15; //0x15
-	u8 field_0x16[0x1C - 0x16]; //0x16
+	u8 noDodge; //0x15, skip the lucky dodge roll (an earlier object of this unit already decided it)
+	u8 pad_16[0x1C - 0x16]; //0x16
 	s32 preCheck; //0x1C
 	s32 sfxId; //0x20
 	EffectEntry* effect; //0x24
@@ -3742,7 +3734,7 @@ s32 _object_fall_attack(EventEntry *event, BOOL isFirstCall)
   BOOL done;
   s32 acCount;
   EvtWord *args = event->args;
-  s32 arg0 = *(args++);
+  s32 outArg = *(args++);
   FallObjectEntry *e3;
   BattleUnit *unit;
   BattleUnitPart *part;
@@ -3787,7 +3779,7 @@ s32 _object_fall_attack(EventEntry *event, BOOL isFirstCall)
 
     if (BattleCheckConcluded(wp))
     {
-      evtSetValue(event, arg0, event->userdata[1]);
+      evtSetValue(event, outArg, event->userdata[1]);
       return 2;
     }
     w->count = 1;
@@ -3858,7 +3850,7 @@ s32 _object_fall_attack(EventEntry *event, BOOL isFirstCall)
         BattleSamplingEnemy(&targets, weapon, BattleGetSystemPtr(wp)->unitId, 1, weapon->targetClassFlags, weapon->targetPropertyFlags, -wp->alliances[1].attackDirection);
         if (targets.numTargets <= 0)
         {
-          evtSetValue(event, arg0, event->userdata[1]);
+          evtSetValue(event, outArg, event->userdata[1]);
           return 2;
         }
         found = 1;
@@ -3880,7 +3872,7 @@ s32 _object_fall_attack(EventEntry *event, BOOL isFirstCall)
 
     if (!found)
     {
-      evtSetValue(event, arg0, event->userdata[1]);
+      evtSetValue(event, outArg, event->userdata[1]);
       return 2;
     }
     for (i = 0; i < w->count; i++)
@@ -3894,7 +3886,7 @@ s32 _object_fall_attack(EventEntry *event, BOOL isFirstCall)
         {
           flags |= 0x100;
         }
-        if (e->field_0x15)
+        if (e->noDodge)
         {
           flags |= 0x100000;
         }
@@ -3911,7 +3903,7 @@ s32 _object_fall_attack(EventEntry *event, BOOL isFirstCall)
               delay += irand(22) + 20;
               if (o2->noAc)
               {
-                o2->field_0x15 = 1;
+                o2->noDodge = 1;
               }
             }
           }
@@ -3995,7 +3987,7 @@ s32 _object_fall_attack(EventEntry *event, BOOL isFirstCall)
       }
 
       e3->sfxId = -1;
-      e3->field_0x12 = 0;
+      e3->timer = 0;
       switch (e3->type)
       {
         case 0:
@@ -4214,6 +4206,6 @@ s32 _object_fall_attack(EventEntry *event, BOOL isFirstCall)
     return 0;
   }
   BattleFree(event->userdatap[0]);
-  evtSetValue(event, arg0, event->userdata[1]);
+  evtSetValue(event, outArg, event->userdata[1]);
   return 2;
 }

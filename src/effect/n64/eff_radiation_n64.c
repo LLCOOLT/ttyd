@@ -41,13 +41,9 @@ s16 size300x40_tex32x32[] = {
     0, 0, 0, 16, 0, -1, -1,
     300, 20, 0, 0, 1024, -5121, -2816,
     300, -20, 0, 1024, 1024, -5121, -2816,
-    0,
 };
 
 
-#pragma force_active on
-u32 gap_07_80413CCC_sdata[1] = {0};
-#pragma force_active reset
 
 EffectEntry* effRadiationN64Entry(s32 type, f32 x, f32 y, f32 z, f32 scale) {
     EffectEntry* effect;
@@ -71,7 +67,7 @@ EffectEntry* effRadiationN64Entry(s32 type, f32 x, f32 y, f32 z, f32 scale) {
     if (type <= 1) {
         count = 9;
     }
-    effect->type = "RadiationN64\0\0\0";
+    effect->type = "RadiationN64";
     effect->count = count;
     work = __memAlloc(HEAP_EFFECT, count * sizeof(EffRadiationN64Work));
     effect->userdata = work;

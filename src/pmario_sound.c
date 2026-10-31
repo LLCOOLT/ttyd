@@ -1,4 +1,7 @@
 #include "libc_decls.h"
+#include "driver/seqdrv.h"
+#include "system.h"
+#include <math.h>
 
 #define _MATH_H_
 double cos(double);
@@ -34,265 +37,265 @@ SoundBGMEntry psbgmlist[] = {
 	{"", 0x00000000, "", 0x00, 0x00, 0x00, 0x00},
 	{"", 0x00000000, "", 0x00, 0x00, 0x00, 0x00},
 	{"", 0x00000000, "", 0x00, 0x00, 0x00, 0x00},
-	{"BGM_TITLE1\000", 0x80000000, "sound/stream/sys_tit1_32k\000\000", 0x58, 0x40, 0x01, 0x01},
-	{"BGM_DEMO1\000\000", 0x80000000, "sound/stream/sys_demo1_32k\000", 0x5A, 0x40, 0x00, 0x01},
-	{"BGM_DEMO2\000\000", 0x80000000, "sound/stream/sys_demo2_32k\000", 0x4D, 0x40, 0x00, 0x01},
-	{"BGM_DIGEST1", 0x80000000, "sound/stream/sys_dig1_32k\000\000", 0x53, 0x40, 0x00, 0x01},
-	{"BGM_FILE_MENU1\000", 0x80000000, "sound/stream/sys_mmc1_32k\000\000", 0x58, 0x40, 0x01, 0x01},
-	{"BGM_OPENING1\000\000\000", 0x80000000, "sound/stream/sys_opn1_32k\000\000", 0x56, 0x40, 0x00, 0x01},
+	{"BGM_TITLE1", 0x80000000, "sound/stream/sys_tit1_32k", 0x58, 0x40, 0x01, 0x01},
+	{"BGM_DEMO1", 0x80000000, "sound/stream/sys_demo1_32k", 0x5A, 0x40, 0x00, 0x01},
+	{"BGM_DEMO2", 0x80000000, "sound/stream/sys_demo2_32k", 0x4D, 0x40, 0x00, 0x01},
+	{"BGM_DIGEST1", 0x80000000, "sound/stream/sys_dig1_32k", 0x53, 0x40, 0x00, 0x01},
+	{"BGM_FILE_MENU1", 0x80000000, "sound/stream/sys_mmc1_32k", 0x58, 0x40, 0x01, 0x01},
+	{"BGM_OPENING1", 0x80000000, "sound/stream/sys_opn1_32k", 0x56, 0x40, 0x00, 0x01},
 	{"", 0x00000000, "", 0x00, 0x00, 0x00, 0x00},
 	{"", 0x00000000, "", 0x00, 0x00, 0x00, 0x00},
 	{"", 0x00000000, "", 0x00, 0x00, 0x00, 0x00},
-	{"BGM_ENDING1", 0x80000000, "sound/stream/evt_ed1_32k\000\000\000", 0x50, 0x40, 0x00, 0x01},
-	{"BGM_ENDING2", 0x80000000, "sound/stream/evt_ed2_32k\000\000\000", 0x43, 0x40, 0x00, 0x01},
-	{"BGM_ENDING3", 0x80000000, "sound/stream/evt_ed3_32k\000\000\000", 0x55, 0x40, 0x00, 0x01},
-	{"BGM_ENDING4", 0x80000000, "sound/stream/evt_ed4_32k\000\000\000", 0x4B, 0x40, 0x00, 0x01},
-	{"BGM_ENDING5", 0x80000000, "sound/stream/evt_ed5_32k\000\000\000", 0x4B, 0x40, 0x00, 0x01},
+	{"BGM_ENDING1", 0x80000000, "sound/stream/evt_ed1_32k", 0x50, 0x40, 0x00, 0x01},
+	{"BGM_ENDING2", 0x80000000, "sound/stream/evt_ed2_32k", 0x43, 0x40, 0x00, 0x01},
+	{"BGM_ENDING3", 0x80000000, "sound/stream/evt_ed3_32k", 0x55, 0x40, 0x00, 0x01},
+	{"BGM_ENDING4", 0x80000000, "sound/stream/evt_ed4_32k", 0x4B, 0x40, 0x00, 0x01},
+	{"BGM_ENDING5", 0x80000000, "sound/stream/evt_ed5_32k", 0x4B, 0x40, 0x00, 0x01},
 	{"", 0x00000000, "", 0x00, 0x00, 0x00, 0x00},
-	{"BGM_STAFF_ROLL1", 0x80000000, "sound/stream/sys_stf1_32k\000\000", 0x5F, 0x40, 0x00, 0x01},
+	{"BGM_STAFF_ROLL1", 0x80000000, "sound/stream/sys_stf1_32k", 0x5F, 0x40, 0x00, 0x01},
 	{"", 0x00000000, "", 0x00, 0x00, 0x00, 0x00},
 	{"", 0x00000000, "", 0x00, 0x00, 0x00, 0x00},
-	{"BGM_M_STG0_GOR1", 0x80000000, "sound/stream/stg_gor2_32k\000\000", 0x3C, 0x40, 0x01, 0x01},
-	{"BGM_M_STG0_TIK1", 0x80000000, "sound/stream/stg_tik2_32k\000\000", 0x3C, 0x40, 0x02, 0x01},
-	{"BGM_M_STG0_TIK2", 0x80000000, "sound/stream/stg_tik1_32k\000\000", 0x5A, 0x40, 0x03, 0x01},
-	{"BGM_M_STG0_CSN1", 0x80000000, "sound/stream/stg_gor1_32k\000\000", 0x50, 0x40, 0x04, 0x01},
+	{"BGM_M_STG0_GOR1", 0x80000000, "sound/stream/stg_gor2_32k", 0x3C, 0x40, 0x01, 0x01},
+	{"BGM_M_STG0_TIK1", 0x80000000, "sound/stream/stg_tik2_32k", 0x3C, 0x40, 0x02, 0x01},
+	{"BGM_M_STG0_TIK2", 0x80000000, "sound/stream/stg_tik1_32k", 0x5A, 0x40, 0x03, 0x01},
+	{"BGM_M_STG0_CSN1", 0x80000000, "sound/stream/stg_gor1_32k", 0x50, 0x40, 0x04, 0x01},
 	{"", 0x00000000, "", 0x00, 0x00, 0x00, 0x00},
-	{"BGM_M_STG1_HEI1", 0x80000000, "sound/stream/stg_dor1_32k\000\000", 0x46, 0x40, 0x05, 0x01},
-	{"BGM_M_STG1_NOK1", 0x80000000, "sound/stream/stg_nok1_32k\000\000", 0x53, 0x40, 0x06, 0x01},
-	{"BGM_M_STG1_TORIDE1\000", 0x80000000, "sound/stream/stg_stn1_32k\000\000", 0x46, 0x40, 0x07, 0x01},
-	{"BGM_M_STG1_GON1", 0x80000000, "sound/stream/stg_gnb1_32k\000\000", 0x4E, 0x40, 0x08, 0x01},
+	{"BGM_M_STG1_HEI1", 0x80000000, "sound/stream/stg_dor1_32k", 0x46, 0x40, 0x05, 0x01},
+	{"BGM_M_STG1_NOK1", 0x80000000, "sound/stream/stg_nok1_32k", 0x53, 0x40, 0x06, 0x01},
+	{"BGM_M_STG1_TORIDE1", 0x80000000, "sound/stream/stg_stn1_32k", 0x46, 0x40, 0x07, 0x01},
+	{"BGM_M_STG1_GON1", 0x80000000, "sound/stream/stg_gnb1_32k", 0x4E, 0x40, 0x08, 0x01},
 	{"", 0x00000000, "", 0x00, 0x00, 0x00, 0x00},
-	{"BGM_M_STG2_WIN1", 0x80000000, "sound/stream/stg_fsg1_32k\000\000", 0x46, 0x40, 0x09, 0x01},
-	{"BGM_M_STG2_MRI1", 0x80000000, "sound/stream/stg_okk1_32k\000\000", 0x5A, 0x40, 0x0A, 0x01},
+	{"BGM_M_STG2_WIN1", 0x80000000, "sound/stream/stg_fsg1_32k", 0x46, 0x40, 0x09, 0x01},
+	{"BGM_M_STG2_MRI1", 0x80000000, "sound/stream/stg_okk1_32k", 0x5A, 0x40, 0x0A, 0x01},
 	{"", 0x00000000, "", 0x00, 0x00, 0x00, 0x00},
-	{"BGM_M_STG3_URN1", 0x80000000, "sound/stream/stg_urg11_32k\000", 0x5A, 0x40, 0x0B, 0x01},
-	{"BGM_M_STG3_TOU1", 0x80000000, "sound/stream/stg_tgm1_32k\000\000", 0x50, 0x40, 0x0C, 0x01},
-	{"BGM_M_STG3_TOU2", 0x80000000, "sound/stream/stg_tog1_32k\000\000", 0x4D, 0x40, 0x0D, 0x01},
+	{"BGM_M_STG3_URN1", 0x80000000, "sound/stream/stg_urg11_32k", 0x5A, 0x40, 0x0B, 0x01},
+	{"BGM_M_STG3_TOU1", 0x80000000, "sound/stream/stg_tgm1_32k", 0x50, 0x40, 0x0C, 0x01},
+	{"BGM_M_STG3_TOU2", 0x80000000, "sound/stream/stg_tog1_32k", 0x4D, 0x40, 0x0D, 0x01},
 	{"", 0x00000000, "", 0x00, 0x00, 0x00, 0x00},
-	{"BGM_M_STG4_USU1", 0x80000000, "sound/stream/stg_ugt1_32k\000\000", 0x53, 0x40, 0x0E, 0x01},
-	{"BGM_M_STG4_GRA1", 0x80000000, "sound/stream/stg_gra1_32k\000\000", 0x55, 0x40, 0x0F, 0x01},
-	{"BGM_M_STG4_JIN1", 0x80000000, "sound/stream/stg_dim1_32k\000\000", 0x55, 0x40, 0x10, 0x01},
+	{"BGM_M_STG4_USU1", 0x80000000, "sound/stream/stg_ugt1_32k", 0x53, 0x40, 0x0E, 0x01},
+	{"BGM_M_STG4_GRA1", 0x80000000, "sound/stream/stg_gra1_32k", 0x55, 0x40, 0x0F, 0x01},
+	{"BGM_M_STG4_JIN1", 0x80000000, "sound/stream/stg_dim1_32k", 0x55, 0x40, 0x10, 0x01},
 	{"", 0x00000000, "", 0x00, 0x00, 0x00, 0x00},
-	{"BGM_M_STG5_MUJ1", 0x80000000, "sound/stream/stg_mjn1_32k\000\000", 0x55, 0x40, 0x11, 0x01},
-	{"BGM_M_STG5_DOU1", 0x80000000, "sound/stream/stg_duk1_32k\000\000", 0x5A, 0x40, 0x12, 0x01},
+	{"BGM_M_STG5_MUJ1", 0x80000000, "sound/stream/stg_mjn1_32k", 0x55, 0x40, 0x11, 0x01},
+	{"BGM_M_STG5_DOU1", 0x80000000, "sound/stream/stg_duk1_32k", 0x5A, 0x40, 0x12, 0x01},
 	{"", 0x00000000, "", 0x00, 0x00, 0x00, 0x00},
 	{"BGM_M_STG6_RSH1", 0x80000000, "sound/stream/stg_rsh_a1_32k", 0x46, 0x40, 0x13, 0x01},
 	{"BGM_M_STG6_RSH2", 0x80000000, "sound/stream/stg_rsh_b1_32k", 0x46, 0x40, 0x14, 0x01},
 	{"BGM_M_STG6_RSH3", 0x80000000, "sound/stream/stg_rsh_c1_32k", 0x46, 0x40, 0x15, 0x01},
-	{"BGM_M_STG6_HOM1", 0x80000000, "sound/stream/stg_hom1_32k\000\000", 0x46, 0x40, 0x16, 0x01},
-	{"BGM_M_STG6_EKI1", 0x80000000, "sound/stream/stg_eki1_32k\000\000", 0x46, 0x40, 0x17, 0x01},
-	{"BGM_M_STG6_PIK1", 0x80000000, "sound/stream/stg_pik1_32k\000\000", 0x46, 0x40, 0x18, 0x01},
-	{"BGM_M_STG6_PIK2", 0x80000000, "sound/stream/stg_snd1_32k\000\000", 0x46, 0x40, 0x19, 0x01},
+	{"BGM_M_STG6_HOM1", 0x80000000, "sound/stream/stg_hom1_32k", 0x46, 0x40, 0x16, 0x01},
+	{"BGM_M_STG6_EKI1", 0x80000000, "sound/stream/stg_eki1_32k", 0x46, 0x40, 0x17, 0x01},
+	{"BGM_M_STG6_PIK1", 0x80000000, "sound/stream/stg_pik1_32k", 0x46, 0x40, 0x18, 0x01},
+	{"BGM_M_STG6_PIK2", 0x80000000, "sound/stream/stg_snd1_32k", 0x46, 0x40, 0x19, 0x01},
 	{"", 0x00000000, "", 0x00, 0x00, 0x00, 0x00},
-	{"BGM_M_STG7_BOM1", 0x80000000, "sound/stream/stg_bmm1_32k\000\000", 0x50, 0x40, 0x1A, 0x01},
-	{"BGM_M_STG7_MON1", 0x80000000, "sound/stream/stg_gtm1_32k\000\000", 0x5A, 0x40, 0x1B, 0x01},
-	{"BGM_M_STG7_DUN1", 0x80000000, "sound/stream/stg_tkd1_32k\000\000", 0x55, 0x40, 0x1C, 0x01},
-	{"BGM_M_STG7_DUN2", 0x80000000, "sound/stream/stg_tkd2_32k\000\000", 0x46, 0x40, 0x1D, 0x01},
+	{"BGM_M_STG7_BOM1", 0x80000000, "sound/stream/stg_bmm1_32k", 0x50, 0x40, 0x1A, 0x01},
+	{"BGM_M_STG7_MON1", 0x80000000, "sound/stream/stg_gtm1_32k", 0x5A, 0x40, 0x1B, 0x01},
+	{"BGM_M_STG7_DUN1", 0x80000000, "sound/stream/stg_tkd1_32k", 0x55, 0x40, 0x1C, 0x01},
+	{"BGM_M_STG7_DUN2", 0x80000000, "sound/stream/stg_tkd2_32k", 0x46, 0x40, 0x1D, 0x01},
 	{"", 0x00000000, "", 0x00, 0x00, 0x00, 0x00},
-	{"BGM_M_STG8_LST1", 0x80000000, "sound/stream/stg_ldn1_32k\000\000", 0x5A, 0x50, 0x1E, 0x01},
-	{"BGM_M_STG8_LST2", 0x80000000, "sound/stream/stg_ldn2_32k\000\000", 0x5A, 0x50, 0x1F, 0x01},
-	{"BGM_M_STG8_LST3", 0x80000000, "sound/stream/stg_ldn3_32k\000\000", 0x5A, 0x50, 0x20, 0x01},
+	{"BGM_M_STG8_LST1", 0x80000000, "sound/stream/stg_ldn1_32k", 0x5A, 0x50, 0x1E, 0x01},
+	{"BGM_M_STG8_LST2", 0x80000000, "sound/stream/stg_ldn2_32k", 0x5A, 0x50, 0x1F, 0x01},
+	{"BGM_M_STG8_LST3", 0x80000000, "sound/stream/stg_ldn3_32k", 0x5A, 0x50, 0x20, 0x01},
 	{"", 0x00000000, "", 0x00, 0x00, 0x00, 0x00},
-	{"BGM_M_STGK_CASTLE1\000", 0x80000000, "sound/stream/stg_kpa1_32k\000\000", 0x50, 0x40, 0x21, 0x01},
-	{"", 0x00000000, "", 0x00, 0x00, 0x00, 0x00},
-	{"", 0x00000000, "", 0x00, 0x00, 0x00, 0x00},
-	{"", 0x00000000, "", 0x00, 0x00, 0x00, 0x00},
-	{"", 0x00000000, "", 0x00, 0x00, 0x00, 0x00},
-	{"BGM_STG0_GOR1\000\000", 0x80000000, "sound/stream/stg_gor2_32k\000\000", 0x46, 0x40, 0x00, 0x00},
-	{"BGM_STG0_TIK1\000\000", 0x80000000, "sound/stream/stg_tik2_32k\000\000", 0x39, 0x40, 0x00, 0x00},
-	{"BGM_STG0_TIK2\000\000", 0x80000000, "sound/stream/stg_tik3_32k\000\000", 0x5A, 0x40, 0x00, 0x00},
-	{"BGM_STG0_CSN1\000\000", 0x80000000, "sound/stream/stg_gor1_32k\000\000", 0x4B, 0x40, 0x00, 0x00},
-	{"BGM_STG0_100DN1", 0x80000000, "sound/stream/stg_tik1_32k\000\000", 0x32, 0x40, 0x00, 0x00},
-	{"", 0x00000000, "", 0x00, 0x00, 0x00, 0x00},
-	{"BGM_STG1_HEI1\000\000", 0x80000000, "sound/stream/stg_dor1_32k\000\000", 0x46, 0x40, 0x00, 0x00},
-	{"BGM_STG1_NOK1\000\000", 0x80000000, "sound/stream/stg_nok1_32k\000\000", 0x57, 0x40, 0x00, 0x00},
-	{"BGM_STG1_TORIDE1\000\000\000", 0x80000000, "sound/stream/stg_stn1_32k\000\000", 0x3F, 0x40, 0x00, 0x00},
-	{"BGM_STG1_GON1\000\000", 0x80000000, "sound/stream/stg_gnb1_32k\000\000", 0x44, 0x40, 0x00, 0x00},
-	{"", 0x00000000, "", 0x00, 0x00, 0x00, 0x00},
-	{"BGM_STG2_WIN1\000\000", 0x80000000, "sound/stream/stg_fsg1_32k\000\000", 0x46, 0x40, 0x00, 0x00},
-	{"BGM_STG2_MRI1\000\000", 0x80000000, "sound/stream/stg_okk1_32k\000\000", 0x4B, 0x40, 0x00, 0x00},
-	{"BGM_STG2_MRI2\000\000", 0x80000000, "sound/stream/evt_pun1_32k\000\000", 0x48, 0x40, 0x00, 0x00},
-	{"", 0x00000000, "", 0x00, 0x00, 0x00, 0x00},
-	{"BGM_STG3_URN1\000\000", 0x80000000, "sound/stream/stg_urg11_32k\000", 0x50, 0x40, 0x00, 0x00},
-	{"BGM_STG3_TOU1\000\000", 0x80000000, "sound/stream/stg_tog1_32k\000\000", 0x4D, 0x40, 0x00, 0x00},
-	{"BGM_STG3_TOU2\000\000", 0x80000000, "sound/stream/stg_tgm1_32k\000\000", 0x50, 0x40, 0x00, 0x00},
-	{"", 0x00000000, "", 0x00, 0x00, 0x00, 0x00},
-	{"BGM_STG4_USU1\000\000", 0x80000000, "sound/stream/stg_ugt1_32k\000\000", 0x3E, 0x40, 0x00, 0x00},
-	{"BGM_STG4_GRA1\000\000", 0x80000000, "sound/stream/stg_gra1_32k\000\000", 0x2D, 0x40, 0x00, 0x00},
-	{"BGM_STG4_JIN1\000\000", 0x80000000, "sound/stream/stg_dim1_32k\000\000", 0x55, 0x40, 0x00, 0x00},
-	{"", 0x00000000, "", 0x00, 0x00, 0x00, 0x00},
-	{"BGM_STG5_MUJ1\000\000", 0x80000000, "sound/stream/stg_mjn1_32k\000\000", 0x55, 0x40, 0x00, 0x00},
-	{"BGM_STG5_DOU1\000\000", 0x80000000, "sound/stream/stg_duk1_32k\000\000", 0x5A, 0x40, 0x00, 0x00},
-	{"", 0x00000000, "", 0x00, 0x00, 0x00, 0x00},
-	{"BGM_STG6_RSH1\000\000", 0x80000000, "sound/stream/stg_rsh_a1_32k", 0x46, 0x40, 0x00, 0x00},
-	{"BGM_STG6_RSH2\000\000", 0x80000000, "sound/stream/stg_rsh_b1_32k", 0x46, 0x40, 0x00, 0x00},
-	{"BGM_STG6_RSH3\000\000", 0x80000000, "sound/stream/stg_rsh_c1_32k", 0x46, 0x40, 0x00, 0x00},
-	{"BGM_STG6_HOM1\000\000", 0x80000000, "sound/stream/stg_hom1_32k\000\000", 0x46, 0x40, 0x00, 0x00},
-	{"BGM_STG6_EKI1\000\000", 0x80000000, "sound/stream/stg_eki1_32k\000\000", 0x46, 0x40, 0x00, 0x00},
-	{"BGM_STG6_PIK1\000\000", 0x80000000, "sound/stream/stg_pik1_32k\000\000", 0x46, 0x40, 0x00, 0x00},
-	{"BGM_STG6_PIK2\000\000", 0x80000000, "sound/stream/stg_snd1_32k\000\000", 0x46, 0x40, 0x00, 0x00},
-	{"", 0x00000000, "", 0x00, 0x00, 0x00, 0x00},
-	{"BGM_STG7_BOM1\000\000", 0x80000000, "sound/stream/stg_bmm1_32k\000\000", 0x4B, 0x40, 0x00, 0x00},
-	{"BGM_STG7_MON1\000\000", 0x80000000, "sound/stream/stg_gtm1_32k\000\000", 0x4B, 0x40, 0x00, 0x00},
-	{"BGM_STG7_DUN1\000\000", 0x80000000, "sound/stream/stg_tkd1_32k\000\000", 0x55, 0x40, 0x00, 0x00},
-	{"BGM_STG7_DUN2\000\000", 0x80000000, "sound/stream/stg_tkd2_32k\000\000", 0x49, 0x40, 0x00, 0x00},
-	{"", 0x00000000, "", 0x00, 0x00, 0x00, 0x00},
-	{"BGM_STG8_LST1\000\000", 0x80000000, "sound/stream/stg_ldn1_32k\000\000", 0x55, 0x50, 0x00, 0x00},
-	{"BGM_STG8_LST2\000\000", 0x80000000, "sound/stream/stg_ldn2_32k\000\000", 0x5A, 0x50, 0x00, 0x00},
-	{"BGM_STG8_LST3\000\000", 0x80000000, "sound/stream/stg_ldn3_32k\000\000", 0x5D, 0x50, 0x00, 0x00},
-	{"", 0x00000000, "", 0x00, 0x00, 0x00, 0x00},
-	{"BGM_STGK_CASTLE1\000\000\000", 0x80000000, "sound/stream/stg_kpa1_32k\000\000", 0x4B, 0x40, 0x00, 0x00},
-	{"BGM_STGK_FIELD1", 0x80000000, "sound/stream/stgk_fld1_32k\000", 0x5F, 0x40, 0x00, 0x00},
-	{"BGM_STGK_FIELD2", 0x80000000, "sound/stream/stg_kpa3_32k\000\000", 0x5A, 0x40, 0x00, 0x00},
-	{"BGM_STGK_FIELD3", 0x80000000, "sound/stream/stgk_fld2_32k\000", 0x55, 0x40, 0x00, 0x00},
-	{"BGM_STGK_FIELD4", 0x80000000, "sound/stream/stgk_fld3_32k\000", 0x5A, 0x40, 0x00, 0x00},
-	{"", 0x00000000, "", 0x00, 0x00, 0x00, 0x00},
-	{"BGM_STGK_FIELD1_UP1", 0x80000000, "sound/stream/stgk_fld1_up1_32k\000", 0x5F, 0x40, 0x00, 0x00},
-	{"BGM_STGK_FIELD1_UP2", 0x80000000, "sound/stream/stgk_fld1_up2_32k\000", 0x5A, 0x40, 0x00, 0x00},
-	{"BGM_STGK_FIELD3_UP1", 0x80000000, "sound/stream/stgk_fld2_up1_32k\000", 0x55, 0x40, 0x00, 0x00},
-	{"BGM_STGK_FIELD4_UP1", 0x80000000, "sound/stream/stgk_fld3_up1_32k\000", 0x5A, 0x40, 0x00, 0x00},
-	{"", 0x00000000, "", 0x00, 0x00, 0x00, 0x00},
-	{"", 0x00000000, "", 0x00, 0x00, 0x00, 0x00},
-	{"", 0x00000000, "", 0x00, 0x00, 0x00, 0x00},
-	{"BGM_ZAKO_BATTLE1\000\000\000", 0x80000000, "sound/stream/btl_zak1_32k\000\000", 0x4B, 0x40, 0x00, 0x01},
-	{"", 0x00000000, "", 0x00, 0x00, 0x00, 0x00},
-	{"BGM_KOBOSS_BATTLE1\000", 0x80000000, "sound/stream/btl_kbs1_32k\000\000", 0x4B, 0x40, 0x00, 0x01},
-	{"BGM_CHUBOSS_BATTLE1", 0x80000000, "sound/stream/btl_cbs1_32k\000\000", 0x4D, 0x40, 0x00, 0x01},
-	{"", 0x00000000, "", 0x00, 0x00, 0x00, 0x00},
-	{"BGM_BOSS_STG1_GONBABA1\000", 0x80000000, "sound/stream/btl_gnb1_32k\000\000", 0x5A, 0x40, 0x00, 0x01},
-	{"BGM_BOSS_STG3_3RDLEADER1\000\000\000", 0x80000000, "sound/stream/btl_mag1_32k\000\000", 0x51, 0x40, 0x00, 0x01},
-	{"BGM_BOSS_STG3_3WOMEN1\000\000", 0x80000000, "sound/stream/btl_wom1_32k\000\000", 0x54, 0x40, 0x00, 0x01},
-	{"BGM_BOSS_STG3_CHAMP1\000\000\000", 0x80000000, "sound/stream/btl_cap1_32k\000\000", 0x55, 0x40, 0x00, 0x01},
-	{"BGM_BOSS_STG3_GANCE1\000\000\000", 0x80000000, "sound/stream/btl_gns1_32k\000\000", 0x5C, 0x40, 0x00, 0x01},
-	{"BGM_BOSS_STG4_RUNPELL1\000", 0x80000000, "sound/stream/btl_rpl1_32k\000\000", 0x5A, 0x40, 0x00, 0x01},
-	{"BGM_BOSS_STG4_FAKEMARIO1\000\000\000", 0x80000000, "sound/stream/btl_rpl1_32k\000\000", 0x5A, 0x40, 0x00, 0x01},
-	{"BGM_BOSS_STG5_KORTESS1\000", 0x80000000, "sound/stream/btl_krt1_32k\000\000", 0x5A, 0x40, 0x00, 0x01},
-	{"BGM_BOSS_STG5_SHIP1", 0x80000000, "sound/stream/btl_sif1_32k\000\000", 0x5A, 0x40, 0x00, 0x01},
-	{"BGM_BOSS_STG6_GREAT_MOAMOA1", 0x80000000, "sound/stream/btl_gmm1_32k\000\000", 0x5D, 0x40, 0x00, 0x01},
-	{"BGM_BOSS_STG8_3RDHEAD1\000", 0x80000000, "sound/stream/btl_3dh1_32k\000\000", 0x5A, 0x40, 0x00, 0x01},
-	{"BGM_BOSS_STG8_WITCH", 0x80000000, "sound/stream/btl_wit1_32k\000\000", 0x5A, 0x40, 0x00, 0x01},
-	{"BGM_BOSS_STG8_KOOPA", 0x80000000, "sound/stream/btl_kpa3_32k\000\000", 0x4B, 0x40, 0x00, 0x01},
-	{"BGM_BOSS_STG8_LAST_BOSS1\000\000\000", 0x80000000, "sound/stream/btl_bpc1_32k\000\000", 0x5E, 0x40, 0x00, 0x01},
-	{"BGM_BOSS_STG8_LAST_BOSS2\000\000\000", 0x80000000, "sound/stream/btl_wth3_32k\000\000", 0x5F, 0x40, 0x00, 0x01},
-	{"", 0x00000000, "", 0x00, 0x00, 0x00, 0x00},
-	{"BGM_BATTLE_WIN1", 0x80000000, "sound/stream/btl_win1_32k\000\000", 0x50, 0x40, 0x00, 0x01},
-	{"BGM_BATTLE_WIN2", 0x80000000, "sound/stream/btl_win2_32k\000\000", 0x50, 0x40, 0x00, 0x01},
-	{"BGM_BATTLE_WIN3", 0x80000000, "sound/stream/btl_win3_32k\000\000", 0x50, 0x40, 0x00, 0x01},
-	{"BGM_BATTLE_LOSE1\000\000\000", 0x80000000, "sound/stream/btl_die1_32k\000\000", 0x50, 0x40, 0x00, 0x01},
+	{"BGM_M_STGK_CASTLE1", 0x80000000, "sound/stream/stg_kpa1_32k", 0x50, 0x40, 0x21, 0x01},
 	{"", 0x00000000, "", 0x00, 0x00, 0x00, 0x00},
 	{"", 0x00000000, "", 0x00, 0x00, 0x00, 0x00},
 	{"", 0x00000000, "", 0x00, 0x00, 0x00, 0x00},
 	{"", 0x00000000, "", 0x00, 0x00, 0x00, 0x00},
+	{"BGM_STG0_GOR1", 0x80000000, "sound/stream/stg_gor2_32k", 0x46, 0x40, 0x00, 0x00},
+	{"BGM_STG0_TIK1", 0x80000000, "sound/stream/stg_tik2_32k", 0x39, 0x40, 0x00, 0x00},
+	{"BGM_STG0_TIK2", 0x80000000, "sound/stream/stg_tik3_32k", 0x5A, 0x40, 0x00, 0x00},
+	{"BGM_STG0_CSN1", 0x80000000, "sound/stream/stg_gor1_32k", 0x4B, 0x40, 0x00, 0x00},
+	{"BGM_STG0_100DN1", 0x80000000, "sound/stream/stg_tik1_32k", 0x32, 0x40, 0x00, 0x00},
 	{"", 0x00000000, "", 0x00, 0x00, 0x00, 0x00},
-	{"BGM_EVT_LECTURE1\000\000\000", 0x80000000, "sound/stream/evt_lec1_32k\000\000", 0x49, 0x40, 0x00, 0x01},
-	{"BGM_EVT_PERAMAJIN1\000", 0x80000000, "sound/stream/evt_prm1_32k\000\000", 0x53, 0x40, 0x00, 0x01},
-	{"BGM_EVT_NOK1\000\000\000", 0x80000000, "sound/stream/evt_nok1_32k\000\000", 0x64, 0x40, 0x00, 0x00},
-	{"BGM_EVT_GONBABA_FLY1\000\000\000", 0x80000000, "sound/stream/evt_gnb1_32k\000\000", 0x69, 0x40, 0x00, 0x01},
-	{"BGM_EVT_GONBABA_FLY2\000\000\000", 0x80000000, "sound/stream/evt_gnb4_32k\000\000", 0x5A, 0x40, 0x00, 0x01},
-	{"BGM_EVT_CASTLE1", 0x80000000, "sound/stream/evt_gnb3_32k\000\000", 0x50, 0x40, 0x00, 0x01},
-	{"BGM_EVT_QUIZ1\000\000", 0x80000000, "sound/stream/evt_qiz1_32k\000\000", 0x55, 0x40, 0x00, 0x01},
-	{"BGM_EVT_QUIZ2\000\000", 0x80000000, "sound/stream/evt_qiz2_32k\000\000", 0x50, 0x40, 0x00, 0x01},
-	{"BGM_EVT_DANGER1", 0x80000000, "sound/stream/evt_kik1_32k\000\000", 0x55, 0x40, 0x00, 0x01},
-	{"BGM_EVT_DANGER2", 0x80000000, "sound/stream/evt_kik2_32k\000\000", 0x50, 0x40, 0x00, 0x01},
-	{"BGM_EVT_DANGER3", 0x80000000, "sound/stream/evt_kik3_32k\000\000", 0x50, 0x40, 0x00, 0x01},
-	{"BGM_EVT_DANGER4", 0x80000000, "sound/stream/evt_kik4_32k\000\000", 0x53, 0x40, 0x00, 0x01},
-	{"BGM_EVT_HAPPY1\000", 0x80000000, "sound/stream/evt_hpy1_32k\000\000", 0x5A, 0x40, 0x00, 0x01},
-	{"BGM_EVT_CYUCYURINA1", 0x80000000, "sound/stream/evt_ccr1_32k\000\000", 0x46, 0x40, 0x00, 0x01},
-	{"BGM_EVT_NOKO_SAIKAI1\000\000\000", 0x80000000, "sound/stream/evt_nsk1_32k\000\000", 0x46, 0x40, 0x00, 0x01},
-	{"BGM_EVT_USU1\000\000\000", 0x80000000, "sound/stream/evt_usg1_32k\000\000", 0x5A, 0x40, 0x00, 0x01},
-	{"BGM_EVT_JIN1\000\000\000", 0x80000000, "sound/stream/evt_dim1_32k\000\000", 0x5A, 0x40, 0x00, 0x01},
-	{"BGM_EVT_SAILING1\000\000\000", 0x80000000, "sound/stream/evt_kou1_32k\000\000", 0x4E, 0x40, 0x00, 0x01},
-	{"BGM_EVT_MINIGAME1\000\000", 0x80000000, "sound/stream/btl_zak3_32k\000\000", 0x50, 0x40, 0x00, 0x01},
-	{"BGM_EVT_FRANKURI1\000\000", 0x80000000, "sound/stream/evt_fkh1_32k\000\000", 0x50, 0x40, 0x00, 0x01},
-	{"BGM_EVT_3RD_ENEMY\000\000", 0x80000000, "sound/stream/evt_3rd1_32k\000\000", 0x4D, 0x40, 0x00, 0x01},
-	{"BGM_EVT_REST1\000\000", 0x80000000, "sound/stream/evt_rst1_32k\000\000", 0x5A, 0x40, 0x00, 0x01},
-	{"BGM_EVT_POWAN1\000", 0x80000000, "sound/stream/evt_pwn1_32k\000\000", 0x46, 0x40, 0x00, 0x01},
-	{"BGM_EVT_STG6_PIK1\000\000", 0x80000000, "sound/stream/evt_pik1_32k\000\000", 0x5A, 0x40, 0x00, 0x00},
-	{"BGM_EVT_STG2_MORI1\000", 0x80000000, "sound/stream/evt_fsg1_32k\000\000", 0x5A, 0x40, 0x00, 0x01},
-	{"BGM_EVT_STG2_TAIJU1", 0x80000000, "sound/stream/evt_okk1_32k\000\000", 0x5A, 0x40, 0x00, 0x01},
-	{"BGM_EVT_WITCH1\000", 0x80000000, "sound/stream/evt_wit1_32k\000\000", 0x52, 0x40, 0x00, 0x01},
-	{"BGM_EVT_CLOUDA1", 0x80000000, "sound/stream/evt_cld1_32k\000\000", 0x4B, 0x40, 0x00, 0x01},
-	{"BGM_EVT_STG2_PUNI1\000", 0x80000000, "sound/stream/evt_pun1_32k\000\000", 0x46, 0x40, 0x00, 0x01},
-	{"BGM_EVT_STG2_PUNITOGE1\000", 0x80000000, "sound/stream/evt_pvt1_32k\000\000", 0x50, 0x40, 0x00, 0x01},
-	{"BGM_EVT_STG3_URON1\000", 0x80000000, "sound/stream/evt_urn1_32k\000\000", 0x5A, 0x40, 0x00, 0x00},
-	{"BGM_EVT_STG3_TOUGI1", 0x80000000, "sound/stream/evt_tug1_32k\000\000", 0x5A, 0x40, 0x00, 0x00},
-	{"BGM_EVT_STG3_EGG1\000\000", 0x80000000, "sound/stream/evt_egg1_32k\000\000", 0x4B, 0x40, 0x00, 0x01},
-	{"BGM_EVT_STG3_GANCE1", 0x80000000, "sound/stream/evt_gns1_32k\000\000", 0x48, 0x40, 0x00, 0x01},
-	{"BGM_EVT_STG3_GANCE2", 0x80000000, "sound/stream/evt_gns2_32k\000\000", 0x4B, 0x40, 0x00, 0x01},
-	{"BGM_EVT_STG4_FAKEMARIO1", 0x80000000, "sound/stream/evt_fmo1_32k\000\000", 0x5A, 0x40, 0x00, 0x01},
+	{"BGM_STG1_HEI1", 0x80000000, "sound/stream/stg_dor1_32k", 0x46, 0x40, 0x00, 0x00},
+	{"BGM_STG1_NOK1", 0x80000000, "sound/stream/stg_nok1_32k", 0x57, 0x40, 0x00, 0x00},
+	{"BGM_STG1_TORIDE1", 0x80000000, "sound/stream/stg_stn1_32k", 0x3F, 0x40, 0x00, 0x00},
+	{"BGM_STG1_GON1", 0x80000000, "sound/stream/stg_gnb1_32k", 0x44, 0x40, 0x00, 0x00},
+	{"", 0x00000000, "", 0x00, 0x00, 0x00, 0x00},
+	{"BGM_STG2_WIN1", 0x80000000, "sound/stream/stg_fsg1_32k", 0x46, 0x40, 0x00, 0x00},
+	{"BGM_STG2_MRI1", 0x80000000, "sound/stream/stg_okk1_32k", 0x4B, 0x40, 0x00, 0x00},
+	{"BGM_STG2_MRI2", 0x80000000, "sound/stream/evt_pun1_32k", 0x48, 0x40, 0x00, 0x00},
+	{"", 0x00000000, "", 0x00, 0x00, 0x00, 0x00},
+	{"BGM_STG3_URN1", 0x80000000, "sound/stream/stg_urg11_32k", 0x50, 0x40, 0x00, 0x00},
+	{"BGM_STG3_TOU1", 0x80000000, "sound/stream/stg_tog1_32k", 0x4D, 0x40, 0x00, 0x00},
+	{"BGM_STG3_TOU2", 0x80000000, "sound/stream/stg_tgm1_32k", 0x50, 0x40, 0x00, 0x00},
+	{"", 0x00000000, "", 0x00, 0x00, 0x00, 0x00},
+	{"BGM_STG4_USU1", 0x80000000, "sound/stream/stg_ugt1_32k", 0x3E, 0x40, 0x00, 0x00},
+	{"BGM_STG4_GRA1", 0x80000000, "sound/stream/stg_gra1_32k", 0x2D, 0x40, 0x00, 0x00},
+	{"BGM_STG4_JIN1", 0x80000000, "sound/stream/stg_dim1_32k", 0x55, 0x40, 0x00, 0x00},
+	{"", 0x00000000, "", 0x00, 0x00, 0x00, 0x00},
+	{"BGM_STG5_MUJ1", 0x80000000, "sound/stream/stg_mjn1_32k", 0x55, 0x40, 0x00, 0x00},
+	{"BGM_STG5_DOU1", 0x80000000, "sound/stream/stg_duk1_32k", 0x5A, 0x40, 0x00, 0x00},
+	{"", 0x00000000, "", 0x00, 0x00, 0x00, 0x00},
+	{"BGM_STG6_RSH1", 0x80000000, "sound/stream/stg_rsh_a1_32k", 0x46, 0x40, 0x00, 0x00},
+	{"BGM_STG6_RSH2", 0x80000000, "sound/stream/stg_rsh_b1_32k", 0x46, 0x40, 0x00, 0x00},
+	{"BGM_STG6_RSH3", 0x80000000, "sound/stream/stg_rsh_c1_32k", 0x46, 0x40, 0x00, 0x00},
+	{"BGM_STG6_HOM1", 0x80000000, "sound/stream/stg_hom1_32k", 0x46, 0x40, 0x00, 0x00},
+	{"BGM_STG6_EKI1", 0x80000000, "sound/stream/stg_eki1_32k", 0x46, 0x40, 0x00, 0x00},
+	{"BGM_STG6_PIK1", 0x80000000, "sound/stream/stg_pik1_32k", 0x46, 0x40, 0x00, 0x00},
+	{"BGM_STG6_PIK2", 0x80000000, "sound/stream/stg_snd1_32k", 0x46, 0x40, 0x00, 0x00},
+	{"", 0x00000000, "", 0x00, 0x00, 0x00, 0x00},
+	{"BGM_STG7_BOM1", 0x80000000, "sound/stream/stg_bmm1_32k", 0x4B, 0x40, 0x00, 0x00},
+	{"BGM_STG7_MON1", 0x80000000, "sound/stream/stg_gtm1_32k", 0x4B, 0x40, 0x00, 0x00},
+	{"BGM_STG7_DUN1", 0x80000000, "sound/stream/stg_tkd1_32k", 0x55, 0x40, 0x00, 0x00},
+	{"BGM_STG7_DUN2", 0x80000000, "sound/stream/stg_tkd2_32k", 0x49, 0x40, 0x00, 0x00},
+	{"", 0x00000000, "", 0x00, 0x00, 0x00, 0x00},
+	{"BGM_STG8_LST1", 0x80000000, "sound/stream/stg_ldn1_32k", 0x55, 0x50, 0x00, 0x00},
+	{"BGM_STG8_LST2", 0x80000000, "sound/stream/stg_ldn2_32k", 0x5A, 0x50, 0x00, 0x00},
+	{"BGM_STG8_LST3", 0x80000000, "sound/stream/stg_ldn3_32k", 0x5D, 0x50, 0x00, 0x00},
+	{"", 0x00000000, "", 0x00, 0x00, 0x00, 0x00},
+	{"BGM_STGK_CASTLE1", 0x80000000, "sound/stream/stg_kpa1_32k", 0x4B, 0x40, 0x00, 0x00},
+	{"BGM_STGK_FIELD1", 0x80000000, "sound/stream/stgk_fld1_32k", 0x5F, 0x40, 0x00, 0x00},
+	{"BGM_STGK_FIELD2", 0x80000000, "sound/stream/stg_kpa3_32k", 0x5A, 0x40, 0x00, 0x00},
+	{"BGM_STGK_FIELD3", 0x80000000, "sound/stream/stgk_fld2_32k", 0x55, 0x40, 0x00, 0x00},
+	{"BGM_STGK_FIELD4", 0x80000000, "sound/stream/stgk_fld3_32k", 0x5A, 0x40, 0x00, 0x00},
+	{"", 0x00000000, "", 0x00, 0x00, 0x00, 0x00},
+	{"BGM_STGK_FIELD1_UP1", 0x80000000, "sound/stream/stgk_fld1_up1_32k", 0x5F, 0x40, 0x00, 0x00},
+	{"BGM_STGK_FIELD1_UP2", 0x80000000, "sound/stream/stgk_fld1_up2_32k", 0x5A, 0x40, 0x00, 0x00},
+	{"BGM_STGK_FIELD3_UP1", 0x80000000, "sound/stream/stgk_fld2_up1_32k", 0x55, 0x40, 0x00, 0x00},
+	{"BGM_STGK_FIELD4_UP1", 0x80000000, "sound/stream/stgk_fld3_up1_32k", 0x5A, 0x40, 0x00, 0x00},
+	{"", 0x00000000, "", 0x00, 0x00, 0x00, 0x00},
+	{"", 0x00000000, "", 0x00, 0x00, 0x00, 0x00},
+	{"", 0x00000000, "", 0x00, 0x00, 0x00, 0x00},
+	{"BGM_ZAKO_BATTLE1", 0x80000000, "sound/stream/btl_zak1_32k", 0x4B, 0x40, 0x00, 0x01},
+	{"", 0x00000000, "", 0x00, 0x00, 0x00, 0x00},
+	{"BGM_KOBOSS_BATTLE1", 0x80000000, "sound/stream/btl_kbs1_32k", 0x4B, 0x40, 0x00, 0x01},
+	{"BGM_CHUBOSS_BATTLE1", 0x80000000, "sound/stream/btl_cbs1_32k", 0x4D, 0x40, 0x00, 0x01},
+	{"", 0x00000000, "", 0x00, 0x00, 0x00, 0x00},
+	{"BGM_BOSS_STG1_GONBABA1", 0x80000000, "sound/stream/btl_gnb1_32k", 0x5A, 0x40, 0x00, 0x01},
+	{"BGM_BOSS_STG3_3RDLEADER1", 0x80000000, "sound/stream/btl_mag1_32k", 0x51, 0x40, 0x00, 0x01},
+	{"BGM_BOSS_STG3_3WOMEN1", 0x80000000, "sound/stream/btl_wom1_32k", 0x54, 0x40, 0x00, 0x01},
+	{"BGM_BOSS_STG3_CHAMP1", 0x80000000, "sound/stream/btl_cap1_32k", 0x55, 0x40, 0x00, 0x01},
+	{"BGM_BOSS_STG3_GANCE1", 0x80000000, "sound/stream/btl_gns1_32k", 0x5C, 0x40, 0x00, 0x01},
+	{"BGM_BOSS_STG4_RUNPELL1", 0x80000000, "sound/stream/btl_rpl1_32k", 0x5A, 0x40, 0x00, 0x01},
+	{"BGM_BOSS_STG4_FAKEMARIO1", 0x80000000, "sound/stream/btl_rpl1_32k", 0x5A, 0x40, 0x00, 0x01},
+	{"BGM_BOSS_STG5_KORTESS1", 0x80000000, "sound/stream/btl_krt1_32k", 0x5A, 0x40, 0x00, 0x01},
+	{"BGM_BOSS_STG5_SHIP1", 0x80000000, "sound/stream/btl_sif1_32k", 0x5A, 0x40, 0x00, 0x01},
+	{"BGM_BOSS_STG6_GREAT_MOAMOA1", 0x80000000, "sound/stream/btl_gmm1_32k", 0x5D, 0x40, 0x00, 0x01},
+	{"BGM_BOSS_STG8_3RDHEAD1", 0x80000000, "sound/stream/btl_3dh1_32k", 0x5A, 0x40, 0x00, 0x01},
+	{"BGM_BOSS_STG8_WITCH", 0x80000000, "sound/stream/btl_wit1_32k", 0x5A, 0x40, 0x00, 0x01},
+	{"BGM_BOSS_STG8_KOOPA", 0x80000000, "sound/stream/btl_kpa3_32k", 0x4B, 0x40, 0x00, 0x01},
+	{"BGM_BOSS_STG8_LAST_BOSS1", 0x80000000, "sound/stream/btl_bpc1_32k", 0x5E, 0x40, 0x00, 0x01},
+	{"BGM_BOSS_STG8_LAST_BOSS2", 0x80000000, "sound/stream/btl_wth3_32k", 0x5F, 0x40, 0x00, 0x01},
+	{"", 0x00000000, "", 0x00, 0x00, 0x00, 0x00},
+	{"BGM_BATTLE_WIN1", 0x80000000, "sound/stream/btl_win1_32k", 0x50, 0x40, 0x00, 0x01},
+	{"BGM_BATTLE_WIN2", 0x80000000, "sound/stream/btl_win2_32k", 0x50, 0x40, 0x00, 0x01},
+	{"BGM_BATTLE_WIN3", 0x80000000, "sound/stream/btl_win3_32k", 0x50, 0x40, 0x00, 0x01},
+	{"BGM_BATTLE_LOSE1", 0x80000000, "sound/stream/btl_die1_32k", 0x50, 0x40, 0x00, 0x01},
+	{"", 0x00000000, "", 0x00, 0x00, 0x00, 0x00},
+	{"", 0x00000000, "", 0x00, 0x00, 0x00, 0x00},
+	{"", 0x00000000, "", 0x00, 0x00, 0x00, 0x00},
+	{"", 0x00000000, "", 0x00, 0x00, 0x00, 0x00},
+	{"", 0x00000000, "", 0x00, 0x00, 0x00, 0x00},
+	{"BGM_EVT_LECTURE1", 0x80000000, "sound/stream/evt_lec1_32k", 0x49, 0x40, 0x00, 0x01},
+	{"BGM_EVT_PERAMAJIN1", 0x80000000, "sound/stream/evt_prm1_32k", 0x53, 0x40, 0x00, 0x01},
+	{"BGM_EVT_NOK1", 0x80000000, "sound/stream/evt_nok1_32k", 0x64, 0x40, 0x00, 0x00},
+	{"BGM_EVT_GONBABA_FLY1", 0x80000000, "sound/stream/evt_gnb1_32k", 0x69, 0x40, 0x00, 0x01},
+	{"BGM_EVT_GONBABA_FLY2", 0x80000000, "sound/stream/evt_gnb4_32k", 0x5A, 0x40, 0x00, 0x01},
+	{"BGM_EVT_CASTLE1", 0x80000000, "sound/stream/evt_gnb3_32k", 0x50, 0x40, 0x00, 0x01},
+	{"BGM_EVT_QUIZ1", 0x80000000, "sound/stream/evt_qiz1_32k", 0x55, 0x40, 0x00, 0x01},
+	{"BGM_EVT_QUIZ2", 0x80000000, "sound/stream/evt_qiz2_32k", 0x50, 0x40, 0x00, 0x01},
+	{"BGM_EVT_DANGER1", 0x80000000, "sound/stream/evt_kik1_32k", 0x55, 0x40, 0x00, 0x01},
+	{"BGM_EVT_DANGER2", 0x80000000, "sound/stream/evt_kik2_32k", 0x50, 0x40, 0x00, 0x01},
+	{"BGM_EVT_DANGER3", 0x80000000, "sound/stream/evt_kik3_32k", 0x50, 0x40, 0x00, 0x01},
+	{"BGM_EVT_DANGER4", 0x80000000, "sound/stream/evt_kik4_32k", 0x53, 0x40, 0x00, 0x01},
+	{"BGM_EVT_HAPPY1", 0x80000000, "sound/stream/evt_hpy1_32k", 0x5A, 0x40, 0x00, 0x01},
+	{"BGM_EVT_CYUCYURINA1", 0x80000000, "sound/stream/evt_ccr1_32k", 0x46, 0x40, 0x00, 0x01},
+	{"BGM_EVT_NOKO_SAIKAI1", 0x80000000, "sound/stream/evt_nsk1_32k", 0x46, 0x40, 0x00, 0x01},
+	{"BGM_EVT_USU1", 0x80000000, "sound/stream/evt_usg1_32k", 0x5A, 0x40, 0x00, 0x01},
+	{"BGM_EVT_JIN1", 0x80000000, "sound/stream/evt_dim1_32k", 0x5A, 0x40, 0x00, 0x01},
+	{"BGM_EVT_SAILING1", 0x80000000, "sound/stream/evt_kou1_32k", 0x4E, 0x40, 0x00, 0x01},
+	{"BGM_EVT_MINIGAME1", 0x80000000, "sound/stream/btl_zak3_32k", 0x50, 0x40, 0x00, 0x01},
+	{"BGM_EVT_FRANKURI1", 0x80000000, "sound/stream/evt_fkh1_32k", 0x50, 0x40, 0x00, 0x01},
+	{"BGM_EVT_3RD_ENEMY", 0x80000000, "sound/stream/evt_3rd1_32k", 0x4D, 0x40, 0x00, 0x01},
+	{"BGM_EVT_REST1", 0x80000000, "sound/stream/evt_rst1_32k", 0x5A, 0x40, 0x00, 0x01},
+	{"BGM_EVT_POWAN1", 0x80000000, "sound/stream/evt_pwn1_32k", 0x46, 0x40, 0x00, 0x01},
+	{"BGM_EVT_STG6_PIK1", 0x80000000, "sound/stream/evt_pik1_32k", 0x5A, 0x40, 0x00, 0x00},
+	{"BGM_EVT_STG2_MORI1", 0x80000000, "sound/stream/evt_fsg1_32k", 0x5A, 0x40, 0x00, 0x01},
+	{"BGM_EVT_STG2_TAIJU1", 0x80000000, "sound/stream/evt_okk1_32k", 0x5A, 0x40, 0x00, 0x01},
+	{"BGM_EVT_WITCH1", 0x80000000, "sound/stream/evt_wit1_32k", 0x52, 0x40, 0x00, 0x01},
+	{"BGM_EVT_CLOUDA1", 0x80000000, "sound/stream/evt_cld1_32k", 0x4B, 0x40, 0x00, 0x01},
+	{"BGM_EVT_STG2_PUNI1", 0x80000000, "sound/stream/evt_pun1_32k", 0x46, 0x40, 0x00, 0x01},
+	{"BGM_EVT_STG2_PUNITOGE1", 0x80000000, "sound/stream/evt_pvt1_32k", 0x50, 0x40, 0x00, 0x01},
+	{"BGM_EVT_STG3_URON1", 0x80000000, "sound/stream/evt_urn1_32k", 0x5A, 0x40, 0x00, 0x00},
+	{"BGM_EVT_STG3_TOUGI1", 0x80000000, "sound/stream/evt_tug1_32k", 0x5A, 0x40, 0x00, 0x00},
+	{"BGM_EVT_STG3_EGG1", 0x80000000, "sound/stream/evt_egg1_32k", 0x4B, 0x40, 0x00, 0x01},
+	{"BGM_EVT_STG3_GANCE1", 0x80000000, "sound/stream/evt_gns1_32k", 0x48, 0x40, 0x00, 0x01},
+	{"BGM_EVT_STG3_GANCE2", 0x80000000, "sound/stream/evt_gns2_32k", 0x4B, 0x40, 0x00, 0x01},
+	{"BGM_EVT_STG4_FAKEMARIO1", 0x80000000, "sound/stream/evt_fmo1_32k", 0x5A, 0x40, 0x00, 0x01},
 	{"BGM_EVT_STG5_GHOST1", 0x80000000, "sound/stream/evt_elmos_app1_32k", 0x50, 0x40, 0x00, 0x01},
-	{"BGM_EVT_STG5_KORTESS1\000\000", 0x80000000, "sound/stream/evt_kts1_32k\000\000", 0x54, 0x40, 0x00, 0x01},
-	{"BGM_EVT_STG5_VS_3RD_ENEMY\000\000", 0x80000000, "sound/stream/evt_v3d1_32k\000\000", 0x5A, 0x40, 0x00, 0x01},
-	{"BGM_EVT_STG7_HUGE_GUN1\000", 0x80000000, "sound/stream/evt_huge_gun1_32k\000", 0x62, 0x40, 0x00, 0x01},
-	{"BGM_EVT_MAGNUM_APP1", 0x80000000, "sound/stream/evt_mag1_32k\000\000", 0x4D, 0x40, 0x00, 0x01},
-	{"BGM_EVT_KUPPA1\000", 0x80000000, "sound/stream/evt_kpa1_32k\000\000", 0x50, 0x40, 0x00, 0x00},
-	{"BGM_EVT_KUPPA2\000", 0x80000000, "sound/stream/evt_kpa1_32k\000\000", 0x50, 0x40, 0x00, 0x01},
-	{"BGM_EVT_STG8_3RDHEAD1\000\000", 0x80000000, "sound/stream/evt_3dh1_32k\000\000", 0x50, 0x40, 0x00, 0x01},
-	{"BGM_EVT_STG8_WITCH\000", 0x80000000, "sound/stream/evt_wit2_32k\000\000", 0x58, 0x40, 0x00, 0x01},
-	{"BGM_EVT_COOKING1\000\000\000", 0x80000000, "sound/stream/evt_cok1_32k\000\000", 0x53, 0x40, 0x00, 0x01},
-	{"BGM_EVT_STAGE_CLEAR1\000\000\000", 0x80000000, "sound/stream/evt_stc1_32k\000\000", 0x62, 0x40, 0x00, 0x01},
-	{"BGM_EVT_ORGEL1\000", 0x80000000, "sound/stream/evt_org1_32k\000\000", 0x3E, 0x40, 0x00, 0x01},
-	{"BGM_EVT_RUIJI1\000", 0x80000000, "sound/stream/evt_rui1_32k\000\000", 0x50, 0x40, 0x00, 0x01},
-	{"BGM_EVT_PEACH_WALTZ1\000\000\000", 0x80000000, "sound/stream/evt_wlt1_32k\000\000", 0x4B, 0x40, 0x00, 0x01},
-	{"BGM_EVT_MARIO_HOUSE1\000\000\000", 0x80000000, "sound/stream/evt_mri1_32k\000\000", 0x50, 0x40, 0x00, 0x01},
-	{"BGM_EVT_MARIO_HOUSE2\000\000\000", 0x80000000, "sound/stream/evt_mri2_32k\000\000", 0x37, 0x40, 0x00, 0x01},
-	{"BGM_EVT_PEACH1\000", 0x80000000, "sound/stream/evt_peh1_32k\000\000", 0x4D, 0x40, 0x00, 0x01},
-	{"BGM_EVT_STG4_TRAIN1", 0x80000000, "sound/stream/evt_rit1_32k\000\000", 0x5A, 0x40, 0x00, 0x01},
-	{"BGM_EVT_DOT_MARIO1\000", 0x80000000, "sound/stream/evt_dot1_32k\000\000", 0x46, 0x40, 0x00, 0x01},
-	{"BGM_EVT_STG3_AIRSHIP1\000\000", 0x80000000, "sound/stream/evt_air1_32k\000\000", 0x55, 0x40, 0x00, 0x01},
-	{"BGM_EVT_STG8_VOICE1", 0x80000000, "sound/stream/evt_vce1_32k\000\000", 0x55, 0x40, 0x00, 0x01},
-	{"BGM_EVT_STG5_GHOST_SHIP1\000\000\000", 0x80000000, "sound/stream/evt_gstship1_32k\000\000", 0x55, 0x40, 0x00, 0x01},
+	{"BGM_EVT_STG5_KORTESS1", 0x80000000, "sound/stream/evt_kts1_32k", 0x54, 0x40, 0x00, 0x01},
+	{"BGM_EVT_STG5_VS_3RD_ENEMY", 0x80000000, "sound/stream/evt_v3d1_32k", 0x5A, 0x40, 0x00, 0x01},
+	{"BGM_EVT_STG7_HUGE_GUN1", 0x80000000, "sound/stream/evt_huge_gun1_32k", 0x62, 0x40, 0x00, 0x01},
+	{"BGM_EVT_MAGNUM_APP1", 0x80000000, "sound/stream/evt_mag1_32k", 0x4D, 0x40, 0x00, 0x01},
+	{"BGM_EVT_KUPPA1", 0x80000000, "sound/stream/evt_kpa1_32k", 0x50, 0x40, 0x00, 0x00},
+	{"BGM_EVT_KUPPA2", 0x80000000, "sound/stream/evt_kpa1_32k", 0x50, 0x40, 0x00, 0x01},
+	{"BGM_EVT_STG8_3RDHEAD1", 0x80000000, "sound/stream/evt_3dh1_32k", 0x50, 0x40, 0x00, 0x01},
+	{"BGM_EVT_STG8_WITCH", 0x80000000, "sound/stream/evt_wit2_32k", 0x58, 0x40, 0x00, 0x01},
+	{"BGM_EVT_COOKING1", 0x80000000, "sound/stream/evt_cok1_32k", 0x53, 0x40, 0x00, 0x01},
+	{"BGM_EVT_STAGE_CLEAR1", 0x80000000, "sound/stream/evt_stc1_32k", 0x62, 0x40, 0x00, 0x01},
+	{"BGM_EVT_ORGEL1", 0x80000000, "sound/stream/evt_org1_32k", 0x3E, 0x40, 0x00, 0x01},
+	{"BGM_EVT_RUIJI1", 0x80000000, "sound/stream/evt_rui1_32k", 0x50, 0x40, 0x00, 0x01},
+	{"BGM_EVT_PEACH_WALTZ1", 0x80000000, "sound/stream/evt_wlt1_32k", 0x4B, 0x40, 0x00, 0x01},
+	{"BGM_EVT_MARIO_HOUSE1", 0x80000000, "sound/stream/evt_mri1_32k", 0x50, 0x40, 0x00, 0x01},
+	{"BGM_EVT_MARIO_HOUSE2", 0x80000000, "sound/stream/evt_mri2_32k", 0x37, 0x40, 0x00, 0x01},
+	{"BGM_EVT_PEACH1", 0x80000000, "sound/stream/evt_peh1_32k", 0x4D, 0x40, 0x00, 0x01},
+	{"BGM_EVT_STG4_TRAIN1", 0x80000000, "sound/stream/evt_rit1_32k", 0x5A, 0x40, 0x00, 0x01},
+	{"BGM_EVT_DOT_MARIO1", 0x80000000, "sound/stream/evt_dot1_32k", 0x46, 0x40, 0x00, 0x01},
+	{"BGM_EVT_STG3_AIRSHIP1", 0x80000000, "sound/stream/evt_air1_32k", 0x55, 0x40, 0x00, 0x01},
+	{"BGM_EVT_STG8_VOICE1", 0x80000000, "sound/stream/evt_vce1_32k", 0x55, 0x40, 0x00, 0x01},
+	{"BGM_EVT_STG5_GHOST_SHIP1", 0x80000000, "sound/stream/evt_gstship1_32k", 0x55, 0x40, 0x00, 0x01},
 	{"", 0x00000000, "", 0x00, 0x00, 0x00, 0x00},
 	{"", 0x00000000, "", 0x00, 0x00, 0x00, 0x00},
 	{"", 0x00000000, "", 0x00, 0x00, 0x00, 0x00},
 	{"", 0x00000000, "", 0x00, 0x00, 0x00, 0x00},
 	{"", 0x00000000, "", 0x00, 0x00, 0x00, 0x00},
-	{"BGM_FF_GET_STARSTONE1\000\000", 0x80000000, "sound/stream/ff_stg1_32k\000\000\000", 0x50, 0x40, 0x00, 0x01},
-	{"BGM_FF_GET_KEYITEM1", 0x80000000, "sound/stream/ff_get2_32k\000\000\000", 0x50, 0x40, 0x00, 0x01},
-	{"BGM_FF_GET_BADGE1\000\000", 0x80000000, "sound/stream/ff_get3_32k\000\000\000", 0x50, 0x40, 0x00, 0x01},
-	{"BGM_FF_GET_ITEM1\000\000\000", 0x80000000, "sound/stream/ff_get4_32k\000\000\000", 0x50, 0x40, 0x00, 0x01},
-	{"BGM_FF_GET_PARTY1\000\000", 0x80000000, "sound/stream/ff_get8_32k\000\000\000", 0x50, 0x40, 0x00, 0x01},
-	{"BGM_FF_GET_STARPIECE1\000\000", 0x80000000, "sound/stream/ff_get6_32k\000\000\000", 0x50, 0x40, 0x00, 0x01},
-	{"BGM_FF_GET_PERA1\000\000\000", 0x80000000, "sound/stream/ff_get7_32k\000\000\000", 0x50, 0x40, 0x00, 0x01},
-	{"BGM_FF_GET_IMPORTANT_ITEM1\000", 0x80000000, "sound/stream/ff_get8_32k\000\000\000", 0x50, 0x40, 0x00, 0x01},
+	{"BGM_FF_GET_STARSTONE1", 0x80000000, "sound/stream/ff_stg1_32k", 0x50, 0x40, 0x00, 0x01},
+	{"BGM_FF_GET_KEYITEM1", 0x80000000, "sound/stream/ff_get2_32k", 0x50, 0x40, 0x00, 0x01},
+	{"BGM_FF_GET_BADGE1", 0x80000000, "sound/stream/ff_get3_32k", 0x50, 0x40, 0x00, 0x01},
+	{"BGM_FF_GET_ITEM1", 0x80000000, "sound/stream/ff_get4_32k", 0x50, 0x40, 0x00, 0x01},
+	{"BGM_FF_GET_PARTY1", 0x80000000, "sound/stream/ff_get8_32k", 0x50, 0x40, 0x00, 0x01},
+	{"BGM_FF_GET_STARPIECE1", 0x80000000, "sound/stream/ff_get6_32k", 0x50, 0x40, 0x00, 0x01},
+	{"BGM_FF_GET_PERA1", 0x80000000, "sound/stream/ff_get7_32k", 0x50, 0x40, 0x00, 0x01},
+	{"BGM_FF_GET_IMPORTANT_ITEM1", 0x80000000, "sound/stream/ff_get8_32k", 0x50, 0x40, 0x00, 0x01},
 	{"", 0x00000000, "", 0x00, 0x00, 0x00, 0x00},
-	{"BGM_FF_STG_START1\000\000", 0x80000000, "sound/stream/ff_stt1_32k\000\000\000", 0x4B, 0x40, 0x00, 0x01},
+	{"BGM_FF_STG_START1", 0x80000000, "sound/stream/ff_stt1_32k", 0x4B, 0x40, 0x00, 0x01},
 	{"", 0x00000000, "", 0x00, 0x00, 0x00, 0x00},
-	{"BGM_FF_ENV_SURPRISED1\000\000", 0x80000000, "sound/stream/ff_spr1_32k\000\000\000", 0x55, 0x40, 0x00, 0x01},
-	{"BGM_FF_ENV_SURPRISED2\000\000", 0x80000000, "sound/stream/ff_spr2_32k\000\000\000", 0x50, 0x40, 0x00, 0x01},
-	{"BGM_FF_ENV_SURPRISED3\000\000", 0x80000000, "sound/stream/ff_spr3_32k\000\000\000", 0x50, 0x40, 0x00, 0x01},
-	{"BGM_FF_ENV_ADMIRE1\000", 0x80000000, "sound/stream/ff_adm1_32k\000\000\000", 0x50, 0x40, 0x00, 0x01},
+	{"BGM_FF_ENV_SURPRISED1", 0x80000000, "sound/stream/ff_spr1_32k", 0x55, 0x40, 0x00, 0x01},
+	{"BGM_FF_ENV_SURPRISED2", 0x80000000, "sound/stream/ff_spr2_32k", 0x50, 0x40, 0x00, 0x01},
+	{"BGM_FF_ENV_SURPRISED3", 0x80000000, "sound/stream/ff_spr3_32k", 0x50, 0x40, 0x00, 0x01},
+	{"BGM_FF_ENV_ADMIRE1", 0x80000000, "sound/stream/ff_adm1_32k", 0x50, 0x40, 0x00, 0x01},
 	{"", 0x00000000, "", 0x00, 0x00, 0x00, 0x00},
-	{"BGM_FF_ENV_SUCCESS1", 0x80000000, "sound/stream/ff_scs1_32k\000\000\000", 0x50, 0x40, 0x00, 0x01},
-	{"BGM_FF_ENV_SUCCESS2", 0x80000000, "sound/stream/ff_scs1_32k\000\000\000", 0x50, 0x40, 0x00, 0x01},
+	{"BGM_FF_ENV_SUCCESS1", 0x80000000, "sound/stream/ff_scs1_32k", 0x50, 0x40, 0x00, 0x01},
+	{"BGM_FF_ENV_SUCCESS2", 0x80000000, "sound/stream/ff_scs1_32k", 0x50, 0x40, 0x00, 0x01},
 	{"", 0x00000000, "", 0x00, 0x00, 0x00, 0x00},
-	{"BGM_FF_GO_SLEEPING1", 0x80000000, "sound/stream/ff_slp1_32k\000\000\000", 0x46, 0x40, 0x00, 0x01},
+	{"BGM_FF_GO_SLEEPING1", 0x80000000, "sound/stream/ff_slp1_32k", 0x46, 0x40, 0x00, 0x01},
 	{"", 0x00000000, "", 0x00, 0x00, 0x00, 0x00},
-	{"BGM_FF_ENV_CRISIS1\000", 0x80000000, "sound/stream/ff_crs1_32k\000\000\000", 0x50, 0x40, 0x00, 0x01},
-	{"BGM_FF_ENV_TOU1", 0x80000000, "sound/stream/ff_tou1_32k\000\000\000", 0x57, 0x40, 0x00, 0x01},
-	{"BGM_FF_ENV_TOU2", 0x80000000, "sound/stream/ff_tou2_32k\000\000\000", 0x52, 0x40, 0x00, 0x01},
-	{"BGM_FF_ENV_TOU3", 0x80000000, "sound/stream/ff_tou3_32k\000\000\000", 0x5C, 0x40, 0x00, 0x01},
+	{"BGM_FF_ENV_CRISIS1", 0x80000000, "sound/stream/ff_crs1_32k", 0x50, 0x40, 0x00, 0x01},
+	{"BGM_FF_ENV_TOU1", 0x80000000, "sound/stream/ff_tou1_32k", 0x57, 0x40, 0x00, 0x01},
+	{"BGM_FF_ENV_TOU2", 0x80000000, "sound/stream/ff_tou2_32k", 0x52, 0x40, 0x00, 0x01},
+	{"BGM_FF_ENV_TOU3", 0x80000000, "sound/stream/ff_tou3_32k", 0x5C, 0x40, 0x00, 0x01},
 	{"", 0x00000000, "", 0x00, 0x00, 0x00, 0x00},
-	{"BGM_FF_ENV_RPL_APPEAR1\000", 0x80000000, "sound/stream/ff_r_apr2_32k\000", 0x54, 0x40, 0x00, 0x01},
-	{"BGM_FF_ENV_SHIP_APPEAR1", 0x80000000, "sound/stream/ff_s_apr1_32k\000", 0x5A, 0x40, 0x00, 0x01},
-	{"BGM_FF_ENV_WITCH_APPEAR1\000\000\000", 0x80000000, "sound/stream/ff_w_apr1_32k\000", 0x50, 0x40, 0x00, 0x01},
+	{"BGM_FF_ENV_RPL_APPEAR1", 0x80000000, "sound/stream/ff_r_apr2_32k", 0x54, 0x40, 0x00, 0x01},
+	{"BGM_FF_ENV_SHIP_APPEAR1", 0x80000000, "sound/stream/ff_s_apr1_32k", 0x5A, 0x40, 0x00, 0x01},
+	{"BGM_FF_ENV_WITCH_APPEAR1", 0x80000000, "sound/stream/ff_w_apr1_32k", 0x50, 0x40, 0x00, 0x01},
 	{"", 0x00000000, "", 0x00, 0x00, 0x00, 0x00},
-	{"BGM_FF_ENV_BOKE1\000\000\000", 0x80000000, "sound/stream/ff_bok1_32k\000\000\000", 0x50, 0x40, 0x00, 0x01},
+	{"BGM_FF_ENV_BOKE1", 0x80000000, "sound/stream/ff_bok1_32k", 0x50, 0x40, 0x00, 0x01},
 	{"", 0x00000000, "", 0x00, 0x00, 0x00, 0x00},
-	{"BGM_FF_ENV_MAP1", 0x80000000, "sound/stream/ff_map1_32k\000\000\000", 0x5A, 0x40, 0x00, 0x01},
-	{"BGM_FF_ENV_OPEN_DOOR1\000\000", 0x80000000, "sound/stream/ff_dor1_32k\000\000\000", 0x5A, 0x40, 0x00, 0x01},
+	{"BGM_FF_ENV_MAP1", 0x80000000, "sound/stream/ff_map1_32k", 0x5A, 0x40, 0x00, 0x01},
+	{"BGM_FF_ENV_OPEN_DOOR1", 0x80000000, "sound/stream/ff_dor1_32k", 0x5A, 0x40, 0x00, 0x01},
 	{"", 0x00000000, "", 0x00, 0x00, 0x00, 0x00},
-	{"BGM_FF_KUPPA_GOAL1\000", 0x80000000, "sound/stream/ff_kpa1_32k\000\000\000", 0x5A, 0x40, 0x00, 0x01},
-	{"BGM_FF_KUPPA_DOWN1\000", 0x80000000, "sound/stream/ff_kpa2_32k\000\000\000", 0x5A, 0x40, 0x00, 0x01},
+	{"BGM_FF_KUPPA_GOAL1", 0x80000000, "sound/stream/ff_kpa1_32k", 0x5A, 0x40, 0x00, 0x01},
+	{"BGM_FF_KUPPA_DOWN1", 0x80000000, "sound/stream/ff_kpa2_32k", 0x5A, 0x40, 0x00, 0x01},
 	{"", 0x00000000, "", 0x00, 0x00, 0x00, 0x00},
-	{"BGM_FF_PEACH_DISCSET1\000\000", 0x80000000, "sound/stream/ff_disc_set1_32k\000\000", 0x50, 0x40, 0x00, 0x01},
+	{"BGM_FF_PEACH_DISCSET1", 0x80000000, "sound/stream/ff_disc_set1_32k", 0x50, 0x40, 0x00, 0x01},
 	{"", 0x00000000, "", 0x00, 0x00, 0x00, 0x00},
-	{"BGM_FF_POWERUP1", 0x80000000, "sound/stream/ff_pow1_32k\000\000\000", 0x64, 0x40, 0x00, 0x01},
-	{"BGM_FF_POWERDOWN1\000\000", 0x80000000, "sound/stream/ff_pow1_32k\000\000\000", 0x64, 0x40, 0x00, 0x01},
+	{"BGM_FF_POWERUP1", 0x80000000, "sound/stream/ff_pow1_32k", 0x64, 0x40, 0x00, 0x01},
+	{"BGM_FF_POWERDOWN1", 0x80000000, "sound/stream/ff_pow1_32k", 0x64, 0x40, 0x00, 0x01},
 	{"", 0x00000000, "", 0x00, 0x00, 0x00, 0x00},
-	{"BGM_FF_MAIL_RECEPTION1\000", 0x80000000, "sound/stream/ff_mail_chakusin1_32k\000", 0x46, 0x40, 0x00, 0x01},
-	{"BGM_FF_MAIL_RECEPTION2\000", 0x80000000, "sound/stream/ff_mail_chakusin2_32k\000", 0x46, 0x40, 0x00, 0x01},
-	{"BGM_FF_MAIL_RECEPTION3\000", 0x80000000, "sound/stream/ff_mail_chakusin3_32k\000", 0x46, 0x40, 0x00, 0x01}
+	{"BGM_FF_MAIL_RECEPTION1", 0x80000000, "sound/stream/ff_mail_chakusin1_32k", 0x46, 0x40, 0x00, 0x01},
+	{"BGM_FF_MAIL_RECEPTION2", 0x80000000, "sound/stream/ff_mail_chakusin2_32k", 0x46, 0x40, 0x00, 0x01},
+	{"BGM_FF_MAIL_RECEPTION3", 0x80000000, "sound/stream/ff_mail_chakusin3_32k", 0x46, 0x40, 0x00, 0x01}
 };
 
 SoundEffectEntry pssfxlist[] = {
@@ -4944,7 +4947,7 @@ BOOL _psndPushGroup_trg = 0;
 void stub_fn(void);
 #define STUB_BODY stub_fn();
 
-u16 SoundSSCheck(s32 chan);
+u32 SoundSSCheck(s32 chan);
 void SoundSSStopCh(s32 chan);
 void SoundSSSetPlayFreqCh(s32 chan, u16 freq);
 
@@ -5040,9 +5043,6 @@ static f32 angleABf(f32 x1, f32 y1, f32 x2, f32 y2) {
 	return v13;
 }
 
-static inline s32 ps_fpclassifyf(f32 x) { switch (*(s32*)&x & 0x7F800000) { case 0x7F800000: if (*(s32*)&x & 0x007FFFFF) { return 1; } else { return 2; } break; case 0: if (*(s32*)&x & 0x007FFFFF) { return 5; } else { return 3; } break; default: return 4; } }
-static inline f32 ps_sqrtf(f32 x) { if (x > 0.0f) { f64 guess = __frsqrte(x); guess = 0.5 * guess * (3.0 - guess * guess * x); guess = 0.5 * guess * (3.0 - guess * guess * x); guess = 0.5 * guess * (3.0 - guess * guess * x); return x * guess; } else if (x < 0.0) { return *(f32*)__float_nan; } else if (ps_fpclassifyf(x) == 1) { return *(f32*)__float_nan; } return x; }
-
 //calc3D, returns the first bit of SND_3DINFO (vol, pan, span, unused)
 u32 calc3D(s32 id, Vec* pos, u8 vol, u16 dist) {
 	static u8 PAN[4];
@@ -5093,9 +5093,9 @@ u32 calc3D(s32 id, Vec* pos, u8 vol, u16 dist) {
 			guess = 0.5 * guess * (3.0 - guess * guess * d);
 			d = d * guess;
 		} else if (d < 0.0) {
-			d = *(f32*)__float_nan;
-		} else if (ps_fpclassifyf(d) == 1) {
-			d = *(f32*)__float_nan;
+			d = NAN;
+		} else if (isnan(d)) {
+			d = NAN;
 		}
 	}
 	{
@@ -5355,7 +5355,6 @@ void psndBGM_rate(s32 id, u16 rate) {
 	}
 }
 
-#pragma dont_inline on
 void psndBGMMain(void) {
 	PaperSoundBGM* bgm;
 	PaperSoundFade* fade;
@@ -5394,18 +5393,18 @@ void psndBGMMain(void) {
 			if (bgm->listId == -1) {
 				alive = 0;
 			} else if (psbgmlist[bgm->listId].flags & 0x80000000) {
-				if (((u32(*)(s32))SoundSSCheck)(bgm->streamId)) {
+				if (SoundSSCheck(bgm->streamId)) {
 					alive = 1;
 				} else {
 					alive = 0;
 				}
 			} else 
-				if (((u32(*)(s32))SoundSongCheck)(bgm->streamId) == 0) {
+				if (SoundSongCheck(bgm->streamId) == 0) {
 					alive = 0;
 				} else {
 					alive = 1;
 				}
-			
+
 			if (!alive) {
 				bgm->listId = -1;
 				continue;
@@ -5496,7 +5495,6 @@ void psndBGMMain(void) {
 		}
 	}
 }
-#pragma dont_inline reset
 
 BOOL psndBGMOn(u32 r3, char* bgm_name) {
 	return psndBGMOn_f_d(r3, bgm_name, 1000, 750, 0);
@@ -5506,13 +5504,11 @@ BOOL psndBGMOn_f(u32 r3, char* bgm_name, u32 fadetime, s32 r6) {
 	return psndBGMOn_f_d(r3, bgm_name, fadetime, 750, r6);
 }
 
-#pragma dont_inline on
-#pragma dont_inline off
 static inline s32 psndSSFindCh(void) {
   u32 ch;
   for (ch = 0; ch < 3; ch++)
   {
-    if (!((u32 (*)(s32)) SoundSSCheck)(ch))
+    if (!SoundSSCheck(ch))
     {
       return ch;
     }
@@ -5526,7 +5522,7 @@ static inline s32 psndSSFindCh(void) {
   }
   for (ch = 0; ch < 3; ch++)
   {
-    if (!((u32 (*)(s32)) SoundSSCheck)(ch))
+    if (!SoundSSCheck(ch))
     {
       return ch;
     }
@@ -5537,14 +5533,13 @@ static inline s32 psndSongFindCh(void) {
   u32 ch;
   for (ch = 0; ch < 4; ch++)
   {
-    if (!((u32 (*)(s32)) SoundSongCheck)(ch))
+    if (!SoundSongCheck(ch))
     {
       return ch;
     }
   }
   return -1;
 }
-#pragma dont_inline on
 static inline s32 psndBGMSearch(char* name) {
   SoundBGMEntry* entry;
   s32 i;
@@ -5560,8 +5555,6 @@ static inline s32 psndBGMSearch(char* name) {
   if (i >= 0x106) {
     i = 0;
   }
-  // FAKE: dead int guard (COLOURING W) keeps name live to the return with 3 division pairs: name degree 22 -> 32, so it is simplified late and colours r24 as in the target; folded after RA, no code
-  { s32 gz = 0; if (gz != 0) { i = ((((SFX_NAME_ID(name) / i) / (i / SFX_NAME_ID(name))) / ((SFX_NAME_ID(name) / (i + 1)) / ((i + 1) / SFX_NAME_ID(name)))) / ((SFX_NAME_ID(name) / (i + 2)) / ((i + 2) / SFX_NAME_ID(name)))); } }
   return i;
 }
 static inline void psndBGMSearchP(char* name, s32* pi) {
@@ -5579,8 +5572,6 @@ static inline void psndBGMSearchP(char* name, s32* pi) {
   if (*pi >= 0x106) {
     *pi = 0;
   }
-  // FAKE: dead int guard (COLOURING W) keeps name live to the return with 3 division pairs: name degree 22 -> 32, so it is simplified late and colours r24 as in the target; folded after RA, no code
-  { s32 gz = 0; if (gz != 0) { *pi = ((((SFX_NAME_ID(name) / *pi) / (*pi / SFX_NAME_ID(name))) / ((SFX_NAME_ID(name) / (*pi + 1)) / ((*pi + 1) / SFX_NAME_ID(name)))) / ((SFX_NAME_ID(name) / (*pi + 2)) / ((*pi + 2) / SFX_NAME_ID(name)))); } }
 }
 BOOL psndBGMOn_f_d(u32 flags, char *bgm_name, u32 fadetime, u32 fadeout, s32 r7)
 {
@@ -5866,13 +5857,11 @@ BOOL psndBGMOn_f_d(u32 flags, char *bgm_name, u32 fadetime, u32 fadeout, s32 r7)
 
   return 1;
 }
-#pragma dont_inline reset
 
 BOOL psndBGMOff(u32 flags) {
 	return psndBGMOff_f_d(flags, 1000, FALSE);
 }
 
-#pragma dont_inline on
 BOOL psndBGMOff_f_d(s32 flags, u32 fadetime, u32 someswitch) {
 	PaperSoundBGM* bgm = &psbgm[flags & 0xF];
 	s32 silent = silent_tbl[(flags >> 12) & 0xF];
@@ -5942,7 +5931,6 @@ BOOL psndBGMOff_f_d(s32 flags, u32 fadetime, u32 someswitch) {
 	return TRUE;
 }
 
-#pragma dont_inline reset
 
 s32 psndBGMChk(s32 id) {
 	return psbgm[id & 0xF].listId == 0xFFFFFFFF ? -1 : 0;
@@ -6005,41 +5993,7 @@ static inline s32 sfxvol(PaperSoundEffect* s) {
 }
 #define SFX_VOL(s) sfxvol(s)
 
-#pragma dont_inline on
-// FAKE: static inline copy of psndSFXOff (defined later in the file, so not inlinable there); the target inlines it at the three fade-out stop sites
-static inline void psndSFXOffI(s32 id) {
-    PaperSoundEffect* sfx;
-    SoundEffectEntry* entry;
 
-    if (id == 0xFFFFFFFF) {
-        return;
-    }
-    sfx = &pssfx[id & 0xFF];
-    if (sfx->listId == 0xFFFFFFFF) {
-        return;
-    }
-    if (sfx->flags & 1) {
-        sfx->listId = -1;
-        sfx->channel = -1;
-        return;
-    }
-    entry = &pssfxlist[sfx->listId & 0x1FFF];
-    if (sfx->channel != 0xFFFFFFFF) {
-        if (entry->fxId & 0x80000000) {
-            SoundSSStopCh(sfx->channel);
-        }
-        else if (entry->fxId & 0x40000000) {
-            SoundSongStopCh(sfx->channel);
-        }
-        else {
-            SoundEfxStop(sfx->channel);
-        }
-    }
-    sfx->listId = -1;
-    sfx->channel = -1;
-}
-
-#pragma dont_inline off
 void psndSFXMain(void) {
 	SoundEffectEntry* e;
 	u32 j;
@@ -6066,12 +6020,12 @@ void psndSFXMain(void) {
 		if ((base->listId != 0xFFFFFFFF) && ( !(base->flags & 1) )) {
 			f = pssfxlist[base->listId & 0x1FFF].fxId;
 			if (f & 0x80000000) {
-				if (!((u32(*)(s32))SoundSSCheck)(base->channel)) {
+				if (!SoundSSCheck(base->channel)) {
 					base->listId = none;
 					base->channel = none;
 				}
 			} else { r = f & 0x40000000; if (r) {
-				if (!((u32(*)(s32))SoundSongCheck)(base->channel)) {
+				if (!SoundSongCheck(base->channel)) {
 					base->listId = none;
 					base->channel = -1;
 				}
@@ -6089,8 +6043,6 @@ void psndSFXMain(void) {
 		}
 		fade = (p->sfxFadeTime * 127) / p->sfxFadeMax;
 	}
-	// FAKE: dead int guard (COLOURING W, A8): 4-division arm adds pre-RA interference only; folded after RA, no code
-	{ s32 gz = 0; if (gz != 0) { fade = ((fade / cnt) / (cnt / fade)) / (((fade + 1) / cnt) / (cnt / (fade + 1))); } }
 	tvol = 100;
 	if ((psnd.flags & 0x20) && ( !(psnd.flags & 0x40)) ) {
 		tvol = 120;
@@ -6119,15 +6071,15 @@ void psndSFXMain(void) {
 			f = e->fxId;
 			if (f & 0x80000000) {
 				for (j = 0; j < 3; j++) {
-					if (!((u32(*)(s32))SoundSSCheck)(j)) { ch[0] = j; goto ssfound; }
+					if (!SoundSSCheck(j)) { ch[0] = j; goto ssfound; }
 				}
 				for (j = 0; j < 3; j++) {
-					if (((u32(*)(s32))SoundSSCheck)(j) & 0x20) {
+					if (SoundSSCheck(j) & 0x20) {
 						SoundSSStopCh(j);
 					}
 				}
 				for (j = 0; j < 3; j++) {
-					if (!((u32(*)(s32))SoundSSCheck)(j)) { ch[0] = j; goto ssfound; }
+					if (!SoundSSCheck(j)) { ch[0] = j; goto ssfound; }
 				}
 				ch[0] = none;
 ssfound:
@@ -6139,7 +6091,7 @@ ssfound:
 				}
 			} else if (f & 0x40000000) {
 				for (j = 0; j < 4; j++) {
-					if (!((u32(*)(s32))SoundSongCheck)(j)) { ch[0] = j; goto sgfound; }
+					if (!SoundSongCheck(j)) { ch[0] = j; goto sgfound; }
 				}
 				ch[0] = none;
 sgfound:
@@ -6150,7 +6102,7 @@ sgfound:
 				}
 			} else {
 				if (sfx[0]->flags & 2) {
-					*((u32*)b) = ((u32 (*)(s32, Vec*, u8, u16))calc3D)(sfx[0]->listId, &sfx[0]->position, SFX_VOL(sfx[0]), sfx[0]->dist);
+					*((u32*)b) = calc3D(sfx[0]->listId, &sfx[0]->position, SFX_VOL(sfx[0]), sfx[0]->dist);
 					sfx[0]->channel = SoundEfxPlayEx(e->fxId & 0xFFFF, 0, b[0], b[1]);
 					if (sfx[0]->channel != ( -1) ) {
 						SoundEfxSetVolume(sfx[0]->channel, b[0]);
@@ -6182,7 +6134,7 @@ sgfound:
 			sfx[0]->flags &= ~1;
 		}
 		if (sfx[0]->flags & 2) {
-			*((u32*)b) = ((u32 (*)(s32, Vec*, u8, u16))calc3D)(sfx[0]->listId, &sfx[0]->position, SFX_VOL(sfx[0]), sfx[0]->dist);
+			*((u32*)b) = calc3D(sfx[0]->listId, &sfx[0]->position, SFX_VOL(sfx[0]), sfx[0]->dist);
 			f = e->fxId;
 			if (f & 0x80000000) {
 				SoundSSSetPanCh(sfx[0]->channel, b[1]);
@@ -6232,19 +6184,19 @@ sgfound:
 				r = (u8)SoundSSGetVolCh(sfx[0]->channel); r = (r * fade) / 127;
 				SoundSSSetVolCh(sfx[0]->channel, r);
 				if (r == 0) {
-					psndSFXOffI(i);
+					psndSFXOff(i);
 				}
 			} else if (f & 0x40000000) {
 				r = (u8)SoundSongGetVolCh(sfx[0]->channel); r = (r * fade) / 127;
 				SoundSongSetVolCh(sfx[0]->channel, r);
 				if (r == 0) {
-					psndSFXOffI(i);
+					psndSFXOff(i);
 				}
 			} else {
 				r = (u8)SoundEfxGetVolume(sfx[0]->channel); r = (r * fade) / 127;
 				SoundEfxSetVolume(sfx[0]->channel, r);
 				if (r == 0) {
-					psndSFXOffI(i);
+					psndSFXOff(i);
 				}
 			}
 		}
@@ -6267,10 +6219,7 @@ sgfound:
 	psnd.sfxActiveCount[0] = cnt;
 	psnd.sfxDelay = 0;
 }
-#pragma dont_inline on
-#pragma dont_inline reset
 
-#pragma dont_inline on
 
 s32 __psndSFXOn(const char *name, u8 vol, u8 pan, u16 pitch, Vec *pos, u32 r8, u16 dist, s32 r10)
 {
@@ -6280,10 +6229,8 @@ s32 __psndSFXOn(const char *name, u8 vol, u8 pan, u16 pitch, Vec *pos, u32 r8, u
   PaperSoundEffect *sfx = (void *) 0;
   SoundEffectEntry *entry;
   s32 idx = 0;
-  PaperSoundEffect* o;
   s32 delay;
-  SoundEffectEntry* le;
-  u16 * new_var ;
+  u16 * delayPtr ;
   s32 i;
   s32 id;
   id = searchPSSFXList(name);
@@ -6315,8 +6262,8 @@ s32 __psndSFXOn(const char *name, u8 vol, u8 pan, u16 pitch, Vec *pos, u32 r8, u
     PaperSoundEffect *t = pssfx + i;
     if ((((((u32) t->listId) != 0xFFFFFFFF) && (((u32) (t->listId & 0x1FFF)) == ((u32) sid))) && (t->flags & 0x100)) && (delay == 0))
     {
-      new_var = (u16 *) (& psnd.sfxDelay);
-      delay = (*new_var += 8);
+      delayPtr = (u16 *) (& psnd.sfxDelay);
+      delay = (*delayPtr += 8);
     }
     if (((u32) t->listId) == 0xFFFFFFFF)
     {
@@ -6340,31 +6287,7 @@ s32 __psndSFXOn(const char *name, u8 vol, u8 pan, u16 pitch, Vec *pos, u32 r8, u
       }
       if (s->priority > entry->priority)
       {
-        // FAKE: psndSFXOff(i) expanded by hand with named locals o/le (the inlined copy's @ temps colour in the wrong order)
-        {
-          if (k != 0xFFFFFFFF) {
-            o = &pssfx[k & 0xFF];
-            if (o->listId != 0xFFFFFFFF) {
-              if (o->flags & 1) {
-                o->listId = -1;
-                o->channel = -1;
-              } else {
-                le = &pssfxlist[o->listId & 0x1FFF];
-                if (o->channel != 0xFFFFFFFF) {
-                  if (le->fxId & 0x80000000) {
-                    SoundSSStopCh(o->channel);
-                  } else if (le->fxId & 0x40000000) {
-                    SoundSongStopCh(o->channel);
-                  } else {
-                    SoundEfxStop(o->channel);
-                  }
-                }
-                o->listId = -1;
-                o->channel = -1;
-              }
-            }
-          }
-        }
+        psndSFXOff(k);
         sfx = s;
         idx = k;
         break;
@@ -6441,14 +6364,13 @@ s32 __psndSFXOn(const char *name, u8 vol, u8 pan, u16 pitch, Vec *pos, u32 r8, u
   return idx;
 }
 
-#pragma dont_inline reset
 
 s32 psndSFXOn_(const char* name) {
 	return __psndSFXOn(name, 0xFF, 0xFF, 0, NULL, 0, 0x10, 1);
 }
 
-void psndSFXOn(const char* name) {
-	__psndSFXOn(name, 0xFF, 0xFF, 0, NULL, 0, 0x10, 0);
+s32 psndSFXOn(const char* name) {
+	return __psndSFXOn(name, 0xFF, 0xFF, 0, NULL, 0, 0x10, 0);
 }
 
 s32 psndSFXOnVol(const char* name, u8 vol) {
@@ -6590,7 +6512,6 @@ u8 psndSFX_get_vol(s32 id) {
 	return sfx->volume;
 }
 
-#pragma dont_inline off
 void psndENV_stop(u32 id) {
 	s32 i;
 	PaperSoundEnv* e;
@@ -6626,11 +6547,9 @@ void psndENV_stop(u32 id) {
 		}
 	}
 }
-#pragma dont_inline reset
 
 #define ENVVOL(e, p, out) 	{ 		PaperSoundFade* f = NULL; 		s16 v; 		if ((p)->envId[0] == (e)->id) f = &(p)->fade[0]; 		if ((p)->envId[1] == (e)->id) f = &(p)->fade[1]; 		if (f == NULL) out = (e)->volume * (p)->envVolume / 100; 		else { 			if (f->dipState == 0) v = 0x7f; else v = f->dipTime * 0x7f / f->dipTimeMax; 			if (f->state == 0) out = (p)->envVolume * ((e)->volume * v / 127) / 100; 			else { 				{ s16 w = f->timeMax * ((e)->volume * v / 127) / f->time; out = w * (p)->envVolume / 100; } 			} 		} 	}
 #define ENVDONE(e) 	{ 		(e)->sfx = -1; 		(e)->state = 0; 		(e)->timer = 0; 		switch ((e)->type) { 		case 0: (e)->timer = (e)->interval * PSND_FPS; (e)->timer += irand((e)->intervalRand) * PSND_FPS; break; case 2: (e)->timer = (e)->interval * PSND_FPS; (e)->timer += irand((e)->intervalRand) * PSND_FPS; break; case 3: break; 		} 	}
-#pragma dont_inline on
 void psndENVMain(void) {
 	char* B = (char*)_buf;
 	char* base = B;
@@ -6771,13 +6690,11 @@ void psndENVMain(void) {
 }
 #define psnd psnd
 #undef psnd
-#pragma dont_inline reset
 
 BOOL psndENVOn(u32 flags, const char* name) {
 	return psndENVOn_f_d(flags, name, 1000, 0);
 }
 
-#pragma dont_inline on
 typedef struct PairU32_ { u32 a, b; } PairU32_;
 static inline s32 psndENVSearch(const char** names, const char* name) {
 	s32 id;
@@ -6907,7 +6824,6 @@ BOOL psndENVOn_f_d(u32 flags, const char* name, u32 fadetime, s32 r6) {
 end:
 	return TRUE;
 }
-#pragma dont_inline reset
 
 #ifndef VERSION_G8ME01
 #pragma dont_inline on
@@ -6919,7 +6835,6 @@ BOOL psndENVOff(u32 flags) {
 }
 #pragma dont_inline reset
 
-#pragma dont_inline on
 #pragma dont_inline on
 BOOL psndENVOff_f_d(u32 flags, u32 fadetime, s32 r5) {
 	u16* env;
@@ -6967,7 +6882,6 @@ BOOL psndENVOff_f_d(u32 flags, u32 fadetime, s32 r5) {
 	}
 	return TRUE;
 }
-#pragma dont_inline reset
 
 #pragma dont_inline reset
 

@@ -4,8 +4,6 @@
 #include "evt/evt_sub.h"
 #include "data_tables.h"
 
-#pragma force_active on
-
 USER_FUNC(evt_bero_get_info);
 USER_FUNC(evt_item_delete_check);
 USER_FUNC(evt_item_entry);
@@ -14,55 +12,12 @@ USER_FUNC(evt_npc_change_fbat_mode);
 USER_FUNC(evt_snd_bgmon);
 USER_FUNC(evt_snd_envon);
 
-f32 fd_hei_04_negone_one_374[2] __attribute__((aligned(8)));
-f32 fd_hei_04_neg_one_382;
-f32 fd_hei_04___local_PI_383;
-f32 fd_hei_04___local_3PIO2_385;
-f32 fd_hei_04_one_negone_373[2] __attribute__((aligned(8)));
-f32 fd_hei_04___local_PIO2_384;
-f32 fd_hei_04_one_381;
-f32 fd_hei_04_negone_one_360[2] __attribute__((aligned(8)));
-f32 fd_hei_04_neg_one_365;
-f32 fd_hei_04___local_PI_366;
-f32 fd_hei_04___local_3PIO2_368;
-f32 fd_hei_04_one_negone_359[2] __attribute__((aligned(8)));
-f32 fd_hei_04___local_PIO2_367;
-f32 fd_hei_04_one_364;
 static BeroEntry bero_entry_data[3];
-static EvtWord evt_ki_3[20];
 static TreeAccess ki_data[4];
-EvtWord evt_kusa_11[20];
-EvtWord evt_kusa_12[20];
+extern EvtWord evt_kusa_11[];
+extern EvtWord evt_kusa_12[];
 static KusaAccess kusa_data[12];
-EvtWord hei_04_init_evt[40];
-
-f32 fd_hei_04_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
-
-f32 fd_hei_04_neg_one_382 = -1.0f;
-
-f32 fd_hei_04___local_PI_383 = 3.1415927f;
-
-f32 fd_hei_04___local_3PIO2_385 = 4.712389f;
-
-f32 fd_hei_04_one_negone_373[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
-
-f32 fd_hei_04___local_PIO2_384 = 1.5707964f;
-
-f32 fd_hei_04_one_381 = 1.0f;
-
-f32 fd_hei_04_negone_one_360[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
-
-f32 fd_hei_04_neg_one_365 = -1.0f;
-
-f32 fd_hei_04___local_PI_366 = 3.1415927f;
-
-f32 fd_hei_04___local_3PIO2_368 = 4.712389f;
-
-f32 fd_hei_04_one_negone_359[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
-
-f32 fd_hei_04___local_PIO2_367 = 1.5707964f;
-
-f32 fd_hei_04_one_364 = 1.0f;
+extern EvtWord hei_04_init_evt[];
 
 static BeroEntry bero_entry_data[] = {
     {
@@ -158,7 +113,7 @@ EVT_BEGIN(hei_04_init_evt)
     CALL_CHILD(PTR(evt_sub_tree_access_entry))
     SET_VALUE(LW(0), PTR(kusa_data))
     CALL_CHILD(PTR(evt_sub_kusa_access_entry))
-    CALL(evt_mapobj_flag_onoff, 1, 0, STRING("group1\0"), 2)
+    CALL(evt_mapobj_flag_onoff, 1, 0, STRING("group1"), 2)
     RETURN
 EVT_END()
 

@@ -1,7 +1,6 @@
 #include "battle/battle_unit.h"
 #include "evt/evt_cmd.h"
 
-#pragma force_active on
 #include "battle/battle.h"
 #include "system.h"
 #include "battle/battle_event_default.h"
@@ -9,6 +8,7 @@
 #include "battle/battle_event_subset.h"
 #include "battle/battle_weapon_power.h"
 #include "battle/battle_database_common.h"
+#include "manager/evtmgr_cmd.h"
 
 USER_FUNC(btlevtcmd_AddPartsRotate);
 USER_FUNC(btlevtcmd_AnimeChangePose);
@@ -52,20 +52,6 @@ static USER_FUNC(hammer_bros_nagemakuri_set_target);
 static void hammer_bros_get_next_target(s32* unitIdx, s32* partIdx);
 static void hammer_bros_get_target(s32* unitIdx, s32* partIdx);
 
-f32 fd_hammer_bros_negone_one_374[2] __attribute__((aligned(8)));
-f32 fd_hammer_bros_neg_one_382;
-f32 fd_hammer_bros___local_PI_383;
-f32 fd_hammer_bros___local_3PIO2_385;
-f32 fd_hammer_bros_one_negone_373[2] __attribute__((aligned(8)));
-f32 fd_hammer_bros___local_PIO2_384;
-f32 fd_hammer_bros_one_381;
-f32 fd_hammer_bros_negone_one_360[2] __attribute__((aligned(8)));
-f32 fd_hammer_bros_neg_one_365;
-f32 fd_hammer_bros___local_PI_366;
-f32 fd_hammer_bros___local_3PIO2_368;
-f32 fd_hammer_bros_one_negone_359[2] __attribute__((aligned(8)));
-f32 fd_hammer_bros___local_PIO2_367;
-f32 fd_hammer_bros_one_364;
 BattleUnitKind unit_hammer_bros;
 static BattleUnitDefense defence;
 static BattleUnitDefenseAttr defence_attr;
@@ -79,11 +65,6 @@ static BattleWeapon weapon_hammer_bros_nagemakuri_attack;
 static EvtWord init_event[21];
 static EvtWord damage_event[10];
 static EvtWord attack_event[96];
-static EvtWord start_avoid[26];
-static EvtWord hammer_bros_attack_common_event1[254];
-static EvtWord hammer_bros_attack_common_event2[112];
-static EvtWord hammer_bros_attack_common_event3[59];
-static EvtWord damage_check_event_sub[137];
 static EvtWord normal_attack_event[112];
 static EvtWord renzoku_attack_event[111];
 static EvtWord renzoku_attack_event_sub_no_last[13];
@@ -145,34 +126,6 @@ static USER_FUNC(hammer_bros_nagemakuri_set_target) {
     }
     return EVT_RETURN_DONE;
 }
-
-f32 fd_hammer_bros_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
-
-f32 fd_hammer_bros_neg_one_382 = -1.0f;
-
-f32 fd_hammer_bros___local_PI_383 = 3.1415927f;
-
-f32 fd_hammer_bros___local_3PIO2_385 = 4.712389f;
-
-f32 fd_hammer_bros_one_negone_373[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
-
-f32 fd_hammer_bros___local_PIO2_384 = 1.5707964f;
-
-f32 fd_hammer_bros_one_381 = 1.0f;
-
-f32 fd_hammer_bros_negone_one_360[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
-
-f32 fd_hammer_bros_neg_one_365 = -1.0f;
-
-f32 fd_hammer_bros___local_PI_366 = 3.1415927f;
-
-f32 fd_hammer_bros___local_3PIO2_368 = 4.712389f;
-
-f32 fd_hammer_bros_one_negone_359[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
-
-f32 fd_hammer_bros___local_PIO2_367 = 1.5707964f;
-
-f32 fd_hammer_bros_one_364 = 1.0f;
 
 BattleUnitKind unit_hammer_bros = {
     56,
@@ -649,7 +602,7 @@ static EVT_BEGIN(normal_attack_event)
     CALL(btlevtcmd_PayWeaponCost, -2, PTR(&weapon_hammer_bros_attack))
     CALL(btlevtcmd_CalculateFaceDirection, -2, -1, LW(3), LW(4), 16, LW(15))
     CALL(btlevtcmd_ChangeFaceDirection, -2, LW(15))
-    CALL(btlevtcmd_AnimeChangePose, -2, 1, STRING("BRO_A_1A\0\0\0"))
+    CALL(btlevtcmd_AnimeChangePose, -2, 1, STRING("BRO_A_1A"))
     WAIT_FRAMES(27)
     SET_VALUE(LW(15), 2)
     SET_VALUE(LW(9), PTR(&weapon_hammer_bros_attack))
@@ -688,7 +641,7 @@ static EVT_BEGIN(renzoku_attack_event)
         IF_INT_GREATER_OR_EQUAL(LW(14), 4)
             BREAK_LOOP
         END_IF
-        CALL(btlevtcmd_AnimeChangePose, -2, 1, STRING("BRO_A_1A\0\0\0"))
+        CALL(btlevtcmd_AnimeChangePose, -2, 1, STRING("BRO_A_1A"))
         WAIT_FRAMES(27)
         IF_INT_EQUAL(LW(14), 3)
             SPAWN_EVENT(PTR(renzoku_attack_event_sub_last))
@@ -770,7 +723,7 @@ static EVT_BEGIN(nagemakuri_attack_event)
         CALL(btlevtcmd_GetUnitWork, -2, LW(14), LW(4))
         CALL(btlevtcmd_CalculateFaceDirection, -2, -1, LW(3), LW(4), 16, LW(10))
         CALL(btlevtcmd_ChangeFaceDirection, -2, LW(10))
-        CALL(btlevtcmd_AnimeChangePose, -2, 1, STRING("BRO_A_1A\0\0\0"))
+        CALL(btlevtcmd_AnimeChangePose, -2, 1, STRING("BRO_A_1A"))
         WAIT_FRAMES(27)
         SPAWN_EVENT(PTR(nagemakuri_attack_event_sub))
         WAIT_MS(250)

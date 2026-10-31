@@ -1,7 +1,6 @@
 #include "battle/battle_unit.h"
 #include "evt/evt_cmd.h"
 
-#pragma force_active on
 #include "mario/mario.h"
 #include "driver/npcdrv.h"
 #include "evt/evt_bero.h"
@@ -10,6 +9,7 @@
 #include "evt/evt_npc.h"
 #include "rsh.h"
 #include "mario/mario_pouch.h"
+#include "manager/evtmgr_cmd.h"
 
 USER_FUNC(evt_bero_get_entername);
 USER_FUNC(evt_bero_get_info);
@@ -73,128 +73,47 @@ USER_FUNC(evt_mario_adjust_dir);
 USER_FUNC(evt_mario_get_dispdir);
 #endif
 
-f32 fd_rsh_04_negone_one_374[2] __attribute__((aligned(8)));
-f32 fd_rsh_04_neg_one_382;
-f32 fd_rsh_04___local_PI_383;
-f32 fd_rsh_04___local_3PIO2_385;
-f32 fd_rsh_04_one_negone_373[2] __attribute__((aligned(8)));
-f32 fd_rsh_04___local_PIO2_384;
-f32 fd_rsh_04_one_381;
-f32 fd_rsh_04_negone_one_360[2] __attribute__((aligned(8)));
-f32 fd_rsh_04_neg_one_365;
-f32 fd_rsh_04___local_PI_366;
-f32 fd_rsh_04___local_3PIO2_368;
-f32 fd_rsh_04_one_negone_359[2] __attribute__((aligned(8)));
-f32 fd_rsh_04___local_PIO2_367;
-f32 fd_rsh_04_one_364;
 static BeroEntry bero_data_a[3];
 static BeroEntry bero_data_b[3];
 static BeroEntry bero_data_c[3];
 static const char* door_3[7];
 static const char* door_4[7];
 static const char* door_5[7];
-#ifdef VERSION_G8ME01
-EvtWord evt_rsh_konarikin_irai_party_talk[89];
-#else
-EvtWord evt_rsh_konarikin_irai_party_talk[85];
-#endif
-#ifdef VERSION_G8ME01
-EvtWord evt_allow_kamotsu[77];
-#else
-EvtWord evt_allow_kamotsu[73];
-#endif
-EvtWord evt_mario_chuumoku[10];
-EvtWord evt_party_chuumoku[11];
-#ifdef VERSION_G8ME01
-EvtWord evt_shorui_funshitu[362];
-#else
-EvtWord evt_shorui_funshitu[352];
-#endif
+extern EvtWord evt_rsh_konarikin_irai_party_talk[];
+extern EvtWord evt_allow_kamotsu[];
+extern EvtWord evt_mario_chuumoku[];
+extern EvtWord evt_party_chuumoku[];
+extern EvtWord evt_shorui_funshitu[];
 static s32 item_tbl[2];
-EvtWord evt_daijisouna_kami[208];
-EvtWord evt_syasyou_auto_talk[27];
-static EvtWord init_syashou[56];
+extern EvtWord evt_daijisouna_kami[];
+extern EvtWord evt_syasyou_auto_talk[];
 static s32 item_tbl2[2];
-#ifdef VERSION_G8ME01
-static EvtWord talk_syashou[413];
-#else
-static EvtWord talk_syashou[367];
-#endif
-EvtWord talk_sarary_repeat[43];
-static EvtWord init_sarary[55];
-static EvtWord talk_sarary[72];
-EvtWord talk_papa_mama[167];
-EvtWord talk_papa_repeat[40];
-static EvtWord init_papa[46];
-static EvtWord talk_papa[49];
-EvtWord talk_mama_repeat[40];
-static EvtWord init_mama[37];
-static EvtWord talk_mama[57];
-static EvtWord init_konari[46];
+extern EvtWord talk_sarary_repeat[];
+extern EvtWord talk_papa_mama[];
+extern EvtWord talk_papa_repeat[];
+extern EvtWord talk_mama_repeat[];
 s32 item_tbl3[2];
-#ifdef VERSION_G8ME01
-static EvtWord talk_konari[265];
-#else
-static EvtWord talk_konari[219];
-#endif
-EvtWord talk_powan_repeat[43];
-static EvtWord init_powan[64];
-static EvtWord talk_powan[204];
+extern EvtWord talk_powan_repeat[];
 static NpcSetupInfo npc_data[7];
-EvtWord evt_tana_5[50];
+extern EvtWord evt_tana_5[];
 /* shelf access table read by READ_INT4: hit, msg, event, second msg; a NULL hit ends it */
 typedef struct ShelfAccess { const char* hit; const char* msg; EvtWord* evt; const char* msg2; } ShelfAccess;
 typedef struct ShelfAccessTbl3 { ShelfAccess rows[3]; const char* end[1]; } ShelfAccessTbl3;
 static ShelfAccessTbl3 access_tbl;
-static EvtWord evt_access[32];
-static EvtWord evt_access_entry[25];
-static EvtWord evt_door_msg[102];
-EvtWord evt_narikin_room[87];
-EvtWord evt_powan_room[83];
-#ifdef VERSION_G8ME01
-EvtWord rsh_04_init_evt[214];
-#else
-EvtWord rsh_04_init_evt[201];
-#endif
-EvtWord rsh_04_a_init_evt[96];
-EvtWord rsh_04_b_init_evt[44];
+extern EvtWord evt_narikin_room[];
+extern EvtWord evt_powan_room[];
+extern EvtWord rsh_04_init_evt[];
+extern EvtWord rsh_04_a_init_evt[];
+extern EvtWord rsh_04_b_init_evt[];
 static const char* window_tbl[4];
-EvtWord rsh_04_c_init_evt[67];
+extern EvtWord rsh_04_c_init_evt[];
 static BeroEntry bero_data_a_return[3];
 static BeroEntry bero_data_b_return[3];
 static BeroEntry bero_data_c_return[3];
-EvtWord rsh_04_init_evt_nidome[149];
-EvtWord rsh_04_a_init_evt_nidome[28];
-EvtWord rsh_04_b_init_evt_nidome[28];
-EvtWord rsh_04_c_init_evt_nidome[38];
-
-f32 fd_rsh_04_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
-
-f32 fd_rsh_04_neg_one_382 = -1.0f;
-
-f32 fd_rsh_04___local_PI_383 = 3.1415927f;
-
-f32 fd_rsh_04___local_3PIO2_385 = 4.712389f;
-
-f32 fd_rsh_04_one_negone_373[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
-
-f32 fd_rsh_04___local_PIO2_384 = 1.5707964f;
-
-f32 fd_rsh_04_one_381 = 1.0f;
-
-f32 fd_rsh_04_negone_one_360[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
-
-f32 fd_rsh_04_neg_one_365 = -1.0f;
-
-f32 fd_rsh_04___local_PI_366 = 3.1415927f;
-
-f32 fd_rsh_04___local_3PIO2_368 = 4.712389f;
-
-f32 fd_rsh_04_one_negone_359[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
-
-f32 fd_rsh_04___local_PIO2_367 = 1.5707964f;
-
-f32 fd_rsh_04_one_364 = 1.0f;
+extern EvtWord rsh_04_init_evt_nidome[];
+extern EvtWord rsh_04_a_init_evt_nidome[];
+extern EvtWord rsh_04_b_init_evt_nidome[];
+extern EvtWord rsh_04_c_init_evt_nidome[];
 
 static BeroEntry bero_data_a[] = {
     {
@@ -1891,7 +1810,7 @@ EVT_BEGIN(rsh_04_init_evt_nidome)
         CALL(evt_snd_bgmoff, 26624)
         ELSE
         IF_INT_EQUAL(GSWF(3461), 1)
-            CALL(evt_snd_bgmon, 512, STRING("BGM_STG0_GOR1\0\0"))
+            CALL(evt_snd_bgmon, 512, STRING("BGM_STG0_GOR1"))
             CALL(evt_snd_envoff, 512)
             CALL(evt_snd_bgmoff, 26624)
             ELSE

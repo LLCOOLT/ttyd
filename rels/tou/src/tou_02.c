@@ -1,10 +1,8 @@
 #include "version.h"
-#pragma dollar_identifiers on
 #include "battle/battle_unit.h"
 #include "evt/evt_cmd.h"
 #include "manager/evtmgr_cmd.h"
 
-#pragma force_active on
 #include "string.h"
 #include "mario/mariost.h"
 #include "dolphin/os.h"
@@ -30,11 +28,10 @@ USER_FUNC(N_evt_sub_status_gauge_force_update);
 USER_FUNC(evt_sub_get_language);
 #endif
 
-typedef struct Fan { u16 flags; s16 state; s16 animIdx; u8 pad_0x6[2]; u64 time; Vec pos; Vec vel; f32 field_0x28; Vec target; Vec param; s16 timer; } Fan;
+typedef struct Fan { u16 flags; s16 state; s16 animIdx; u8 pad_0x6[2]; u64 time; Vec pos; Vec vel; f32 dir; Vec target; Vec param; s16 timer; } Fan; /* dir: never accessed */
 typedef struct FanAnim { char name[16]; char anim[8]; s16 loop; f32 rate; s32 start; s32 count; } FanAnim;
 typedef struct FanWork { s32 num; Fan* fans; s32 animNum; FanAnim anim[32]; s32 hammerTimer; s32 count; s32 sfxId; u8 vol; } FanWork;
 typedef struct FanData { const char* name; const char* anim; f32 rate; } FanData;
-u32 gap_05_00000024_bss;
 FanWork* fan_wp;
 static void pose_init(void);
 static void pose_init(void);
@@ -151,88 +148,52 @@ static void pose_change(Fan* fan, const char* name, const char* anim);
 static void pose_main(void);
 static void pose_init(void);
 
-static f32 negone_one$374[2] __attribute__((aligned(8)));
-static f32 neg_one$382;
-static f32 __local_PI$383;
-static f32 __local_3PIO2$385;
-u32 gap_04_0001116C_data[1];
-static f32 one_negone$373[2] __attribute__((aligned(8)));
-static f32 __local_PIO2$384;
-static f32 one$381;
-static f32 negone_one$360[2] __attribute__((aligned(8)));
-static f32 neg_one$365;
-static f32 __local_PI$366;
-static f32 __local_3PIO2$368;
-u32 gap_04_00011194_data[1];
-static f32 one_negone$359[2] __attribute__((aligned(8)));
-static f32 __local_PIO2$367;
-static f32 one$364;
-static EvtWord s_door_open[58];
-static EvtWord s_door_close[58];
-EvtWord n_1_door_open[22];
-EvtWord n_1_door_close[22];
-static EvtWord n_2_door_open[22];
-static EvtWord n_2_door_close[22];
-EvtWord n_3_door_open[12];
-EvtWord n_3_door_close[12];
-EvtWord n_4_door_open[12];
-EvtWord n_4_door_close[12];
+extern EvtWord n_1_door_open[];
+extern EvtWord n_1_door_close[];
+extern EvtWord n_3_door_open[];
+extern EvtWord n_3_door_close[];
+extern EvtWord n_4_door_open[];
+extern EvtWord n_4_door_close[];
 static BeroEntry bero_data[6];
-EvtWord evt_move_g[63];
-EvtWord init_gard1[39];
-EvtWord talk_gard1[70];
-EvtWord init_gard2[39];
-EvtWord talk_gard2[70];
-static EvtWord init_madam[39];
-static EvtWord talk_madam[67];
-EvtWord init_repo[8];
-EvtWord talk_repo[112];
-EvtWord init_cam1[8];
-EvtWord talk_cam1[112];
-EvtWord init_cam2[19];
-EvtWord talk_cam2[112];
-EvtWord init_kino4[13];
-EvtWord reg_kino4[31];
-EvtWord talk_kino4[112];
-EvtWord init_kino5[8];
-EvtWord talk_kino5[236];
-EvtWord init_kinopiko[8];
-EvtWord talk_kinopiko[112];
-EvtWord init_kinopio_f[8];
-EvtWord talk_kinopio_f[112];
-EvtWord init_chu[20];
-EvtWord talk_chu[67];
-static EvtWord init_champ[32];
+extern EvtWord evt_move_g[];
+extern EvtWord init_gard1[];
+extern EvtWord talk_gard1[];
+extern EvtWord init_gard2[];
+extern EvtWord talk_gard2[];
+extern EvtWord init_repo[];
+extern EvtWord talk_repo[];
+extern EvtWord init_cam1[];
+extern EvtWord talk_cam1[];
+extern EvtWord init_cam2[];
+extern EvtWord talk_cam2[];
+extern EvtWord init_kino4[];
+extern EvtWord reg_kino4[];
+extern EvtWord talk_kino4[];
+extern EvtWord init_kino5[];
+extern EvtWord talk_kino5[];
+extern EvtWord init_kinopiko[];
+extern EvtWord talk_kinopiko[];
+extern EvtWord init_kinopio_f[];
+extern EvtWord talk_kinopio_f[];
+extern EvtWord init_chu[];
+extern EvtWord talk_chu[];
 s32 move_pos[26];
-EvtWord move_champ[155];
-EvtWord talk_champ[34];
-EvtWord init_shikowa[32];
-EvtWord talk_shikowa[13];
-static EvtWord init_uranoko[32];
-static EvtWord talk_uranoko[13];
-EvtWord init_ironA[38];
-EvtWord talk_ironA[13];
-EvtWord init_ironB[38];
-EvtWord talk_ironB[13];
-EvtWord init_borodo[32];
-EvtWord talk_borodo[13];
+extern EvtWord move_champ[];
+extern EvtWord talk_champ[];
+extern EvtWord init_shikowa[];
+extern EvtWord talk_shikowa[];
+extern EvtWord init_ironA[];
+extern EvtWord talk_ironA[];
+extern EvtWord init_ironB[];
+extern EvtWord talk_ironB[];
+extern EvtWord init_borodo[];
+extern EvtWord talk_borodo[];
 static NpcSetupInfo npcEnt[17];
-EvtWord evt_tougi2[285];
+extern EvtWord evt_tougi2[];
 ExtTexInfo ext_fan_data[28];
-EvtWord mario_momikucha_msg[111];
-EvtWord evt_momikucha[105];
-static EvtWord evt_key[173];
-static EvtWord evt_poster_1[5];
-static EvtWord evt_poster_2[5];
-static EvtWord evt_poster_3[5];
-static EvtWord evt_poster_4[5];
-static EvtWord evt_poster_5[5];
-static EvtWord evt_poster_6[5];
-static EvtWord evt_poster_7[5];
-static EvtWord evt_poster_8[VERSION_PICK(46, 60)];
-static EvtWord evt_poster_9[5];
-static EvtWord evt_after_peach[188];
-EvtWord tou_02_init_evt[VERSION_PICK(576, 919)];
+extern EvtWord mario_momikucha_msg[];
+extern EvtWord evt_momikucha[];
+extern EvtWord tou_02_init_evt[];
 
 void C_VECReflect(const Vec* src, const Vec* normal, Vec* dst);
 void PSMTXIdentity(Mtx m);
@@ -323,38 +284,6 @@ static f32 randf(f32 min, f32 max) {
 
     return r * (max - min) + min;
 }
-
-static f32 negone_one$374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
-
-static f32 neg_one$382 = -1.0f;
-
-static f32 __local_PI$383 = 3.1415927f;
-
-static f32 __local_3PIO2$385 = 4.712389f;
-
-u32 gap_04_0001116C_data[1] = {0};
-
-static f32 one_negone$373[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
-
-static f32 __local_PIO2$384 = 1.5707964f;
-
-static f32 one$381 = 1.0f;
-
-static f32 negone_one$360[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
-
-static f32 neg_one$365 = -1.0f;
-
-static f32 __local_PI$366 = 3.1415927f;
-
-static f32 __local_3PIO2$368 = 4.712389f;
-
-u32 gap_04_00011194_data[1] = {0};
-
-static f32 one_negone$359[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
-
-static f32 __local_PIO2$367 = 1.5707964f;
-
-static f32 one$364 = 1.0f;
 
 static EVT_BEGIN(s_door_open)
     IF_FLOAT_EQUAL(LW(0), FLOAT((0.0f)))
@@ -553,11 +482,11 @@ EVT_BEGIN(evt_move_g)
     ADD(LW(2), 100)
     CALL(evt_mario_mov_pos, LW(0), LW(2), 500)
     BEGIN_INLINE_EVENT
-        CALL(evt_npc_move_position, STRING(("\203K\201[\203h\203}\203\223\202P")), -530, -185, 0, FLOAT(80.0f), 1)
-        CALL(evt_set_dir_to_target, STRING(("\203K\201[\203h\203}\203\223\202P")), STRING(("mario")))
+        CALL(evt_npc_move_position, STRING(("ガードマン１")), -530, -185, 0, FLOAT(80.0f), 1)
+        CALL(evt_set_dir_to_target, STRING(("ガードマン１")), STRING(("mario")))
     END_INLINE_EVENT
-    CALL(evt_npc_move_position, STRING(("\203K\201[\203h\203}\203\223\202Q")), 530, -185, 0, FLOAT(80.0f), 1)
-    CALL(evt_set_dir_to_target, STRING(("\203K\201[\203h\203}\203\223\202Q")), STRING(("mario")))
+    CALL(evt_npc_move_position, STRING(("ガードマン２")), 530, -185, 0, FLOAT(80.0f), 1)
+    CALL(evt_set_dir_to_target, STRING(("ガードマン２")), STRING(("mario")))
     SET_VALUE(LW(0), 3)
     CALL_CHILD(PTR(bero_case_switch_on))
     SET_VALUE(LW(0), 4)
@@ -918,7 +847,21 @@ EVT_BEGIN(talk_kino5)
             CASE_GREATER(0)
             CALL(evt_mario_get_party, LW(0))
             IF_INT_EQUAL(LW(0), 4)
+#ifdef VERSION_G8MP01
+                CALL(evt_sub_get_language, LW(0))
+                SWITCH(LW(0))
+                    CASE_EQUAL(2)
+                    CALL(evt_msg_print_insert, 0, STRING(("stg3_npc_02_06_05_yos")), 0, 0, LW(10))
+                    CASE_EQUAL(4)
+                    CALL(evt_msg_print_insert, 0, STRING(("stg3_npc_02_06_05_yos")), 0, 0, LW(10))
+                    CASE_EQUAL(5)
+                    CALL(evt_msg_print_insert, 0, STRING(("stg3_npc_02_06_05_yos")), 0, 0, LW(10))
+                    CASE_DEFAULT
+                    CALL(evt_msg_print_insert, 0, STRING(("stg3_npc_02_06_05_yos")), 0, 0, LW(10), LW(10))
+                END_SWITCH
+#else
                 CALL(evt_msg_print_insert, 0, STRING(("stg3_npc_02_06_05_yos")), 0, 0, LW(10), LW(10))
+#endif
                 ELSE
                 CALL(evt_msg_print_insert, 0, STRING(("stg3_npc_02_06_05")), 0, 0, LW(10))
             END_IF
@@ -1023,7 +966,7 @@ EVT_BEGIN(talk_kinopiko)
 EVT_END()
 
 EVT_BEGIN(init_kinopio_f)
-    CALL(evt_npc_set_position, STRING(("\203L\203m\203s\203I\217\227")), 100, 0, 0)
+    CALL(evt_npc_set_position, STRING(("キノピオ女")), 100, 0, 0)
     RETURN
 EVT_END()
 
@@ -1310,7 +1253,7 @@ EVT_END()
 
 static NpcSetupInfo npcEnt[] = {
     {
-        /*"ガードマン１"*/"\203K\201[\203h\203}\203\223\202P", // name
+        "ガードマン１", // name
         0x40080600, // flags
         0, // reactionFlags
         init_gard1, // initEvent
@@ -1322,7 +1265,7 @@ static NpcSetupInfo npcEnt[] = {
         0.0f, 0.0f, 0.0f, 0.0f, 0, // searchRange..battleInfoId
     },
     {
-        /*"ガードマン２"*/"\203K\201[\203h\203}\203\223\202Q", // name
+        "ガードマン２", // name
         0x40080600, // flags
         0, // reactionFlags
         init_gard2, // initEvent
@@ -1334,7 +1277,7 @@ static NpcSetupInfo npcEnt[] = {
         0.0f, 0.0f, 0.0f, 0.0f, 0, // searchRange..battleInfoId
     },
     {
-        /*"マダム"*/"\203}\203_\203\200", // name
+        "マダム", // name
         0x40080600, // flags
         0, // reactionFlags
         init_madam, // initEvent
@@ -1346,7 +1289,7 @@ static NpcSetupInfo npcEnt[] = {
         0.0f, 0.0f, 0.0f, 0.0f, 0, // searchRange..battleInfoId
     },
     {
-        /*"レポーター"*/"\203\214\203|\201[\203^\201[", // name
+        "レポーター", // name
         0x40080600, // flags
         0, // reactionFlags
         init_repo, // initEvent
@@ -1358,7 +1301,7 @@ static NpcSetupInfo npcEnt[] = {
         0.0f, 0.0f, 0.0f, 0.0f, 0, // searchRange..battleInfoId
     },
     {
-        /*"カメラマン１"*/"\203J\203\201\203\211\203}\203\223\202P", // name
+        "カメラマン１", // name
         0x40080600, // flags
         0, // reactionFlags
         init_cam1, // initEvent
@@ -1370,7 +1313,7 @@ static NpcSetupInfo npcEnt[] = {
         0.0f, 0.0f, 0.0f, 0.0f, 0, // searchRange..battleInfoId
     },
     {
-        /*"カメラマン２"*/"\203J\203\201\203\211\203}\203\223\202Q", // name
+        "カメラマン２", // name
         0x40080600, // flags
         0, // reactionFlags
         init_cam2, // initEvent
@@ -1382,7 +1325,7 @@ static NpcSetupInfo npcEnt[] = {
         0.0f, 0.0f, 0.0f, 0.0f, 0, // searchRange..battleInfoId
     },
     {
-        /*"キノピオ４"*/"\203L\203m\203s\203I\202S", // name
+        "キノピオ４", // name
         0x40080600, // flags
         0, // reactionFlags
         init_kino4, // initEvent
@@ -1394,7 +1337,7 @@ static NpcSetupInfo npcEnt[] = {
         0.0f, 0.0f, 0.0f, 0.0f, 0, // searchRange..battleInfoId
     },
     {
-        /*"キノピオ５"*/"\203L\203m\203s\203I\202T", // name
+        "キノピオ５", // name
         0x40080600, // flags
         0, // reactionFlags
         init_kino5, // initEvent
@@ -1406,7 +1349,7 @@ static NpcSetupInfo npcEnt[] = {
         0.0f, 0.0f, 0.0f, 0.0f, 0, // searchRange..battleInfoId
     },
     {
-        /*"キノピコ"*/"\203L\203m\203s\203R", // name
+        "キノピコ", // name
         0x40080600, // flags
         0, // reactionFlags
         init_kinopiko, // initEvent
@@ -1418,7 +1361,7 @@ static NpcSetupInfo npcEnt[] = {
         0.0f, 0.0f, 0.0f, 0.0f, 0, // searchRange..battleInfoId
     },
     {
-        /*"バッジ屋"*/"\203o\203b\203W\211\256", // name
+        "バッジ屋", // name
         0x40080600, // flags
         0, // reactionFlags
         init_chu, // initEvent
@@ -1430,7 +1373,7 @@ static NpcSetupInfo npcEnt[] = {
         0.0f, 0.0f, 0.0f, 0.0f, 0, // searchRange..battleInfoId
     },
     {
-        /*"チャンピョン"*/"\203`\203\203\203\223\203s\203\207\203\223", // name
+        "チャンピョン", // name
         0x40080600, // flags
         0, // reactionFlags
         init_champ, // initEvent
@@ -1442,7 +1385,7 @@ static NpcSetupInfo npcEnt[] = {
         0.0f, 0.0f, 0.0f, 0.0f, 0, // searchRange..battleInfoId
     },
     {
-        /*"キノシコワ"*/"\203L\203m\203V\203R\203\217", // name
+        "キノシコワ", // name
         0x40080600, // flags
         0, // reactionFlags
         init_shikowa, // initEvent
@@ -1454,7 +1397,7 @@ static NpcSetupInfo npcEnt[] = {
         0.0f, 0.0f, 0.0f, 0.0f, 0, // searchRange..battleInfoId
     },
     {
-        /*"ウラノコ"*/"\203E\203\211\203m\203R", // name
+        "ウラノコ", // name
         0x40080600, // flags
         0, // reactionFlags
         init_uranoko, // initEvent
@@ -1466,7 +1409,7 @@ static NpcSetupInfo npcEnt[] = {
         0.0f, 0.0f, 0.0f, 0.0f, 0, // searchRange..battleInfoId
     },
     {
-        /*"アイアンＡ"*/"\203A\203C\203A\203\223\202`", // name
+        "アイアンＡ", // name
         0x40080600, // flags
         0, // reactionFlags
         init_ironA, // initEvent
@@ -1478,7 +1421,7 @@ static NpcSetupInfo npcEnt[] = {
         0.0f, 0.0f, 0.0f, 0.0f, 0, // searchRange..battleInfoId
     },
     {
-        /*"アイアンＢ"*/"\203A\203C\203A\203\223\202a", // name
+        "アイアンＢ", // name
         0x40080600, // flags
         0, // reactionFlags
         init_ironB, // initEvent
@@ -1490,7 +1433,7 @@ static NpcSetupInfo npcEnt[] = {
         0.0f, 0.0f, 0.0f, 0.0f, 0, // searchRange..battleInfoId
     },
     {
-        /*"ボロドー"*/"\203{\203\215\203h\201[", // name
+        "ボロドー", // name
         0x40080600, // flags
         0, // reactionFlags
         init_borodo, // initEvent
@@ -1678,7 +1621,7 @@ void ext_fan_init(void) {
             fan->vel = (Vec){0.0f, 0.0f, 0.0f};
         }
     }
-    fan_wp->sfxId = psndSFXOn_3D("SFX_STG3_AUDIENCE_FAN1\0", &(Vec){0.0f, 0.0f, 0.0f});
+    fan_wp->sfxId = psndSFXOn_3D("SFX_STG3_AUDIENCE_FAN1", &(Vec){0.0f, 0.0f, 0.0f});
     fan_wp->vol = psndSFX_get_vol(fan_wp->sfxId);
 }
 
@@ -1693,7 +1636,7 @@ void fan_disp(CameraId camera, void* param) {
 
 #pragma opt_propagation off
 #pragma opt_lifetimes off
-static __declspec(section ".rodata") Vec fan_zero;
+static Vec fan_zero;
 void ext_fan_main(void) {
     MarioWork* mario = marioGetPtr();
     Fan* fan;
@@ -1737,7 +1680,7 @@ void ext_fan_main(void) {
                     pose->flags &= ~1;
                     fan->flags |= 1;
                 } else {
-                    fan->pos = npcNameToPtr("\203`\203\203\203\223\203s\203\207\203\223")->position;
+                    fan->pos = npcNameToPtr("チャンピョン")->position;
                     target = fan->pos;
                     pose->flags &= ~1;
                     fan->flags |= 1;
@@ -2001,8 +1944,8 @@ EVT_BEGIN(evt_momikucha)
     CALL(evt_npc_set_position, STRING(("fan3")), 0, -1000, 0)
     CALL(evt_ext_entry, 200, PTR(ext_fan_data), PTR(ext_fan_init), PTR(ext_fan_main), PTR(ext_fan_dispent))
     IF_INT_EQUAL(GF(10), 0)
-        CALL(evt_npc_set_position, STRING(("\203`\203\203\203\223\203s\203\207\203\223")), 0, 0, 0)
-        CALL(evt_npc_change_interrupt, STRING(("\203`\203\203\203\223\203s\203\207\203\223")), 1, PTR(move_champ))
+        CALL(evt_npc_set_position, STRING(("チャンピョン")), 0, 0, 0)
+        CALL(evt_npc_change_interrupt, STRING(("チャンピョン")), 1, PTR(move_champ))
         ELSE
         SPAWN_EVENT(PTR(mario_momikucha_msg))
     END_IF
@@ -2212,7 +2155,7 @@ static EVT_BEGIN(evt_after_peach)
     CALL(evt_bero_exec_wait, 65536)
     CALL(evt_fade_end_wait)
     WAIT_MS(2000)
-    CALL(evt_msg_print, 0, STRING(("stg3_tou_479_00_01")), 0, STRING(("\203L\203m\203V\203R\203\217")))
+    CALL(evt_msg_print, 0, STRING(("stg3_tou_479_00_01")), 0, STRING(("キノシコワ")))
     WAIT_MS(300)
     CALL(evt_mario_get_pos, 0, LW(0), LW(1), LW(2))
     CALL(evt_snd_sfxon_3d, STRING(("SFX_VOICE_MARIO_NOD1_4")), LW(0), LW(1), LW(2), 0)
@@ -2221,17 +2164,17 @@ static EVT_BEGIN(evt_after_peach)
     CALL(evt_mario_set_pose, STRING(("M_S_1")))
     CALL(evt_cam3d_evt_set, 0, 100, 395, 0, 40, 0, 500, 11)
     WAIT_MS(500)
-    CALL(evt_msg_print, 0, STRING(("stg3_tou_479_00_02")), 0, STRING(("\203L\203m\203V\203R\203\217")))
+    CALL(evt_msg_print, 0, STRING(("stg3_tou_479_00_02")), 0, STRING(("キノシコワ")))
     WAIT_MS(300)
     CALL(evt_cam3d_evt_set, -40, 100, 395, -40, 40, 0, 500, 11)
     WAIT_MS(500)
-    CALL(evt_msg_print, 0, STRING(("stg3_tou_479_00_03")), 0, STRING(("\203`\203\203\203\223\203s\203\207\203\223")))
+    CALL(evt_msg_print, 0, STRING(("stg3_tou_479_00_03")), 0, STRING(("チャンピョン")))
     WAIT_MS(300)
-    CALL(evt_msg_print, 0, STRING(("stg3_tou_479_00_04")), 0, STRING(("\203E\203\211\203m\203R")))
+    CALL(evt_msg_print, 0, STRING(("stg3_tou_479_00_04")), 0, STRING(("ウラノコ")))
     WAIT_MS(300)
     CALL(evt_cam3d_evt_set, 0, 100, 395, 0, 40, 0, 500, 11)
     WAIT_MS(500)
-    CALL(evt_msg_print, 0, STRING(("stg3_tou_479_00_05")), 0, STRING(("\203L\203m\203V\203R\203\217")))
+    CALL(evt_msg_print, 0, STRING(("stg3_tou_479_00_05")), 0, STRING(("キノシコワ")))
     WAIT_MS(300)
     CALL(evt_mario_set_pose, STRING(("M_I_2")))
     WAIT_MS(800)
@@ -2536,7 +2479,7 @@ EVT_BEGIN(tou_02_init_evt)
     END_IF
     CALL(evt_npc_setup, PTR(npcEnt))
     CALL_CHILD(PTR(init_kinopio_f))
-    CALL(evt_npc_change_interrupt, STRING(("\203L\203m\203s\203I\217\227")), 6, PTR(talk_kinopio_f))
+    CALL(evt_npc_change_interrupt, STRING(("キノピオ女")), 6, PTR(talk_kinopio_f))
     CALL(evt_mobj_kururing_floor, STRING(("kururin1")), -260, 0, -120, STRING(("sita")), 125, GSWF(5623))
     IF_INT_LESS(GSW(0), 129)
         SET_VALUE(LW(0), 3)
@@ -2554,8 +2497,8 @@ EVT_BEGIN(tou_02_init_evt)
     END_IF
     IF_INT_EQUAL(GSW(0), 171)
         IF_INT_EQUAL(GSWF(2496), 0)
-            CALL(evt_npc_set_position, STRING(("\203L\203m\203s\203I\217\227")), 0, -1000, 0)
-            CALL(evt_npc_set_position, STRING(("\203L\203m\203s\203I\202S")), 0, -1000, 0)
+            CALL(evt_npc_set_position, STRING(("キノピオ女")), 0, -1000, 0)
+            CALL(evt_npc_set_position, STRING(("キノピオ４")), 0, -1000, 0)
         END_IF
     END_IF
     IF_INT_EQUAL(GSW(0), 171)
@@ -2690,5 +2633,4 @@ EVT_BEGIN(tou_02_init_evt)
     RETURN
 EVT_END()
 #endif
-
 

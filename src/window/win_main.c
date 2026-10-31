@@ -15,6 +15,7 @@
 #include <demo/DEMOPad.h>
 #include <string.h>
 #include <stdarg.h>
+#include "evt/evt_yuugijou.h"
 #ifdef VERSION_G8ME01
 char* strstr(const char* str, const char* sub);
 #endif
@@ -79,8 +80,6 @@ EvtWord evt_diary_read[];
 //.data
 
 //.sbss
-#pragma force_active on
-#pragma force_active reset
 static s32 cnt;
 TEXPalette* winTexTpl;
 static WindowWork* wp;
@@ -97,6 +96,7 @@ static WindowWork* wp;
 #include "pmario_sound.h"
 #include "statuswindow.h"
 #include "data/party_data.h"
+#include "manager/evtmgr_cmd.h"
 s32 winRootMain(WindowWork* wp);
 void winRootDisp(CameraId camId, WindowWork* wp);
 const char* winGetMapTplName(void);
@@ -117,13 +117,9 @@ void winDispKoopa(CameraId camId, void* param);
 void statusWinForceOff(void);
 void allPartyForceSlitOff(void);
 
-#pragma explicit_zero_data on
 WindowWork* winGetPtr(void) {
-    static const volatile u32 gap_09_8041DCCC_sdata2 = 0;
-    (void)&gap_09_8041DCCC_sdata2;
     return wp;
 }
-#pragma explicit_zero_data reset
 
 void winInit(void) {
     wp = __memAlloc(HEAP_DEFAULT, sizeof(WindowWork));
@@ -171,11 +167,12 @@ typedef struct { const char* s[2]; } WinLangTbl;
 #endif
 static const WinLangTbl winLangTbl;
 
-#pragma force_active on
-#pragma explicit_zero_data on
 void winMain(void) {
     MarioWork* mario;
     s32 i;
+#ifdef VERSION_G8MP01
+    WindowPartyDt* list[7];
+#endif
 
     mario = marioGetPtr();
     if (!(wp->flags & 1) && seqGetSeq() == SEQ_GAME && !seqCheckSeq()) {
@@ -306,7 +303,7 @@ void winMain(void) {
                     fileAsyncf(4, 0, "%s/w/%s/%s", getMarioStDvdRoot(), (u32)gp->language == 0 ? "jp" : "us", winGetMapTplName());
 #else
                     const char* name = winGetMapTplName();
-                    fileAsyncf(4, 0, "%s/w/jp/%s\0", getMarioStDvdRoot(), name);
+                    fileAsyncf(4, 0, "%s/w/jp/%s", getMarioStDvdRoot(), name);
 #endif
                 }
                 wp->active = 0;
@@ -407,6 +404,25 @@ void winMain(void) {
                 break;
 
             case 200: {
+#ifdef VERSION_G8MP01
+                s32 partyId;
+                s32 n;
+
+                partyId = !marioBgmodeChk() ? marioGetParty() : marioGetPtr()->prevPartyMemberId[0];
+                n = 0;
+                for (i = 0; i < 7; i++) {
+                    if (partyId == winPartyDt[i].partyId) {
+                        list[n++] = &winPartyDt[i];
+                    }
+                }
+                // PAL lists only the other partners that have joined (flag 1) and are not away (flag 2)
+                for (i = 0; i < 7; i++) {
+                    if (partyId != winPartyDt[i].partyId && (pouchGetPtr()->partyData[winPartyDt[i].partyId].flags & 1) &&
+                        !(pouchGetPtr()->partyData[winPartyDt[i].partyId].flags & 2)) {
+                        list[n++] = &winPartyDt[i];
+                    }
+                }
+#else
 #ifdef VERSION_G8ME01
                 WindowPartyDt* list[11]; /* FAKE */ // US frame is 96 bytes; only 7 entries used
 #else
@@ -430,6 +446,7 @@ void winMain(void) {
                         list[n++] = base;
                     }
                 }
+#endif
                 wp->currentEvent = evtEntryType(evt_item_use, 0, 0, 0);
                 wp->currentEvent->lwData[10] = wp->item.useItem;
                 wp->currentEvent->lwData[11] = wp->item.useTarget == 0 ? 0 : list[wp->item.useTarget - 1]->partyId;
@@ -484,8 +501,6 @@ void winMain(void) {
         }
     }
 }
-#pragma explicit_zero_data reset
-#pragma force_active reset
 
 void winDisp(CameraId camId, void* param) {
     winRootDisp(camId, wp);
@@ -704,21 +719,21 @@ EVT_BEGIN(evt_diary_read)
     CALL(evt_mario_set_pose, STRING("M_L_2"))
     CALL(evt_msg_print, 0, STRING("stg6_rsh_diary_04"), 0, 0)
     CALL(evt_mario_set_pose, STRING("M_S_1"))
-    CALL(evt_npc_check, STRING("\202\344\202\244\202\352\202\242"), LW(0))
+    CALL(evt_npc_check, STRING("ゆうれい"), LW(0))
     IF_INT_EQUAL(LW(0), 0)
-        CALL(evt_npc_entry, STRING("\202\344\202\244\202\352\202\242"), STRING("c_ghost_k"))
-        CALL(evt_npc_set_position, STRING("\202\344\202\244\202\352\202\242"), 0, -1000, 0)
-        CALL(evt_npc_set_tribe, STRING("\202\344\202\244\202\352\202\242"), STRING("\202\344\202\244\202\352\202\242"))
-        CALL(evt_npc_set_anim, STRING("\202\344\202\244\202\352\202\242"), STRING("O_1"))
-        CALL(evt_npc_set_autotalkpose, STRING("\202\344\202\244\202\352\202\242"), STRING("O_2"), STRING("T_2"))
+        CALL(evt_npc_entry, STRING("ゆうれい"), STRING("c_ghost_k"))
+        CALL(evt_npc_set_position, STRING("ゆうれい"), 0, -1000, 0)
+        CALL(evt_npc_set_tribe, STRING("ゆうれい"), STRING("ゆうれい"))
+        CALL(evt_npc_set_anim, STRING("ゆうれい"), STRING("O_1"))
+        CALL(evt_npc_set_autotalkpose, STRING("ゆうれい"), STRING("O_2"), STRING("T_2"))
     END_IF
-    CALL(evt_npc_flag_onoff, 1, STRING("\202\344\202\244\202\352\202\242"), 262176)
+    CALL(evt_npc_flag_onoff, 1, STRING("ゆうれい"), 262176)
     BEGIN_INLINE_EVENT
         LOOP(0)
             CALL(evt_sub_intpl_msec_init, 11, 180, 64, 1000)
             LABEL(1)
             CALL(evt_sub_intpl_msec_get_value)
-            CALL(evt_npc_set_color, STRING("\202\344\202\244\202\352\202\242"), 255, 255, 255, LW(0))
+            CALL(evt_npc_set_color, STRING("ゆうれい"), 255, 255, 255, LW(0))
             WAIT_FRAMES(1)
             IF_INT_EQUAL(LW(1), 1)
                 GOTO(1)
@@ -726,7 +741,7 @@ EVT_BEGIN(evt_diary_read)
             CALL(evt_sub_intpl_msec_init, 11, 64, 180, 1000)
             LABEL(2)
             CALL(evt_sub_intpl_msec_get_value)
-            CALL(evt_npc_set_color, STRING("\202\344\202\244\202\352\202\242"), 255, 255, 255, LW(0))
+            CALL(evt_npc_set_color, STRING("ゆうれい"), 255, 255, 255, LW(0))
             WAIT_FRAMES(1)
             IF_INT_EQUAL(LW(1), 1)
                 GOTO(2)
@@ -737,11 +752,11 @@ EVT_BEGIN(evt_diary_read)
     CALL(evt_mario_get_pos, 0, LW(0), LW(1), LW(2))
     ADD(LW(1), 20)
     ADD(LW(2), 20)
-    CALL(evt_npc_set_position, STRING("\202\344\202\244\202\352\202\242"), LW(0), LW(1), LW(2))
+    CALL(evt_npc_set_position, STRING("ゆうれい"), LW(0), LW(1), LW(2))
     CALL(evt_snd_sfxon_3d, 132773, LW(0), LW(1), LW(2), 0)
     WAIT_MS(200)
     CALL(evt_mario_set_pose, STRING("M_I_O"))
-    CALL(evt_msg_print, 0, STRING("stg6_rsh_diary_05"), 0, STRING("\202\344\202\244\202\352\202\242"))
+    CALL(evt_msg_print, 0, STRING("stg6_rsh_diary_05"), 0, STRING("ゆうれい"))
     WAIT_MS(300)
     CALL(evt_snd_bgmoff, 512)
     BEGIN_INLINE_EVENT
@@ -829,13 +844,13 @@ USER_FUNC(itemUseFunc) {
         case 0:
             statusWinForceOpen();
             if (event->lwData[11] == 0) {
-                ((void (*)(s32))pouchSetHP)(((s32 (*)(void))pouchGetHP)() + item->hp_restored);
-                ((void (*)(s32))pouchSetFP)(((s32 (*)(void))pouchGetFP)() + item->fp_restored);
-                ((void (*)(s32))pouchSetAP)(((s32 (*)(void))pouchGetAP)() + item->sp_restored);
+                ((void (*)(s32))pouchSetHP)(pouchGetHP() + item->hp_restored);
+                ((void (*)(s32))pouchSetFP)(pouchGetFP() + item->fp_restored);
+                ((void (*)(s32))pouchSetAP)(pouchGetAP() + item->sp_restored);
             } else {
-                ((void (*)(s32, s32))pouchSetPartyHP)(event->lwData[11], ((s32 (*)(s32))pouchGetPartyHP)(event->lwData[11]) + item->hp_restored);
-                ((void (*)(s32))pouchSetFP)(((s32 (*)(void))pouchGetFP)() + item->fp_restored);
-                ((void (*)(s32))pouchSetAP)(((s32 (*)(void))pouchGetAP)() + item->sp_restored);
+                ((void (*)(s32, s32))pouchSetPartyHP)(event->lwData[11], pouchGetPartyHP(event->lwData[11]) + item->hp_restored);
+                ((void (*)(s32))pouchSetFP)(pouchGetFP() + item->fp_restored);
+                ((void (*)(s32))pouchSetAP)(pouchGetAP() + item->sp_restored);
             }
             cnt++;
             break;
@@ -1054,6 +1069,42 @@ void winFontSetR(Vec pos, Vec scale, GXColor color, const char* fmt, ...) {
     PSMTXConcat(trans, scl, trans);
     FontDrawColor(color);
     FontDrawStringMtx(trans, buf);
+}
+#endif
+
+#ifdef VERSION_G8MP01
+// PAL: right-aligned like winFontSetR, squeezed horizontally to fit width
+void winFontSetRWidth(Vec pos, Vec scale, GXColor color, f32 width, const char* fmt, ...) {
+    char buf[0x1000];
+    const char* msg;
+    Mtx trans;
+    Mtx scl;
+    va_list args;
+    s32 ref;
+    s32 w;
+
+    if (strstr(fmt, "%")) {
+        va_start(args, fmt);
+        vsprintf(buf, fmt, args);
+        msg = buf;
+    } else {
+        msg = fmt;
+    }
+    if ((u32)gp->language != 0) {
+        ref = scale.x * FontGetMessageWidth("999");
+    } else {
+        ref = scale.x * FontGetMessageWidth("９９９");
+    }
+    w = scale.x * FontGetMessageWidth(msg);
+    if (w > width) {
+        scale.x *= width / w;
+        w = width;
+    }
+    PSMTXTrans(trans, pos.x + (ref - w), pos.y, pos.z);
+    PSMTXScale(scl, scale.x, scale.y, scale.z);
+    PSMTXConcat(trans, scl, trans);
+    FontDrawColor(color);
+    FontDrawStringMtx(trans, msg);
 }
 #endif
 
@@ -1514,13 +1565,8 @@ BOOL winLectureCheck(void) {
     return FALSE;
 }
 
-#pragma force_active on
-#ifndef VERSION_G8ME01
-__declspec(section ".data") u32 gap_05_8037631C_data[1] = {0};
-#endif
 
 const volatile f32 float_0p5_8041dc98 __attribute__((aligned(8))) = 0.5f;
-#pragma force_active reset
 
 void winMainStrippedPool(f32* f, s32 i) {
     *f = (f32)i;

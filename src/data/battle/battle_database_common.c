@@ -125,6 +125,18 @@ ItemDropData battle_item_champion[1];
 ItemDropData battle_item_kanbu1[1];
 ItemDropData battle_item_zonbaba[1];
 ItemDropData battle_item_default_param_list[1];
+#ifdef VERSION_G8MP01
+ItemDropData battle_item_test_killer_cannon[1];
+ItemDropData battle_item_test_yami_pata[1];
+ItemDropData battle_item_test_yami_noko[1];
+ItemDropData battle_item_test_yami_kuriboo[1];
+ItemDropData battle_item_test_togekuri[1];
+ItemDropData battle_item_test_patakuri[1];
+ItemDropData battle_item_test_hyper_kuriboo[1];
+ItemDropData battle_item_test_hyper_togekuri[1];
+ItemDropData battle_item_test_hyper_patakuri[1];
+ItemDropData battle_item_test_kuriboo[1];
+#endif
 
 ItemDropData battle_item_gundan_zako[] = {
     {0, 200, 300},
@@ -1476,4 +1488,47 @@ ItemDropData battle_item_zonbaba[] = {
 ItemDropData battle_item_default_param_list[] = {
     {0},
 };
+
+#ifdef VERSION_G8MP01
+// PAL only: empty drop tables of the tst.rel test battles (BTLNO_TEST_*); killer_cannon is shared by both cannons
+ItemDropData battle_item_test_killer_cannon[] = {
+    {0},
+};
+
+ItemDropData battle_item_test_yami_pata[] = {
+    {0},
+};
+
+ItemDropData battle_item_test_yami_noko[] = {
+    {0},
+};
+
+ItemDropData battle_item_test_yami_kuriboo[] = {
+    {0},
+};
+
+ItemDropData battle_item_test_togekuri[] = {
+    {0},
+};
+
+ItemDropData battle_item_test_patakuri[] = {
+    {0},
+};
+
+ItemDropData battle_item_test_hyper_kuriboo[] = {
+    {0},
+};
+
+ItemDropData battle_item_test_hyper_togekuri[] = {
+    {0},
+};
+
+ItemDropData battle_item_test_hyper_patakuri[] = {
+    {0},
+};
+
+ItemDropData battle_item_test_kuriboo[] = {
+    {0},
+};
+#endif
 

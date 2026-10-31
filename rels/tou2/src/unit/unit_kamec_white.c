@@ -2,7 +2,6 @@
 #include "eff/eff_magic1_n64.h"
 #include "evt/evt_cmd.h"
 
-#pragma force_active on
 #include "battle/battle.h"
 #include "battle/battle_unit.h"
 #include "battle/battle_sub.h"
@@ -17,7 +16,7 @@
 #include "party/party_motion.h"
 #include "battle/battle_database_common.h"
 
-EffectEntry* effMagic1N64Entry(s32 type, s32 arg1, f32 x, f32 y, f32 z, f32 arg5, f32 arg6, f32 arg7);
+EffectEntry* effMagic1N64Entry(s32 type, s32 life, f32 x, f32 y, f32 z, f32 tx, f32 ty, f32 tz);
 EffectEntry* effPokopiPchargeN64Entry(s32 type, f32 x, f32 y, f32 z, f32 scale, s32 lifetime);
 EffectEntry* effThunderflareN64Entry(s32 type, f32 x, f32 y, f32 z, f32 scale, s32 lifetime);
 
@@ -85,20 +84,6 @@ static USER_FUNC(eff_staff2);
 static USER_FUNC(eff_staff1);
 static USER_FUNC(kamec_shuffle);
 
-f32 fd_kamec_white_negone_one_374[2] __attribute__((aligned(8)));
-f32 fd_kamec_white_neg_one_382;
-f32 fd_kamec_white___local_PI_383;
-f32 fd_kamec_white___local_3PIO2_385;
-f32 fd_kamec_white_one_negone_373[2] __attribute__((aligned(8)));
-f32 fd_kamec_white___local_PIO2_384;
-f32 fd_kamec_white_one_381;
-f32 fd_kamec_white_negone_one_360[2] __attribute__((aligned(8)));
-f32 fd_kamec_white_neg_one_365;
-f32 fd_kamec_white___local_PI_366;
-f32 fd_kamec_white___local_3PIO2_368;
-f32 fd_kamec_white_one_negone_359[2] __attribute__((aligned(8)));
-f32 fd_kamec_white___local_PIO2_367;
-f32 fd_kamec_white_one_364;
 BattleUnitKind unit_kamec_white;
 BattleUnitKind unit_kamec_white_bunsin;
 static BattleUnitDefense defence;
@@ -122,28 +107,18 @@ static BattleWeapon weapon_kamec_all_recover_magic;
 static BattleUnitSetup entry_kamec;
 static EvtWord init_event[22];
 static EvtWord init_event2[87];
-static EvtWord alpha_down_event[58];
-static EvtWord alpha_up_event[58];
 static EvtWord damage_event[66];
 static EvtWord kamec_subset_bunsin_all_kill[68];
 static EvtWord kamec_subset_dead_event[203];
 static EvtWord kamec_subset_blow_dead_event[78];
 static EvtWord avoid_miss_event[16];
 static EvtWord bunsin_kill_event[37];
-static EvtWord phase_event[2];
 static EvtWord dmg_fall_event[159];
 static EvtWord dmg_first_attack_pos[19];
 static EvtWord attack_event[296];
-static EvtWord ground_magic_common_event1[305];
-static EvtWord ground_magic_common_event2[61];
-static EvtWord sky_magic_common_event[258];
-static EvtWord magic_common_event1[27];
-static EvtWord magic_common_event2[16];
-static EvtWord start_avoid[26];
 static EvtWord attack_magic_event[325];
 static EvtWord attack_magic_event_sub_no_hit[45];
 static EvtWord attack_magic_event_sub_hit[30];
-static EvtWord support_magic_event[140];
 static EvtWord dekadeka_magic_event[7];
 static EvtWord katikati_magic_event[7];
 static EvtWord biribiri_magic_event[7];
@@ -162,34 +137,6 @@ static USER_FUNC(eff_magic_get_posX) {
     evtSetFloat(event, args[1], ((EffMagic1N64Work*)((EffectEntry*)unit->work[5])->userdata)->offset.x);
     return EVT_RETURN_DONE;
 }
-
-f32 fd_kamec_white_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
-
-f32 fd_kamec_white_neg_one_382 = -1.0f;
-
-f32 fd_kamec_white___local_PI_383 = 3.1415927f;
-
-f32 fd_kamec_white___local_3PIO2_385 = 4.712389f;
-
-f32 fd_kamec_white_one_negone_373[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
-
-f32 fd_kamec_white___local_PIO2_384 = 1.5707964f;
-
-f32 fd_kamec_white_one_381 = 1.0f;
-
-f32 fd_kamec_white_negone_one_360[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
-
-f32 fd_kamec_white_neg_one_365 = -1.0f;
-
-f32 fd_kamec_white___local_PI_366 = 3.1415927f;
-
-f32 fd_kamec_white___local_3PIO2_368 = 4.712389f;
-
-f32 fd_kamec_white_one_negone_359[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
-
-f32 fd_kamec_white___local_PIO2_367 = 1.5707964f;
-
-f32 fd_kamec_white_one_364 = 1.0f;
 
 BattleUnitKind unit_kamec_white = {
     51,

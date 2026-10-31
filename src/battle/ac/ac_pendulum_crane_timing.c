@@ -15,7 +15,7 @@ f32 sinfd(f32 degrees);
 #include "icon_ids.h"
 
 typedef struct PendulumParams {
-    u8 field_0x0[0x3C - 0x0];
+    u8 header[0x3C - 0x0]; // 0x0, BattleActions header up to params[1]
     s32 unitId;    // 0x3C
     s32 partsId;   // 0x40
     s32 rotOffset; // 0x44
@@ -28,8 +28,8 @@ typedef struct PendulumWork {
     s32 frame;    // 0x4
     Vec basePos;  // 0x8
     Vec pos;      // 0x14
-    f32 unk20;    // 0x20
-    s32 unk24;    // 0x24
+    f32 speed;    // 0x20, set to 0.5 at start, never read (crane timing layout)
+    s32 delay;    // 0x24, never used (crane timing layout)
     f32 force;    // 0x28
     f32 angle;    // 0x2C
     f32 ang360;   // 0x30
@@ -110,7 +110,7 @@ s32 battleAcMain_PendulumCraneTiming(BattleWork* work) {
             BtlUnit_GetPos(unit, &cw->pos.x, &cw->pos.y, &cw->pos.z);
             cw->basePos = cw->pos;
             cw->frame = 0;
-            cw->unk20 = 0.5f;
+            cw->speed = 0.5f;
             cw->flag = 1;
             work->actionCommands.mAcState = 1000;
         case 1000:
@@ -250,7 +250,6 @@ void battleAcDelete_PendulumCraneTiming(BattleWork* work) {
     work->actionCommands.mAcState = 1002;
 }
 
-#pragma dont_inline on
 static void actionCommandDisp(f32 x, f32 y) {
     BattleWork* work = _battleWorkPointer;
     CameraEntry* cam;
@@ -284,7 +283,6 @@ static void actionCommandDisp(f32 x, f32 y) {
         iconDispGx(&pos2, 0x10, ICON_096, 1.0f);
     }
 }
-#pragma dont_inline reset
 
 s32 _get_angle_rate(f32 angle) {
     s32 r;

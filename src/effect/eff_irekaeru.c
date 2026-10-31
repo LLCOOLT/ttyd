@@ -17,7 +17,7 @@ typedef struct EffIrekaeruWork {
     f32 scale;      // 0x10
     s32 poseId;     // 0x14
     s32 state;      // 0x18
-    s32 field_0x1C; // 0x1C
+    s32 timer;      // 0x1C, only cleared at entry
     s32 alpha;      // 0x20
 } EffIrekaeruWork;
 
@@ -26,7 +26,7 @@ EffectEntry* effIrekaeruEntry(s32 type, f32 x, f32 y, f32 z) {
     EffIrekaeruWork* work;
 
     effect = effEntry();
-    effect->type = "Irekaeru\0\0\0";
+    effect->type = "Irekaeru";
     effect->count = 1;
     work = __memAlloc(HEAP_EFFECT, sizeof(EffIrekaeruWork) * effect->count);
     effect->userdata = work;
@@ -39,7 +39,7 @@ EffectEntry* effIrekaeruEntry(s32 type, f32 x, f32 y, f32 z) {
     work->scale = 1.0f;
     work->poseId = -1;
     work->state = 0;
-    work->field_0x1C = 0;
+    work->timer = 0;
     work->alpha = 0;
     return effect;
 }

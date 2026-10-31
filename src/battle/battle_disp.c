@@ -344,6 +344,7 @@ void btlDispMain(void) {
 	BattleUnit* partner;
 	f32 h;
 	f32 scale;
+	f64 dist;
 	Vec tpos;
 	s32 xlu;
 	Vec pos;
@@ -374,16 +375,15 @@ void btlDispMain(void) {
 				h = BattleGetFloorHeight(wp, tpos.x, tpos.y, tpos.z);
 				switch (unit->work[2]) {
 					case 2:
-						// FAKE: double temp for the fabs result (register order of the diff/fabs webs)
-						{ f64 a = __fabs(pos.x - tpos.x);
-						if (a > 10.0) {
+						dist = __fabs(pos.x - tpos.x);
+						if (dist > 10.0) {
 							if (tpos.x > pos.x) {
 								pos.x = pos.x + ((tpos.x - pos.x) - 10.0f);
 							}
 							else {
 								pos.x = pos.x - ((pos.x - tpos.x) - 10.0f);
 							}
-						} }
+						}
 						BtlUnit_SetPos(unit, pos.x, tpos.y, tpos.z);
 						break;
 					case 3:

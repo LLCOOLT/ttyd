@@ -2,7 +2,6 @@
 #include "eff/eff_fire.h"
 #include "evt/evt_cmd.h"
 
-#pragma force_active on
 #include "battle/battle.h"
 #include "battle/battle_sub.h"
 #include "battle/battle_unit.h"
@@ -14,6 +13,7 @@
 #include "battle/battle_weapon_power.h"
 #include "evt/evt_eff.h"
 #include "battle/battle_database_common.h"
+#include "manager/evtmgr_cmd.h"
 
 static EffectEntry* eff;
 static EffectEntry* eff2[10];
@@ -38,20 +38,6 @@ USER_FUNC(evt_sub_random);
 static USER_FUNC(eff_fire);
 static USER_FUNC(bubble_copy_status);
 
-f32 fd_phantom_negone_one_374[2] __attribute__((aligned(8)));
-f32 fd_phantom_neg_one_382;
-f32 fd_phantom___local_PI_383;
-f32 fd_phantom___local_3PIO2_385;
-f32 fd_phantom_one_negone_373[2] __attribute__((aligned(8)));
-f32 fd_phantom___local_PIO2_384;
-f32 fd_phantom_one_381;
-f32 fd_phantom_negone_one_360[2] __attribute__((aligned(8)));
-f32 fd_phantom_neg_one_365;
-f32 fd_phantom___local_PI_366;
-f32 fd_phantom___local_3PIO2_368;
-f32 fd_phantom_one_negone_359[2] __attribute__((aligned(8)));
-f32 fd_phantom___local_PIO2_367;
-f32 fd_phantom_one_364;
 BattleUnitKind unit_phantom;
 static BattleUnitDefense defence;
 static BattleUnitDefenseAttr defence_attr;
@@ -70,8 +56,6 @@ static EvtWord friend_event[99];
 static EvtWord attack_event[51];
 static EvtWord normal_attack_event[412];
 static EvtWord fire_attack_event[365];
-static EvtWord all_fire_attackEvent_sub[10];
-static EvtWord all_fire_attack_event[321];
 static EvtWord wait_event[6];
 
 static USER_FUNC(bubble_copy_status) {
@@ -93,34 +77,6 @@ static USER_FUNC(bubble_copy_status) {
     unit2->hpGauge.barRatio = unit2->hpGauge.trailRatio = (f32)unit2->currentHp / unit2->maxHp;
     return EVT_RETURN_DONE;
 }
-
-f32 fd_phantom_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
-
-f32 fd_phantom_neg_one_382 = -1.0f;
-
-f32 fd_phantom___local_PI_383 = 3.1415927f;
-
-f32 fd_phantom___local_3PIO2_385 = 4.712389f;
-
-f32 fd_phantom_one_negone_373[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
-
-f32 fd_phantom___local_PIO2_384 = 1.5707964f;
-
-f32 fd_phantom_one_381 = 1.0f;
-
-f32 fd_phantom_negone_one_360[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
-
-f32 fd_phantom_neg_one_365 = -1.0f;
-
-f32 fd_phantom___local_PI_366 = 3.1415927f;
-
-f32 fd_phantom___local_3PIO2_368 = 4.712389f;
-
-f32 fd_phantom_one_negone_359[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
-
-f32 fd_phantom___local_PIO2_367 = 1.5707964f;
-
-f32 fd_phantom_one_364 = 1.0f;
 
 BattleUnitKind unit_phantom = {
     124,

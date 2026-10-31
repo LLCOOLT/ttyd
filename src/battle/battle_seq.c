@@ -27,6 +27,8 @@
 #include "battle/battle_event_cmd.h"
 #include "unit/party/unit_party_nokotarou.h"
 #include "unit/party/unit_party_sanders.h"
+#include "manager/evtmgr_cmd.h"
+#include "driver/fadedrv.h"
 
 
 #define STAGE_WORK(wp) (&(wp)->stageObjectWork)
@@ -44,7 +46,7 @@ void BattleStatusWindowSystemOn(void);
 void BattleStatusWindowSystemOff(void);
 void BattleStatusWindowEventOff(void);
 void BattleCommandInit(BattleWork* wp);
-BOOL BattleCommandInput(BattleWork* wp);
+BOOL BattleCommandInput(void* work);
 f32 battleCameraGetPosMoveSpeed(void);
 void BattleStatusChangeMsgAdjust(BattleWork* wp);
 BOOL BattleStatusChangeMsgMain(BattleWork* wp);
@@ -103,30 +105,6 @@ void btlseqTurn(BattleWork* wp);
 void btlseqEnd(BattleWork* wp);
 
 // static data from an inlined header function (see unit_party_sanders.c)
-__declspec(section ".data") f32 battle_seq_negone_one_a[] = {
-	-1.0f, 1.0f,
-};
-static __declspec(section ".data") f32 seq_negone_one_374[] = {
-	-1.0f, 1.0f,
-};
-__declspec(section ".data") f32 battle_seq_one_negone_a[] = {
-	1.0f, -1.0f,
-};
-static __declspec(section ".data") f32 seq_one_negone_373[] = {
-	1.0f, -1.0f,
-};
-__declspec(section ".data") f32 battle_seq_negone_one_b[] = {
-	-1.0f, 1.0f,
-};
-static __declspec(section ".data") f32 seq_negone_one_360[] = {
-	-1.0f, 1.0f,
-};
-__declspec(section ".data") f32 battle_seq_one_negone_b[] = {
-	1.0f, -1.0f,
-};
-static __declspec(section ".data") f32 seq_one_negone_359[] = {
-	1.0f, -1.0f,
-};
 
 const BattleWeapon N_weapon_lucky_start = {
     NULL, 0, // name..icon
@@ -294,7 +272,7 @@ void BattleCheckAllPinchStatus(BattleWork* wp, BOOL a2) { //1:1, needs stmw forc
 			if (wp->alertTick <= 0) {
 				wp->alertTick = 60;
 				if (wp->commandMenu.flags & 1) {
-					psndSFXOn("SFX_BTL_PINCH1\0");
+					psndSFXOn("SFX_BTL_PINCH1");
 				}
 			}
 		}
@@ -499,7 +477,7 @@ void btlseqFirstAct(BattleWork* wp) {
 			{
 				fadeEntry(0x17, 200, c);
 			}
-			wp->curtainSfxId = ((s32 (*)(const char*))psndSFXOn)("SFX_OFF_BTL_START_CURTAIN_UP1");
+			wp->curtainSfxId = psndSFXOn("SFX_OFF_BTL_START_CURTAIN_UP1");
 			BattleSetSeq(wp, SEQ_FIRST_ACT, 0x2000002);
 
 		case 0x2000002:
@@ -2936,6 +2914,16 @@ BOOL BattleWaitAllActiveEvtEnd_NoBgSetEndWait(BattleWork* wp) {
 				unit->entryEventId = 0;
 				break;
 			}
+#ifdef VERSION_G8MP01
+			while (unit->slideReturnEventId) {
+				if (evtCheckID(unit->slideReturnEventId)) {
+					done = FALSE;
+					break;
+				}
+				unit->slideReturnEventId = 0;
+				break;
+			}
+#endif
 		}
 	}
 	if (!done) {

@@ -21,10 +21,10 @@ typedef struct EffFireworksN64Work {
     s32 g;           // 0x28
     s32 b;           // 0x2c
     s32 alpha;       // 0x30
-    s32 unk34;       // 0x34
-    s32 unk38;       // 0x38
-    s32 unk3C;       // 0x3c
-    s32 unk40;       // 0x40
+    s32 r2;          // 0x34, second color, set at entry; never read
+    s32 g2;          // 0x38
+    s32 b2;          // 0x3c
+    s32 alpha2;      // 0x40
     f32 scale;       // 0x44
     f32 scaleTarget; // 0x48
     s32 state;       // 0x4c
@@ -36,7 +36,7 @@ typedef struct EffFireworksN64Work {
     f32 vz[4];       // 0xa0
 } EffFireworksN64Work;
 
-static s8 vtx[288] = {
+static s8 vtx[285] = {
     36, 0, 93, 54, -40, 74, 67, 0, 74, 82, -36, 45, 89, 0, 45, 60, -66, 45, 21, -64, 74, 28, -85, 45,
     10, -98, 15, 49, -86, 15, -90, -40, 15, -87, -19, 45, -99, 0, 15, -72, -53, 45, -87, 19, 45, -90, 40, 15,
     -66, 73, 15, -72, 53, 45, -45, 77, 45, -31, 94, 15, -9, 89, 45, -72, 53, 45, 11, -34, 93, 0, 0, 100,
@@ -48,9 +48,9 @@ static s8 vtx[288] = {
     -54, -40, 74, -29, 21, 93, 0, 0, 100, 60, -66, 45, 82, -36, 45, 89, 0, 45, 28, -85, 45, 28, -85, 45,
     -9, -89, 45, -45, -77, 45, -72, -53, 45, 60, 66, 45, 28, 85, 45, 82, 36, 45, 28, 85, 45, 89, 0, 45,
     -9, 89, 45, -45, 77, 45, -72, 53, 45, 49, 86, 15, 10, 98, 15, 82, 36, 45, 97, -21, 15, 97, 21, 15,
-    60, 66, 45, 28, 85, 45, -87, 19, 45, -66, 73, 15, -90, 40, 15, -87, -19, 45, -72, -53, 45, 0, 0, 0};
+    60, 66, 45, 28, 85, 45, -87, 19, 45, -66, 73, 15, -90, 40, 15, -87, -19, 45, -72, -53, 45};
 
-static s8 vtx2[200] = {
+static s8 vtx2[198] = {
     -48, -15, 0, -36, -26, 22, -45, 0, 22, -48, 15, 0, -36, 26, 22, -29, 40, 0, -36, 26, 22, -14, 43, 22,
     0, 50, 0, 14, 43, 22, 8, -25, 43, 14, -43, 22, 36, -26, 22, 26, 0, 43, 0, 0, 50, 0, -50, 0,
     29, -40, 0, 45, 0, 22, 29, -40, 0, 36, -26, 22, 14, -43, 22, 48, -15, 0, 45, 0, 22, 0, -50, 0,
@@ -59,7 +59,7 @@ static s8 vtx2[200] = {
     8, 25, 43, -21, -15, 43, 0, 0, 50, -36, -26, 22, 8, -25, 43, 0, 0, 50, -21, 15, 43, -21, -15, 43,
     -36, 26, 22, -14, 43, 22, -36, 26, 22, 29, 40, 0, 0, 50, 0, 36, 26, 22, 48, -15, 0, 48, 15, 0,
     14, 43, 22, -14, -43, 22, -48, -15, 0, -29, -40, 0, 14, -43, 22, -45, 0, 22, -36, -26, 22, -29, 40, 0,
-    -48, 15, 0, 0, 0, 0, 0, 0};
+    -48, 15, 0, 0, 0, 0};
 
 static s8 vtx3[168] = {
     -9, 105, 0, -17, 87, 0, 17, 87, 0, 9, 105, 0, 0, 122, 0, -26, 69, 0, 26, 69, 0, -35, 52, 0,
@@ -84,7 +84,7 @@ EffectEntry* effFireworksN64Entry(s32 type, s32 lifetime, f32 x, f32 y, f32 z, f
     EffFireworksN64Work* work;
 
     effect = effEntry();
-    effect->type = "FireworksN64\0\0\0";
+    effect->type = "FireworksN64";
     effect->count = 1;
     work = __memAlloc(HEAP_EFFECT, sizeof(EffFireworksN64Work));
     effect->userdata = work;
@@ -109,10 +109,10 @@ EffectEntry* effFireworksN64Entry(s32 type, s32 lifetime, f32 x, f32 y, f32 z, f
     work->r = 255;
     work->g = 255;
     work->b = 100;
-    work->unk34 = 255;
-    work->unk38 = 100;
-    work->unk3C = 150;
-    work->unk40 = 255;
+    work->r2 = 255;
+    work->g2 = 100;
+    work->b2 = 150;
+    work->alpha2 = 255;
     work->px[0] = work->position.x;
     work->py[0] = work->position.y - 1000.0f;
     work->pz[0] = work->position.z;
@@ -140,8 +140,6 @@ EffectEntry* effFireworksN64Entry(s32 type, s32 lifetime, f32 x, f32 y, f32 z, f
     return effect;
 }
 
-#pragma push
-#pragma opt_unroll_instr_count 16
 void effFireworksMain(EffectEntry* effect) {
     EffFireworksN64Work* work = effect->userdata;
     Vec position2;
@@ -207,7 +205,6 @@ void effFireworksMain(EffectEntry* effect) {
     }
     dispEntry(CAMERA_3D, dispCalcZ(&position2), 2, (DispCallback)effFireworksDisp, effect);
 }
-#pragma pop
 
 void effFireworksDisp(CameraId cameraId, EffectEntry* effect) {
     static s32 salpha;

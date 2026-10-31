@@ -11,8 +11,8 @@
 #include "win/win_main.h"
 #include <dolphin/mtx.h>
 #include <string.h>
+#include "pmario_sound.h"
 
-void psndSFXOn(s32 id);
 s32 psndSFXOn_3D(const char* name, Vec* position);
 void statusWinForceUpdateCoin(void);
 void nameEntOff(void);
@@ -189,7 +189,7 @@ static void oneMessageDisp(WinMgrEntry* entry) {
 	if (winMgrAction(w->id) == 0) {
 		switch (w->type) {
 		case 0:
-			msg = msgSearch("msg_you_gotta_mail\0");
+			msg = msgSearch("msg_you_gotta_mail");
 			break;
 		}
 		FontDrawStart();
@@ -254,7 +254,7 @@ USER_FUNC(evt_win_one_message) {
 static void coin_disp(WinMgrEntry* entry) {
 	CoinWin* w;
 	s32 target;
-	s16 icon;
+	u16 icon;
 	Mtx pos;
 	Mtx scale;
 	s32 diff;
@@ -301,7 +301,7 @@ static void coin_disp(WinMgrEntry* entry) {
 		w->timer++;
 		w->timer = w->timer % 1200;
 		if (coinwin_se_wait == 0) {
-			psndSFXOn(0x2005B);
+			psndSFXOn(SFX_NAME_WORD(0x2005B));
 			coinwin_se_wait = 7;
 		}
 	}

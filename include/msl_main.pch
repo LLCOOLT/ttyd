@@ -1,0 +1,4 @@
+/* Precompiled header of the main.dol game units: the MSL math headers, compiled once and loaded before each unit. */
+#include <math.h>
+#define DTRIGF_WITH_INITIAL_VALUES
+#include <dtrigf.h>

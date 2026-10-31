@@ -39,7 +39,7 @@ static BattleUnitKindPart parts[1];
 static EvtWord init_event[70];
 static EvtWord phase_event[67];
 static EvtWord wait_event[57];
-EvtWord end_battle_evt[19];
+extern EvtWord end_battle_evt[];
 static EvtWord explosion_event[173];
 static BattleDataEntry data_table[4];
 static EvtWord damage_event[10];
@@ -257,7 +257,7 @@ static EVT_BEGIN(explosion_event)
     END_IF
     CALL(btlevtcmd_GetPos, -2, LW(0), LW(1), LW(2))
     CALL(evt_eff, STRING(""), STRING("hibashira"), 2, LW(0), LW(1), LW(2), LW(0), LW(1), LW(2), 1, FLOAT(1.0f), 60, 0, 0)
-    CALL(btlevtcmd_snd_se, -2, STRING("SFX_BTL_THUNDERS_BOMB2\0"), -250000000, 0, -250000000)
+    CALL(btlevtcmd_snd_se, -2, STRING("SFX_BTL_THUNDERS_BOMB2"), -250000000, 0, -250000000)
     CALL(btlevtcmd_StageDispellFog)
     CALL(btlevtcmd_OnAttribute, -2, 16777216)
     CALL(btlevtcmd_OnPartsAttribute, -2, 1, 50331648)

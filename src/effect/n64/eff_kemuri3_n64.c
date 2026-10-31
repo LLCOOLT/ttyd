@@ -12,7 +12,7 @@ double cos(double x);
 
 typedef struct EffKemuri3N64Work {
     BOOL active;      // 0x0
-    s16 field_0x4;    // 0x4
+    s16 type;         // 0x4, never read or written
     s16 timer;        // 0x6
     u8 alpha;         // 0x8
     u8 pad_9[3];      // 0x9
@@ -21,13 +21,13 @@ typedef struct EffKemuri3N64Work {
     Vec rotation;     // 0x24
     Mtx mtx;          // 0x30
     f32 speed;        // 0x60
-    f32 field_0x64;   // 0x64
-    f32 field_0x68;   // 0x68
-    f32 field_0x6C;   // 0x6C
-    f32 field_0x70;   // 0x70
-    f32 field_0x74;   // 0x74
-    f32 field_0x78;   // 0x78
-    f32 field_0x7C;   // 0x7C
+    f32 accel;        // 0x64, horizontal accel terms are set but never applied
+    f32 accelStep;    // 0x68
+    f32 accelStep2;   // 0x6C
+    f32 velY;         // 0x70
+    f32 accelY;       // 0x74
+    f32 accelStepY;   // 0x78
+    f32 accelStep2Y;  // 0x7C
     f32 sinAngle;     // 0x80
     f32 cosAngle;     // 0x84
 } EffKemuri3N64Work;
@@ -53,9 +53,9 @@ EffectEntry* effKemuri3N64Entry(f32 x, f32 y, f32 z, f32 angle) {
     effect->callback = effKemuri3Main;
     for (i = 0, ofs = 0; i < 5; i++, ofs += 72, work++) {
         work->active = TRUE;
-        work->field_0x64 = 0.29999998f;
-        work->field_0x68 = 0.0f;
-        work->field_0x6C = 0.0f;
+        work->accel = 0.29999998f;
+        work->accelStep = 0.0f;
+        work->accelStep2 = 0.0f;
         work->position.x = x;
         work->position.y = y;
         work->position.z = z;
@@ -67,10 +67,10 @@ EffectEntry* effKemuri3N64Entry(f32 x, f32 y, f32 z, f32 angle) {
         work->rotation.x = 0.0f;
         work->rotation.y = angle + (f32)ofs;
         work->rotation.z = 0.0f;
-        work->field_0x70 = 1.75f;
-        work->field_0x74 = -0.08f;
-        work->field_0x78 = 0.0f;
-        work->field_0x7C = 0.0f;
+        work->velY = 1.75f;
+        work->accelY = -0.08f;
+        work->accelStepY = 0.0f;
+        work->accelStep2Y = 0.0f;
         work->speed = -3.9f;
         rad = reviseAngle(work->rotation.y);
         t = 6.2831855f * rad;
@@ -112,12 +112,12 @@ void effKemuri3Main(EffectEntry* effect) {
         work->speed *= 0.85f;
         work->position.x += work->speed * work->sinAngle;
         work->position.z += work->speed * work->cosAngle;
-        work->field_0x78 += work->field_0x7C;
-        work->field_0x74 += work->field_0x78;
-        work->field_0x70 += work->field_0x74;
-        work->position.y += work->field_0x70;
-        if (work->field_0x70 < 0.0f) {
-            work->field_0x78 = 0.004f;
+        work->accelStepY += work->accelStep2Y;
+        work->accelY += work->accelStepY;
+        work->velY += work->accelY;
+        work->position.y += work->velY;
+        if (work->velY < 0.0f) {
+            work->accelStepY = 0.004f;
         }
         work->rotation.x -= 1.0f;
         if (work->rotation.x < -100.0f) {

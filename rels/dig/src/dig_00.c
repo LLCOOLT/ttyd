@@ -2,7 +2,6 @@
 #include "evt/evt_cmd.h"
 #include "manager/evtmgr_cmd.h"
 
-#pragma force_active on
 #include "seq/seq_demo.h"
 #include "memory.h"
 #include "manager/fontmgr.h"
@@ -13,6 +12,9 @@
 #include "driver/npcdrv.h"
 #include "evt/evt_npc.h"
 #include "stdlib.h"
+#ifdef VERSION_G8MP01
+#include "system.h"
+#endif
 
 void FontDrawString(f32 x, f32 y, const char* str);
 void movie_draw(CameraId camera, void* param);
@@ -61,30 +63,16 @@ void movie_draw(CameraId camera, void* param);
 void dig_thpStop(void);
 void dig_thpInit(void);
 
-f32 fd_dig_00_negone_one_374[2] __attribute__((aligned(8)));
-f32 fd_dig_00_neg_one_382;
-f32 fd_dig_00___local_PI_383;
-f32 fd_dig_00___local_3PIO2_385;
-f32 fd_dig_00_one_negone_373[2] __attribute__((aligned(8)));
-f32 fd_dig_00___local_PIO2_384;
-f32 fd_dig_00_one_381;
-f32 fd_dig_00_negone_one_360[2] __attribute__((aligned(8)));
-f32 fd_dig_00_neg_one_365;
-f32 fd_dig_00___local_PI_366;
-f32 fd_dig_00___local_3PIO2_368;
-f32 fd_dig_00_one_negone_359[2] __attribute__((aligned(8)));
-f32 fd_dig_00___local_PIO2_367;
-f32 fd_dig_00_one_364;
 static s32* wp[1];
 static DigAnim anim_tbl[48];
-EvtWord evt_action_1_2[154];
-EvtWord evt_action_1[7];
-EvtWord evt_action_2[7];
-EvtWord evt_action_jump[42];
-EvtWord evt_action_fall[45];
-EvtWord evt_action_walk[57];
-EvtWord evt_action[111];
-EvtWord dig_00_init_evt[107];
+extern EvtWord evt_action_1_2[];
+extern EvtWord evt_action_1[];
+extern EvtWord evt_action_2[];
+extern EvtWord evt_action_jump[];
+extern EvtWord evt_action_fall[];
+extern EvtWord evt_action_walk[];
+extern EvtWord evt_action[];
+extern EvtWord dig_00_init_evt[];
 
 void dig_thpInit(void) {
     u32 type;
@@ -121,7 +109,7 @@ void movie_draw(CameraId camera, void* param) {
 
     EXIGetType(0, 2, &type);
     if (type == 0x05070000) {
-        msg = "\202\261\202\261\202\311\203\200\201[\203r\201[\202\252\202\310\202\252\202\352\202\334\202\267";
+        msg = "ここにムービーがながれます";
         FontDrawStart();
         FontDrawColor((GXColor){0xFF, 0xFF, 0xFF, 0xFF});
         FontDrawString(-FontGetMessageWidth(msg) / 2, 0.0f, msg);
@@ -129,7 +117,11 @@ void movie_draw(CameraId camera, void* param) {
     } else {
         width = gp->fbWidth;
         height = gp->efbHeight;
-        if (THPSimpleDecode(0) != 1) {
+        if (THPSimpleDecode(0) == 1) {
+#ifdef VERSION_G8MP01
+            sysDebugReport("dig_00.c", 130, /*"THP Video Decode 失敗\n"*/"THP Video Decode \x8E\xB8\x94\x73\n");
+#endif
+        } else {
             *DIG_WP = THPSimpleDrawCurrentFrame(DEMOGetRenderModeObj(), 0, 0, width, height);
         }
     }
@@ -207,7 +199,7 @@ USER_FUNC(evt_action_sub) {
         evtSetValue(event, *args++, (EvtWord)name);
     } else {
         evtSetValue(event, *args++, (EvtWord)"a_mario");
-        evtSetValue(event, *args++, (EvtWord)"\202\311\202\271\203}\203\212\203I\202Q");
+        evtSetValue(event, *args++, (EvtWord)"にせマリオ２");
     }
     evtSetValue(event, *args++, bit);
     evtSetValue(event, *args++, ANIM_TBL[idx].anim);
@@ -220,34 +212,6 @@ static USER_FUNC(z) {
     event->lwData[0] = (s32)(1024.0f * (240.0f / t)) - 230000000;
     return EVT_RETURN_DONE;
 }
-
-f32 fd_dig_00_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
-
-f32 fd_dig_00_neg_one_382 = -1.0f;
-
-f32 fd_dig_00___local_PI_383 = 3.1415927f;
-
-f32 fd_dig_00___local_3PIO2_385 = 4.712389f;
-
-f32 fd_dig_00_one_negone_373[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
-
-f32 fd_dig_00___local_PIO2_384 = 1.5707964f;
-
-f32 fd_dig_00_one_381 = 1.0f;
-
-f32 fd_dig_00_negone_one_360[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
-
-f32 fd_dig_00_neg_one_365 = -1.0f;
-
-f32 fd_dig_00___local_PI_366 = 3.1415927f;
-
-f32 fd_dig_00___local_3PIO2_368 = 4.712389f;
-
-f32 fd_dig_00_one_negone_359[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
-
-f32 fd_dig_00___local_PIO2_367 = 1.5707964f;
-
-f32 fd_dig_00_one_364 = 1.0f;
 
 static s32* wp[] = {
     work,

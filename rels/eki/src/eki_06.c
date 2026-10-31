@@ -1,7 +1,6 @@
 #include "battle/battle_unit.h"
 #include "evt/evt_cmd.h"
 
-#pragma force_active on
 #include "manager/evtmgr_cmd.h"
 #include "driver/mobjdrv.h"
 #include "driver/animdrv.h"
@@ -45,54 +44,10 @@ void sw_reset(void);
 s32 sw_cnt(MapObjectEntry* mobj);
 void sw_cntup(MapObjectEntry* mobj);
 
-f32 fd_eki_06_negone_one_374[2] __attribute__((aligned(8)));
-f32 fd_eki_06_neg_one_382;
-f32 fd_eki_06___local_PI_383;
-f32 fd_eki_06___local_3PIO2_385;
-f32 fd_eki_06_one_negone_373[2] __attribute__((aligned(8)));
-f32 fd_eki_06___local_PIO2_384;
-f32 fd_eki_06_one_381;
-f32 fd_eki_06_negone_one_360[2] __attribute__((aligned(8)));
-f32 fd_eki_06_neg_one_365;
-f32 fd_eki_06___local_PI_366;
-f32 fd_eki_06___local_3PIO2_368;
-f32 fd_eki_06_one_negone_359[2] __attribute__((aligned(8)));
-f32 fd_eki_06___local_PIO2_367;
-f32 fd_eki_06_one_364;
-static EvtWord e_close[12];
-static EvtWord e_open[12];
 static BeroEntry bero_data[3];
-EvtWord evt_box_open[115];
-EvtWord evt_sw_complete[272];
-EvtWord eki_06_init_evt[132];
-
-f32 fd_eki_06_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
-
-f32 fd_eki_06_neg_one_382 = -1.0f;
-
-f32 fd_eki_06___local_PI_383 = 3.1415927f;
-
-f32 fd_eki_06___local_3PIO2_385 = 4.712389f;
-
-f32 fd_eki_06_one_negone_373[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
-
-f32 fd_eki_06___local_PIO2_384 = 1.5707964f;
-
-f32 fd_eki_06_one_381 = 1.0f;
-
-f32 fd_eki_06_negone_one_360[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
-
-f32 fd_eki_06_neg_one_365 = -1.0f;
-
-f32 fd_eki_06___local_PI_366 = 3.1415927f;
-
-f32 fd_eki_06___local_3PIO2_368 = 4.712389f;
-
-f32 fd_eki_06_one_negone_359[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
-
-f32 fd_eki_06___local_PIO2_367 = 1.5707964f;
-
-f32 fd_eki_06_one_364 = 1.0f;
+extern EvtWord evt_box_open[];
+extern EvtWord evt_sw_complete[];
+extern EvtWord eki_06_init_evt[];
 
 static EVT_BEGIN(e_close)
     MULTIPLY_FLOAT(LW(0), FLOAT(-0.44433594f))
@@ -266,7 +221,6 @@ void sw_cntup(MapObjectEntry* mobj) {
     }
 }
 
-
 s32 sw_cnt(MapObjectEntry* mobj) {
     if (strcmp(mobj->name, "MOBJ_eki_06_su1") == 0) {
         return evtGetValue(NULL, GW(0));
@@ -369,7 +323,7 @@ s32 sw_main(MapObjectEntry* mobj) {
             mobjNameToPtr("MOBJ_eki_06_su3")->flags |= 2;
             if (strcmp(mobj->name, "MOBJ_eki_06_su1") == 0) {
                 if (sw_cnt(mobj) == 1) {
-                    animPoseSetAnim(mobj->poseId, "ANIM_3\0", 1);
+                    animPoseSetAnim(mobj->poseId, "ANIM_3", 1);
                 } else {
                     animPoseSetAnim(mobj->poseId, "ANIM_1", 1);
                 }

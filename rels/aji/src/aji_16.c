@@ -2,7 +2,6 @@
 #include "evt/evt_cmd.h"
 #include "manager/evtmgr_cmd.h"
 
-#pragma force_active on
 #include "mario/mario.h"
 #include "evt/evt_bero.h"
 #include "evt/evt_sub.h"
@@ -56,66 +55,14 @@ USER_FUNC(evt_sub_intpl_msec_get_value);
 USER_FUNC(evt_sub_intpl_msec_init);
 static USER_FUNC(peach_set_pose);
 
-f32 fd_aji_16_negone_one_374[2] __attribute__((aligned(8)));
-f32 fd_aji_16_neg_one_382;
-f32 fd_aji_16___local_PI_383;
-f32 fd_aji_16___local_3PIO2_385;
-f32 fd_aji_16_one_negone_373[2] __attribute__((aligned(8)));
-f32 fd_aji_16___local_PIO2_384;
-f32 fd_aji_16_one_381;
-f32 fd_aji_16_negone_one_360[2] __attribute__((aligned(8)));
-f32 fd_aji_16_neg_one_365;
-f32 fd_aji_16___local_PI_366;
-f32 fd_aji_16___local_3PIO2_368;
-f32 fd_aji_16_one_negone_359[2] __attribute__((aligned(8)));
-f32 fd_aji_16___local_PIO2_367;
-f32 fd_aji_16_one_364;
-static EvtWord w_door_close[22];
-static EvtWord w_door_open[22];
-static EvtWord e_door_close[22];
-static EvtWord e_door_open[22];
-EvtWord w_bero_in_evt[15];
+extern EvtWord w_bero_in_evt[];
 static BeroEntry bero_entry_data[3];
 static BeroEntry bero_peach_data[2];
-EvtWord evt_last_mail_init[62];
-EvtWord evt_last_mail[56];
-EvtWord peach_evt_door_open[41];
-static EvtWord peach_evt_stg1[97];
-static EvtWord peach_evt_stg1_1[86];
-EvtWord peach_evt_stg2_1[103];
-static EvtWord peach_evt_stg2[107];
-static EvtWord peach_evt_stg3[158];
-static EvtWord peach_evt_stg6[138];
-static EvtWord peach_evt_door_stop[18];
-EvtWord aji_16_init_evt[167];
-
-f32 fd_aji_16_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
-
-f32 fd_aji_16_neg_one_382 = -1.0f;
-
-f32 fd_aji_16___local_PI_383 = 3.1415927f;
-
-f32 fd_aji_16___local_3PIO2_385 = 4.712389f;
-
-f32 fd_aji_16_one_negone_373[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
-
-f32 fd_aji_16___local_PIO2_384 = 1.5707964f;
-
-f32 fd_aji_16_one_381 = 1.0f;
-
-f32 fd_aji_16_negone_one_360[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
-
-f32 fd_aji_16_neg_one_365 = -1.0f;
-
-f32 fd_aji_16___local_PI_366 = 3.1415927f;
-
-f32 fd_aji_16___local_3PIO2_368 = 4.712389f;
-
-f32 fd_aji_16_one_negone_359[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
-
-f32 fd_aji_16___local_PIO2_367 = 1.5707964f;
-
-f32 fd_aji_16_one_364 = 1.0f;
+extern EvtWord evt_last_mail_init[];
+extern EvtWord evt_last_mail[];
+extern EvtWord peach_evt_door_open[];
+extern EvtWord peach_evt_stg2_1[];
+extern EvtWord aji_16_init_evt[];
 
 static EVT_BEGIN(w_door_close)
     MULTIPLY_FLOAT(LW(0), FLOAT(0.22167969f))
@@ -536,7 +483,7 @@ EVT_BEGIN(aji_16_init_evt)
     CALL(evt_hitobj_onoff, STRING("A_door1_1"), 1, 0)
     CALL(evt_hitobj_onoff, STRING("A_door1_2"), 1, 0)
     CALL(evt_hitobj_onoff, STRING("A_door2_1"), 1, 0)
-    CALL(evt_hitobj_onoff, STRING("A_door2_2\0\0"), 1, 0)
+    CALL(evt_hitobj_onoff, STRING("A_door2_2"), 1, 0)
     SPAWN_EVENT(PTR(evt_emergency))
     RETURN
 EVT_END()

@@ -18,7 +18,7 @@ typedef struct EffStarPointWork {
     f32 velZ;                // 0x1C
     f32 velY;                // 0x20
     f32 gravity;             // 0x24
-    u8 field_0x28[4];        // 0x28
+    u8 pad_28[4];            // 0x28
     s32 alpha;               // 0x2C
     s32 delay;               // 0x30
 } EffStarPointWork;

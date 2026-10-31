@@ -74,9 +74,9 @@ void battleAcDelete_TimingA(BattleWork* work) {
 
 void battleAcDisp_TimingA(CameraId cameraId, void* param) {
     BattleWork* work = (BattleWork*)param;
-    BattleACDispParams* disp = (BattleACDispParams*)&work->actionCommands.disp;
-    int new_var;
-    switch (work->actionCommands.mAcState) {
+    BattleActions* ac = &work->actionCommands;
+    BattleACDispParams* disp = &ac->disp;
+    switch (ac->mAcState) {
         case 99:
             disp->iconX = intplGetValue(4, 20 - disp->slideTimer, 20, -300.0f, 30.0f);
         case 100:
@@ -89,13 +89,12 @@ void battleAcDisp_TimingA(CameraId cameraId, void* param) {
         case 1000:
         case 1001:
             if (disp->slideTimer >= 40) {
-                new_var = 4; // FAKE: register-held index; also read uninitialized on the else path below. Literal 4 / slot = 4 at decl both differ
-                disp->iconX = intplGetValue(new_var, AC_SLIDE_TIMER_AT(disp, new_var) - 40, 20, 30.0f, -300.0f);
+                disp->iconX = intplGetValue(4, disp->slideTimer - 40, 20, 30.0f, -300.0f);
             } else {
                 disp->iconX = 30.0f;
             }
             actionCommandDisp(disp->iconX, disp->iconY);
-            if (AC_SLIDE_TIMER_AT(disp, new_var) < 60) {
+            if (disp->slideTimer < 60) {
                 disp->slideTimer++;
             }
             break;

@@ -4,7 +4,6 @@
 #include "evt/evt_cmd.h"
 #include "driver/msgdrv.h"
 
-#pragma force_active on
 #include "driver/mapdrv.h"
 #include "pmario_sound.h"
 #include "string.h"
@@ -79,67 +78,19 @@ USER_FUNC(evt_sub_random);
 USER_FUNC(mario_set_dir);
 static void callback(s32 type, void** work);
 
-f32 fd_hei_07_negone_one_374[2] __attribute__((aligned(8)));
-f32 fd_hei_07_neg_one_382;
-f32 fd_hei_07___local_PI_383;
-f32 fd_hei_07___local_3PIO2_385;
-f32 fd_hei_07_one_negone_373[2] __attribute__((aligned(8)));
-f32 fd_hei_07___local_PIO2_384;
-f32 fd_hei_07_one_381;
-f32 fd_hei_07_negone_one_360[2] __attribute__((aligned(8)));
-f32 fd_hei_07_neg_one_365;
-f32 fd_hei_07___local_PI_366;
-f32 fd_hei_07___local_3PIO2_368;
-f32 fd_hei_07_one_negone_359[2] __attribute__((aligned(8)));
-f32 fd_hei_07___local_PIO2_367;
-f32 fd_hei_07_one_364;
 static BeroEntry bero_entry_data[3];
-static EvtWord npc_jump[53];
-EvtWord dokan_shake[8];
-EvtWord dokan_shake2[20];
-EvtWord sekizou_move[136];
-EvtWord animation_wait[46];
-static EvtWord shake_evt[52];
-EvtWord seikai_anime[46];
-EvtWord seikai_anime_stop[19];
-EvtWord fuseikai_anime[21];
-EvtWord fuseikai_anime_stop[19];
-static EvtWord evt_down_snd[116];
-static EvtWord evt_up_snd_[12];
-static EvtWord evt_up_snd__[76];
-EvtWord offscreen_to_quiz[101];
-static EvtWord offscreen_to_normal[100];
+extern EvtWord dokan_shake[];
+extern EvtWord dokan_shake2[];
+extern EvtWord sekizou_move[];
+extern EvtWord animation_wait[];
+extern EvtWord seikai_anime[];
+extern EvtWord seikai_anime_stop[];
+extern EvtWord fuseikai_anime[];
+extern EvtWord fuseikai_anime_stop[];
+extern EvtWord offscreen_to_quiz[];
 QuizEntry quiz_data[8];
-EvtWord a_sekizou_1[1018];
-EvtWord hei_07_init_evt[114];
-
-f32 fd_hei_07_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
-
-f32 fd_hei_07_neg_one_382 = -1.0f;
-
-f32 fd_hei_07___local_PI_383 = 3.1415927f;
-
-f32 fd_hei_07___local_3PIO2_385 = 4.712389f;
-
-f32 fd_hei_07_one_negone_373[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
-
-f32 fd_hei_07___local_PIO2_384 = 1.5707964f;
-
-f32 fd_hei_07_one_381 = 1.0f;
-
-f32 fd_hei_07_negone_one_360[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
-
-f32 fd_hei_07_neg_one_365 = -1.0f;
-
-f32 fd_hei_07___local_PI_366 = 3.1415927f;
-
-f32 fd_hei_07___local_3PIO2_368 = 4.712389f;
-
-f32 fd_hei_07_one_negone_359[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
-
-f32 fd_hei_07___local_PIO2_367 = 1.5707964f;
-
-f32 fd_hei_07_one_364 = 1.0f;
+extern EvtWord a_sekizou_1[];
+extern EvtWord hei_07_init_evt[];
 
 static BeroEntry bero_entry_data[] = {
     {
@@ -830,7 +781,7 @@ EVT_BEGIN(hei_07_init_evt)
     RETURN
 EVT_END()
 
-void mapPlayAnimationLv(const char* animName, s32 arg1, s32 arg2);
+void mapPlayAnimationLv(const char* animName, s32 mode, s32 level);
 
 static void callback(s32 type, void** work) {
     EventEntry* evt = ((MsgWinData*)*work)->event;

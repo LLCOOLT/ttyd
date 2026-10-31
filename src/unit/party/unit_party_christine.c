@@ -52,40 +52,25 @@ USER_FUNC(btlevtcmd_StartWaitEvent);
 USER_FUNC(_set_hustle);
 USER_FUNC(_monosiri_flag_on);
 USER_FUNC(btlevtcmd_get_monosiri_msg_no);
-#ifdef VERSION_G8ME01
-#endif
 static void __makeTechMenuFunc(BattleCommand* command, s32* count);
 static USER_FUNC(krb_get_dir);
 
-__declspec(section ".data") f32 unit_party_christine_negone_one_a[2];
-__declspec(section ".data") f32 christine_negone_one_374[2];
-__declspec(section ".data") f32 unit_party_christine_one_negone_a[2];
-__declspec(section ".data") f32 christine_one_negone_373[2];
-__declspec(section ".data") f32 unit_party_christine_negone_one_b[2];
-__declspec(section ".data") f32 christine_negone_one_360[2];
-__declspec(section ".data") f32 unit_party_christine_one_negone_b[2];
-__declspec(section ".data") f32 christine_one_negone_359[2];
 PoseTableEntry pose_table_christine_stay[25];
 static BattleDataEntry data_table[8];
 BattleUnitKindPart unitpartsdata_Party_Christine[1];
 BattleUnitKind unitdata_Party_Christine;
-static EvtWord battle_entry_event[59];
 static EvtWord init_event[51];
 static EvtWord damage_event[16];
 BattleWeapon partyWeapon_ChristineNormalAttack;
 BattleWeapon partyWeapon_ChristineMonosiri;
 BattleWeapon partyWeapon_ChristineRenzokuAttack;
 BattleWeapon partyWeapon_ChristineKiss;
-EvtWord partyChristineAttack_NormalAttack[824];
-EvtWord christine_dictionary_event[26];
-EvtWord partyChristineAttack_Monosiri[397];
-#ifdef VERSION_G8ME01
-EvtWord partyChristineAttack_RenzokuAttack[1078];
-#else
-EvtWord partyChristineAttack_RenzokuAttack[1071];
-#endif
-EvtWord partyChristineAttack_Kiss[546];
-EvtWord christine_appeal_event[71];
+extern EvtWord partyChristineAttack_NormalAttack[];
+extern EvtWord christine_dictionary_event[];
+extern EvtWord partyChristineAttack_Monosiri[];
+extern EvtWord partyChristineAttack_RenzokuAttack[];
+extern EvtWord partyChristineAttack_Kiss[];
+extern EvtWord christine_appeal_event[];
 static EvtWord party_win_reaction[14];
 static EvtWord attack_audience_event[392];
 static BattleUnitDefense defence;
@@ -94,37 +79,13 @@ static StatusVulnerability regist;
 static EvtWord attack_event[2];
 static EvtWord wait_event[6];
 
-__declspec(section ".data") f32 unit_party_christine_negone_one_a[] = {
-    -1.0f, 1.0f,
-};
 
-__declspec(section ".data") f32 christine_negone_one_374[] = {
-    -1.0f, 1.0f,
-};
 
-__declspec(section ".data") f32 unit_party_christine_one_negone_a[] = {
-    1.0f, -1.0f,
-};
 
-__declspec(section ".data") f32 christine_one_negone_373[] = {
-    1.0f, -1.0f,
-};
 
-__declspec(section ".data") f32 unit_party_christine_negone_one_b[] = {
-    -1.0f, 1.0f,
-};
 
-__declspec(section ".data") f32 christine_negone_one_360[] = {
-    -1.0f, 1.0f,
-};
 
-__declspec(section ".data") f32 unit_party_christine_one_negone_b[] = {
-    1.0f, -1.0f,
-};
 
-__declspec(section ".data") f32 christine_one_negone_359[] = {
-    1.0f, -1.0f,
-};
 
 PoseTableEntry pose_table_christine_stay[] = {
     {9, "PKR_D_5"},
@@ -2069,7 +2030,7 @@ EVT_BEGIN(christine_appeal_event)
     CALL(btlevtcmd_RunDataEventChild, -2, 7)
     CALL(btlevtcmd_AnimeChangePoseType, -2, 1, 66)
     CALL(btlevtcmd_GetPos, -2, LW(0), LW(1), LW(2))
-    CALL(btlevtcmd_snd_se, -2, STRING("SFX_MARIO_APPEAL1\0\0"), -250000000, 0, -250000000)
+    CALL(btlevtcmd_snd_se, -2, STRING("SFX_MARIO_APPEAL1"), -250000000, 0, -250000000)
     CALL(btlevtcmd_GetPos, -2, LW(0), LW(1), LW(2))
     CALL(btlevtcmd_FaceDirectionAdd, -2, LW(0), 15)
     ADD(LW(1), 30)
@@ -2387,13 +2348,14 @@ USER_FUNC(_monosiri_flag_on) {
 
 USER_FUNC(_dictionary) {
     EvtWord* args = event->args;
+    s32 selfId;
     s32 state;
     BattleWork* wp = _battleWorkPointer;
     BattleUnit* unit;
-    s32 selfId, targetId;
+    s32 targetId;
     void* work;
 
-    selfId = (0, BattleTransID(event, -2)); // FAKE: comma expression; plain call changes codegen
+    selfId = BattleTransID(event, -2);
     targetId = evtGetValue(event, args[0]);
     targetId = BattleTransID(event, targetId);
     evtGetValue(event, args[1]);

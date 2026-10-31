@@ -21,10 +21,8 @@
 #endif
 
 s32 mobjCheckItemboxOpen(void* mobj);
-void partyChgPoseId(PartyEntry* party, s32 id);
 
 //.sbss
-u32 gap_08_804188C4_sbss;
 u32 msg_ep; //unknown since it only gets written to once and never used
 
 BOOL christineGetStatus(void) {
@@ -138,7 +136,7 @@ USER_FUNC(pre_kurio_use) {
             msg = "obj_hlp_yajirushi";
         } else if (!strcmp(name, "MOBJ_Lock")) {
             msg = "obj_hlp_lock";
-        } else if (!strcmp(name, "MOBJ_KururinFloor\x00\x00")) {
+        } else if (!strcmp(name, "MOBJ_KururinFloor")) {
             msg = "msg_kuri_map";
         } else {
             msg = "msg_kuri_map";
@@ -195,7 +193,6 @@ BOOL partyGetAppearPos3(PartyEntry* party, Vec* pos);
 s32 fbatNpcTalkCheck(void);
 void partyChgMoveMode(PartyEntry* party, s32 mode);
 void partyChgMot(PartyEntry* party, s32 mot);
-void partyChgPoseId(PartyEntry* party, s32 id);
 void partyChkGnd(PartyEntry* party);
 f32 angleABf(f32, f32, f32, f32);
 f32 distABf(f32, f32, f32, f32);

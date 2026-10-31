@@ -20,17 +20,17 @@ static void actionCommandDisp(f32 x, f32 y);
 
 typedef struct GaugeAC {
     struct BattleUnit* unit; // 0x0
-    s32 field_0x4;           // 0x4
-    s32 field_0x8;           // 0x8
+    s32 setupFlags;          // 0x4
+    s32 setupParam;          // 0x8
     s32 state;               // 0xC
     void* maincb;            // 0x10
     void* resultcb;          // 0x14
     void* dispcb;            // 0x18
     void* deletecb;          // 0x1C
-    s32 field_0x20;          // 0x20
+    s32 defenseResult;       // 0x20, not used here
     s32 resultCount;         // 0x24
     s32 result;              // 0x28
-    u8 field_0x2C[4];        // 0x2C
+    u8 difficulty[4];        // 0x2C, base and current difficulty, not used here
     u32 flags;               // 0x30
     u32 opts;                // 0x34
     s32 type;                // 0x38
@@ -38,7 +38,7 @@ typedef struct GaugeAC {
     s32 mode;                // 0x40
     s32 target;              // 0x44
     s32 period;              // 0x48
-    u8 field_0x4C[0x58 - 0x4C];
+    u8 pad_4C[0x58 - 0x4C];  // 0x4C, params[5..7], unused here
     u32 out0; // 0x58
 } GaugeAC;
 
@@ -51,7 +51,7 @@ typedef struct GaugeWork {
     s8 passed;     // 0x14
     s8 phase;      // 0x15
     s8 hold;       // 0x16
-    u8 field_0x17;
+    u8 pad_17;
     u32 button;   // 0x18
     s32 timer;    // 0x1C
     s32 hits;     // 0x20
@@ -59,8 +59,6 @@ typedef struct GaugeWork {
     s32 endTimer; // 0x28
 } GaugeWork;
 
-#define PadNow ((s32(*)(s32))BattlePadCheckNow)
-#define PadUp ((s32(*)(s32))BattlePadCheckUp)
 #define GAC(work) ((GaugeAC*)&(work)->actionCommands)
 
 s32 battleAcMain_GaugeTiming(BattleWork* work) {
@@ -128,13 +126,13 @@ s32 battleAcMain_GaugeTiming(BattleWork* work) {
         case 99:
             break;
         case 100:
-            if ((GAC(work)->field_0x4 & 1) && ((u32)work->actionCommands.mAcUnit->mTokenFlags & 0x10)) {
+            if ((GAC(work)->setupFlags & 1) && ((u32)work->actionCommands.mAcUnit->mTokenFlags & 0x10)) {
                 if (irand(100) >= 0) {
-                    GAC(work)->field_0x8 = 30;
+                    GAC(work)->setupParam = 30;
                     cw->passed = 0;
                 } else {
                     cw->passed = 1;
-                    GAC(work)->field_0x8 = 30;
+                    GAC(work)->setupParam = 30;
                 }
                 work->actionCommands.mAcState = 1002;
                 break;
@@ -149,7 +147,7 @@ s32 battleAcMain_GaugeTiming(BattleWork* work) {
             cw->frame++;
             switch (cw->phase) {
                 case 0:
-                    if (!cw->hold && PadNow(cw->button)) {
+                    if (!cw->hold && BattlePadCheckNow(cw->button)) {
                         cw->phase = 1;
                         work->actionCommands.mAcState = 1001;
                         cw->frame = 0;
@@ -162,7 +160,7 @@ s32 battleAcMain_GaugeTiming(BattleWork* work) {
                             cw->phase = 2;
                         }
                     } else {
-                        if (!PadNow(cw->button) && PadUp(cw->button)) {
+                        if (!BattlePadCheckNow(cw->button) && BattlePadCheckUp(cw->button)) {
                             cw->phase = 2;
                         }
                     }
@@ -281,8 +279,8 @@ s32 battleAcMain_GaugeTiming(BattleWork* work) {
             }
             break;
         case 1002:
-            GAC(work)->field_0x8--;
-            if (GAC(work)->field_0x8 < 0) {
+            GAC(work)->setupParam--;
+            if (GAC(work)->setupParam < 0) {
                 if (cw->passed) {
                     work->actionCommands.result = 2;
                     work->actionCommands.mResultCount++;

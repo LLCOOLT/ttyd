@@ -2,7 +2,6 @@
 #include "eff/n64/eff_kumokumo_n64.h"
 #include "evt/evt_cmd.h"
 
-#pragma force_active on
 #include "battle/battle.h"
 #include "battle/battle_unit.h"
 #include "battle/battle_sub.h"
@@ -12,8 +11,9 @@
 #include "evt/evt_msg.h"
 #include "evt/evt_sub.h"
 #include "unit/party/unit_party_christine.h"
+#include "manager/evtmgr_cmd.h"
 
-EffectEntry* effKumokumoN64Entry(s32 type, s32 time, f32 x, f32 y, f32 z, f32 arg5, f32 arg6, f32 scale);
+EffectEntry* effKumokumoN64Entry(s32 type, s32 time, f32 x, f32 y, f32 z, f32 rot, f32 unused, f32 scale);
 
 static USER_FUNC(_clauda_breath_effect_fire);
 static USER_FUNC(_clauda_breath_effect_ready);
@@ -48,20 +48,6 @@ extern BattleUnitKind unit_act_kinopiko;
 extern BattleUnitKind unit_act_kinopio;
 extern BattleUnitKind unit_act_teresa;
 
-f32 fd_act_mario_negone_one_374[2] __attribute__((aligned(8)));
-f32 fd_act_mario_neg_one_382;
-f32 fd_act_mario___local_PI_383;
-f32 fd_act_mario___local_3PIO2_385;
-f32 fd_act_mario_one_negone_373[2] __attribute__((aligned(8)));
-f32 fd_act_mario___local_PIO2_384;
-f32 fd_act_mario_one_381;
-f32 fd_act_mario_negone_one_360[2] __attribute__((aligned(8)));
-f32 fd_act_mario_neg_one_365;
-f32 fd_act_mario___local_PI_366;
-f32 fd_act_mario___local_3PIO2_368;
-f32 fd_act_mario_one_negone_359[2] __attribute__((aligned(8)));
-f32 fd_act_mario___local_PIO2_367;
-f32 fd_act_mario_one_364;
 BattleUnitKind unit_act_mario;
 static BattleUnitDefense defence;
 static BattleUnitDefenseAttr defence_attr;
@@ -70,48 +56,17 @@ static PoseTableEntry pose_table[7];
 static BattleDataEntry data_table[1];
 static BattleUnitKindPart parts[1];
 static EvtWord init_event[15];
-static EvtWord damage_event[10];
-static EvtWord phase_event[2];
-static EvtWord attack_event[5];
 static EvtWord wait_event[6];
 BattleUnitSetup entry_unit_data[8];
 static EvtWord battle_entry_event[168];
-EvtWord _battle_event[155];
-EvtWord _act_target_enemy[33];
-EvtWord _act_target_mario[26];
-EvtWord _act_mario_jump_attack[240];
-EvtWord _act_clauda_press_attack[350];
-EvtWord _act_clauda_breath_attack[269];
-EvtWord _act_teresa_attack[190];
-EvtWord _act_atmic_teresa_press_attack[188];
-
-f32 fd_act_mario_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
-
-f32 fd_act_mario_neg_one_382 = -1.0f;
-
-f32 fd_act_mario___local_PI_383 = 3.1415927f;
-
-f32 fd_act_mario___local_3PIO2_385 = 4.712389f;
-
-f32 fd_act_mario_one_negone_373[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
-
-f32 fd_act_mario___local_PIO2_384 = 1.5707964f;
-
-f32 fd_act_mario_one_381 = 1.0f;
-
-f32 fd_act_mario_negone_one_360[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
-
-f32 fd_act_mario_neg_one_365 = -1.0f;
-
-f32 fd_act_mario___local_PI_366 = 3.1415927f;
-
-f32 fd_act_mario___local_3PIO2_368 = 4.712389f;
-
-f32 fd_act_mario_one_negone_359[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
-
-f32 fd_act_mario___local_PIO2_367 = 1.5707964f;
-
-f32 fd_act_mario_one_364 = 1.0f;
+extern EvtWord _battle_event[];
+extern EvtWord _act_target_enemy[];
+extern EvtWord _act_target_mario[];
+extern EvtWord _act_mario_jump_attack[];
+extern EvtWord _act_clauda_press_attack[];
+extern EvtWord _act_clauda_breath_attack[];
+extern EvtWord _act_teresa_attack[];
+extern EvtWord _act_atmic_teresa_press_attack[];
 
 BattleUnitKind unit_act_mario = {
     181,

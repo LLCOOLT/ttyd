@@ -1,7 +1,6 @@
 #include "battle/battle_unit.h"
 #include "evt/evt_cmd.h"
 
-#pragma force_active on
 #include "mario/mario.h"
 #include "driver/mapdrv.h"
 #include "dolphin/gx.h"
@@ -24,28 +23,14 @@ USER_FUNC(evt_kagemario_init);
 static s32 color_change_evt(s32 on);
 static void callback(MapTevCallbackInfo* info);
 
-f32 fd_evt_kagemario_negone_one_374[2] __attribute__((aligned(8)));
-f32 fd_evt_kagemario_neg_one_382;
-f32 fd_evt_kagemario___local_PI_383;
-f32 fd_evt_kagemario___local_3PIO2_385;
-f32 fd_evt_kagemario_one_negone_373[2] __attribute__((aligned(8)));
-f32 fd_evt_kagemario___local_PIO2_384;
-f32 fd_evt_kagemario_one_381;
-f32 fd_evt_kagemario_negone_one_360[2] __attribute__((aligned(8)));
-f32 fd_evt_kagemario_neg_one_365;
-f32 fd_evt_kagemario___local_PI_366;
-f32 fd_evt_kagemario___local_3PIO2_368;
-f32 fd_evt_kagemario_one_negone_359[2] __attribute__((aligned(8)));
-f32 fd_evt_kagemario___local_PIO2_367;
-f32 fd_evt_kagemario_one_364;
 static EvtWord evt_check[4];
-EvtWord evt_usu_kagemario_party_kill[42];
+extern EvtWord evt_usu_kagemario_party_kill[];
 
 static void callback(MapTevCallbackInfo* info) {
     s32 stage = info->tevStage;
     s32 texCoord = info->texCoord;
     s32 texMap = info->texMap;
-    s32 field_0x18 = info->indStage;
+    s32 indStage = info->indStage;
 
     if (marioGetPtr()->flags & 0x2000000) {
         GXColor color = {0, 0, 0, 255};
@@ -62,7 +47,7 @@ static void callback(MapTevCallbackInfo* info) {
     GXSetTevSwapMode(stage, GX_TEV_SWAP0, GX_TEV_SWAP0);
     info->tevStage = stage + 1;
     info->texMap = texMap;
-    info->indStage = field_0x18;
+    info->indStage = indStage;
     info->texCoord = texCoord;
 }
 
@@ -113,34 +98,6 @@ static USER_FUNC(test) {
     marioGetPtr()->prevPartyMemberId[1] = 0;
     return EVT_RETURN_DONE;
 }
-
-f32 fd_evt_kagemario_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
-
-f32 fd_evt_kagemario_neg_one_382 = -1.0f;
-
-f32 fd_evt_kagemario___local_PI_383 = 3.1415927f;
-
-f32 fd_evt_kagemario___local_3PIO2_385 = 4.712389f;
-
-f32 fd_evt_kagemario_one_negone_373[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
-
-f32 fd_evt_kagemario___local_PIO2_384 = 1.5707964f;
-
-f32 fd_evt_kagemario_one_381 = 1.0f;
-
-f32 fd_evt_kagemario_negone_one_360[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
-
-f32 fd_evt_kagemario_neg_one_365 = -1.0f;
-
-f32 fd_evt_kagemario___local_PI_366 = 3.1415927f;
-
-f32 fd_evt_kagemario___local_3PIO2_368 = 4.712389f;
-
-f32 fd_evt_kagemario_one_negone_359[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
-
-f32 fd_evt_kagemario___local_PIO2_367 = 1.5707964f;
-
-f32 fd_evt_kagemario_one_364 = 1.0f;
 
 static EVT_BEGIN(evt_check)
     CALL(check)

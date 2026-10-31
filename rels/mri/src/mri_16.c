@@ -2,7 +2,6 @@
 #include "battle/battle_unit.h"
 #include "evt/evt_cmd.h"
 
-#pragma force_active on
 #include "manager/evtmgr_cmd.h"
 #include "evt/evt_bero.h"
 #include "evt/evt_damage.h"
@@ -60,30 +59,13 @@ USER_FUNC(puni_get_id);
 static USER_FUNC(ss_check);
 static USER_FUNC(ss_set);
 
-f32 fd_mri_16_negone_one_374[2] __attribute__((aligned(8)));
-f32 fd_mri_16_neg_one_382;
-f32 fd_mri_16___local_PI_383;
-f32 fd_mri_16___local_3PIO2_385;
-f32 fd_mri_16_one_negone_373[2] __attribute__((aligned(8)));
-f32 fd_mri_16___local_PIO2_384;
-f32 fd_mri_16_one_381;
-f32 fd_mri_16_negone_one_360[2] __attribute__((aligned(8)));
-f32 fd_mri_16_neg_one_365;
-f32 fd_mri_16___local_PI_366;
-f32 fd_mri_16___local_3PIO2_368;
-f32 fd_mri_16_one_negone_359[2] __attribute__((aligned(8)));
-f32 fd_mri_16___local_PIO2_367;
-f32 fd_mri_16_one_364;
 static BeroEntry bero_entry_data[7];
-static EvtWord cam_shake[33];
-static EvtWord cam_shake2[27];
-EvtWord water_shikake[312];
-EvtWord bar_shikake[7];
-EvtWord bar_shikake_up[7];
-EvtWord switch_up_down[106];
+extern EvtWord water_shikake[];
+extern EvtWord bar_shikake[];
+extern EvtWord bar_shikake_up[];
+extern EvtWord switch_up_down[];
 static HitDamageReturn hitDmgRetPoints[5];
-static EvtWord mobj_box00[34];
-EvtWord mri_16_init_evt[282];
+extern EvtWord mri_16_init_evt[];
 
 static USER_FUNC(ss_check) {
     s32 a;
@@ -114,34 +96,6 @@ USER_FUNC(puni_get_id) {
     evtSetValue(event, args[1], puni->index);
     return EVT_RETURN_DONE;
 }
-
-f32 fd_mri_16_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
-
-f32 fd_mri_16_neg_one_382 = -1.0f;
-
-f32 fd_mri_16___local_PI_383 = 3.1415927f;
-
-f32 fd_mri_16___local_3PIO2_385 = 4.712389f;
-
-f32 fd_mri_16_one_negone_373[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
-
-f32 fd_mri_16___local_PIO2_384 = 1.5707964f;
-
-f32 fd_mri_16_one_381 = 1.0f;
-
-f32 fd_mri_16_negone_one_360[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
-
-f32 fd_mri_16_neg_one_365 = -1.0f;
-
-f32 fd_mri_16___local_PI_366 = 3.1415927f;
-
-f32 fd_mri_16___local_3PIO2_368 = 4.712389f;
-
-f32 fd_mri_16_one_negone_359[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
-
-f32 fd_mri_16___local_PIO2_367 = 1.5707964f;
-
-f32 fd_mri_16_one_364 = 1.0f;
 
 static BeroEntry bero_entry_data[] = {
     {
@@ -498,13 +452,7 @@ EVT_BEGIN(mri_16_init_evt)
     CALL_CHILD(PTR(evt_gazigazi_entry))
     CALL(evt_item_entry, STRING("item_00"), 141, -115, 0, -25, 0, GSWF(2869), 0)
     CALL(evt_mobj_itembox, STRING("mobj_box00"), -125, 0, 125, 0, 0, PTR(mobj_box00), GSWF(2885))
-    CALL(evt_mobj_powerupblk, STRING("pblk1\0\0"), 65, -260, -70, 0, GSWF(5544), 0)
+    CALL(evt_mobj_powerupblk, STRING("pblk1"), 65, -260, -70, 0, GSWF(5544), 0)
     RETURN
 EVT_END()
 
-
-#ifdef VERSION_G8ME01
-#pragma force_active on
-u32 gap_04_0002354C_data[5] = {0, 0, 0, 0, 0};
-#pragma force_active reset
-#endif

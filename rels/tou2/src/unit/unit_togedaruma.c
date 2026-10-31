@@ -8,8 +8,6 @@
 #include "party/party_motion.h"
 #include "battle/battle_database_common.h"
 
-#pragma force_active on
-
 USER_FUNC(btlevtcmd_AnimeChangePoseFromTable);
 USER_FUNC(btlevtcmd_CheckStatus);
 USER_FUNC(btlevtcmd_GetPos);
@@ -22,20 +20,6 @@ USER_FUNC(btlevtcmd_SetEventWait);
 USER_FUNC(btlevtcmd_StartWaitEvent);
 USER_FUNC(evt_eff);
 
-f32 fd_togedaruma_negone_one_374[2] __attribute__((aligned(8)));
-f32 fd_togedaruma_neg_one_382;
-f32 fd_togedaruma___local_PI_383;
-f32 fd_togedaruma___local_3PIO2_385;
-f32 fd_togedaruma_one_negone_373[2] __attribute__((aligned(8)));
-f32 fd_togedaruma___local_PIO2_384;
-f32 fd_togedaruma_one_381;
-f32 fd_togedaruma_negone_one_360[2] __attribute__((aligned(8)));
-f32 fd_togedaruma_neg_one_365;
-f32 fd_togedaruma___local_PI_366;
-f32 fd_togedaruma___local_3PIO2_368;
-f32 fd_togedaruma_one_negone_359[2] __attribute__((aligned(8)));
-f32 fd_togedaruma___local_PIO2_367;
-f32 fd_togedaruma_one_364;
 BattleUnitKind unit_togedaruma;
 static BattleUnitDefense defence;
 static BattleUnitDefenseAttr defence_attr;
@@ -51,37 +35,8 @@ static EvtWord dmg_avoid_counter_thorn_head_event[63];
 static EvtWord dmg_avoid_counter_thorn_front_event[121];
 static EvtWord damage_event[10];
 static EvtWord dmg_turn_event[131];
-static EvtWord wakeup_event[134];
 static EvtWord attack_event[358];
 static EvtWord wait_event[102];
-
-f32 fd_togedaruma_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
-
-f32 fd_togedaruma_neg_one_382 = -1.0f;
-
-f32 fd_togedaruma___local_PI_383 = 3.1415927f;
-
-f32 fd_togedaruma___local_3PIO2_385 = 4.712389f;
-
-f32 fd_togedaruma_one_negone_373[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
-
-f32 fd_togedaruma___local_PIO2_384 = 1.5707964f;
-
-f32 fd_togedaruma_one_381 = 1.0f;
-
-f32 fd_togedaruma_negone_one_360[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
-
-f32 fd_togedaruma_neg_one_365 = -1.0f;
-
-f32 fd_togedaruma___local_PI_366 = 3.1415927f;
-
-f32 fd_togedaruma___local_3PIO2_368 = 4.712389f;
-
-f32 fd_togedaruma_one_negone_359[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
-
-f32 fd_togedaruma___local_PIO2_367 = 1.5707964f;
-
-f32 fd_togedaruma_one_364 = 1.0f;
 
 BattleUnitKind unit_togedaruma = {
     19,
@@ -475,7 +430,7 @@ static EVT_BEGIN(attack_event)
     CALL(btlevtcmd_AnimeChangePose, -2, 1, STRING("TGD_N_1"))
     WAIT_MS(1500)
     CALL(btlevtcmd_AnimeChangePose, -2, 1, STRING("TGD_J_1"))
-    CALL(btlevtcmd_snd_se, -2, STRING("SFX_ENM_TOGEDA_MOVE5\0\0\0"), -250000000, 0, -250000000)
+    CALL(btlevtcmd_snd_se, -2, STRING("SFX_ENM_TOGEDA_MOVE5"), -250000000, 0, -250000000)
     GOTO(98)
     LABEL(91)
     CALL(evt_btl_camera_shake_h, 0, 1, 1, 8, 0)

@@ -8,8 +8,6 @@
 #include "party/party_motion.h"
 #include "battle/battle_database_common.h"
 
-#pragma force_active on
-
 USER_FUNC(btlevtcmd_AnimeChangePoseFromTable);
 USER_FUNC(btlevtcmd_EnemyItemUseCheck);
 USER_FUNC(btlevtcmd_GetUnitWork);
@@ -23,20 +21,6 @@ extern s32 boss_moamoa_check_zenei_kouei[];
 extern PoseTableEntry moamoa1_weakness_pose_table[];
 extern s32 moamoa_defence_no_parts[];
 
-f32 fd_boss_moamoa_tentacle_b_negone_one_374[2] __attribute__((aligned(8)));
-f32 fd_boss_moamoa_tentacle_b_neg_one_382;
-f32 fd_boss_moamoa_tentacle_b___local_PI_383;
-f32 fd_boss_moamoa_tentacle_b___local_3PIO2_385;
-f32 fd_boss_moamoa_tentacle_b_one_negone_373[2] __attribute__((aligned(8)));
-f32 fd_boss_moamoa_tentacle_b___local_PIO2_384;
-f32 fd_boss_moamoa_tentacle_b_one_381;
-f32 fd_boss_moamoa_tentacle_b_negone_one_360[2] __attribute__((aligned(8)));
-f32 fd_boss_moamoa_tentacle_b_neg_one_365;
-f32 fd_boss_moamoa_tentacle_b___local_PI_366;
-f32 fd_boss_moamoa_tentacle_b___local_3PIO2_368;
-f32 fd_boss_moamoa_tentacle_b_one_negone_359[2] __attribute__((aligned(8)));
-f32 fd_boss_moamoa_tentacle_b___local_PIO2_367;
-f32 fd_boss_moamoa_tentacle_b_one_364;
 BattleUnitKind unit_boss_moamoa_tentacle_b;
 static BattleUnitDefense defence;
 static BattleUnitDefenseAttr defence_attr;
@@ -48,43 +32,13 @@ static BattleWeapon weapon_moamoa_attack;
 static EvtWord init_event[26];
 static EvtWord damage_event[10];
 static EvtWord dead_event[115];
-static EvtWord phase_event[2];
 static EvtWord attack_event[21];
-static EvtWord evt_attack_other_arm[81];
 const char* A_of_B_Attack[3];
 const char* B_of_B_Attack_front[10];
 const char* B_of_B_Attack_back[10];
 const char* C_of_B_Attack[6];
 static EvtWord evt_attack[387];
 static EvtWord wait_event[32];
-
-f32 fd_boss_moamoa_tentacle_b_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
-
-f32 fd_boss_moamoa_tentacle_b_neg_one_382 = -1.0f;
-
-f32 fd_boss_moamoa_tentacle_b___local_PI_383 = 3.1415927f;
-
-f32 fd_boss_moamoa_tentacle_b___local_3PIO2_385 = 4.712389f;
-
-f32 fd_boss_moamoa_tentacle_b_one_negone_373[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
-
-f32 fd_boss_moamoa_tentacle_b___local_PIO2_384 = 1.5707964f;
-
-f32 fd_boss_moamoa_tentacle_b_one_381 = 1.0f;
-
-f32 fd_boss_moamoa_tentacle_b_negone_one_360[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
-
-f32 fd_boss_moamoa_tentacle_b_neg_one_365 = -1.0f;
-
-f32 fd_boss_moamoa_tentacle_b___local_PI_366 = 3.1415927f;
-
-f32 fd_boss_moamoa_tentacle_b___local_3PIO2_368 = 4.712389f;
-
-f32 fd_boss_moamoa_tentacle_b_one_negone_359[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
-
-f32 fd_boss_moamoa_tentacle_b___local_PIO2_367 = 1.5707964f;
-
-f32 fd_boss_moamoa_tentacle_b_one_364 = 1.0f;
 
 BattleUnitKind unit_boss_moamoa_tentacle_b = {
     109,
@@ -425,7 +379,7 @@ static EVT_BEGIN(evt_attack)
     IF_INT_EQUAL(LF(0), 0)
         CALL(btlevtcmd_snd_se, -2, STRING("SFX_BOSS_MOA_G_ARM_MOVE3"), -250000000, 0, -250000000)
     ELSE
-        CALL(btlevtcmd_snd_se, -2, STRING("SFX_BOSS_MOA_G_ARM_MOVE3_2\0"), -250000000, 0, -250000000)
+        CALL(btlevtcmd_snd_se, -2, STRING("SFX_BOSS_MOA_G_ARM_MOVE3_2"), -250000000, 0, -250000000)
     END_IF
     IF_INT_EQUAL(LW(15), 0)
         LOOP(0)

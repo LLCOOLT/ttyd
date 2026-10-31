@@ -1,7 +1,6 @@
 #include "battle/battle_unit.h"
 #include "evt/evt_cmd.h"
 
-#pragma force_active on
 #include "mario/mario.h"
 #include "driver/hitdrv.h"
 #include "string.h"
@@ -51,65 +50,22 @@ USER_FUNC(evt_sub_intpl_msec_init);
 USER_FUNC(evt_sub_random);
 USER_FUNC(mario_moveride_check);
 
-f32 fd_muj_04_negone_one_374[2] __attribute__((aligned(8)));
-f32 fd_muj_04_neg_one_382;
-f32 fd_muj_04___local_PI_383;
-f32 fd_muj_04___local_3PIO2_385;
-f32 fd_muj_04_one_negone_373[2] __attribute__((aligned(8)));
-f32 fd_muj_04___local_PIO2_384;
-f32 fd_muj_04_one_381;
-f32 fd_muj_04_negone_one_360[2] __attribute__((aligned(8)));
-f32 fd_muj_04_neg_one_365;
-f32 fd_muj_04___local_PI_366;
-f32 fd_muj_04___local_3PIO2_368;
-f32 fd_muj_04_one_negone_359[2] __attribute__((aligned(8)));
-f32 fd_muj_04___local_PIO2_367;
-f32 fd_muj_04_one_364;
 static NpcSetupInfo npcEnt[6];
-static EvtWord evt_haikei_in[16];
 static BeroEntry bero_entry_data[5];
 const char* hitname[17];
 const char* mapanim[17];
-EvtWord mario_hashi_anime[34];
-EvtWord erumos00_attack[50];
-EvtWord erumos01_attack[50];
-EvtWord sanders_attack[88];
-EvtWord mario_katsugi[24];
-EvtWord sanders_funto[477];
-EvtWord yashi_yure_init[5];
-EvtWord yashi_yure[255];
+extern EvtWord mario_hashi_anime[];
+extern EvtWord erumos00_attack[];
+extern EvtWord erumos01_attack[];
+extern EvtWord sanders_attack[];
+extern EvtWord mario_katsugi[];
+extern EvtWord sanders_funto[];
+extern EvtWord yashi_yure_init[];
+extern EvtWord yashi_yure[];
 static HitDamageReturn hitDmgRetPoints[4];
 static TreeAccess tree_tbl[3];
 static KusaAccess kusa_tbl[5];
-EvtWord muj_04_init_evt[131];
-
-f32 fd_muj_04_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
-
-f32 fd_muj_04_neg_one_382 = -1.0f;
-
-f32 fd_muj_04___local_PI_383 = 3.1415927f;
-
-f32 fd_muj_04___local_3PIO2_385 = 4.712389f;
-
-f32 fd_muj_04_one_negone_373[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
-
-f32 fd_muj_04___local_PIO2_384 = 1.5707964f;
-
-f32 fd_muj_04_one_381 = 1.0f;
-
-f32 fd_muj_04_negone_one_360[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
-
-f32 fd_muj_04_neg_one_365 = -1.0f;
-
-f32 fd_muj_04___local_PI_366 = 3.1415927f;
-
-f32 fd_muj_04___local_3PIO2_368 = 4.712389f;
-
-f32 fd_muj_04_one_negone_359[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
-
-f32 fd_muj_04___local_PIO2_367 = 1.5707964f;
-
-f32 fd_muj_04_one_364 = 1.0f;
+extern EvtWord muj_04_init_evt[];
 
 static NpcSetupInfo npcEnt[] = {
     {
@@ -370,8 +326,13 @@ EVT_BEGIN(sanders_funto)
     CALL(evt_npc_set_ry, STRING(/*"オドオド水夫"*/"\x83\x49\x83\x68\x83\x49\x83\x68\x90\x85\x95\x76"), 270)
     CALL(evt_npc_set_position, STRING(/*"めがね水夫"*/"\x82\xDF\x82\xAA\x82\xCB\x90\x85\x95\x76"), 25, 112, -20)
     CALL(evt_npc_set_ry, STRING(/*"めがね水夫"*/"\x82\xDF\x82\xAA\x82\xCB\x90\x85\x95\x76"), 90)
+#ifdef VERSION_G8MP01 // PAL: also sets NPC flag 0x40000000 on the two sailors
+    CALL(evt_npc_flag_onoff, 1, STRING(/*"オドオド水夫"*/"\x83\x49\x83\x68\x83\x49\x83\x68\x90\x85\x95\x76"), 1073741856)
+    CALL(evt_npc_flag_onoff, 1, STRING(/*"めがね水夫"*/"\x82\xDF\x82\xAA\x82\xCB\x90\x85\x95\x76"), 1073741856)
+#else
     CALL(evt_npc_flag_onoff, 1, STRING(/*"オドオド水夫"*/"\x83\x49\x83\x68\x83\x49\x83\x68\x90\x85\x95\x76"), 32)
     CALL(evt_npc_flag_onoff, 1, STRING(/*"めがね水夫"*/"\x82\xDF\x82\xAA\x82\xCB\x90\x85\x95\x76"), 32)
+#endif
     CALL(evt_npc_sound_data_set, STRING(/*"めがね水夫"*/"\x82\xDF\x82\xAA\x82\xCB\x90\x85\x95\x76"), STRING("SFX_STG5_KANBU_GLASSES_MOVE1L"), STRING("SFX_STG5_KANBU_GLASSES_MOVE1R"), -250000000, -250000000, -250000000)
     CALL(evt_npc_set_ry, STRING(/*"エルモスA"*/"\x83\x47\x83\x8B\x83\x82\x83\x58\x41"), 90)
     CALL(evt_npc_set_ry, STRING(/*"エルモスB"*/"\x83\x47\x83\x8B\x83\x82\x83\x58\x42"), 270)
@@ -610,7 +571,7 @@ EVT_BEGIN(muj_04_init_evt)
     CALL(evt_hitobj_attr_onoff, 1, 1, STRING("A_hasi18"), 2097152)
     CALL(evt_hitobj_attr_onoff, 1, 1, STRING("A_srt"), 2097152)
     CALL(evt_mobj_jumpstand_blue, 0, STRING("mobj_jump00"), 150, 425, 10, 130, 0, 0)
-    CALL(evt_eff64, STRING("sunlight"), STRING("sunlight_n64\0\0\0"), 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0)
+    CALL(evt_eff64, STRING("sunlight"), STRING("sunlight_n64"), 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0)
     SET_VALUE(LW(0), PTR(tree_tbl))
     CALL_CHILD(PTR(evt_sub_tree_access_entry))
     SET_VALUE(LW(0), PTR(kusa_tbl))

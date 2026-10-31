@@ -4,8 +4,7 @@
 #include "evt/evt_bero.h"
 #include "evt/evt_item.h"
 #include "evt/evt_npc.h"
-
-#pragma force_active on
+#include "manager/evtmgr_cmd.h"
 
 USER_FUNC(evt_bero_exec_wait);
 USER_FUNC(evt_bero_get_entername);
@@ -103,69 +102,18 @@ USER_FUNC(evt_sub_save_playtime);
 void gans_msg_callback(s32 type, void** work);
 extern s32 evt_pouch_add_coin[];
 
-f32 fd_tou_05_negone_one_374[2] __attribute__((aligned(8)));
-f32 fd_tou_05_neg_one_382;
-f32 fd_tou_05___local_PI_383;
-f32 fd_tou_05___local_3PIO2_385;
-f32 fd_tou_05_one_negone_373[2] __attribute__((aligned(8)));
-f32 fd_tou_05___local_PIO2_384;
-f32 fd_tou_05_one_381;
-f32 fd_tou_05_negone_one_360[2] __attribute__((aligned(8)));
-f32 fd_tou_05_neg_one_365;
-f32 fd_tou_05___local_PI_366;
-f32 fd_tou_05___local_3PIO2_368;
-f32 fd_tou_05_one_negone_359[2] __attribute__((aligned(8)));
-f32 fd_tou_05___local_PIO2_367;
-f32 fd_tou_05_one_364;
-static EvtWord evt_dakuto[90];
-static EvtWord n_door_open[12];
-static EvtWord n_door_close[12];
-EvtWord n_bero_match_reset[14];
+extern EvtWord n_bero_match_reset[];
 static BeroEntry bero_data[3];
-EvtWord evt_takurami[352];
-EvtWord evt_hiki_close[86];
-EvtWord evt_hiki_open[193];
-static EvtWord init_gans[29];
-static EvtWord talk_gans[182];
-static EvtWord init_kinoshikowa[18];
-static EvtWord talk_kinoshikowa[386];
+extern EvtWord evt_takurami[];
+extern EvtWord evt_hiki_close[];
+extern EvtWord evt_hiki_open[];
 static NpcSetupInfo npcEnt[3];
 static EvtWord evt_kinoshikowa[222];
-static EvtWord evt_sensyu[430];
-EvtWord evt_sensyu2[208];
-static EvtWord evt_1st_leagu[467];
-EvtWord evt_nozoki_msg[33];
-EvtWord evt_nozoki[769];
-EvtWord evt_sensyu_reentry[293];
-EvtWord tou_05_init_evt[445];
-
-f32 fd_tou_05_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
-
-f32 fd_tou_05_neg_one_382 = -1.0f;
-
-f32 fd_tou_05___local_PI_383 = 3.1415927f;
-
-f32 fd_tou_05___local_3PIO2_385 = 4.712389f;
-
-f32 fd_tou_05_one_negone_373[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
-
-f32 fd_tou_05___local_PIO2_384 = 1.5707964f;
-
-f32 fd_tou_05_one_381 = 1.0f;
-
-f32 fd_tou_05_negone_one_360[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
-
-f32 fd_tou_05_neg_one_365 = -1.0f;
-
-f32 fd_tou_05___local_PI_366 = 3.1415927f;
-
-f32 fd_tou_05___local_3PIO2_368 = 4.712389f;
-
-f32 fd_tou_05_one_negone_359[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
-
-f32 fd_tou_05___local_PIO2_367 = 1.5707964f;
-
-f32 fd_tou_05_one_364 = 1.0f;
+extern EvtWord evt_sensyu2[];
+extern EvtWord evt_nozoki_msg[];
+extern EvtWord evt_nozoki[];
+extern EvtWord evt_sensyu_reentry[];
+extern EvtWord tou_05_init_evt[];
 
 static EVT_BEGIN(evt_dakuto)
     CALL(evt_mario_normalize)
@@ -1460,7 +1408,7 @@ EVT_BEGIN(tou_05_init_evt)
         END_IF
     END_IF
     CALL(evt_hitobj_onoff, STRING("haiku_kabe"), 1, 0)
-    CALL(evt_hitobj_onoff, STRING("kore\0\0\0"), 1, 0)
+    CALL(evt_hitobj_onoff, STRING("kore"), 1, 0)
     CALL(evt_hitobj_attr_onoff, 1, 1, STRING("w_bero"), 4)
     RETURN
 EVT_END()

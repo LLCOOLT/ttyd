@@ -2,7 +2,6 @@
 #include "battle/battle_unit.h"
 #include "evt/evt_cmd.h"
 
-#pragma force_active on
 #include "manager/evtmgr_cmd.h"
 #include "driver/npcdrv.h"
 #include "driver/animdrv.h"
@@ -32,10 +31,6 @@ typedef struct DanceData { u16 flags; u8 step; u8 movePos; f32 cx; f32 cy; f32 r
 double sin(double x);
 double cos(double x);
 typedef struct HorogramWork { void* buf0; void* buf1; GXTexObj tex0; GXTexObj tex1; u16 ready; u16 flags; } HorogramWork;
-// target .bss pad (uninitialised objects are emitted in reverse order, so this sits last)
-#pragma force_active on
-u32 gap_05_0000014C_bss[1];
-#pragma force_active reset
 HorogramWork* horogram_wp;
 DanceData dance_dt;
 void peach_capture(CameraId cameraId, void* param);
@@ -48,6 +43,9 @@ int rand(void);
 
 static s32 bgm_start_wait(EventEntry* event, BOOL isFirstCall);
 static USER_FUNC(bgm_start_wait);
+#ifdef VERSION_G8MP01
+static USER_FUNC(wait_move_end_50hz);
+#endif
 s32 btn_check(EventEntry* event, BOOL isFirstCall);
 s32 btn_check(EventEntry* event, BOOL isFirstCall);
 s32 compute_horogram_pos(EventEntry* event, BOOL isFirstCall);
@@ -209,46 +207,33 @@ void noiseDisp(CameraId cameraId, void* param);
 #define SAVE_EVT evt_memcard_save
 #endif
 
-static EvtWord w_door_close[22];
-static EvtWord w_door_open[22];
 static BeroEntry bero_entry_data[2];
-EvtWord evt_emergency[48];
-EvtWord evt_last[728];
-EvtWord evt_last2[339];
-EvtWord evt_camera[68];
-EvtWord mail_sousin_se[36];
-static EvtWord peach_evt_stg1[1131];
+extern EvtWord evt_emergency[];
+extern EvtWord evt_last[];
+extern EvtWord evt_last2[];
+extern EvtWord evt_camera[];
+extern EvtWord mail_sousin_se[];
 f32 move_pos_list[15][2];
-EvtWord peach_dance_move[95];
-EvtWord peach_dance_pose[44];
-EvtWord peach_dance_action_step[2];
-EvtWord dance_action_turn_sub[108];
-EvtWord peach_dance_action_turn[12];
-EvtWord peach_dance_action_reverse[18];
-EvtWord peach_dance_action_fail[28];
-EvtWord dance_btn_disp_sub[49];
-EvtWord dance_btn_disp[25];
-EvtWord dance_btn_batu[20];
-EvtWord dance_btn_clear[56];
-EvtWord dance_btn_clear_all[47];
-EvtWord wait_action_time[16];
-EvtWord peach_dance_dark[27];
-EvtWord peach_dance_light[27];
-EvtWord peach_evt_dance[VERSION_PICK(504, 521)];
-static EvtWord peach_evt_stg2[900];
-static EvtWord peach_evt_stg3[352];
-static EvtWord peach_evt_stg3_1[650];
+extern EvtWord peach_dance_move[];
+extern EvtWord peach_dance_pose[];
+extern EvtWord peach_dance_action_step[];
+extern EvtWord dance_action_turn_sub[];
+extern EvtWord peach_dance_action_turn[];
+extern EvtWord peach_dance_action_reverse[];
+extern EvtWord peach_dance_action_fail[];
+extern EvtWord dance_btn_disp_sub[];
+extern EvtWord dance_btn_disp[];
+extern EvtWord dance_btn_batu[];
+extern EvtWord dance_btn_clear[];
+extern EvtWord dance_btn_clear_all[];
+extern EvtWord wait_action_time[];
+extern EvtWord peach_dance_dark[];
+extern EvtWord peach_dance_light[];
+extern EvtWord peach_evt_dance[];
 EvtWord peach_evt_stg4_quiz_data[5][4];
-static EvtWord peach_evt_stg4[980];
-static EvtWord peach_evt_stg5[408];
-static EvtWord peach_evt_stg5_1[528];
-static EvtWord peach_evt_stg6[1467];
-static EvtWord teshita1_init[9];
-static EvtWord teshita2_init[9];
-static EvtWord syuryo_init[9];
 static NpcSetupInfo npcEnt[4];
-EvtWord tec_talk[36];
-EvtWord aji_17_init_evt[VERSION_PICK(253, 255)];
+extern EvtWord tec_talk[];
+extern EvtWord aji_17_init_evt[];
 
 #pragma defer_codegen off
 s32 peach_evt_stg4_read_quiz_data(EventEntry* event, BOOL isFirstCall) {
@@ -267,56 +252,16 @@ BOOL psndBGMStartCheck(s32 id);
 static s32 bgm_start_wait(EventEntry* event, BOOL isFirstCall) {
     return psndBGMStartCheck(1) ? EVT_RETURN_DONE : EVT_RETURN_BLOCK;
 }
+#ifdef VERSION_G8MP01
+// PAL: at 50 Hz the next dance move waits for the previous one to end (dance_dt flag 4)
+static s32 wait_move_end_50hz(EventEntry* event, BOOL isFirstCall) {
+    if (gp->framerate != 50) {
+        return EVT_RETURN_DONE;
+    }
+    return (dance_dt.flags & 4) ? EVT_RETURN_BLOCK : EVT_RETURN_DONE;
+}
+#endif
 #pragma defer_codegen on
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-#pragma force_active on
-f32 fd_aji_17_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
-
-f32 fd_aji_17_neg_one_382 = -1.0f;
-
-f32 fd_aji_17___local_PI_383 = 3.1415927f;
-
-f32 fd_aji_17___local_3PIO2_385 = 4.712389f;
-
-u32 gap_04_0001E124_data[1] = {0};
-
-f32 fd_aji_17_one_negone_373[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
-
-f32 fd_aji_17___local_PIO2_384 = 1.5707964f;
-
-f32 fd_aji_17_one_381 = 1.0f;
-
-f32 fd_aji_17_negone_one_360[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
-
-f32 fd_aji_17_neg_one_365 = -1.0f;
-
-f32 fd_aji_17___local_PI_366 = 3.1415927f;
-
-f32 fd_aji_17___local_3PIO2_368 = 4.712389f;
-
-u32 gap_04_0001E14C_data[1] = {0};
-
-f32 fd_aji_17_one_negone_359[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
-
-f32 fd_aji_17___local_PIO2_367 = 1.5707964f;
-
-f32 fd_aji_17_one_364 = 1.0f;
-
-#pragma force_active reset
 
 static EVT_BEGIN(w_door_close)
     MULTIPLY_FLOAT(LW(0), FLOAT(0.25f))
@@ -1160,8 +1105,8 @@ EVT_BEGIN(peach_dance_move)
         CALL(compute_peach_pos, LW(0), LW(1), LW(2), LW(3))
         CALL(evt_mario_set_pos, LW(2), LW(4), LW(3))
         CALL(compute_horogram_pos, LW(0), LW(1), LW(2), LW(3))
-        CALL(set_npc_pos, STRING(("\203z\203\215\203O\203\211\203\200")), LW(2), FLOAT(0.0f), LW(3))
-        CALL(set_npc_pos, STRING(("\203_\203~\201[")), LW(0), FLOAT(5.0f), LW(1))
+        CALL(set_npc_pos, STRING(("ホログラム")), LW(2), FLOAT(0.0f), LW(3))
+        CALL(set_npc_pos, STRING(("ダミー")), LW(0), FLOAT(5.0f), LW(1))
         WAIT_FRAMES(1)
     END_LOOP
     RETURN
@@ -1205,7 +1150,7 @@ EVT_BEGIN(dance_action_turn_sub)
     ADD_FLOAT(LW(9), FLOAT(3.140625f))
     MULTIPLY_FLOAT(LW(8), FLOAT(1000.0f))
     MULTIPLY_FLOAT(LW(9), FLOAT(1000.0f))
-    CALL(evt_npc_get_position, STRING(("\203z\203\215\203O\203\211\203\200")), LW(2), LW(0), LW(3))
+    CALL(evt_npc_get_position, STRING(("ホログラム")), LW(2), LW(0), LW(3))
     CALL(evt_snd_sfxon_3d, STRING(("SFX_PEACH_DANCE_TURN1")), LW(2), 0, LW(3), 0)
     BEGIN_INLINE_EVENT
         CALL(evt_sub_intpl_msec_init, 11, LW(6), LW(7), 400)
@@ -1213,7 +1158,7 @@ EVT_BEGIN(dance_action_turn_sub)
         CALL(evt_sub_intpl_msec_get_value)
         SET_VALUE(LW(2), 360)
         SUBTRACT(LW(2), LW(0))
-        CALL(evt_npc_set_ry, STRING(("\203z\203\215\203O\203\211\203\200")), LW(2))
+        CALL(evt_npc_set_ry, STRING(("ホログラム")), LW(2))
         CALL(evt_mario_set_dir, LW(0), 0, 0)
         CALL(evt_mario_set_dispdir, LW(0))
         WAIT_FRAMES(1)
@@ -1278,7 +1223,7 @@ EVT_BEGIN(dance_btn_disp_sub)
         CASE_EQUAL(0)
         SET_VALUE(LW(3), -45)
     END_SWITCH
-    CALL(evt_fuki_btn, LW(2), LW(4), STRING(("\203_\203~\201[")), 0, 0, 0, 0, LW(3), -1)
+    CALL(evt_fuki_btn, LW(2), LW(4), STRING(("ダミー")), 0, 0, 0, 0, LW(3), -1)
     RETURN
 EVT_END()
 
@@ -1430,6 +1375,9 @@ EVT_BEGIN(peach_evt_dance)
         END_IF
         SET_VALUE(LW(1), 0)
         SPAWN_EVENT_GET_ID(PTR(evt_sub_stopwatch), LW(12))
+#ifdef VERSION_G8MP01
+        CALL(wait_move_end_50hz)
+#endif
         SPAWN_EVENT(PTR(peach_dance_move))
         LOOP(0)
             CALL(evt_sub_get_stopwatch, LW(12), LW(4))
@@ -1448,6 +1396,9 @@ EVT_BEGIN(peach_evt_dance)
             SET_RAW_VALUE(LW(2), 2)
         END_SWITCH
         CALL_CHILD(PTR(dance_btn_disp))
+#ifdef VERSION_G8MP01
+        CALL(wait_move_end_50hz)
+#endif
         SPAWN_EVENT(PTR(peach_dance_move))
         SPAWN_EVENT_GET_ID(PTR(evt_sub_stopwatch), LW(14))
         LOOP(0)
@@ -1478,6 +1429,9 @@ EVT_BEGIN(peach_evt_dance)
             WAIT_FRAMES(1)
         END_LOOP
         ADD(LW(11), 2000)
+#ifdef VERSION_G8MP01
+        CALL(wait_move_end_50hz)
+#endif
         SPAWN_EVENT(PTR(peach_dance_move))
         IF_INT_NOT_EQUAL(LW(3), 0)
             SWITCH(LW(3))
@@ -1499,6 +1453,9 @@ EVT_BEGIN(peach_evt_dance)
                 SPAWN_EVENT(PTR(peach_dance_action_fail))
             END_SWITCH
         END_IF
+#ifdef VERSION_G8MP01
+        CALL_CHILD(PTR(dance_btn_clear_all)) // PAL clears the buttons at once, as JP does
+#else
         BEGIN_INLINE_EVENT
             CALL(dance_flag_check, 4096, LW(5))
             IF_INT_NOT_EQUAL(LW(5), 0)
@@ -1507,6 +1464,7 @@ EVT_BEGIN(peach_evt_dance)
                 CALL(dance_flag_onoff, 4096, 0)
             END_IF
         END_INLINE_EVENT
+#endif
         LOOP(0)
             CALL(evt_sub_get_stopwatch, LW(12), LW(4))
             IF_INT_GREATER_OR_EQUAL(LW(4), 1980)
@@ -1574,10 +1532,10 @@ EVT_BEGIN(peach_evt_dance)
 EVT_END()
 #else
 EVT_BEGIN(peach_evt_dance)
-    CALL(evt_npc_pera_onoff, STRING(("\203z\203\215\203O\203\211\203\200")), 0)
-    CALL(evt_npc_set_ry, STRING(("\203z\203\215\203O\203\211\203\200")), 180)
-    CALL(evt_npc_pera_onoff, STRING(("\203z\203\215\203O\203\211\203\2002")), 0)
-    CALL(evt_npc_set_ry, STRING(("\203z\203\215\203O\203\211\203\2002")), 180)
+    CALL(evt_npc_pera_onoff, STRING(("ホログラム")), 0)
+    CALL(evt_npc_set_ry, STRING(("ホログラム")), 180)
+    CALL(evt_npc_pera_onoff, STRING(("ホログラム2")), 0)
+    CALL(evt_npc_set_ry, STRING(("ホログラム2")), 180)
     LABEL(100)
     SET_VALUE(LW(15), 0)
     SET_VALUE(LW(14), 0)
@@ -1586,10 +1544,10 @@ EVT_BEGIN(peach_evt_dance)
     SET_VALUE(LW(11), 0)
     CALL(dance_data_init)
     CALL(get_center, LW(2), LW(3))
-    CALL(evt_npc_set_position, STRING(("\203_\203~\201[")), LW(2), FLOAT(5.0f), LW(3))
+    CALL(evt_npc_set_position, STRING(("ダミー")), LW(2), FLOAT(5.0f), LW(3))
     CALL(peach_set_pose, STRING(("P_O_Z_1")))
-    CALL(evt_npc_set_anim, STRING(("\203z\203\215\203O\203\211\203\200")), STRING(("P_O_Z_1")))
-    CALL(evt_npc_set_anim, STRING(("\203z\203\215\203O\203\211\203\2002")), STRING(("P_O_Z_1R")))
+    CALL(evt_npc_set_anim, STRING(("ホログラム")), STRING(("P_O_Z_1")))
+    CALL(evt_npc_set_anim, STRING(("ホログラム2")), STRING(("P_O_Z_1R")))
     WAIT_MS(350)
     CALL(peach_set_pose, STRING(("P_O_S_1")))
     CALL(horogram_set_pose, STRING(("P_O_S_2")))
@@ -1678,7 +1636,7 @@ EVT_BEGIN(peach_evt_dance)
                     SPAWN_EVENT(PTR(peach_dance_action_reverse))
                 END_SWITCH
                 CASE_EQUAL(2)
-                CALL(evt_npc_get_position, STRING(("\203z\203\215\203O\203\211\203\200")), LW(5), LW(6), LW(7))
+                CALL(evt_npc_get_position, STRING(("ホログラム")), LW(5), LW(6), LW(7))
                 CALL(evt_snd_sfxon_3d, STRING(("SFX_PEACH_DANCE_NG1")), LW(5), 0, LW(7), 0)
                 CALL_CHILD(PTR(dance_btn_batu))
                 SPAWN_EVENT(PTR(peach_dance_action_fail))
@@ -1704,17 +1662,17 @@ EVT_BEGIN(peach_evt_dance)
     CALL(horogram_set_pose, STRING(("P_S_1")))
     WAIT_MS(300)
     SET_VALUE(LW(10), LW(15))
-    CALL(evt_npc_get_position, STRING(("\203z\203\215\203O\203\211\203\200")), LW(2), LW(0), LW(3))
+    CALL(evt_npc_get_position, STRING(("ホログラム")), LW(2), LW(0), LW(3))
     CALL(evt_snd_sfxon_3d, STRING(("SFX_PEACH_DANCE_APPEAR1")), LW(2), 0, LW(3), 0)
     CALL(evt_sub_intpl_msec_init, 11, 192, 0, 500)
     LABEL(0)
     CALL(evt_sub_intpl_msec_get_value)
-    CALL(evt_npc_set_color, STRING(("\203z\203\215\203O\203\211\203\200")), 255, 255, 255, LW(0))
+    CALL(evt_npc_set_color, STRING(("ホログラム")), 255, 255, 255, LW(0))
     WAIT_FRAMES(1)
     IF_INT_EQUAL(LW(1), 1)
         GOTO(0)
     END_IF
-    CALL(evt_npc_flag_onoff, 1, STRING(("\203z\203\215\203O\203\211\203\200")), 128)
+    CALL(evt_npc_flag_onoff, 1, STRING(("ホログラム")), 128)
     CALL_CHILD(PTR(peach_dance_light))
     SET_VALUE(LW(15), LW(10))
     CALL(evt_cam3d_evt_set, 0, 105, 243, 0, 55, -53, 1500, 11)
@@ -1728,18 +1686,18 @@ EVT_BEGIN(peach_evt_dance)
         CALL(evt_msg_print, 0, STRING(("peach_aji_94")), 0, 0)
         CALL(evt_map_pauseanim, 0, STRING(("moza")))
         CALL(evt_mario_get_pos, 0, LW(0), LW(1), LW(2))
-        CALL(evt_npc_set_position, STRING(("\203_\203~\201[")), LW(0), LW(1), LW(2))
-        CALL(evt_msg_print, 0, STRING(("peach_aji_95")), 0, STRING(("\203_\203~\201[")))
+        CALL(evt_npc_set_position, STRING(("ダミー")), LW(0), LW(1), LW(2))
+        CALL(evt_msg_print, 0, STRING(("peach_aji_95")), 0, STRING(("ダミー")))
         CALL(horogram_flag_onoff, 0, 4)
-        CALL(evt_npc_set_ry, STRING(("\203z\203\215\203O\203\211\203\200")), 180)
+        CALL(evt_npc_set_ry, STRING(("ホログラム")), 180)
         CALL_CHILD(PTR(peach_dance_dark))
         CALL(compute_horogram_pos, 0, -80, LW(2), LW(3))
-        CALL(evt_npc_set_position, STRING(("\203z\203\215\203O\203\211\203\200")), LW(2), 0, LW(3))
+        CALL(evt_npc_set_position, STRING(("ホログラム")), LW(2), 0, LW(3))
         CALL(evt_snd_sfxon_3d, STRING(("SFX_PEACH_DANCE_APPEAR1")), LW(2), 0, LW(3), 0)
         CALL(evt_sub_intpl_msec_init, 11, 0, 192, 500)
         LABEL(1)
         CALL(evt_sub_intpl_msec_get_value)
-        CALL(evt_npc_set_color, STRING(("\203z\203\215\203O\203\211\203\200")), 255, 255, 255, LW(0))
+        CALL(evt_npc_set_color, STRING(("ホログラム")), 255, 255, 255, LW(0))
         WAIT_FRAMES(1)
         IF_INT_EQUAL(LW(1), 1)
             GOTO(1)
@@ -1754,25 +1712,25 @@ EVT_END()
 
 static EVT_BEGIN(peach_evt_stg2)
     CALL(evt_mario_set_mode, 1)
-    CALL(evt_npc_entry, STRING(("\203_\203~\201[")), STRING(("c_peach")))
-    CALL(evt_npc_flag_onoff, 1, STRING(("\203_\203~\201[")), 128)
-    CALL(evt_npc_flag_onoff, 1, STRING(("\203_\203~\201[")), 32)
-    CALL(evt_npc_set_width, STRING(("\203_\203~\201[")), FLOAT(20.0f))
-    CALL(evt_npc_set_height, STRING(("\203_\203~\201[")), FLOAT(47.0f))
-    CALL(evt_npc_entry, STRING(("\203z\203\215\203O\203\211\203\200")), STRING(("c_peach")))
-    CALL(evt_npc_set_tribe, STRING(("\203z\203\215\203O\203\211\203\200")), STRING(("\203s\201[\203`\225P")))
-    CALL(evt_npc_flag_onoff, 1, STRING(("\203z\203\215\203O\203\211\203\200")), 128)
-    CALL(evt_npc_flag_onoff, 1, STRING(("\203z\203\215\203O\203\211\203\200")), 32)
-    CALL(evt_npc_set_color, STRING(("\203z\203\215\203O\203\211\203\200")), 255, 255, 255, 255)
-    CALL(evt_npc_set_width, STRING(("\203z\203\215\203O\203\211\203\200")), FLOAT(20.0f))
-    CALL(evt_npc_set_height, STRING(("\203z\203\215\203O\203\211\203\200")), FLOAT(47.0f))
-    CALL(evt_npc_entry, STRING(("\203z\203\215\203O\203\211\203\2002")), STRING(("c_peach_r")))
-    CALL(evt_npc_set_tribe, STRING(("\203z\203\215\203O\203\211\203\2002")), STRING(("\203s\201[\203`\225P")))
-    CALL(evt_npc_flag_onoff, 1, STRING(("\203z\203\215\203O\203\211\203\2002")), 128)
-    CALL(evt_npc_flag_onoff, 1, STRING(("\203z\203\215\203O\203\211\203\2002")), 32)
-    CALL(evt_npc_set_color, STRING(("\203z\203\215\203O\203\211\203\2002")), 255, 255, 255, 255)
-    CALL(evt_npc_set_width, STRING(("\203z\203\215\203O\203\211\203\2002")), FLOAT(20.0f))
-    CALL(evt_npc_set_height, STRING(("\203z\203\215\203O\203\211\203\2002")), FLOAT(47.0f))
+    CALL(evt_npc_entry, STRING(("ダミー")), STRING(("c_peach")))
+    CALL(evt_npc_flag_onoff, 1, STRING(("ダミー")), 128)
+    CALL(evt_npc_flag_onoff, 1, STRING(("ダミー")), 32)
+    CALL(evt_npc_set_width, STRING(("ダミー")), FLOAT(20.0f))
+    CALL(evt_npc_set_height, STRING(("ダミー")), FLOAT(47.0f))
+    CALL(evt_npc_entry, STRING(("ホログラム")), STRING(("c_peach")))
+    CALL(evt_npc_set_tribe, STRING(("ホログラム")), STRING(("ピーチ姫")))
+    CALL(evt_npc_flag_onoff, 1, STRING(("ホログラム")), 128)
+    CALL(evt_npc_flag_onoff, 1, STRING(("ホログラム")), 32)
+    CALL(evt_npc_set_color, STRING(("ホログラム")), 255, 255, 255, 255)
+    CALL(evt_npc_set_width, STRING(("ホログラム")), FLOAT(20.0f))
+    CALL(evt_npc_set_height, STRING(("ホログラム")), FLOAT(47.0f))
+    CALL(evt_npc_entry, STRING(("ホログラム2")), STRING(("c_peach_r")))
+    CALL(evt_npc_set_tribe, STRING(("ホログラム2")), STRING(("ピーチ姫")))
+    CALL(evt_npc_flag_onoff, 1, STRING(("ホログラム2")), 128)
+    CALL(evt_npc_flag_onoff, 1, STRING(("ホログラム2")), 32)
+    CALL(evt_npc_set_color, STRING(("ホログラム2")), 255, 255, 255, 255)
+    CALL(evt_npc_set_width, STRING(("ホログラム2")), FLOAT(20.0f))
+    CALL(evt_npc_set_height, STRING(("ホログラム2")), FLOAT(47.0f))
     CALL(evt_mapobj_flag_onoff, 1, 1, STRING(("S_kurai")), 1)
     CALL(evt_mapobj_flag_onoff, 1, 0, STRING(("S_kikai")), 1)
     CALL(evt_map_playanim, STRING(("kika_1")), 1, 0)
@@ -1786,8 +1744,8 @@ static EVT_BEGIN(peach_evt_stg2)
     CALL(evt_snd_envon, 272, STRING(("ENV_STG7_AJI4")))
     CALL(horogram_init)
     WAIT_FRAMES(1)
-    CALL(evt_npc_set_color, STRING(("\203z\203\215\203O\203\211\203\200")), 255, 255, 255, 0)
-    CALL(evt_npc_set_color, STRING(("\203z\203\215\203O\203\211\203\2002")), 255, 255, 255, 0)
+    CALL(evt_npc_set_color, STRING(("ホログラム")), 255, 255, 255, 0)
+    CALL(evt_npc_set_color, STRING(("ホログラム2")), 255, 255, 255, 0)
     WAIT_MS(1000)
     BEGIN_INLINE_EVENT
         CALL(horogram_cap_evt)
@@ -1856,12 +1814,12 @@ static EVT_BEGIN(peach_evt_stg2)
     CALL(evt_snd_envoff_f, 512, 1000)
     CALL_CHILD(PTR(peach_dance_dark))
     LABEL(100)
-    CALL(evt_npc_set_position, STRING(("\203z\203\215\203O\203\211\203\200")), 30, 0, -68)
+    CALL(evt_npc_set_position, STRING(("ホログラム")), 30, 0, -68)
     CALL(evt_sub_intpl_msec_init, 11, 0, 192, 500)
     CALL(evt_snd_sfxon_3d, STRING(("SFX_PEACH_DANCE_APPEAR1")), 30, 0, -67, 0)
     LABEL(0)
     CALL(evt_sub_intpl_msec_get_value)
-    CALL(evt_npc_set_color, STRING(("\203z\203\215\203O\203\211\203\200")), 255, 255, 255, LW(0))
+    CALL(evt_npc_set_color, STRING(("ホログラム")), 255, 255, 255, LW(0))
     WAIT_FRAMES(1)
     IF_INT_EQUAL(LW(1), 1)
         GOTO(0)
@@ -1880,10 +1838,10 @@ static EVT_BEGIN(peach_evt_stg2)
     DEBUG_PUT_MSG(STRING(("move_pos")))
     DEBUG_PUT_REG(LW(0))
     BEGIN_INLINE_EVENT
-        CALL(evt_npc_move_position, STRING(("\203z\203\215\203O\203\211\203\200")), LW(2), LW(3), 0, FLOAT(48.0f), 0)
-        CALL(evt_npc_set_ry, STRING(("\203z\203\215\203O\203\211\203\200")), 180)
-        CALL(evt_npc_set_anim, STRING(("\203z\203\215\203O\203\211\203\200")), STRING(("P_S_1")))
-        CALL(evt_npc_set_anim, STRING(("\203z\203\215\203O\203\211\203\2002")), STRING(("P_S_1R")))
+        CALL(evt_npc_move_position, STRING(("ホログラム")), LW(2), LW(3), 0, FLOAT(48.0f), 0)
+        CALL(evt_npc_set_ry, STRING(("ホログラム")), 180)
+        CALL(evt_npc_set_anim, STRING(("ホログラム")), STRING(("P_S_1")))
+        CALL(evt_npc_set_anim, STRING(("ホログラム2")), STRING(("P_S_1R")))
         CALL(horogram_flag_onoff, 1, 1)
     END_INLINE_EVENT
     CALL(evt_mario_mov_pos2, LW(0), LW(1), FLOAT(48.0f))
@@ -2941,9 +2899,9 @@ static EVT_BEGIN(peach_evt_stg6)
     WAIT_MS(500)
     SET_VALUE(LW(0), 180)
     CALL_CHILD(PTR(w_door_open))
-    CALL(evt_npc_set_position, STRING(("\216\350\211\272\202P")), -140, 0, 0)
-    CALL(evt_npc_set_position, STRING(("\203V\203\205\203\212\203\207\201[")), -190, 0, 0)
-    CALL(evt_npc_set_position, STRING(("\216\350\211\272\202Q")), -240, 0, 0)
+    CALL(evt_npc_set_position, STRING(("手下１")), -140, 0, 0)
+    CALL(evt_npc_set_position, STRING(("シュリョー")), -190, 0, 0)
+    CALL(evt_npc_set_position, STRING(("手下２")), -240, 0, 0)
     BEGIN_INLINE_EVENT
         WAIT_MS(1000)
         SET_VALUE(LW(1), 0)
@@ -2957,13 +2915,13 @@ static EVT_BEGIN(peach_evt_stg6)
         END_IF
     END_INLINE_EVENT
     BEGIN_INLINE_EVENT
-        CALL(evt_npc_move_position, STRING(("\216\350\211\272\202P")), -80, 0, 0, FLOAT(60.0f), 0)
+        CALL(evt_npc_move_position, STRING(("手下１")), -80, 0, 0, FLOAT(60.0f), 0)
     END_INLINE_EVENT
     BEGIN_INLINE_EVENT
-        CALL(evt_npc_move_position, STRING(("\203V\203\205\203\212\203\207\201[")), -130, 0, 0, FLOAT(60.0f), 0)
+        CALL(evt_npc_move_position, STRING(("シュリョー")), -130, 0, 0, FLOAT(60.0f), 0)
     END_INLINE_EVENT
-    CALL(evt_npc_move_position, STRING(("\216\350\211\272\202Q")), -180, 0, 0, FLOAT(60.0f), 0)
-    CALL(evt_msg_print, 0, STRING(("peach_aji_303")), 0, STRING(("\203V\203\205\203\212\203\207\201[")))
+    CALL(evt_npc_move_position, STRING(("手下２")), -180, 0, 0, FLOAT(60.0f), 0)
+    CALL(evt_msg_print, 0, STRING(("peach_aji_303")), 0, STRING(("シュリョー")))
     CALL(evt_snd_sfxoff, LW(15))
     CALL(evt_mario_get_pos, 0, LW(0), LW(1), LW(2))
     CALL(evt_snd_sfxon_3d, STRING(("SFX_VOICE_PEACH_SURPRISED2_1")), LW(0), LW(1), LW(2), 0)
@@ -2980,21 +2938,21 @@ static EVT_BEGIN(peach_evt_stg6)
     WAIT_MS(1500)
     CALL(evt_snd_bgmon, 512, STRING(("BGM_EVT_STG8_3RDHEAD1")))
     WAIT_MS(2000)
-    CALL(evt_msg_print, 0, STRING(("peach_aji_305")), 0, STRING(("\203V\203\205\203\212\203\207\201[")))
+    CALL(evt_msg_print, 0, STRING(("peach_aji_305")), 0, STRING(("シュリョー")))
     CALL(evt_cam3d_evt_set, 0, 80, 44, 0, 130, -150, 0, 11)
     WAIT_FRAMES(1)
     SET_VALUE(GF(0), 1)
     BEGIN_INLINE_EVENT
-        CALL(evt_npc_move_position, STRING(("\216\350\211\272\202P")), 30, -70, 0, FLOAT(60.0f), 0)
-        CALL(evt_npc_set_ry, STRING(("\216\350\211\272\202P")), 270)
+        CALL(evt_npc_move_position, STRING(("手下１")), 30, -70, 0, FLOAT(60.0f), 0)
+        CALL(evt_npc_set_ry, STRING(("手下１")), 270)
     END_INLINE_EVENT
     BEGIN_INLINE_EVENT
-        CALL(evt_npc_flag_onoff, 1, STRING(("\203V\203\205\203\212\203\207\201[")), 32)
-        CALL(evt_npc_move_position, STRING(("\203V\203\205\203\212\203\207\201[")), -30, -70, 0, FLOAT(60.0f), 0)
+        CALL(evt_npc_flag_onoff, 1, STRING(("シュリョー")), 32)
+        CALL(evt_npc_move_position, STRING(("シュリョー")), -30, -70, 0, FLOAT(60.0f), 0)
         SET_VALUE(GF(0), 0)
     END_INLINE_EVENT
     BEGIN_INLINE_EVENT
-        CALL(evt_npc_move_position, STRING(("\216\350\211\272\202Q")), -100, -70, 0, FLOAT(60.0f), 0)
+        CALL(evt_npc_move_position, STRING(("手下２")), -100, -70, 0, FLOAT(60.0f), 0)
     END_INLINE_EVENT
     WAIT_MS(500)
     CALL(evt_map_replayanim, 0, STRING(("moza")))
@@ -3004,11 +2962,11 @@ static EVT_BEGIN(peach_evt_stg6)
     WAIT_FRAMES(1)
     WAIT_WHILE(GF(0))
     WAIT_MS(300)
-    CALL(evt_msg_print, 0, STRING(("peach_aji_307")), 0, STRING(("\203V\203\205\203\212\203\207\201[")))
+    CALL(evt_msg_print, 0, STRING(("peach_aji_307")), 0, STRING(("シュリョー")))
     CALL(evt_msg_print, 0, STRING(("peach_aji_308")), 0, STRING(("mario")))
     CALL(evt_cam3d_evt_set, -30, 100, 184, -30, 65, -13, 800, 11)
     WAIT_MS(800)
-    CALL(evt_msg_print, 0, STRING(("peach_aji_309")), 0, STRING(("\203V\203\205\203\212\203\207\201[")))
+    CALL(evt_msg_print, 0, STRING(("peach_aji_309")), 0, STRING(("シュリョー")))
     CALL(evt_cam3d_evt_set, 0, 80, 44, 0, 130, -150, 0, 11)
     WAIT_FRAMES(1)
     CALL(peach_set_pose, STRING(("P_C_1")))
@@ -3018,40 +2976,40 @@ static EVT_BEGIN(peach_evt_stg6)
     CALL(evt_map_pauseanim, 0, STRING(("moza")))
     CALL(evt_cam3d_evt_set, 0, 75, 387, 0, 75, -13, 1000, 11)
     WAIT_MS(1000)
-    CALL(evt_msg_print, 0, STRING(("peach_aji_311")), 0, STRING(("\203V\203\205\203\212\203\207\201[")))
-    CALL(evt_msg_print, 0, STRING(("peach_aji_312")), 0, STRING(("\216\350\211\272\202Q")))
+    CALL(evt_msg_print, 0, STRING(("peach_aji_311")), 0, STRING(("シュリョー")))
+    CALL(evt_msg_print, 0, STRING(("peach_aji_312")), 0, STRING(("手下２")))
     WAIT_FRAMES(1)
     BEGIN_INLINE_EVENT
-        CALL(evt_npc_move_position, STRING(("\216\350\211\272\202P")), 105, -95, 0, 70, 4)
-        CALL(evt_npc_set_ry, STRING(("\216\350\211\272\202P")), 270)
+        CALL(evt_npc_move_position, STRING(("手下１")), 105, -95, 0, 70, 4)
+        CALL(evt_npc_set_ry, STRING(("手下１")), 270)
     END_INLINE_EVENT
     BEGIN_INLINE_EVENT
-        CALL(evt_npc_move_position, STRING(("\216\350\211\272\202Q")), -105, -95, 0, 60, 4)
-        CALL(evt_npc_set_ry, STRING(("\216\350\211\272\202Q")), 90)
+        CALL(evt_npc_move_position, STRING(("手下２")), -105, -95, 0, 60, 4)
+        CALL(evt_npc_set_ry, STRING(("手下２")), 90)
     END_INLINE_EVENT
     WAIT_MS(1400)
     WAIT_MS(500)
     BEGIN_INLINE_EVENT
-        CALL(evt_npc_flag_onoff, 1, STRING(("\216\350\211\272\202P")), 1073741824)
-        CALL(evt_npc_status_onoff, 0, STRING(("\216\350\211\272\202P")), 2)
+        CALL(evt_npc_flag_onoff, 1, STRING(("手下１")), 1073741824)
+        CALL(evt_npc_status_onoff, 0, STRING(("手下１")), 2)
         WAIT_FRAMES(1)
-        CALL(evt_npc_move_position, STRING(("\216\350\211\272\202P")), 105, -100, 100, 0, 0)
+        CALL(evt_npc_move_position, STRING(("手下１")), 105, -100, 100, 0, 0)
         WAIT_MS(100)
-        CALL(evt_npc_move_position, STRING(("\216\350\211\272\202P")), 105, -95, 100, 0, 0)
+        CALL(evt_npc_move_position, STRING(("手下１")), 105, -95, 100, 0, 0)
         WAIT_MS(100)
-        CALL(evt_npc_status_onoff, 1, STRING(("\216\350\211\272\202P")), 2)
-        CALL(evt_npc_flag_onoff, 0, STRING(("\216\350\211\272\202P")), 1073741824)
+        CALL(evt_npc_status_onoff, 1, STRING(("手下１")), 2)
+        CALL(evt_npc_flag_onoff, 0, STRING(("手下１")), 1073741824)
     END_INLINE_EVENT
     BEGIN_INLINE_EVENT
-        CALL(evt_npc_flag_onoff, 1, STRING(("\216\350\211\272\202Q")), 1073741824)
-        CALL(evt_npc_status_onoff, 0, STRING(("\216\350\211\272\202Q")), 2)
+        CALL(evt_npc_flag_onoff, 1, STRING(("手下２")), 1073741824)
+        CALL(evt_npc_status_onoff, 0, STRING(("手下２")), 2)
         WAIT_FRAMES(1)
-        CALL(evt_npc_move_position, STRING(("\216\350\211\272\202Q")), -105, -100, 100, 0, 0)
+        CALL(evt_npc_move_position, STRING(("手下２")), -105, -100, 100, 0, 0)
         WAIT_MS(100)
-        CALL(evt_npc_move_position, STRING(("\216\350\211\272\202Q")), -105, -95, 100, 0, 0)
+        CALL(evt_npc_move_position, STRING(("手下２")), -105, -95, 100, 0, 0)
         WAIT_MS(100)
-        CALL(evt_npc_status_onoff, 1, STRING(("\216\350\211\272\202Q")), 2)
-        CALL(evt_npc_flag_onoff, 0, STRING(("\216\350\211\272\202Q")), 1073741824)
+        CALL(evt_npc_status_onoff, 1, STRING(("手下２")), 2)
+        CALL(evt_npc_flag_onoff, 0, STRING(("手下２")), 1073741824)
     END_INLINE_EVENT
     CALL(evt_mapobj_get_position, STRING(("S_sui2")), LW(0), LW(1), LW(2))
     CALL(evt_mapobj_get_position, STRING(("S_sui3")), LW(3), LW(4), LW(5))
@@ -3099,14 +3057,14 @@ static EVT_BEGIN(peach_evt_stg6)
     CALL(evt_npc_set_autotalkpose, STRING(("mario")), STRING(("P_S_1")), STRING(("P_T_1")))
     CALL(evt_msg_print, 0, STRING(("peach_aji_316")), 0, STRING(("mario")))
     WAIT_MS(500)
-    CALL(evt_msg_print, 0, STRING(("peach_aji_317")), 0, STRING(("\203V\203\205\203\212\203\207\201[")))
+    CALL(evt_msg_print, 0, STRING(("peach_aji_317")), 0, STRING(("シュリョー")))
     CALL(peach_set_pose, STRING(("P_S_6")))
     CALL(evt_mario_set_dir, 270, 200, 0)
     WAIT_MS(300)
     CALL(evt_npc_set_autotalkpose, STRING(("mario")), STRING(("P_S_6")), STRING(("P_T_6")))
     CALL(evt_msg_print, 0, STRING(("peach_aji_318")), 0, STRING(("mario")))
     WAIT_MS(500)
-    CALL(evt_msg_print, 0, STRING(("peach_aji_319")), 0, STRING(("\203V\203\205\203\212\203\207\201[")))
+    CALL(evt_msg_print, 0, STRING(("peach_aji_319")), 0, STRING(("シュリョー")))
     WAIT_MS(500)
     CALL(evt_mario_get_pos, 0, LW(0), LW(1), LW(2))
     CALL(evt_snd_sfxon_3d, STRING(("SFX_VOICE_PEACH_SURPRISED1_3")), LW(0), LW(1), LW(2), 0)
@@ -3114,7 +3072,7 @@ static EVT_BEGIN(peach_evt_stg6)
     CALL(evt_msg_print, 0, STRING(("peach_aji_320")), 0, STRING(("mario")))
     CALL(evt_cam3d_evt_set, -35, 100, 184, -35, 65, -13, 800, 11)
     WAIT_MS(800)
-    CALL(evt_msg_print, 0, STRING(("peach_aji_321")), 0, STRING(("\203V\203\205\203\212\203\207\201[")))
+    CALL(evt_msg_print, 0, STRING(("peach_aji_321")), 0, STRING(("シュリョー")))
     SET_VALUE(GSW(0), 341)
     WAIT_MS(2000)
     CALL(evt_snd_bgmoff_f, 512, 1000)
@@ -3156,7 +3114,7 @@ EVT_END()
 
 static NpcSetupInfo npcEnt[] = {
     {
-        /*"手下１"*/"\216\350\211\272\202P", // name
+        "手下１", // name
         0, 0, // flags..reactionFlags
         teshita1_init, // initEvent
         NULL, NULL, NULL, NULL, NULL, NULL, NULL, 0, // regularEvent..territoryType
@@ -3165,7 +3123,7 @@ static NpcSetupInfo npcEnt[] = {
         0.0f, 0.0f, 0.0f, 0.0f, 0, // searchRange..battleInfoId
     },
     {
-        /*"手下２"*/"\216\350\211\272\202Q", // name
+        "手下２", // name
         0, 0, // flags..reactionFlags
         teshita2_init, // initEvent
         NULL, NULL, NULL, NULL, NULL, NULL, NULL, 0, // regularEvent..territoryType
@@ -3174,7 +3132,7 @@ static NpcSetupInfo npcEnt[] = {
         0.0f, 0.0f, 0.0f, 0.0f, 0, // searchRange..battleInfoId
     },
     {
-        /*"シュリョー"*/"\203V\203\205\203\212\203\207\201[", // name
+        "シュリョー", // name
         0, 0, // flags..reactionFlags
         syuryo_init, // initEvent
         NULL, NULL, NULL, NULL, NULL, NULL, NULL, 0, // regularEvent..territoryType
@@ -3332,7 +3290,7 @@ EVT_BEGIN(aji_17_init_evt)
     END_IF
     IF_INT_EQUAL(GSW(0), 340)
         CALL(evt_npc_setup, PTR(npcEnt))
-        CALL(evt_shuryolight_init, STRING(("\203V\203\205\203\212\203\207\201[")))
+        CALL(evt_shuryolight_init, STRING(("シュリョー")))
         CALL(evt_shuryolight_run_evt, PTR(shuryolight_pow_normal), PTR(shuryolight_head_normal), PTR(shuryolight_tue_normal))
         SPAWN_EVENT(PTR(peach_evt_stg6))
     END_IF
@@ -3389,8 +3347,6 @@ EVT_END()
 #endif
 
 // target .data tail pad word
-#pragma force_active on
-#pragma force_active reset
 
 s32 noise(EventEntry* event, BOOL isFirstCall) {
     EvtWord alpha = evtGetValue(event, event->args[0]);
@@ -3424,7 +3380,7 @@ void disp_horogram(CameraId cameraId, void* param) {
     Mtx rot;
     GXColor mat;
     f32 angle;
-    NpcEntry* npc = npcNameToPtr("\203z\203\215\203O\203\211\203\200");
+    NpcEntry* npc = npcNameToPtr("ホログラム");
 
     if (horogram_wp->ready) {
         GXGetCullMode(&cull);
@@ -3497,8 +3453,8 @@ void peach_capture(CameraId cameraId, void* param) {
     NpcEntry* holo2;
     NpcEntry* npc;
 
-    holo = npcNameToPtr("\203z\203\215\203O\203\211\203\200");
-    holo2 = npcNameToPtr("\203z\203\215\203O\203\211\203\2002");
+    holo = npcNameToPtr("ホログラム");
+    holo2 = npcNameToPtr("ホログラム2");
     if (90.0f <= holo->direction && holo->direction < 270.0f) {
         npc = holo2;
         if (!(horogram_wp->flags & 2)) {
@@ -3841,8 +3797,8 @@ static const char horogram_pose_suffix[] = "R";
 s32 horogram_set_pose(EventEntry* event, BOOL isFirstCall) {
     char name[24];
     const char* pose = (const char*)evtGetValue(event, event->args[0]);
-    NpcEntry* npc = npcNameToPtr("\203z\203\215\203O\203\211\203\200");
-    NpcEntry* npc2 = npcNameToPtr("\203z\203\215\203O\203\211\203\2002");
+    NpcEntry* npc = npcNameToPtr("ホログラム");
+    NpcEntry* npc2 = npcNameToPtr("ホログラム2");
     MarioWork* mario = marioGetPtr();
 
     animPoseSetAnim(npc->poseId, pose, TRUE);

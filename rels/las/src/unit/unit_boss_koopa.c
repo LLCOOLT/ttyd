@@ -2,7 +2,6 @@
 #include "battle/battle_unit.h"
 #include "evt/evt_cmd.h"
 
-#pragma force_active on
 #include "driver/icondrv.h"
 #include "driver/camdrv.h"
 #include "battle/battle.h"
@@ -18,6 +17,7 @@
 #include "evt/evt_eff.h"
 #include "party/party_motion.h"
 #include "battle/battle_database_common.h"
+#include "battle/battle_sub.h"
 
 void btlMovePos(f32 speed, f32 angle, f32* x, f32* z);
 typedef struct IconJumpWork { Vec start; Vec pos; Vec end; s32 frames; f32 speed; f32 gravity; f32 vy; u8 pad[0x7C - 0x34]; } IconJumpWork;
@@ -71,20 +71,6 @@ static USER_FUNC(party_cannot_use_command);
 static USER_FUNC(mario_cannot_use_command);
 extern BattleUnitKind unit_boss_kamec_obaba;
 
-f32 fd_boss_koopa_negone_one_374[2] __attribute__((aligned(8)));
-f32 fd_boss_koopa_neg_one_382;
-f32 fd_boss_koopa___local_PI_383;
-f32 fd_boss_koopa___local_3PIO2_385;
-f32 fd_boss_koopa_one_negone_373[2] __attribute__((aligned(8)));
-f32 fd_boss_koopa___local_PIO2_384;
-f32 fd_boss_koopa_one_381;
-f32 fd_boss_koopa_negone_one_360[2] __attribute__((aligned(8)));
-f32 fd_boss_koopa_neg_one_365;
-f32 fd_boss_koopa___local_PI_366;
-f32 fd_boss_koopa___local_3PIO2_368;
-f32 fd_boss_koopa_one_negone_359[2] __attribute__((aligned(8)));
-f32 fd_boss_koopa___local_PIO2_367;
-f32 fd_boss_koopa_one_364;
 BattleUnitKind unit_boss_koopa;
 static BattleUnitDefense defence;
 static BattleUnitDefenseAttr defence_attr;
@@ -99,8 +85,6 @@ static BattleWeapon weapon_koopa_bite_attack;
 static BattleWeapon weapon_koopa_critical_bite_attack;
 static BattleWeapon weapon_koopa_fire_attack;
 BattleUnitSetup entry_kamec_obaba;
-static EvtWord koopa_zoom[25];
-static EvtWord kamec_obaba_zoom[40];
 static EvtWord init_event[124];
 static EvtWord entry_event[55];
 static EvtWord damage_event[22];
@@ -112,38 +96,10 @@ static EvtWord hip_attack_event[VERSION_PICK(431, 432)];
 static EvtWord bite_attack_event[278];
 static EvtWord critical_bite_attack_event[261];
 static EvtWord fire_attack_event[356];
-EvtWord first_mario_damage_check[33];
-EvtWord first_mario_damage_event[114];
+extern EvtWord first_mario_damage_check[];
+extern EvtWord first_mario_damage_event[];
 static EvtWord wait_event[6];
 static const char* cmd_disable_string[5];
-
-f32 fd_boss_koopa_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
-
-f32 fd_boss_koopa_neg_one_382 = -1.0f;
-
-f32 fd_boss_koopa___local_PI_383 = 3.1415927f;
-
-f32 fd_boss_koopa___local_3PIO2_385 = 4.712389f;
-
-f32 fd_boss_koopa_one_negone_373[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
-
-f32 fd_boss_koopa___local_PIO2_384 = 1.5707964f;
-
-f32 fd_boss_koopa_one_381 = 1.0f;
-
-f32 fd_boss_koopa_negone_one_360[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
-
-f32 fd_boss_koopa_neg_one_365 = -1.0f;
-
-f32 fd_boss_koopa___local_PI_366 = 3.1415927f;
-
-f32 fd_boss_koopa___local_3PIO2_368 = 4.712389f;
-
-f32 fd_boss_koopa_one_negone_359[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
-
-f32 fd_boss_koopa___local_PIO2_367 = 1.5707964f;
-
-f32 fd_boss_koopa_one_364 = 1.0f;
 
 BattleUnitKind unit_boss_koopa = {
     144,

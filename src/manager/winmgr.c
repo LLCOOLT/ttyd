@@ -73,7 +73,7 @@ static s16* mario_status_point_table[3];
 //.sdata
 static WinMgrWork* wp = &work;
 static u16 party_id_table[] = {1, 2, 5, 4, 6, 3, 7, 0};
-static u16 party_icon_table[] = {ICON_155, ICON_156, ICON_15F, ICON_158, ICON_160, ICON_157, ICON_161, 0};
+static u16 party_icon_table[] = {ICON_155, ICON_156, ICON_15F, ICON_158, ICON_160, ICON_157, ICON_161};
 static const char* party_labelname_table[] = {"_kur", "_nok", "_win", "_yos", "_viv", "_bom", "_chu"};
 static s32 mario_status_icon_table[] = {ICON_19F, ICON_1A0, ICON_1A1};
 static const char* mario_status_labelname_table[] = {"_hp", "_fp", "_bp"};
@@ -149,15 +149,7 @@ WinMgrSelectTbl select_desc_tbl[] = {
 };
 
 //.sbss
-#pragma force_active on
-u32 gap_08_80418B74_sbss;
-#pragma force_active reset
-#pragma force_active on
 
-#ifndef VERSION_G8ME01
-u32 gap_07_8041799C_sdata[1] = {0};
-#endif
-#pragma force_active reset
 
 static const char name_party0[12];
 static const char name_party1[12];
@@ -258,8 +250,6 @@ USER_FUNC(evt_win_party_lankdown_chk) {
 
 
 void winMgrInit(void) {
-    static const u32 gap_09_80421AD4_sdata2 = 0;
-    (void)&gap_09_80421AD4_sdata2;
     wp->mNumEntries = 32;
     wp->mEntries = (WinMgrEntry*)__memAlloc(HEAP_DEFAULT, wp->mNumEntries * sizeof(WinMgrEntry));
     memset(wp->mEntries, 0, wp->mNumEntries * sizeof(WinMgrEntry));
@@ -533,7 +523,11 @@ void winMgrHelpMain(WinMgrEntry* entry) {
                 }
             }
             else if (keyGetDirTrg(0) & 0x200) {
+#ifdef VERSION_G8MP01
+                if (entry->scroll / 2 < (entry->lines + 1) / 2 - 1) {
+#else
                 if ((entry->lines + 1) / 2 - 1 > (entry->scroll + 1) / 2) {
+#endif
                     entry->scroll += 2;
                 }
             }
@@ -549,7 +543,7 @@ void winMgrHelpDraw(WinMgrEntry* entry) {
 
     if (!(entry->flags & 4)) {
         GXSetScissor(0, 384, 608, 56);
-        if (!strcmp(entry->msg, msgSearch("msg_lottery_number\0"))) {
+        if (!strcmp(entry->msg, msgSearch("msg_lottery_number"))) {
             sprintf(buf, entry->msg, lotteryGetPtr()->number);
             FontDrawStart();
             FontDrawMessage(-210, -144.0f + 28.0f * entry->scroll, buf);
@@ -568,7 +562,11 @@ void winMgrHelpDraw(WinMgrEntry* entry) {
                     iconDispGx2(mtx, 16, ICON_1B6);
                 }
             }
+#ifdef VERSION_G8MP01
+            else if (entry->scroll / 2 == (entry->lines + 1) / 2 - 1) {
+#else
             else if (entry->scroll + 2 == entry->lines) {
+#endif
                 if ((gp->retraceCount & 31) < 20) {
                     PSMTXTrans(mtx, entry->x + entry->width - 12, entry->y - entry->height + 44, 0.0f);
                     PSMTXScale(scale, 0.6f, 0.6f, 0.6f);
@@ -817,7 +815,7 @@ WinMgrSelect* winMgrSelectEntry(EvtWord type, s32 a2, BOOL a3) {
                 m = (s16)badgeShop_get(bdsw->starmaniac_table, i + 240);
                 if (m - badgeShop_ThrowCheck(i + 240) > 0) {
                     sel->items[sel->numItems].id = i + 240;
-                    if (itemDataTable[i + 240].star_piece_price > ((s32 (*)(void))pouchGetStarPiece)()) {
+                    if (itemDataTable[i + 240].star_piece_price > pouchGetStarPiece()) {
                         sel->items[sel->numItems].flags |= 3;
                     }
                     sel->numItems++;
@@ -903,6 +901,23 @@ WinMgrSelect* winMgrSelectEntry(EvtWord type, s32 a2, BOOL a3) {
     return sel;
 }
 
+#ifdef VERSION_G8MP01
+#define SEL_ID(p) (((WinMgrSelectItem*)(p))->id)
+int select_comp_starpiece(void* a, void* b) {
+    // PAL: equal prices fall back to the type order
+    if (itemDataTable[SEL_ID(a)].star_piece_price > itemDataTable[SEL_ID(b)].star_piece_price) {
+        return 1;
+    }
+    if (itemDataTable[SEL_ID(a)].star_piece_price < itemDataTable[SEL_ID(b)].star_piece_price) {
+        return -1;
+    }
+    if (itemDataTable[SEL_ID(a)].type_sort_order > itemDataTable[SEL_ID(b)].type_sort_order) {
+        return 1;
+    }
+    return -(itemDataTable[SEL_ID(a)].type_sort_order < itemDataTable[SEL_ID(b)].type_sort_order);
+}
+#undef SEL_ID
+#else
 int select_comp_starpiece(void* a, void* b) {
     u16 x = itemDataTable[((WinMgrSelectItem*)a)->id].star_piece_price;
     u16 y = itemDataTable[((WinMgrSelectItem*)b)->id].star_piece_price;
@@ -911,6 +926,7 @@ int select_comp_starpiece(void* a, void* b) {
     }
     return -(x < y);
 }
+#endif
 
 int select_comp_type(void* a, void* b) {
     s16 x = itemDataTable[((WinMgrSelectItem*)a)->id].type_sort_order;
@@ -1181,6 +1197,12 @@ void select_main(WinMgrEntry* entry) {
             if (prev != sel->cursor) {
                 psndSFXOn((const char*)0x20005);
             }
+#ifdef VERSION_G8MP01
+            // PAL: moving the cursor resets the help window's text
+            if (prev != sel->cursor && sel->numDescriptors >= 3) {
+                winMgrHelpInit(&wp->mEntries[sel->descriptorId[2]]);
+            }
+#endif
             if (keyGetButtonTrg(0) & 0x100) {
                 if (sel->items[sel->cursor].flags & 2) {
                     psndSFXOn((const char*)0x20014);

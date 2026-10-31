@@ -5,8 +5,6 @@
 #include "gra.h"
 #include "data_tables.h"
 
-#pragma force_active on
-
 USER_FUNC(evt_bero_get_info);
 USER_FUNC(evt_gra_vivian_pose_set);
 USER_FUNC(evt_kagemario_init);
@@ -26,52 +24,10 @@ USER_FUNC(evt_seq_wait);
 USER_FUNC(evt_snd_bgmon);
 USER_FUNC(evt_snd_envon);
 
-f32 fd_gra_01_negone_one_374[2] __attribute__((aligned(8)));
-f32 fd_gra_01_neg_one_382;
-f32 fd_gra_01___local_PI_383;
-f32 fd_gra_01___local_3PIO2_385;
-f32 fd_gra_01_one_negone_373[2] __attribute__((aligned(8)));
-f32 fd_gra_01___local_PIO2_384;
-f32 fd_gra_01_one_381;
-f32 fd_gra_01_negone_one_360[2] __attribute__((aligned(8)));
-f32 fd_gra_01_neg_one_365;
-f32 fd_gra_01___local_PI_366;
-f32 fd_gra_01___local_3PIO2_368;
-f32 fd_gra_01_one_negone_359[2] __attribute__((aligned(8)));
-f32 fd_gra_01___local_PIO2_367;
-f32 fd_gra_01_one_364;
 static BeroEntry bero_entry_data[3];
-EvtWord gra_01_after_ranpel2[94];
+extern EvtWord gra_01_after_ranpel2[];
 static TreeAccess tree_tbl[4];
-EvtWord gra_01_init_evt[107];
-
-f32 fd_gra_01_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
-
-f32 fd_gra_01_neg_one_382 = -1.0f;
-
-f32 fd_gra_01___local_PI_383 = 3.1415927f;
-
-f32 fd_gra_01___local_3PIO2_385 = 4.712389f;
-
-f32 fd_gra_01_one_negone_373[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
-
-f32 fd_gra_01___local_PIO2_384 = 1.5707964f;
-
-f32 fd_gra_01_one_381 = 1.0f;
-
-f32 fd_gra_01_negone_one_360[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
-
-f32 fd_gra_01_neg_one_365 = -1.0f;
-
-f32 fd_gra_01___local_PI_366 = 3.1415927f;
-
-f32 fd_gra_01___local_3PIO2_368 = 4.712389f;
-
-f32 fd_gra_01_one_negone_359[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
-
-f32 fd_gra_01___local_PIO2_367 = 1.5707964f;
-
-f32 fd_gra_01_one_364 = 1.0f;
+extern EvtWord gra_01_init_evt[];
 
 static BeroEntry bero_entry_data[] = {
     {
@@ -158,7 +114,7 @@ EVT_BEGIN(gra_01_init_evt)
     CALL(evt_mobj_brick, STRING("blk03"), -200, 60, 100, 0, 0, 0, LSWF(3))
     CALL(evt_mobj_brick, STRING("blk04"), 200, 60, 100, 0, 0, 0, LSWF(4))
     CALL(evt_mobj_brick, STRING("blk05"), 0, 85, -100, 149, 11, 0, GSWF(2087))
-    CALL(evt_mobj_brick, STRING("blk06\0\0"), 475, 60, -100, 0, 3, 0, GSWF(2088))
+    CALL(evt_mobj_brick, STRING("blk06"), 475, 60, -100, 0, 3, 0, GSWF(2088))
     SET_VALUE(LF(0), 0)
     IF_INT_GREATER_OR_EQUAL(GSW(0), 206)
         IF_INT_EQUAL(GSWF(2075), 0)

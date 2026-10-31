@@ -2,7 +2,6 @@
 #include "evt/evt_cmd.h"
 #include "manager/evtmgr_cmd.h"
 
-#pragma force_active on
 #include "driver/effdrv.h"
 #include "battle/battle.h"
 #include "battle/battle_stage_object.h"
@@ -32,20 +31,6 @@ extern BattleUnitKind unit_boss_rampell_las;
 extern BattleUnitKind unit_red_honenoko;
 extern BattleUnitKind unit_super_killer_cannon;
 
-f32 fd_battle_database_las_negone_one_374[2] __attribute__((aligned(8)));
-f32 fd_battle_database_las_neg_one_382;
-f32 fd_battle_database_las___local_PI_383;
-f32 fd_battle_database_las___local_3PIO2_385;
-f32 fd_battle_database_las_one_negone_373[2] __attribute__((aligned(8)));
-f32 fd_battle_database_las___local_PIO2_384;
-f32 fd_battle_database_las_one_381;
-f32 fd_battle_database_las_negone_one_360[2] __attribute__((aligned(8)));
-f32 fd_battle_database_las_neg_one_365;
-f32 fd_battle_database_las___local_PI_366;
-f32 fd_battle_database_las___local_3PIO2_368;
-f32 fd_battle_database_las_one_negone_359[2] __attribute__((aligned(8)));
-f32 fd_battle_database_las___local_PIO2_367;
-f32 fd_battle_database_las_one_364;
 BattleStageObjectData las_btlobject_data[38];
 BattleStageData las_btlstage_data[10];
 BattleUnitSetup btlparty_las_las_05_01[5];
@@ -228,44 +213,16 @@ NpcBattleSelect btlgrpsel_las_btlno_las_25_05_off[2];
 NpcBattleSelect btlgrpsel_las_btlno_las_25_06_off[2];
 NpcSetupBattleInfo btlsetup_las_tbl[61];
 NpcTerritoryInfo btl_las_setup_no_tbl[61];
-EvtWord bgset_las_gear_event[38];
-EvtWord stg_08_1_init_sub_event[97];
-EvtWord stg_08_1_init_event[4];
-EvtWord stg_08_6_init_sub_event[46];
-EvtWord stg_08_6_init_event[4];
+extern EvtWord bgset_las_gear_event[];
+extern EvtWord stg_08_1_init_sub_event[];
+extern EvtWord stg_08_1_init_event[];
+extern EvtWord stg_08_6_init_sub_event[];
+extern EvtWord stg_08_6_init_event[];
 
 USER_FUNC(hi_fire_end) {
     hi_fire_end_flag[0] = 1;
     return EVT_RETURN_DONE;
 }
-
-f32 fd_battle_database_las_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
-
-f32 fd_battle_database_las_neg_one_382 = -1.0f;
-
-f32 fd_battle_database_las___local_PI_383 = 3.1415927f;
-
-f32 fd_battle_database_las___local_3PIO2_385 = 4.712389f;
-
-f32 fd_battle_database_las_one_negone_373[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
-
-f32 fd_battle_database_las___local_PIO2_384 = 1.5707964f;
-
-f32 fd_battle_database_las_one_381 = 1.0f;
-
-f32 fd_battle_database_las_negone_one_360[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
-
-f32 fd_battle_database_las_neg_one_365 = -1.0f;
-
-f32 fd_battle_database_las___local_PI_366 = 3.1415927f;
-
-f32 fd_battle_database_las___local_3PIO2_368 = 4.712389f;
-
-f32 fd_battle_database_las_one_negone_359[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
-
-f32 fd_battle_database_las___local_PIO2_367 = 1.5707964f;
-
-f32 fd_battle_database_las_one_364 = 1.0f;
 
 BattleStageObjectData las_btlobject_data[] = {
     {"A1", 2, 0, {93.0f, 0.0f, -64.0f}, 0, 60, {0}},
@@ -478,7 +435,7 @@ BattleGroupSetup btlgrp_las_las_05_01 = {
     100, // noItemWeight
     battle_heart_drop_param_default, // hpDropTable
     battle_flower_drop_param_default3, // fpDropTable
-    5, // field_1C
+    5, // reserved_1C
 };
 
 BattleUnitSetup btlparty_las_las_17_01_off_1[] = {
@@ -501,7 +458,7 @@ BattleGroupSetup btlgrp_las_las_17_01_off_1 = {
     100, // noItemWeight
     battle_heart_drop_param_default, // hpDropTable
     battle_flower_drop_param_default, // fpDropTable
-    5, // field_1C
+    5, // reserved_1C
 };
 
 BattleUnitSetup btlparty_las_las_17_02_off_1[] = {
@@ -524,7 +481,7 @@ BattleGroupSetup btlgrp_las_las_17_02_off_1 = {
     100, // noItemWeight
     battle_heart_drop_param_default, // hpDropTable
     battle_flower_drop_param_default, // fpDropTable
-    5, // field_1C
+    5, // reserved_1C
 };
 
 BattleUnitSetup btlparty_las_las_17_03_off_1[] = {
@@ -547,7 +504,7 @@ BattleGroupSetup btlgrp_las_las_17_03_off_1 = {
     100, // noItemWeight
     battle_heart_drop_param_default, // hpDropTable
     battle_flower_drop_param_default3, // fpDropTable
-    5, // field_1C
+    5, // reserved_1C
 };
 
 BattleUnitSetup btlparty_las_las_17_04_off_1[] = {
@@ -570,7 +527,7 @@ BattleGroupSetup btlgrp_las_las_17_04_off_1 = {
     100, // noItemWeight
     battle_heart_drop_param_default, // hpDropTable
     battle_flower_drop_param_default, // fpDropTable
-    5, // field_1C
+    5, // reserved_1C
 };
 
 BattleUnitSetup btlparty_las_las_09_rampell[] = {
@@ -593,7 +550,7 @@ BattleGroupSetup btlgrp_las_las_09_rampell = {
     100, // noItemWeight
     battle_heart_drop_param_default, // hpDropTable
     battle_flower_drop_param_default, // fpDropTable
-    5, // field_1C
+    5, // reserved_1C
 };
 
 BattleUnitSetup btlparty_las_las_bunbaba[] = {
@@ -616,7 +573,7 @@ BattleGroupSetup btlgrp_las_las_bunbaba = {
     100, // noItemWeight
     battle_heart_drop_param_default, // hpDropTable
     battle_flower_drop_param_default, // fpDropTable
-    5, // field_1C
+    5, // reserved_1C
 };
 
 BattleUnitSetup btlparty_las_las_28_batten_leader[] = {
@@ -639,7 +596,7 @@ BattleGroupSetup btlgrp_las_las_28_batten_leader = {
     100, // noItemWeight
     battle_heart_drop_param_default, // hpDropTable
     battle_flower_drop_param_default, // fpDropTable
-    5, // field_1C
+    5, // reserved_1C
 };
 
 BattleUnitSetup btlparty_las_las_28_koopa[] = {
@@ -662,7 +619,7 @@ BattleGroupSetup btlgrp_las_las_28_koopa = {
     100, // noItemWeight
     battle_heart_drop_param_default, // hpDropTable
     battle_flower_drop_param_default, // fpDropTable
-    5, // field_1C
+    5, // reserved_1C
 };
 
 BattleUnitSetup btlparty_las_las_29_black_peach_1[] = {
@@ -685,7 +642,7 @@ BattleGroupSetup btlgrp_las_las_29_black_peach_1 = {
     100, // noItemWeight
     battle_heart_drop_param_default, // hpDropTable
     battle_flower_drop_param_default, // fpDropTable
-    5, // field_1C
+    5, // reserved_1C
 };
 
 BattleUnitSetup btlparty_las_las_29_black_peach_2[] = {
@@ -708,7 +665,7 @@ BattleGroupSetup btlgrp_las_las_29_black_peach_2 = {
     100, // noItemWeight
     battle_heart_drop_param_default, // hpDropTable
     battle_flower_drop_param_default, // fpDropTable
-    5, // field_1C
+    5, // reserved_1C
 };
 
 BattleUnitSetup btlparty_las_las_01_01_off_1[] = {
@@ -742,7 +699,7 @@ BattleGroupSetup btlgrp_las_las_01_01_off_1 = {
     50, // noItemWeight
     battle_heart_drop_param_default2, // hpDropTable
     battle_flower_drop_param_default, // fpDropTable
-    5, // field_1C
+    5, // reserved_1C
 };
 
 BattleUnitSetup btlparty_las_las_01_02_off_1[] = {
@@ -786,7 +743,7 @@ BattleGroupSetup btlgrp_las_las_01_02_off_1 = {
     50, // noItemWeight
     battle_heart_drop_param_default2, // hpDropTable
     battle_flower_drop_param_default, // fpDropTable
-    5, // field_1C
+    5, // reserved_1C
 };
 
 BattleUnitSetup btlparty_las_las_01_03_off_1[] = {
@@ -840,7 +797,7 @@ BattleGroupSetup btlgrp_las_las_01_03_off_1 = {
     50, // noItemWeight
     battle_heart_drop_param_default2, // hpDropTable
     battle_flower_drop_param_default, // fpDropTable
-    5, // field_1C
+    5, // reserved_1C
 };
 
 BattleUnitSetup btlparty_las_las_01_01_off_2[] = {
@@ -874,7 +831,7 @@ BattleGroupSetup btlgrp_las_las_01_01_off_2 = {
     50, // noItemWeight
     battle_heart_drop_param_default2, // hpDropTable
     battle_flower_drop_param_default, // fpDropTable
-    5, // field_1C
+    5, // reserved_1C
 };
 
 BattleUnitSetup btlparty_las_las_01_02_off_2[] = {
@@ -918,7 +875,7 @@ BattleGroupSetup btlgrp_las_las_01_02_off_2 = {
     50, // noItemWeight
     battle_heart_drop_param_default2, // hpDropTable
     battle_flower_drop_param_default, // fpDropTable
-    5, // field_1C
+    5, // reserved_1C
 };
 
 BattleUnitSetup btlparty_las_las_01_03_off_2[] = {
@@ -972,7 +929,7 @@ BattleGroupSetup btlgrp_las_las_01_03_off_2 = {
     50, // noItemWeight
     battle_heart_drop_param_default2, // hpDropTable
     battle_flower_drop_param_default, // fpDropTable
-    5, // field_1C
+    5, // reserved_1C
 };
 
 BattleUnitSetup btlparty_las_las_02_01_off_1[] = {
@@ -1006,7 +963,7 @@ BattleGroupSetup btlgrp_las_las_02_01_off_1 = {
     50, // noItemWeight
     battle_heart_drop_param_default, // hpDropTable
     battle_flower_drop_param_default3, // fpDropTable
-    5, // field_1C
+    5, // reserved_1C
 };
 
 BattleUnitSetup btlparty_las_las_02_02_off_1[] = {
@@ -1050,7 +1007,7 @@ BattleGroupSetup btlgrp_las_las_02_02_off_1 = {
     50, // noItemWeight
     battle_heart_drop_param_default2, // hpDropTable
     battle_flower_drop_param_default, // fpDropTable
-    5, // field_1C
+    5, // reserved_1C
 };
 
 BattleUnitSetup btlparty_las_las_02_03_off_1[] = {
@@ -1094,7 +1051,7 @@ BattleGroupSetup btlgrp_las_las_02_03_off_1 = {
     50, // noItemWeight
     battle_heart_drop_param_default, // hpDropTable
     battle_flower_drop_param_default3, // fpDropTable
-    5, // field_1C
+    5, // reserved_1C
 };
 
 BattleUnitSetup btlparty_las_las_02_04_off_1[] = {
@@ -1148,7 +1105,7 @@ BattleGroupSetup btlgrp_las_las_02_04_off_1 = {
     50, // noItemWeight
     battle_heart_drop_param_default, // hpDropTable
     battle_flower_drop_param_default3, // fpDropTable
-    5, // field_1C
+    5, // reserved_1C
 };
 
 BattleUnitSetup btlparty_las_las_02_05_off_1[] = {
@@ -1182,7 +1139,7 @@ BattleGroupSetup btlgrp_las_las_02_05_off_1 = {
     50, // noItemWeight
     battle_heart_drop_param_default3, // hpDropTable
     battle_flower_drop_param_default, // fpDropTable
-    5, // field_1C
+    5, // reserved_1C
 };
 
 BattleUnitSetup btlparty_las_las_02_06_off_1[] = {
@@ -1216,7 +1173,7 @@ BattleGroupSetup btlgrp_las_las_02_06_off_1 = {
     50, // noItemWeight
     battle_heart_drop_param_default3, // hpDropTable
     battle_flower_drop_param_default, // fpDropTable
-    5, // field_1C
+    5, // reserved_1C
 };
 
 BattleUnitSetup btlparty_las_las_02_99_off_1[] = {
@@ -1250,7 +1207,7 @@ BattleGroupSetup btlgrp_las_las_02_99_off_1 = {
     50, // noItemWeight
     battle_heart_drop_param_default, // hpDropTable
     battle_flower_drop_param_default, // fpDropTable
-    5, // field_1C
+    5, // reserved_1C
 };
 
 BattleUnitSetup btlparty_las_las_03_01_off_1[] = {
@@ -1274,7 +1231,7 @@ BattleGroupSetup btlgrp_las_las_03_01_off_1 = {
     50, // noItemWeight
     battle_heart_drop_param_default2, // hpDropTable
     battle_flower_drop_param_default, // fpDropTable
-    5, // field_1C
+    5, // reserved_1C
 };
 
 BattleUnitSetup btlparty_las_las_03_02_off_1[] = {
@@ -1298,7 +1255,7 @@ BattleGroupSetup btlgrp_las_las_03_02_off_1 = {
     50, // noItemWeight
     battle_heart_drop_param_default2, // hpDropTable
     battle_flower_drop_param_default, // fpDropTable
-    5, // field_1C
+    5, // reserved_1C
 };
 
 BattleUnitSetup btlparty_las_las_03_03_off_1[] = {
@@ -1322,7 +1279,7 @@ BattleGroupSetup btlgrp_las_las_03_03_off_1 = {
     50, // noItemWeight
     battle_heart_drop_param_default2, // hpDropTable
     battle_flower_drop_param_default, // fpDropTable
-    5, // field_1C
+    5, // reserved_1C
 };
 
 BattleUnitSetup btlparty_las_las_03_01_off_2[] = {
@@ -1346,7 +1303,7 @@ BattleGroupSetup btlgrp_las_las_03_01_off_2 = {
     50, // noItemWeight
     battle_heart_drop_param_default2, // hpDropTable
     battle_flower_drop_param_default, // fpDropTable
-    5, // field_1C
+    5, // reserved_1C
 };
 
 BattleUnitSetup btlparty_las_las_03_02_off_2[] = {
@@ -1370,7 +1327,7 @@ BattleGroupSetup btlgrp_las_las_03_02_off_2 = {
     50, // noItemWeight
     battle_heart_drop_param_default2, // hpDropTable
     battle_flower_drop_param_default, // fpDropTable
-    5, // field_1C
+    5, // reserved_1C
 };
 
 BattleUnitSetup btlparty_las_las_03_03_off_2[] = {
@@ -1394,7 +1351,7 @@ BattleGroupSetup btlgrp_las_las_03_03_off_2 = {
     50, // noItemWeight
     battle_heart_drop_param_default2, // hpDropTable
     battle_flower_drop_param_default, // fpDropTable
-    5, // field_1C
+    5, // reserved_1C
 };
 
 BattleUnitSetup btlparty_las_las_04_01_off_1[] = {
@@ -1418,7 +1375,7 @@ BattleGroupSetup btlgrp_las_las_04_01_off_1 = {
     50, // noItemWeight
     battle_heart_drop_param_default, // hpDropTable
     battle_flower_drop_param_default3, // fpDropTable
-    5, // field_1C
+    5, // reserved_1C
 };
 
 BattleUnitSetup btlparty_las_las_06_01_off_1[] = {
@@ -1452,7 +1409,7 @@ BattleGroupSetup btlgrp_las_las_06_01_off_1 = {
     50, // noItemWeight
     battle_heart_drop_param_default3, // hpDropTable
     battle_flower_drop_param_default, // fpDropTable
-    5, // field_1C
+    5, // reserved_1C
 };
 
 BattleUnitSetup btlparty_las_las_06_02_off_1[] = {
@@ -1486,7 +1443,7 @@ BattleGroupSetup btlgrp_las_las_06_02_off_1 = {
     50, // noItemWeight
     battle_heart_drop_param_default3, // hpDropTable
     battle_flower_drop_param_default, // fpDropTable
-    5, // field_1C
+    5, // reserved_1C
 };
 
 BattleUnitSetup btlparty_las_las_06_03_off_1[] = {
@@ -1520,7 +1477,7 @@ BattleGroupSetup btlgrp_las_las_06_03_off_1 = {
     50, // noItemWeight
     battle_heart_drop_param_default, // hpDropTable
     battle_flower_drop_param_default3, // fpDropTable
-    5, // field_1C
+    5, // reserved_1C
 };
 
 BattleUnitSetup btlparty_las_las_06_04_off_1[] = {
@@ -1574,7 +1531,7 @@ BattleGroupSetup btlgrp_las_las_06_04_off_1 = {
     50, // noItemWeight
     battle_heart_drop_param_default, // hpDropTable
     battle_flower_drop_param_default3, // fpDropTable
-    5, // field_1C
+    5, // reserved_1C
 };
 
 BattleUnitSetup btlparty_las_las_06_05_off_1[] = {
@@ -1608,7 +1565,7 @@ BattleGroupSetup btlgrp_las_las_06_05_off_1 = {
     50, // noItemWeight
     battle_heart_drop_param_default3, // hpDropTable
     battle_flower_drop_param_default, // fpDropTable
-    5, // field_1C
+    5, // reserved_1C
 };
 
 BattleUnitSetup btlparty_las_las_06_06_off_1[] = {
@@ -1642,7 +1599,7 @@ BattleGroupSetup btlgrp_las_las_06_06_off_1 = {
     50, // noItemWeight
     battle_heart_drop_param_default3, // hpDropTable
     battle_flower_drop_param_default, // fpDropTable
-    5, // field_1C
+    5, // reserved_1C
 };
 
 BattleUnitSetup btlparty_las_las_06_99_off_1[] = {
@@ -1676,7 +1633,7 @@ BattleGroupSetup btlgrp_las_las_06_99_off_1 = {
     50, // noItemWeight
     battle_heart_drop_param_default, // hpDropTable
     battle_flower_drop_param_default, // fpDropTable
-    5, // field_1C
+    5, // reserved_1C
 };
 
 BattleUnitSetup btlparty_las_las_07_01_off_1[] = {
@@ -1720,7 +1677,7 @@ BattleGroupSetup btlgrp_las_las_07_01_off_1 = {
     50, // noItemWeight
     battle_heart_drop_param_default, // hpDropTable
     battle_flower_drop_param_default3, // fpDropTable
-    5, // field_1C
+    5, // reserved_1C
 };
 
 BattleUnitSetup btlparty_las_las_07_02_off_1[] = {
@@ -1764,7 +1721,7 @@ BattleGroupSetup btlgrp_las_las_07_02_off_1 = {
     50, // noItemWeight
     battle_heart_drop_param_default, // hpDropTable
     battle_flower_drop_param_default3, // fpDropTable
-    5, // field_1C
+    5, // reserved_1C
 };
 
 BattleUnitSetup btlparty_las_las_07_03_off_1[] = {
@@ -1808,7 +1765,7 @@ BattleGroupSetup btlgrp_las_las_07_03_off_1 = {
     50, // noItemWeight
     battle_heart_drop_param_default, // hpDropTable
     battle_flower_drop_param_default3, // fpDropTable
-    5, // field_1C
+    5, // reserved_1C
 };
 
 BattleUnitSetup btlparty_las_las_09_01_off_1[] = {
@@ -1842,7 +1799,7 @@ BattleGroupSetup btlgrp_las_las_09_01_off_1 = {
     50, // noItemWeight
     battle_heart_drop_param_default4, // hpDropTable
     battle_flower_drop_param_default, // fpDropTable
-    5, // field_1C
+    5, // reserved_1C
 };
 
 BattleUnitSetup btlparty_las_las_09_02_off_1[] = {
@@ -1886,7 +1843,7 @@ BattleGroupSetup btlgrp_las_las_09_02_off_1 = {
     50, // noItemWeight
     battle_heart_drop_param_default4, // hpDropTable
     battle_flower_drop_param_default, // fpDropTable
-    5, // field_1C
+    5, // reserved_1C
 };
 
 BattleUnitSetup btlparty_las_las_19_01_off_1[] = {
@@ -1910,7 +1867,7 @@ BattleGroupSetup btlgrp_las_las_19_01_off_1 = {
     50, // noItemWeight
     battle_heart_drop_param_default3, // hpDropTable
     battle_flower_drop_param_default3, // fpDropTable
-    5, // field_1C
+    5, // reserved_1C
 };
 
 BattleUnitSetup btlparty_las_las_19_02_off_1[] = {
@@ -1944,7 +1901,7 @@ BattleGroupSetup btlgrp_las_las_19_02_off_1 = {
     50, // noItemWeight
     battle_heart_drop_param_default3, // hpDropTable
     battle_flower_drop_param_default3, // fpDropTable
-    5, // field_1C
+    5, // reserved_1C
 };
 
 BattleUnitSetup btlparty_las_las_19_03_off_1[] = {
@@ -1988,7 +1945,7 @@ BattleGroupSetup btlgrp_las_las_19_03_off_1 = {
     50, // noItemWeight
     battle_heart_drop_param_default3, // hpDropTable
     battle_flower_drop_param_default3, // fpDropTable
-    5, // field_1C
+    5, // reserved_1C
 };
 
 BattleUnitSetup btlparty_las_las_20_01_off_1[] = {
@@ -2012,7 +1969,7 @@ BattleGroupSetup btlgrp_las_las_20_01_off_1 = {
     50, // noItemWeight
     battle_heart_drop_param_default3, // hpDropTable
     battle_flower_drop_param_default3, // fpDropTable
-    5, // field_1C
+    5, // reserved_1C
 };
 
 BattleUnitSetup btlparty_las_las_21_01_off_1[] = {
@@ -2046,7 +2003,7 @@ BattleGroupSetup btlgrp_las_las_21_01_off_1 = {
     50, // noItemWeight
     battle_heart_drop_param_default4, // hpDropTable
     battle_flower_drop_param_default, // fpDropTable
-    5, // field_1C
+    5, // reserved_1C
 };
 
 BattleUnitSetup btlparty_las_las_21_02_off_1[] = {
@@ -2080,7 +2037,7 @@ BattleGroupSetup btlgrp_las_las_21_02_off_1 = {
     50, // noItemWeight
     battle_heart_drop_param_default4, // hpDropTable
     battle_flower_drop_param_default, // fpDropTable
-    5, // field_1C
+    5, // reserved_1C
 };
 
 BattleUnitSetup btlparty_las_las_22_01_off_1[] = {
@@ -2114,7 +2071,7 @@ BattleGroupSetup btlgrp_las_las_22_01_off_1 = {
     50, // noItemWeight
     battle_heart_drop_param_default3, // hpDropTable
     battle_flower_drop_param_default3, // fpDropTable
-    5, // field_1C
+    5, // reserved_1C
 };
 
 BattleUnitSetup btlparty_las_las_22_02_off_1[] = {
@@ -2168,7 +2125,7 @@ BattleGroupSetup btlgrp_las_las_22_02_off_1 = {
     50, // noItemWeight
     battle_heart_drop_param_default, // hpDropTable
     battle_flower_drop_param_default3, // fpDropTable
-    5, // field_1C
+    5, // reserved_1C
 };
 
 BattleUnitSetup btlparty_las_las_22_03_off_1[] = {
@@ -2202,7 +2159,7 @@ BattleGroupSetup btlgrp_las_las_22_03_off_1 = {
     50, // noItemWeight
     battle_heart_drop_param_default4, // hpDropTable
     battle_flower_drop_param_default, // fpDropTable
-    5, // field_1C
+    5, // reserved_1C
 };
 
 BattleUnitSetup btlparty_las_las_24_01_off_1[] = {
@@ -2236,7 +2193,7 @@ BattleGroupSetup btlgrp_las_las_24_01_off_1 = {
     50, // noItemWeight
     battle_heart_drop_param_default4, // hpDropTable
     battle_flower_drop_param_default, // fpDropTable
-    5, // field_1C
+    5, // reserved_1C
 };
 
 BattleUnitSetup btlparty_las_las_25_01_off_1[] = {
@@ -2260,7 +2217,7 @@ BattleGroupSetup btlgrp_las_las_25_01_off_1 = {
     50, // noItemWeight
     battle_heart_drop_param_default, // hpDropTable
     battle_flower_drop_param_default3, // fpDropTable
-    5, // field_1C
+    5, // reserved_1C
 };
 
 BattleUnitSetup btlparty_las_las_25_02_off_1[] = {
@@ -2304,7 +2261,7 @@ BattleGroupSetup btlgrp_las_las_25_02_off_1 = {
     50, // noItemWeight
     battle_heart_drop_param_default, // hpDropTable
     battle_flower_drop_param_default3, // fpDropTable
-    5, // field_1C
+    5, // reserved_1C
 };
 
 BattleUnitSetup btlparty_las_las_25_03_off_1[] = {
@@ -2358,7 +2315,7 @@ BattleGroupSetup btlgrp_las_las_25_03_off_1 = {
     50, // noItemWeight
     battle_heart_drop_param_default, // hpDropTable
     battle_flower_drop_param_default3, // fpDropTable
-    5, // field_1C
+    5, // reserved_1C
 };
 
 BattleUnitSetup btlparty_las_las_25_04_off_1[] = {
@@ -2392,7 +2349,7 @@ BattleGroupSetup btlgrp_las_las_25_04_off_1 = {
     50, // noItemWeight
     battle_heart_drop_param_default, // hpDropTable
     battle_flower_drop_param_default3, // fpDropTable
-    5, // field_1C
+    5, // reserved_1C
 };
 
 BattleUnitSetup btlparty_las_las_25_05_off_1[] = {
@@ -2436,7 +2393,7 @@ BattleGroupSetup btlgrp_las_las_25_05_off_1 = {
     50, // noItemWeight
     battle_heart_drop_param_default, // hpDropTable
     battle_flower_drop_param_default3, // fpDropTable
-    5, // field_1C
+    5, // reserved_1C
 };
 
 BattleUnitSetup btlparty_las_las_25_06_off_1[] = {
@@ -2480,7 +2437,7 @@ BattleGroupSetup btlgrp_las_las_25_06_off_1 = {
     50, // noItemWeight
     battle_heart_drop_param_default, // hpDropTable
     battle_flower_drop_param_default3, // fpDropTable
-    5, // field_1C
+    5, // reserved_1C
 };
 
 NpcBattleSelect btlgrpsel_las_btlno_las_test1_off[] = {
@@ -2796,8 +2753,8 @@ NpcSetupBattleInfo btlsetup_las_tbl[] = {
         -1, // swFlag
         NULL, // altSelect
         btlgrpsel_las_btlno_las_test1_off, // select
-        0, 0, // battleFlags..field_1C
-        {{3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {1, 1}, {1, 1}, {1, 1}, {1, 1}}, // field_20
+        0, 0, // battleFlags, randomMode
+        {{3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {1, 1}, {1, 1}, {1, 1}, {1, 1}}, // randomRanges
         "BGM_ZAKO_BATTLE1", // bgmName
     },
     {
@@ -2806,8 +2763,8 @@ NpcSetupBattleInfo btlsetup_las_tbl[] = {
         -1, // swFlag
         NULL, // altSelect
         btlgrpsel_las_btlno_las_test2_off, // select
-        0, 0, // battleFlags..field_1C
-        {{3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {1, 1}, {1, 1}, {1, 1}, {1, 1}}, // field_20
+        0, 0, // battleFlags, randomMode
+        {{3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {1, 1}, {1, 1}, {1, 1}, {1, 1}}, // randomRanges
         "BGM_ZAKO_BATTLE1", // bgmName
     },
     {
@@ -2816,8 +2773,8 @@ NpcSetupBattleInfo btlsetup_las_tbl[] = {
         -1, // swFlag
         NULL, // altSelect
         btlgrpsel_las_btlno_las_test3_off, // select
-        0, 0, // battleFlags..field_1C
-        {{3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {1, 1}, {1, 1}, {1, 1}, {1, 1}}, // field_20
+        0, 0, // battleFlags, randomMode
+        {{3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {1, 1}, {1, 1}, {1, 1}, {1, 1}}, // randomRanges
         "BGM_ZAKO_BATTLE1", // bgmName
     },
     {
@@ -2826,8 +2783,8 @@ NpcSetupBattleInfo btlsetup_las_tbl[] = {
         -1, // swFlag
         NULL, // altSelect
         btlgrpsel_las_btlno_las_test4_off, // select
-        0, 0, // battleFlags..field_1C
-        {{3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {1, 1}, {1, 1}, {1, 1}, {1, 1}}, // field_20
+        0, 0, // battleFlags, randomMode
+        {{3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {1, 1}, {1, 1}, {1, 1}, {1, 1}}, // randomRanges
         "BGM_ZAKO_BATTLE1", // bgmName
     },
     {
@@ -2836,8 +2793,8 @@ NpcSetupBattleInfo btlsetup_las_tbl[] = {
         -1, // swFlag
         NULL, // altSelect
         btlgrpsel_las_btlno_las_test5_off, // select
-        0, 0, // battleFlags..field_1C
-        {{3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {1, 1}, {1, 1}, {1, 1}, {1, 1}}, // field_20
+        0, 0, // battleFlags, randomMode
+        {{3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {1, 1}, {1, 1}, {1, 1}, {1, 1}}, // randomRanges
         "BGM_ZAKO_BATTLE1", // bgmName
     },
     {
@@ -2846,8 +2803,8 @@ NpcSetupBattleInfo btlsetup_las_tbl[] = {
         -1, // swFlag
         NULL, // altSelect
         btlgrpsel_las_btlno_las_test6_off, // select
-        0, 0, // battleFlags..field_1C
-        {{3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {1, 1}, {1, 1}, {1, 1}, {1, 1}}, // field_20
+        0, 0, // battleFlags, randomMode
+        {{3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {1, 1}, {1, 1}, {1, 1}, {1, 1}}, // randomRanges
         "BGM_ZAKO_BATTLE1", // bgmName
     },
     {
@@ -2856,8 +2813,8 @@ NpcSetupBattleInfo btlsetup_las_tbl[] = {
         -1, // swFlag
         NULL, // altSelect
         btlgrpsel_las_btlno_las_test7_off, // select
-        0, 0, // battleFlags..field_1C
-        {{3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {1, 1}, {1, 1}, {1, 1}, {1, 1}}, // field_20
+        0, 0, // battleFlags, randomMode
+        {{3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {1, 1}, {1, 1}, {1, 1}, {1, 1}}, // randomRanges
         "BGM_ZAKO_BATTLE1", // bgmName
     },
     {
@@ -2867,8 +2824,8 @@ NpcSetupBattleInfo btlsetup_las_tbl[] = {
         NULL, // altSelect
         btlgrpsel_las_btlno_las_05_01_off, // select
         0x20000010, // battleFlags
-        0, // field_1C
-        {{3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {1, 1}, {1, 1}, {1, 1}, {1, 1}}, // field_20
+        0, // randomMode
+        {{3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {1, 1}, {1, 1}, {1, 1}, {1, 1}}, // randomRanges
         "BGM_CHUBOSS_BATTLE1", // bgmName
     },
     {
@@ -2879,8 +2836,8 @@ NpcSetupBattleInfo btlsetup_las_tbl[] = {
         NULL, // altSelect
         btlgrpsel_las_btlno_las_09_rampell_off, // select
         0x20000010, // battleFlags
-        6, // field_1C
-        {{3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {1, 1}, {1, 1}, {1, 1}, {1, 1}}, // field_20
+        6, // randomMode
+        {{3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {1, 1}, {1, 1}, {1, 1}, {1, 1}}, // randomRanges
         "BGM_BOSS_STG3_3WOMEN1", // bgmName
     },
     {
@@ -2889,8 +2846,8 @@ NpcSetupBattleInfo btlsetup_las_tbl[] = {
         -1, // swFlag
         NULL, // altSelect
         btlgrpsel_las_btlno_las_17_01_off, // select
-        0, 0, // battleFlags..field_1C
-        {{3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {1, 1}, {1, 1}, {1, 1}, {1, 1}}, // field_20
+        0, 0, // battleFlags, randomMode
+        {{3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {1, 1}, {1, 1}, {1, 1}, {1, 1}}, // randomRanges
         "BGM_ZAKO_BATTLE1", // bgmName
     },
     {
@@ -2899,8 +2856,8 @@ NpcSetupBattleInfo btlsetup_las_tbl[] = {
         -1, // swFlag
         NULL, // altSelect
         btlgrpsel_las_btlno_las_17_02_off, // select
-        0, 0, // battleFlags..field_1C
-        {{3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {1, 1}, {1, 1}, {1, 1}, {1, 1}}, // field_20
+        0, 0, // battleFlags, randomMode
+        {{3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {1, 1}, {1, 1}, {1, 1}, {1, 1}}, // randomRanges
         "BGM_ZAKO_BATTLE1", // bgmName
     },
     {
@@ -2909,8 +2866,8 @@ NpcSetupBattleInfo btlsetup_las_tbl[] = {
         -1, // swFlag
         NULL, // altSelect
         btlgrpsel_las_btlno_las_17_03_off, // select
-        0, 0, // battleFlags..field_1C
-        {{3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {1, 1}, {1, 1}, {1, 1}, {1, 1}}, // field_20
+        0, 0, // battleFlags, randomMode
+        {{3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {1, 1}, {1, 1}, {1, 1}, {1, 1}}, // randomRanges
         "BGM_ZAKO_BATTLE1", // bgmName
     },
     {
@@ -2919,8 +2876,8 @@ NpcSetupBattleInfo btlsetup_las_tbl[] = {
         -1, // swFlag
         NULL, // altSelect
         btlgrpsel_las_btlno_las_17_04_off, // select
-        0, 0, // battleFlags..field_1C
-        {{3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {1, 1}, {1, 1}, {1, 1}, {1, 1}}, // field_20
+        0, 0, // battleFlags, randomMode
+        {{3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {1, 1}, {1, 1}, {1, 1}, {1, 1}}, // randomRanges
         "BGM_ZAKO_BATTLE1", // bgmName
     },
     {
@@ -2931,8 +2888,8 @@ NpcSetupBattleInfo btlsetup_las_tbl[] = {
         NULL, // altSelect
         btlgrpsel_las_btlno_las_28_koopa_off, // select
         0x20000010, // battleFlags
-        6, // field_1C
-        {{3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {1, 1}, {1, 1}, {1, 1}, {1, 1}}, // field_20
+        6, // randomMode
+        {{3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {1, 1}, {1, 1}, {1, 1}, {1, 1}}, // randomRanges
         "BGM_BOSS_STG8_KOOPA", // bgmName
     },
     {
@@ -2943,8 +2900,8 @@ NpcSetupBattleInfo btlsetup_las_tbl[] = {
         NULL, // altSelect
         btlgrpsel_las_btlno_las_bunbaba_off, // select
         0x20100010, // battleFlags
-        6, // field_1C
-        {{3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {1, 1}, {1, 1}, {1, 1}, {1, 1}}, // field_20
+        6, // randomMode
+        {{3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {1, 1}, {1, 1}, {1, 1}, {1, 1}}, // randomRanges
         "BGM_BOSS_STG1_GONBABA1", // bgmName
     },
     {
@@ -2955,8 +2912,8 @@ NpcSetupBattleInfo btlsetup_las_tbl[] = {
         NULL, // altSelect
         btlgrpsel_las_btlno_las_28_batten_leader_off, // select
         0x20000010, // battleFlags
-        5, // field_1C
-        {{0}, {10, 10}, {0}, {0}, {0}, {0}, {0}, {0}, {0}, {0}, {0}, {0}, {0}, {1, 1}, {1, 1}, {1, 1}}, // field_20
+        5, // randomMode
+        {{0}, {10, 10}, {0}, {0}, {0}, {0}, {0}, {0}, {0}, {0}, {0}, {0}, {0}, {1, 1}, {1, 1}, {1, 1}}, // randomRanges
         "BGM_BOSS_STG8_3RDHEAD1", // bgmName
     },
     {
@@ -2967,8 +2924,8 @@ NpcSetupBattleInfo btlsetup_las_tbl[] = {
         NULL, // altSelect
         btlgrpsel_las_btlno_las_29_black_peach_1_off, // select
         0x20000010, // battleFlags
-        6, // field_1C
-        {{10, 10}, {1, 1}, {1, 1}, {1, 1}, {1, 1}, {1, 1}, {1, 1}, {10, 10}, {1, 1}, {1, 1}, {1, 1}, {1, 1}, {1, 1}, {1, 1}, {1, 1}, {1, 1}}, // field_20
+        6, // randomMode
+        {{10, 10}, {1, 1}, {1, 1}, {1, 1}, {1, 1}, {1, 1}, {1, 1}, {10, 10}, {1, 1}, {1, 1}, {1, 1}, {1, 1}, {1, 1}, {1, 1}, {1, 1}, {1, 1}}, // randomRanges
         "BGM_BOSS_STG8_WITCH", // bgmName
     },
     {
@@ -2979,8 +2936,8 @@ NpcSetupBattleInfo btlsetup_las_tbl[] = {
         NULL, // altSelect
         btlgrpsel_las_btlno_las_29_black_peach_2_off, // select
         0x20000010, // battleFlags
-        6, // field_1C
-        {{10, 10}, {1, 1}, {1, 1}, {1, 1}, {1, 1}, {1, 1}, {1, 1}, {10, 10}, {1, 1}, {1, 1}, {1, 1}, {1, 1}, {1, 1}, {1, 1}, {1, 1}, {1, 1}}, // field_20
+        6, // randomMode
+        {{10, 10}, {1, 1}, {1, 1}, {1, 1}, {1, 1}, {1, 1}, {1, 1}, {10, 10}, {1, 1}, {1, 1}, {1, 1}, {1, 1}, {1, 1}, {1, 1}, {1, 1}, {1, 1}}, // randomRanges
         "BGM_BOSS_STG8_LAST_BOSS2", // bgmName
     },
     {
@@ -2989,8 +2946,8 @@ NpcSetupBattleInfo btlsetup_las_tbl[] = {
         -1, // swFlag
         NULL, // altSelect
         btlgrpsel_las_btlno_las_01_01_off, // select
-        0, 0, // battleFlags..field_1C
-        {{3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {1, 1}, {1, 1}, {1, 1}, {1, 1}}, // field_20
+        0, 0, // battleFlags, randomMode
+        {{3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {1, 1}, {1, 1}, {1, 1}, {1, 1}}, // randomRanges
         "BGM_ZAKO_BATTLE1", // bgmName
     },
     {
@@ -2999,8 +2956,8 @@ NpcSetupBattleInfo btlsetup_las_tbl[] = {
         -1, // swFlag
         NULL, // altSelect
         btlgrpsel_las_btlno_las_01_02_off, // select
-        0, 0, // battleFlags..field_1C
-        {{3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {1, 1}, {1, 1}, {1, 1}, {1, 1}}, // field_20
+        0, 0, // battleFlags, randomMode
+        {{3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {1, 1}, {1, 1}, {1, 1}, {1, 1}}, // randomRanges
         "BGM_ZAKO_BATTLE1", // bgmName
     },
     {
@@ -3009,8 +2966,8 @@ NpcSetupBattleInfo btlsetup_las_tbl[] = {
         -1, // swFlag
         NULL, // altSelect
         btlgrpsel_las_btlno_las_01_03_off, // select
-        0, 0, // battleFlags..field_1C
-        {{3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {1, 1}, {1, 1}, {1, 1}, {1, 1}}, // field_20
+        0, 0, // battleFlags, randomMode
+        {{3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {1, 1}, {1, 1}, {1, 1}, {1, 1}}, // randomRanges
         "BGM_ZAKO_BATTLE1", // bgmName
     },
     {
@@ -3019,8 +2976,8 @@ NpcSetupBattleInfo btlsetup_las_tbl[] = {
         -1, // swFlag
         NULL, // altSelect
         btlgrpsel_las_btlno_las_02_01_off, // select
-        0, 0, // battleFlags..field_1C
-        {{3, 3}, {3, 3}, {3, 3}, {3, 3}, {10, 10}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {1, 1}, {1, 1}, {1, 1}, {1, 1}}, // field_20
+        0, 0, // battleFlags, randomMode
+        {{3, 3}, {3, 3}, {3, 3}, {3, 3}, {10, 10}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {1, 1}, {1, 1}, {1, 1}, {1, 1}}, // randomRanges
         "BGM_ZAKO_BATTLE1", // bgmName
     },
     {
@@ -3029,8 +2986,8 @@ NpcSetupBattleInfo btlsetup_las_tbl[] = {
         -1, // swFlag
         NULL, // altSelect
         btlgrpsel_las_btlno_las_02_02_off, // select
-        0, 0, // battleFlags..field_1C
-        {{3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {1, 1}, {1, 1}, {1, 1}, {1, 1}}, // field_20
+        0, 0, // battleFlags, randomMode
+        {{3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {1, 1}, {1, 1}, {1, 1}, {1, 1}}, // randomRanges
         "BGM_ZAKO_BATTLE1", // bgmName
     },
     {
@@ -3039,8 +2996,8 @@ NpcSetupBattleInfo btlsetup_las_tbl[] = {
         -1, // swFlag
         NULL, // altSelect
         btlgrpsel_las_btlno_las_02_03_off, // select
-        0, 0, // battleFlags..field_1C
-        {{3, 3}, {3, 3}, {3, 3}, {3, 3}, {10, 10}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {1, 1}, {1, 1}, {1, 1}, {1, 1}}, // field_20
+        0, 0, // battleFlags, randomMode
+        {{3, 3}, {3, 3}, {3, 3}, {3, 3}, {10, 10}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {1, 1}, {1, 1}, {1, 1}, {1, 1}}, // randomRanges
         "BGM_ZAKO_BATTLE1", // bgmName
     },
     {
@@ -3049,8 +3006,8 @@ NpcSetupBattleInfo btlsetup_las_tbl[] = {
         -1, // swFlag
         NULL, // altSelect
         btlgrpsel_las_btlno_las_02_04_off, // select
-        0, 0, // battleFlags..field_1C
-        {{3, 3}, {3, 3}, {3, 3}, {3, 3}, {10, 10}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {1, 1}, {1, 1}, {1, 1}, {1, 1}}, // field_20
+        0, 0, // battleFlags, randomMode
+        {{3, 3}, {3, 3}, {3, 3}, {3, 3}, {10, 10}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {1, 1}, {1, 1}, {1, 1}, {1, 1}}, // randomRanges
         "BGM_ZAKO_BATTLE1", // bgmName
     },
     {
@@ -3059,8 +3016,8 @@ NpcSetupBattleInfo btlsetup_las_tbl[] = {
         -1, // swFlag
         NULL, // altSelect
         btlgrpsel_las_btlno_las_02_05_off, // select
-        0, 0, // battleFlags..field_1C
-        {{3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {1, 1}, {1, 1}, {1, 1}, {1, 1}}, // field_20
+        0, 0, // battleFlags, randomMode
+        {{3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {1, 1}, {1, 1}, {1, 1}, {1, 1}}, // randomRanges
         "BGM_ZAKO_BATTLE1", // bgmName
     },
     {
@@ -3069,8 +3026,8 @@ NpcSetupBattleInfo btlsetup_las_tbl[] = {
         -1, // swFlag
         NULL, // altSelect
         btlgrpsel_las_btlno_las_02_06_off, // select
-        0, 0, // battleFlags..field_1C
-        {{3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {1, 1}, {1, 1}, {1, 1}, {1, 1}}, // field_20
+        0, 0, // battleFlags, randomMode
+        {{3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {1, 1}, {1, 1}, {1, 1}, {1, 1}}, // randomRanges
         "BGM_ZAKO_BATTLE1", // bgmName
     },
     {
@@ -3079,8 +3036,8 @@ NpcSetupBattleInfo btlsetup_las_tbl[] = {
         -1, // swFlag
         NULL, // altSelect
         btlgrpsel_las_btlno_las_02_99_off, // select
-        0, 0, // battleFlags..field_1C
-        {{3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {1, 1}, {1, 1}, {1, 1}, {1, 1}}, // field_20
+        0, 0, // battleFlags, randomMode
+        {{3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {1, 1}, {1, 1}, {1, 1}, {1, 1}}, // randomRanges
         "BGM_ZAKO_BATTLE1", // bgmName
     },
     {
@@ -3089,8 +3046,8 @@ NpcSetupBattleInfo btlsetup_las_tbl[] = {
         -1, // swFlag
         NULL, // altSelect
         btlgrpsel_las_btlno_las_03_01_off, // select
-        0, 0, // battleFlags..field_1C
-        {{3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {1, 1}, {1, 1}, {1, 1}, {1, 1}}, // field_20
+        0, 0, // battleFlags, randomMode
+        {{3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {1, 1}, {1, 1}, {1, 1}, {1, 1}}, // randomRanges
         "BGM_ZAKO_BATTLE1", // bgmName
     },
     {
@@ -3099,8 +3056,8 @@ NpcSetupBattleInfo btlsetup_las_tbl[] = {
         -1, // swFlag
         NULL, // altSelect
         btlgrpsel_las_btlno_las_03_02_off, // select
-        0, 0, // battleFlags..field_1C
-        {{3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {1, 1}, {1, 1}, {1, 1}, {1, 1}}, // field_20
+        0, 0, // battleFlags, randomMode
+        {{3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {1, 1}, {1, 1}, {1, 1}, {1, 1}}, // randomRanges
         "BGM_ZAKO_BATTLE1", // bgmName
     },
     {
@@ -3109,8 +3066,8 @@ NpcSetupBattleInfo btlsetup_las_tbl[] = {
         -1, // swFlag
         NULL, // altSelect
         btlgrpsel_las_btlno_las_03_03_off, // select
-        0, 0, // battleFlags..field_1C
-        {{3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {1, 1}, {1, 1}, {1, 1}, {1, 1}}, // field_20
+        0, 0, // battleFlags, randomMode
+        {{3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {1, 1}, {1, 1}, {1, 1}, {1, 1}}, // randomRanges
         "BGM_ZAKO_BATTLE1", // bgmName
     },
     {
@@ -3119,8 +3076,8 @@ NpcSetupBattleInfo btlsetup_las_tbl[] = {
         -1, // swFlag
         NULL, // altSelect
         btlgrpsel_las_btlno_las_04_01_off, // select
-        0, 0, // battleFlags..field_1C
-        {{3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {1, 1}, {1, 1}, {1, 1}, {1, 1}}, // field_20
+        0, 0, // battleFlags, randomMode
+        {{3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {1, 1}, {1, 1}, {1, 1}, {1, 1}}, // randomRanges
         "BGM_ZAKO_BATTLE1", // bgmName
     },
     {
@@ -3129,8 +3086,8 @@ NpcSetupBattleInfo btlsetup_las_tbl[] = {
         -1, // swFlag
         NULL, // altSelect
         btlgrpsel_las_btlno_las_06_01_off, // select
-        0, 0, // battleFlags..field_1C
-        {{3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {1, 1}, {1, 1}, {1, 1}, {1, 1}}, // field_20
+        0, 0, // battleFlags, randomMode
+        {{3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {1, 1}, {1, 1}, {1, 1}, {1, 1}}, // randomRanges
         "BGM_ZAKO_BATTLE1", // bgmName
     },
     {
@@ -3139,8 +3096,8 @@ NpcSetupBattleInfo btlsetup_las_tbl[] = {
         -1, // swFlag
         NULL, // altSelect
         btlgrpsel_las_btlno_las_06_02_off, // select
-        0, 0, // battleFlags..field_1C
-        {{3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {1, 1}, {1, 1}, {1, 1}, {1, 1}}, // field_20
+        0, 0, // battleFlags, randomMode
+        {{3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {1, 1}, {1, 1}, {1, 1}, {1, 1}}, // randomRanges
         "BGM_ZAKO_BATTLE1", // bgmName
     },
     {
@@ -3149,8 +3106,8 @@ NpcSetupBattleInfo btlsetup_las_tbl[] = {
         -1, // swFlag
         NULL, // altSelect
         btlgrpsel_las_btlno_las_06_03_off, // select
-        0, 0, // battleFlags..field_1C
-        {{3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {1, 1}, {1, 1}, {1, 1}, {1, 1}}, // field_20
+        0, 0, // battleFlags, randomMode
+        {{3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {1, 1}, {1, 1}, {1, 1}, {1, 1}}, // randomRanges
         "BGM_ZAKO_BATTLE1", // bgmName
     },
     {
@@ -3159,8 +3116,8 @@ NpcSetupBattleInfo btlsetup_las_tbl[] = {
         -1, // swFlag
         NULL, // altSelect
         btlgrpsel_las_btlno_las_06_04_off, // select
-        0, 0, // battleFlags..field_1C
-        {{3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {1, 1}, {1, 1}, {1, 1}, {1, 1}}, // field_20
+        0, 0, // battleFlags, randomMode
+        {{3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {1, 1}, {1, 1}, {1, 1}, {1, 1}}, // randomRanges
         "BGM_ZAKO_BATTLE1", // bgmName
     },
     {
@@ -3169,8 +3126,8 @@ NpcSetupBattleInfo btlsetup_las_tbl[] = {
         -1, // swFlag
         NULL, // altSelect
         btlgrpsel_las_btlno_las_06_05_off, // select
-        0, 0, // battleFlags..field_1C
-        {{3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {1, 1}, {1, 1}, {1, 1}, {1, 1}}, // field_20
+        0, 0, // battleFlags, randomMode
+        {{3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {1, 1}, {1, 1}, {1, 1}, {1, 1}}, // randomRanges
         "BGM_ZAKO_BATTLE1", // bgmName
     },
     {
@@ -3179,8 +3136,8 @@ NpcSetupBattleInfo btlsetup_las_tbl[] = {
         -1, // swFlag
         NULL, // altSelect
         btlgrpsel_las_btlno_las_06_06_off, // select
-        0, 0, // battleFlags..field_1C
-        {{3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {1, 1}, {1, 1}, {1, 1}, {1, 1}}, // field_20
+        0, 0, // battleFlags, randomMode
+        {{3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {1, 1}, {1, 1}, {1, 1}, {1, 1}}, // randomRanges
         "BGM_ZAKO_BATTLE1", // bgmName
     },
     {
@@ -3189,8 +3146,8 @@ NpcSetupBattleInfo btlsetup_las_tbl[] = {
         -1, // swFlag
         NULL, // altSelect
         btlgrpsel_las_btlno_las_06_99_off, // select
-        0, 0, // battleFlags..field_1C
-        {{3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {1, 1}, {1, 1}, {1, 1}, {1, 1}}, // field_20
+        0, 0, // battleFlags, randomMode
+        {{3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {1, 1}, {1, 1}, {1, 1}, {1, 1}}, // randomRanges
         "BGM_ZAKO_BATTLE1", // bgmName
     },
     {
@@ -3199,8 +3156,8 @@ NpcSetupBattleInfo btlsetup_las_tbl[] = {
         -1, // swFlag
         NULL, // altSelect
         btlgrpsel_las_btlno_las_07_01_off, // select
-        0, 0, // battleFlags..field_1C
-        {{3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {1, 1}, {1, 1}, {1, 1}, {1, 1}}, // field_20
+        0, 0, // battleFlags, randomMode
+        {{3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {1, 1}, {1, 1}, {1, 1}, {1, 1}}, // randomRanges
         "BGM_ZAKO_BATTLE1", // bgmName
     },
     {
@@ -3209,8 +3166,8 @@ NpcSetupBattleInfo btlsetup_las_tbl[] = {
         -1, // swFlag
         NULL, // altSelect
         btlgrpsel_las_btlno_las_07_02_off, // select
-        0, 0, // battleFlags..field_1C
-        {{3, 3}, {3, 3}, {3, 3}, {3, 3}, {10, 10}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {1, 1}, {1, 1}, {1, 1}, {1, 1}}, // field_20
+        0, 0, // battleFlags, randomMode
+        {{3, 3}, {3, 3}, {3, 3}, {3, 3}, {10, 10}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {1, 1}, {1, 1}, {1, 1}, {1, 1}}, // randomRanges
         "BGM_ZAKO_BATTLE1", // bgmName
     },
     {
@@ -3219,8 +3176,8 @@ NpcSetupBattleInfo btlsetup_las_tbl[] = {
         -1, // swFlag
         NULL, // altSelect
         btlgrpsel_las_btlno_las_07_03_off, // select
-        0, 0, // battleFlags..field_1C
-        {{3, 3}, {3, 3}, {3, 3}, {3, 3}, {10, 10}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {1, 1}, {1, 1}, {1, 1}, {1, 1}}, // field_20
+        0, 0, // battleFlags, randomMode
+        {{3, 3}, {3, 3}, {3, 3}, {3, 3}, {10, 10}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {1, 1}, {1, 1}, {1, 1}, {1, 1}}, // randomRanges
         "BGM_ZAKO_BATTLE1", // bgmName
     },
     {
@@ -3229,8 +3186,8 @@ NpcSetupBattleInfo btlsetup_las_tbl[] = {
         -1, // swFlag
         NULL, // altSelect
         btlgrpsel_las_btlno_las_09_01_off, // select
-        0, 0, // battleFlags..field_1C
-        {{3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {1, 1}, {1, 1}, {1, 1}, {1, 1}}, // field_20
+        0, 0, // battleFlags, randomMode
+        {{3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {1, 1}, {1, 1}, {1, 1}, {1, 1}}, // randomRanges
         "BGM_ZAKO_BATTLE1", // bgmName
     },
     {
@@ -3239,8 +3196,8 @@ NpcSetupBattleInfo btlsetup_las_tbl[] = {
         -1, // swFlag
         NULL, // altSelect
         btlgrpsel_las_btlno_las_09_02_off, // select
-        0, 0, // battleFlags..field_1C
-        {{3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {1, 1}, {1, 1}, {1, 1}, {1, 1}}, // field_20
+        0, 0, // battleFlags, randomMode
+        {{3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {1, 1}, {1, 1}, {1, 1}, {1, 1}}, // randomRanges
         "BGM_ZAKO_BATTLE1", // bgmName
     },
     {
@@ -3249,8 +3206,8 @@ NpcSetupBattleInfo btlsetup_las_tbl[] = {
         -1, // swFlag
         NULL, // altSelect
         btlgrpsel_las_btlno_las_19_01_off, // select
-        0, 0, // battleFlags..field_1C
-        {{3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {1, 1}, {1, 1}, {1, 1}, {1, 1}}, // field_20
+        0, 0, // battleFlags, randomMode
+        {{3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {1, 1}, {1, 1}, {1, 1}, {1, 1}}, // randomRanges
         "BGM_ZAKO_BATTLE1", // bgmName
     },
     {
@@ -3259,8 +3216,8 @@ NpcSetupBattleInfo btlsetup_las_tbl[] = {
         -1, // swFlag
         NULL, // altSelect
         btlgrpsel_las_btlno_las_19_02_off, // select
-        0, 0, // battleFlags..field_1C
-        {{3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {1, 1}, {1, 1}, {1, 1}, {1, 1}}, // field_20
+        0, 0, // battleFlags, randomMode
+        {{3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {1, 1}, {1, 1}, {1, 1}, {1, 1}}, // randomRanges
         "BGM_ZAKO_BATTLE1", // bgmName
     },
     {
@@ -3269,8 +3226,8 @@ NpcSetupBattleInfo btlsetup_las_tbl[] = {
         -1, // swFlag
         NULL, // altSelect
         btlgrpsel_las_btlno_las_19_03_off, // select
-        0, 0, // battleFlags..field_1C
-        {{3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {1, 1}, {1, 1}, {1, 1}, {1, 1}}, // field_20
+        0, 0, // battleFlags, randomMode
+        {{3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {1, 1}, {1, 1}, {1, 1}, {1, 1}}, // randomRanges
         "BGM_ZAKO_BATTLE1", // bgmName
     },
     {
@@ -3279,8 +3236,8 @@ NpcSetupBattleInfo btlsetup_las_tbl[] = {
         -1, // swFlag
         NULL, // altSelect
         btlgrpsel_las_btlno_las_20_01_off, // select
-        0, 0, // battleFlags..field_1C
-        {{3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {1, 1}, {1, 1}, {1, 1}, {1, 1}}, // field_20
+        0, 0, // battleFlags, randomMode
+        {{3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {1, 1}, {1, 1}, {1, 1}, {1, 1}}, // randomRanges
         "BGM_ZAKO_BATTLE1", // bgmName
     },
     {
@@ -3289,8 +3246,8 @@ NpcSetupBattleInfo btlsetup_las_tbl[] = {
         -1, // swFlag
         NULL, // altSelect
         btlgrpsel_las_btlno_las_21_01_off, // select
-        0, 0, // battleFlags..field_1C
-        {{3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {1, 1}, {1, 1}, {1, 1}, {1, 1}}, // field_20
+        0, 0, // battleFlags, randomMode
+        {{3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {1, 1}, {1, 1}, {1, 1}, {1, 1}}, // randomRanges
         "BGM_ZAKO_BATTLE1", // bgmName
     },
     {
@@ -3299,8 +3256,8 @@ NpcSetupBattleInfo btlsetup_las_tbl[] = {
         -1, // swFlag
         NULL, // altSelect
         btlgrpsel_las_btlno_las_21_02_off, // select
-        0, 0, // battleFlags..field_1C
-        {{3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {1, 1}, {1, 1}, {1, 1}, {1, 1}}, // field_20
+        0, 0, // battleFlags, randomMode
+        {{3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {1, 1}, {1, 1}, {1, 1}, {1, 1}}, // randomRanges
         "BGM_ZAKO_BATTLE1", // bgmName
     },
     {
@@ -3309,8 +3266,8 @@ NpcSetupBattleInfo btlsetup_las_tbl[] = {
         -1, // swFlag
         NULL, // altSelect
         btlgrpsel_las_btlno_las_22_01_off, // select
-        0, 0, // battleFlags..field_1C
-        {{3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {1, 1}, {1, 1}, {1, 1}, {1, 1}}, // field_20
+        0, 0, // battleFlags, randomMode
+        {{3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {1, 1}, {1, 1}, {1, 1}, {1, 1}}, // randomRanges
         "BGM_ZAKO_BATTLE1", // bgmName
     },
     {
@@ -3319,8 +3276,8 @@ NpcSetupBattleInfo btlsetup_las_tbl[] = {
         -1, // swFlag
         NULL, // altSelect
         btlgrpsel_las_btlno_las_22_02_off, // select
-        0, 0, // battleFlags..field_1C
-        {{3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {1, 1}, {1, 1}, {1, 1}, {1, 1}}, // field_20
+        0, 0, // battleFlags, randomMode
+        {{3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {1, 1}, {1, 1}, {1, 1}, {1, 1}}, // randomRanges
         "BGM_ZAKO_BATTLE1", // bgmName
     },
     {
@@ -3329,8 +3286,8 @@ NpcSetupBattleInfo btlsetup_las_tbl[] = {
         -1, // swFlag
         NULL, // altSelect
         btlgrpsel_las_btlno_las_22_03_off, // select
-        0, 0, // battleFlags..field_1C
-        {{3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {1, 1}, {1, 1}, {1, 1}, {1, 1}}, // field_20
+        0, 0, // battleFlags, randomMode
+        {{3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {1, 1}, {1, 1}, {1, 1}, {1, 1}}, // randomRanges
         "BGM_ZAKO_BATTLE1", // bgmName
     },
     {
@@ -3339,8 +3296,8 @@ NpcSetupBattleInfo btlsetup_las_tbl[] = {
         -1, // swFlag
         NULL, // altSelect
         btlgrpsel_las_btlno_las_24_01_off, // select
-        0, 0, // battleFlags..field_1C
-        {{3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {1, 1}, {1, 1}, {1, 1}, {1, 1}}, // field_20
+        0, 0, // battleFlags, randomMode
+        {{3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {1, 1}, {1, 1}, {1, 1}, {1, 1}}, // randomRanges
         "BGM_ZAKO_BATTLE1", // bgmName
     },
     {
@@ -3349,8 +3306,8 @@ NpcSetupBattleInfo btlsetup_las_tbl[] = {
         -1, // swFlag
         NULL, // altSelect
         btlgrpsel_las_btlno_las_25_01_off, // select
-        0, 0, // battleFlags..field_1C
-        {{3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {1, 1}, {1, 1}, {1, 1}, {1, 1}}, // field_20
+        0, 0, // battleFlags, randomMode
+        {{3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {1, 1}, {1, 1}, {1, 1}, {1, 1}}, // randomRanges
         "BGM_ZAKO_BATTLE1", // bgmName
     },
     {
@@ -3359,8 +3316,8 @@ NpcSetupBattleInfo btlsetup_las_tbl[] = {
         -1, // swFlag
         NULL, // altSelect
         btlgrpsel_las_btlno_las_25_02_off, // select
-        0, 0, // battleFlags..field_1C
-        {{3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {1, 1}, {1, 1}, {1, 1}, {1, 1}}, // field_20
+        0, 0, // battleFlags, randomMode
+        {{3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {1, 1}, {1, 1}, {1, 1}, {1, 1}}, // randomRanges
         "BGM_ZAKO_BATTLE1", // bgmName
     },
     {
@@ -3369,8 +3326,8 @@ NpcSetupBattleInfo btlsetup_las_tbl[] = {
         -1, // swFlag
         NULL, // altSelect
         btlgrpsel_las_btlno_las_25_03_off, // select
-        0, 0, // battleFlags..field_1C
-        {{3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {1, 1}, {1, 1}, {1, 1}, {1, 1}}, // field_20
+        0, 0, // battleFlags, randomMode
+        {{3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {1, 1}, {1, 1}, {1, 1}, {1, 1}}, // randomRanges
         "BGM_ZAKO_BATTLE1", // bgmName
     },
     {
@@ -3379,8 +3336,8 @@ NpcSetupBattleInfo btlsetup_las_tbl[] = {
         -1, // swFlag
         NULL, // altSelect
         btlgrpsel_las_btlno_las_25_04_off, // select
-        0, 0, // battleFlags..field_1C
-        {{3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {1, 1}, {1, 1}, {1, 1}, {1, 1}}, // field_20
+        0, 0, // battleFlags, randomMode
+        {{3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {1, 1}, {1, 1}, {1, 1}, {1, 1}}, // randomRanges
         "BGM_ZAKO_BATTLE1", // bgmName
     },
     {
@@ -3389,8 +3346,8 @@ NpcSetupBattleInfo btlsetup_las_tbl[] = {
         -1, // swFlag
         NULL, // altSelect
         btlgrpsel_las_btlno_las_25_05_off, // select
-        0, 0, // battleFlags..field_1C
-        {{3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {1, 1}, {1, 1}, {1, 1}, {1, 1}}, // field_20
+        0, 0, // battleFlags, randomMode
+        {{3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {1, 1}, {1, 1}, {1, 1}, {1, 1}}, // randomRanges
         "BGM_ZAKO_BATTLE1", // bgmName
     },
     {
@@ -3399,8 +3356,8 @@ NpcSetupBattleInfo btlsetup_las_tbl[] = {
         -1, // swFlag
         NULL, // altSelect
         btlgrpsel_las_btlno_las_25_06_off, // select
-        0, 0, // battleFlags..field_1C
-        {{3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {1, 1}, {1, 1}, {1, 1}, {1, 1}}, // field_20
+        0, 0, // battleFlags, randomMode
+        {{3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {1, 1}, {1, 1}, {1, 1}, {1, 1}}, // randomRanges
         "BGM_ZAKO_BATTLE1", // bgmName
     },
     {0},

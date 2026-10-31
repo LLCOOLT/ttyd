@@ -1,7 +1,6 @@
 #include "battle/battle_unit.h"
 #include "evt/evt_cmd.h"
 
-#pragma force_active on
 #include "battle/battle.h"
 #include "battle/battle_event_default.h"
 #include "battle/battle_event_cmd.h"
@@ -10,6 +9,7 @@
 #include "battle/battle_weapon_power.h"
 #include "evt/evt_eff.h"
 #include "battle/battle_database_common.h"
+#include "manager/evtmgr_cmd.h"
 
 USER_FUNC(btlevtcmd_AnimeChangePoseFromTable);
 USER_FUNC(btlevtcmd_CheckStatus);
@@ -28,20 +28,6 @@ USER_FUNC(btlevtcmd_check_battleflag);
 USER_FUNC(evt_sub_random);
 static USER_FUNC(kanbu_get_id);
 
-f32 fd_gundan_zako_magician_negone_one_374[2] __attribute__((aligned(8)));
-f32 fd_gundan_zako_magician_neg_one_382;
-f32 fd_gundan_zako_magician___local_PI_383;
-f32 fd_gundan_zako_magician___local_3PIO2_385;
-f32 fd_gundan_zako_magician_one_negone_373[2] __attribute__((aligned(8)));
-f32 fd_gundan_zako_magician___local_PIO2_384;
-f32 fd_gundan_zako_magician_one_381;
-f32 fd_gundan_zako_magician_negone_one_360[2] __attribute__((aligned(8)));
-f32 fd_gundan_zako_magician_neg_one_365;
-f32 fd_gundan_zako_magician___local_PI_366;
-f32 fd_gundan_zako_magician___local_3PIO2_368;
-f32 fd_gundan_zako_magician_one_negone_359[2] __attribute__((aligned(8)));
-f32 fd_gundan_zako_magician___local_PIO2_367;
-f32 fd_gundan_zako_magician_one_364;
 BattleUnitKind unit_gundan_zako_magician;
 static BattleUnitDefense defence;
 static BattleUnitDefenseAttr defence_attr;
@@ -59,9 +45,6 @@ static BattleWeapon weapon_gundan_zako_magician_ziwaziwa_bottle;
 static EvtWord init_event[21];
 static EvtWord damage_event[10];
 static EvtWord attack_event[235];
-static EvtWord attack_common_event1[141];
-static EvtWord attack_common_event2[332];
-static EvtWord attack_common_event3[251];
 static EvtWord fire_bottle_event[56];
 static EvtWord hunyahunya_bottle_event[43];
 static EvtWord yokeyoke_bottle_event[74];
@@ -94,34 +77,6 @@ static USER_FUNC(kanbu_get_id) {
     }
     return EVT_RETURN_DONE;
 }
-
-f32 fd_gundan_zako_magician_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
-
-f32 fd_gundan_zako_magician_neg_one_382 = -1.0f;
-
-f32 fd_gundan_zako_magician___local_PI_383 = 3.1415927f;
-
-f32 fd_gundan_zako_magician___local_3PIO2_385 = 4.712389f;
-
-f32 fd_gundan_zako_magician_one_negone_373[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
-
-f32 fd_gundan_zako_magician___local_PIO2_384 = 1.5707964f;
-
-f32 fd_gundan_zako_magician_one_381 = 1.0f;
-
-f32 fd_gundan_zako_magician_negone_one_360[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
-
-f32 fd_gundan_zako_magician_neg_one_365 = -1.0f;
-
-f32 fd_gundan_zako_magician___local_PI_366 = 3.1415927f;
-
-f32 fd_gundan_zako_magician___local_3PIO2_368 = 4.712389f;
-
-f32 fd_gundan_zako_magician_one_negone_359[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
-
-f32 fd_gundan_zako_magician___local_PIO2_367 = 1.5707964f;
-
-f32 fd_gundan_zako_magician_one_364 = 1.0f;
 
 BattleUnitKind unit_gundan_zako_magician = {
     119,
@@ -1005,7 +960,7 @@ static EVT_BEGIN(one_recover_event)
     CALL(btlevtcmd_GetStatusMg, LW(3), LW(6))
     MULTIPLY_FLOAT(LW(5), LW(6))
     ADD(LW(1), LW(5))
-    CALL(evt_eff, STRING(""), STRING("recovery\0\0\0"), 0, LW(0), LW(1), LW(2), 10, 0, 0, 0, 0, 0, 0, 0)
+    CALL(evt_eff, STRING(""), STRING("recovery"), 0, LW(0), LW(1), LW(2), 10, 0, 0, 0, 0, 0, 0, 0)
     WAIT_FRAMES(30)
     CALL(evt_btl_camera_set_mode, 0, 0)
     WAIT_FRAMES(60)
@@ -1049,7 +1004,7 @@ static EVT_BEGIN(all_recover_event)
         CALL(btlevtcmd_GetStatusMg, LW(3), LW(6))
         MULTIPLY_FLOAT(LW(5), LW(6))
         ADD(LW(1), LW(5))
-        CALL(evt_eff, STRING(""), STRING("recovery\0\0\0"), 0, LW(0), LW(1), LW(2), 5, 0, 0, 0, 0, 0, 0, 0)
+        CALL(evt_eff, STRING(""), STRING("recovery"), 0, LW(0), LW(1), LW(2), 5, 0, 0, 0, 0, 0, 0, 0)
     END_SIBLING_EVENT
     CALL(btlevtcmd_GetSelectNextEnemy, LW(3), LW(4))
     IF_INT_NOT_EQUAL(LW(3), -1)

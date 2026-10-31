@@ -2,7 +2,6 @@
 #include "eff/eff_starstone.h"
 #include "evt/evt_cmd.h"
 
-#pragma force_active on
 #include "driver/effdrv.h"
 #include "manager/evtmgr_cmd.h"
 #include "driver/icondrv.h"
@@ -138,121 +137,44 @@ extern s32 envSetYami[];
 
 EffectEntry* effStarStoneEntry(s32 type, f32 x, f32 y, f32 z, f32 scale);
 void envSetYamiView(Mtx mtx);
-f32 fd_muj_01_negone_one_374[2] __attribute__((aligned(8)));
-f32 fd_muj_01_neg_one_382;
-f32 fd_muj_01___local_PI_383;
-f32 fd_muj_01___local_3PIO2_385;
-f32 fd_muj_01_one_negone_373[2] __attribute__((aligned(8)));
-f32 fd_muj_01___local_PIO2_384;
-f32 fd_muj_01_one_381;
-f32 fd_muj_01_negone_one_360[2] __attribute__((aligned(8)));
-f32 fd_muj_01_neg_one_365;
-f32 fd_muj_01___local_PI_366;
-f32 fd_muj_01___local_3PIO2_368;
-f32 fd_muj_01_one_negone_359[2] __attribute__((aligned(8)));
-f32 fd_muj_01___local_PIO2_367;
-f32 fd_muj_01_one_364;
-EvtWord custom_door_dark2[34];
-EvtWord custom_door_light2[30];
-static EvtWord garawaru_init[39];
-static EvtWord garawaru_talk[270];
-static EvtWord marco_init[31];
-EvtWord marco_kyorokyoro[28];
-#ifdef VERSION_G8ME01
-static EvtWord marco_talk[848];
-#else
-static EvtWord marco_talk[831];
-#endif
-static EvtWord megane_init[14];
-static EvtWord megane_talk[54];
-static EvtWord odoodo_init[14];
-static EvtWord odoodo_talk[54];
-static EvtWord suifu_a_init[14];
-static EvtWord suifu_a_talk[48];
-static EvtWord suifu_bomb_init[14];
-static EvtWord suifu_bomb_talk[48];
-static EvtWord suifu_d_init[13];
-EvtWord suifu_d_regl[24];
-static EvtWord suifu_d_talk[56];
-EvtWord borosuifu_a_init[13];
-EvtWord borosuifu_a_talk[56];
-EvtWord borosuifu_b_init[22];
-EvtWord borosuifu_b_regl[30];
-EvtWord borosuifu_b_talk[56];
-static EvtWord mony_init[14];
-static EvtWord mony_talk[8];
-static EvtWord peton_init[14];
-static EvtWord peton_talk[8];
-static EvtWord musume_talk[20];
-static EvtWord musume_a_entry[30];
-static EvtWord musume_b_entry[30];
-static EvtWord musume_c_entry[30];
+extern EvtWord custom_door_dark2[];
+extern EvtWord custom_door_light2[];
+extern EvtWord marco_kyorokyoro[];
+extern EvtWord suifu_d_regl[];
+extern EvtWord borosuifu_a_init[];
+extern EvtWord borosuifu_a_talk[];
+extern EvtWord borosuifu_b_init[];
+extern EvtWord borosuifu_b_regl[];
+extern EvtWord borosuifu_b_talk[];
 static NpcSetupInfo npcEnt[17];
-static EvtWord bero_in_event[5];
 static BeroEntry bero_entry_data[3];
-EvtWord muj_00_door_open[247];
-EvtWord muj_00_door_close[22];
+extern EvtWord muj_00_door_open[];
+extern EvtWord muj_00_door_close[];
 static const char* mise_npc[2];
-EvtWord mise_data_open[32];
-EvtWord mise_data_close[36];
+extern EvtWord mise_data_open[];
+extern EvtWord mise_data_close[];
 static DoorParam mise_data;
 static const char* yado_npc[2];
-EvtWord mise_open_event[22];
-EvtWord mise_close_event[26];
+extern EvtWord mise_open_event[];
+extern EvtWord mise_close_event[];
 static DoorParam yado_data;
-EvtWord evt_door_entry_custom00[39];
-EvtWord evt_door_entry_custom01[39];
+extern EvtWord evt_door_entry_custom00[];
+extern EvtWord evt_door_entry_custom01[];
 static ShopObj obj_list[6];
 static ShopItem goods_list[6];
 static ShopDb trade_list[12];
 static ShopperData35 shopper_data;
 static KinopioData kino_dt;
-EvtWord kyoshu_event[196];
-EvtWord maruco_buruburu[17];
-EvtWord garawaru_buruburu[17];
-EvtWord suifu_a_buruburu[17];
-EvtWord suifu_bom_buruburu[17];
-EvtWord nakamaware_event[791];
-EvtWord settoku_event[54];
-EvtWord settoku_event_main[95];
-static EvtWord delete_npc_regl_evt[24];
-static EvtWord sekai_yami_shake[11];
-static EvtWord sekai_yami_evt[283];
-static EvtWord minnnanokoe_evt[402];
-static EvtWord epilogue_npc_entry[60];
-static EvtWord epilogue_evt_sub[117];
-static EvtWord epilogue_evt[88];
-EvtWord yakan_anime[17];
-EvtWord muj_01_init_evt[225];
-
-
-f32 fd_muj_01_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
-
-f32 fd_muj_01_neg_one_382 = -1.0f;
-
-f32 fd_muj_01___local_PI_383 = 3.1415927f;
-
-f32 fd_muj_01___local_3PIO2_385 = 4.712389f;
-
-f32 fd_muj_01_one_negone_373[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
-
-f32 fd_muj_01___local_PIO2_384 = 1.5707964f;
-
-f32 fd_muj_01_one_381 = 1.0f;
-
-f32 fd_muj_01_negone_one_360[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
-
-f32 fd_muj_01_neg_one_365 = -1.0f;
-
-f32 fd_muj_01___local_PI_366 = 3.1415927f;
-
-f32 fd_muj_01___local_3PIO2_368 = 4.712389f;
-
-f32 fd_muj_01_one_negone_359[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
-
-f32 fd_muj_01___local_PIO2_367 = 1.5707964f;
-
-f32 fd_muj_01_one_364 = 1.0f;
+extern EvtWord kyoshu_event[];
+extern EvtWord maruco_buruburu[];
+extern EvtWord garawaru_buruburu[];
+extern EvtWord suifu_a_buruburu[];
+extern EvtWord suifu_bom_buruburu[];
+extern EvtWord nakamaware_event[];
+extern EvtWord settoku_event[];
+extern EvtWord settoku_event_main[];
+extern EvtWord yakan_anime[];
+extern EvtWord muj_01_init_evt[];
 
 EVT_BEGIN(custom_door_dark2)
     CALL(evt_sub_intpl_msec_init, 11, 255, 0, 300)

@@ -28,12 +28,12 @@ typedef struct EffSparkWork {
     f32 x;                     // 0x4
     f32 y;                     // 0x8
     f32 z;                     // 0xC
-    f32 unk10;                 // 0x10
-    f32 unk14;                 // 0x14
-    f32 unk18;                 // 0x18
-    f32 unk1C;                 // 0x1C
-    s32 unk20;                 // 0x20
-    f32 unk24;                 // 0x24
+    f32 velX;                  // 0x10, header mirrors EffSparkParticle
+    f32 velY;                  // 0x14
+    f32 destX;                 // 0x18
+    f32 destY;                 // 0x1C
+    s32 seq;                   // 0x20
+    f32 angle;                 // 0x24
     s32 life;                  // 0x28
     s32 counter;               // 0x2C
     s32 alpha;                 // 0x30

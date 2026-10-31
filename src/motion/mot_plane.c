@@ -19,7 +19,6 @@ void marioChkWallAround(Vec* pos, s32 a1, f32 a2, f32 angle, f32 radius, f32 hei
 
 void marioClearJumpPara(void);
 void marioPaperOff(void);
-void marioUpdateCamCollision(Vec pos);
 void allPartyRideOff2(void);
 void allPartyRidePlane(void);
 void marioSetSplash(s32 kind, Vec* pos);
@@ -32,7 +31,6 @@ s32 marioKeyOffChk(void);
 void animPoseSetLocalTime(s32 poseId, f32 localTimeFrames);
 s32 marioAnimeId(void);
 s32 sysMsec2Frame(s32 msec);
-void marioMakeJumpPara(void);
 void marioSetFallPara(void);
 void marioPreJump(void);
 void marioChkOverhead(void);
@@ -351,7 +349,7 @@ void mot_plane(void) {
 			break;
 		}
 		planeReset();
-		marioChgPose("M_J_1C\0");
+		marioChgPose("M_J_1C");
 		mp->position.y = 1.0f + (mp->mot.plane.groundY - 37.0f);
 		mp->baseSpeed = 0.0f;
 		marioSetFallPara();

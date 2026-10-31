@@ -3,8 +3,6 @@
 #include "evt/evt_bero.h"
 #include "gra.h"
 
-#pragma force_active on
-
 USER_FUNC(N_evt_bero_set_mario_bottomless_respawn_pos_to_current_mario_pos);
 USER_FUNC(camera_curve_off);
 USER_FUNC(camera_curve_on);
@@ -60,62 +58,17 @@ USER_FUNC(evt_snd_sfxon_3d);
 USER_FUNC(evt_sub_intpl_msec_get_value);
 USER_FUNC(evt_sub_intpl_msec_init);
 
-f32 fd_gra_05_negone_one_374[2] __attribute__((aligned(8)));
-f32 fd_gra_05_neg_one_382;
-f32 fd_gra_05___local_PI_383;
-f32 fd_gra_05___local_3PIO2_385;
-f32 fd_gra_05_one_negone_373[2] __attribute__((aligned(8)));
-f32 fd_gra_05___local_PIO2_384;
-f32 fd_gra_05_one_381;
-f32 fd_gra_05_negone_one_360[2] __attribute__((aligned(8)));
-f32 fd_gra_05_neg_one_365;
-f32 fd_gra_05___local_PI_366;
-f32 fd_gra_05___local_3PIO2_368;
-f32 fd_gra_05_one_negone_359[2] __attribute__((aligned(8)));
-f32 fd_gra_05___local_PIO2_367;
-f32 fd_gra_05_one_364;
-EvtWord gra_05_in_01[5];
-EvtWord gra_05_out_01[149];
-EvtWord gra_05_in_02[5];
-EvtWord gra_05_out_02[149];
-static EvtWord in_evt[5];
-static EvtWord out_evt[113];
-static EvtWord out_evt2[150];
+extern EvtWord gra_05_in_01[];
+extern EvtWord gra_05_out_01[];
+extern EvtWord gra_05_in_02[];
+extern EvtWord gra_05_out_02[];
 static BeroEntry bero_entry_data[7];
-EvtWord gra_05_futa_open_evt[28];
-EvtWord evt_gra_05iwa_move_init[31];
-EvtWord evt_gra_05iwa_move_evt[186];
-EvtWord evt_break_floor[7];
+extern EvtWord gra_05_futa_open_evt[];
+extern EvtWord evt_gra_05iwa_move_init[];
+extern EvtWord evt_gra_05iwa_move_evt[];
+extern EvtWord evt_break_floor[];
 static const char* fukitobashi_tbl[4];
-EvtWord gra_05_init_evt[108];
-
-f32 fd_gra_05_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
-
-f32 fd_gra_05_neg_one_382 = -1.0f;
-
-f32 fd_gra_05___local_PI_383 = 3.1415927f;
-
-f32 fd_gra_05___local_3PIO2_385 = 4.712389f;
-
-f32 fd_gra_05_one_negone_373[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
-
-f32 fd_gra_05___local_PIO2_384 = 1.5707964f;
-
-f32 fd_gra_05_one_381 = 1.0f;
-
-f32 fd_gra_05_negone_one_360[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
-
-f32 fd_gra_05_neg_one_365 = -1.0f;
-
-f32 fd_gra_05___local_PI_366 = 3.1415927f;
-
-f32 fd_gra_05___local_3PIO2_368 = 4.712389f;
-
-f32 fd_gra_05_one_negone_359[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
-
-f32 fd_gra_05___local_PIO2_367 = 1.5707964f;
-
-f32 fd_gra_05_one_364 = 1.0f;
+extern EvtWord gra_05_init_evt[];
 
 EVT_BEGIN(gra_05_in_01)
     SET_VALUE(LW(0), 1)
@@ -533,14 +486,14 @@ EVT_END()
 void camRoadCurveOff(const char* name);
 
 USER_FUNC(camera_curve_off) {
-    camRoadCurveOff("|MarioSt_CameraRoad|curve2\0");
+    camRoadCurveOff("|MarioSt_CameraRoad|curve2");
     return EVT_RETURN_DONE;
 }
 
 void camRoadCurveOn(const char* name);
 
 USER_FUNC(camera_curve_on) {
-    camRoadCurveOn("|MarioSt_CameraRoad|curve2\0");
+    camRoadCurveOn("|MarioSt_CameraRoad|curve2");
     return EVT_RETURN_DONE;
 }
 

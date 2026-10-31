@@ -1,7 +1,6 @@
 #include "battle/battle_unit.h"
 #include "evt/evt_cmd.h"
 
-#pragma force_active on
 #include "driver/dispdrv.h"
 #include "stdlib.h"
 #include "memory.h"
@@ -105,78 +104,34 @@ static f32 randf(f32 min, f32 max);
 void flower_disp(CameraId camera, void* param);
 void mirror_ball(void* param);
 
-f32 fd_win_04_negone_one_374[2] __attribute__((aligned(8)));
-f32 fd_win_04_neg_one_382;
-f32 fd_win_04___local_PI_383;
-f32 fd_win_04___local_3PIO2_385;
-f32 fd_win_04_one_negone_373[2] __attribute__((aligned(8)));
-f32 fd_win_04___local_PIO2_384;
-f32 fd_win_04_one_381;
-f32 fd_win_04_negone_one_360[2] __attribute__((aligned(8)));
-f32 fd_win_04_neg_one_365;
-f32 fd_win_04___local_PI_366;
-f32 fd_win_04___local_3PIO2_368;
-f32 fd_win_04_one_negone_359[2] __attribute__((aligned(8)));
-f32 fd_win_04___local_PIO2_367;
-f32 fd_win_04_one_364;
-EvtWord win_04w_door_open[10];
-EvtWord win_04w_door_close[10];
-EvtWord win_04e_door_open[10];
-EvtWord win_04e_door_close[10];
-static EvtWord out_w_bero[12];
+extern EvtWord win_04w_door_open[];
+extern EvtWord win_04w_door_close[];
+extern EvtWord win_04e_door_open[];
+extern EvtWord win_04e_door_close[];
 BeroEntry bero_witchtrio[1];
 static BeroEntry bero_entry_data[3];
-EvtWord meet_clouda[76];
-EvtWord meet_clouda2[139];
-EvtWord clouda_inai[17];
-EvtWord clouda_irai[444];
-EvtWord clouda_irai_ato[20];
-EvtWord mirror_trans[35];
-EvtWord mirror_rotate[41];
-EvtWord mario_move_wait[63];
-EvtWord dummy1_jump[26];
-EvtWord dummy2_jump[32];
+extern EvtWord meet_clouda[];
+extern EvtWord meet_clouda2[];
+extern EvtWord clouda_inai[];
+extern EvtWord clouda_irai[];
+extern EvtWord clouda_irai_ato[];
+extern EvtWord mirror_trans[];
+extern EvtWord mirror_rotate[];
+extern EvtWord mario_move_wait[];
+extern EvtWord dummy1_jump[];
+extern EvtWord dummy2_jump[];
 static s32 item_list[2];
-EvtWord clouda_nakama[1556];
-EvtWord touch_door[39];
-EvtWord mirror_ball_event[18];
+extern EvtWord clouda_nakama[];
+extern EvtWord touch_door[];
+extern EvtWord mirror_ball_event[];
 static u32 texture_0[1248];
 Vec rose_table_direct[55];
 f32 rose_table[120];
-EvtWord flower_event[28];
-EvtWord flower_disp_pos[21];
-static EvtWord cloud_toujou[95];
-EvtWord win_04_init_evt[94];
+extern EvtWord flower_event[];
+extern EvtWord flower_disp_pos[];
+extern EvtWord win_04_init_evt[];
 
 int rand(void);
-
-f32 fd_win_04_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
-
-f32 fd_win_04_neg_one_382 = -1.0f;
-
-f32 fd_win_04___local_PI_383 = 3.1415927f;
-
-f32 fd_win_04___local_3PIO2_385 = 4.712389f;
-
-f32 fd_win_04_one_negone_373[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
-
-f32 fd_win_04___local_PIO2_384 = 1.5707964f;
-
-f32 fd_win_04_one_381 = 1.0f;
-
-f32 fd_win_04_negone_one_360[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
-
-f32 fd_win_04_neg_one_365 = -1.0f;
-
-f32 fd_win_04___local_PI_366 = 3.1415927f;
-
-f32 fd_win_04___local_3PIO2_368 = 4.712389f;
-
-f32 fd_win_04_one_negone_359[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
-
-f32 fd_win_04___local_PIO2_367 = 1.5707964f;
-
-f32 fd_win_04_one_364 = 1.0f;
 
 EVT_BEGIN(win_04w_door_open)
     SET_VALUE(LW(8), STRING("S_doa_w_l"))

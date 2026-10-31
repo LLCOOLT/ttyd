@@ -4,7 +4,6 @@
 #include "battle/battle_unit.h"
 #include "evt/evt_cmd.h"
 
-#pragma force_active on
 #include "manager/evtmgr_cmd.h"
 #include "driver/npcdrv.h"
 #include "evt/evt_npc.h"
@@ -35,6 +34,7 @@
 #include "gor.h"
 #include "evt/evt_shop.h"
 #include "data_tables.h"
+#include "driver/msgdrv.h"
 #ifdef VERSION_G8ME01
 USER_FUNC(evt_msg_fmt_int);
 USER_FUNC(evt_msg_fmt_str);
@@ -44,7 +44,7 @@ s32 U_badgeShop_SpecialCheck(void);
 void statusWinForceOpen(void);
 void statusWinForceOff(void);
 extern ItemData itemDataTable[];
-typedef struct ShopSel { u8 field_0x0[8]; s32* items; u8 field_0xC[0x24 - 0xC]; s32 sel; } ShopSel;
+typedef struct ShopSel { u8 head[8]; s32* items; u8 listState[0x24 - 0xC]; s32 sel; } ShopSel; /* head: u16 flags first (cleared by disp_off); listState: never accessed */
 void mapGrpSetColor(const char* name, GXColor color);
 NpcEntry* fbatNpcTalkCheck(MarioWork* mario);
 EffectEntry* effKemuriEntry(s32 type, f32 x, f32 y, f32 z, f32 scale);
@@ -277,143 +277,109 @@ s32 naniga_okorukana_cook(void);
 static s32 npc_process(void);
 extern s32 envSetYami[];
 
-f32 fd_gor_01_negone_one_374[2] __attribute__((aligned(8)));
-f32 fd_gor_01_neg_one_382;
-f32 fd_gor_01___local_PI_383;
-f32 fd_gor_01___local_3PIO2_385;
-f32 fd_gor_01_one_negone_373[2] __attribute__((aligned(8)));
-f32 fd_gor_01___local_PIO2_384;
-f32 fd_gor_01_one_381;
-f32 fd_gor_01_negone_one_360[2] __attribute__((aligned(8)));
-f32 fd_gor_01_neg_one_365;
-f32 fd_gor_01___local_PI_366;
-f32 fd_gor_01___local_3PIO2_368;
-f32 fd_gor_01_one_negone_359[2] __attribute__((aligned(8)));
-f32 fd_gor_01___local_PIO2_367;
-f32 fd_gor_01_one_364;
-static EvtWord sell_evt[VERSION_PICK(135, 146)];
-EvtWord zaiko_buy_evt[VERSION_PICK(174, 185)];
-static EvtWord buy_evt[53];
-EvtWord badgeshopper_talk_evt[38];
-EvtWord badgemaster_init[36];
-EvtWord badgemaster_talk[76];
-EvtWord kinoji_init[2];
-EvtWord kinoji_talk[76];
-EvtWord nancy_init_check[608];
-EvtWord nancy_init[58];
-EvtWord nancy_door_anime[99];
-EvtWord nancy_regl[35];
+extern EvtWord zaiko_buy_evt[];
+extern EvtWord badgeshopper_talk_evt[];
+extern EvtWord badgemaster_init[];
+extern EvtWord badgemaster_talk[];
+extern EvtWord kinoji_init[];
+extern EvtWord kinoji_talk[];
+extern EvtWord nancy_init_check[];
+extern EvtWord nancy_init[];
+extern EvtWord nancy_door_anime[];
+extern EvtWord nancy_regl[];
 s32 item_tbl_nancy[2];
-EvtWord nancy_talk[175];
-static EvtWord marco_init[14];
-static EvtWord marco_talk[519];
-EvtWord master_init[12];
-EvtWord iri_20_master_tubuyaki[37];
-EvtWord master_talk[645];
-EvtWord shoptender_init[27];
-EvtWord shoptender_talk[227];
-EvtWord yadotender_init[2];
-EvtWord yadotender_talk[2];
-EvtWord roten1_init[12];
-EvtWord roten1_regl[25];
-EvtWord roten1_talk[76];
-EvtWord roten2_init[7];
-EvtWord roten2_talk[76];
-EvtWord kuribo1_init[12];
-EvtWord kuribo1_regl[25];
-EvtWord kuribo1_talk[101];
-EvtWord kuribo2_init[7];
-EvtWord kuribo2_regl[4];
-EvtWord kuribo2_talk[76];
-EvtWord kuribo3_init[2];
-EvtWord kuribo3_regl[4];
-EvtWord kuribo3_talk[144];
-EvtWord chusan1_init[31];
-EvtWord chusan1_regl[12];
-EvtWord chusan1_dead[123];
-EvtWord chusan1_naguru[79];
-EvtWord chusan1_talk[180];
-EvtWord chusan2_init[2];
-EvtWord chusan2_talk[76];
-static EvtWord bomhei_init[2];
-EvtWord bomhei_talk[76];
-EvtWord bottakuru_init[25];
-EvtWord bottakuru_talk[VERSION_PICK(292, 314)];
-static EvtWord luigi_init[43];
-static EvtWord luigi_talk[4];
-static EvtWord luigi_npcEnt[46];
-EvtWord kick_init[12];
-EvtWord kick_talk[8];
+extern EvtWord nancy_talk[];
+extern EvtWord master_init[];
+extern EvtWord iri_20_master_tubuyaki[];
+extern EvtWord master_talk[];
+extern EvtWord shoptender_init[];
+extern EvtWord shoptender_talk[];
+extern EvtWord yadotender_init[];
+extern EvtWord yadotender_talk[];
+extern EvtWord roten1_init[];
+extern EvtWord roten1_regl[];
+extern EvtWord roten1_talk[];
+extern EvtWord roten2_init[];
+extern EvtWord roten2_talk[];
+extern EvtWord kuribo1_init[];
+extern EvtWord kuribo1_regl[];
+extern EvtWord kuribo1_talk[];
+extern EvtWord kuribo2_init[];
+extern EvtWord kuribo2_regl[];
+extern EvtWord kuribo2_talk[];
+extern EvtWord kuribo3_init[];
+extern EvtWord kuribo3_regl[];
+extern EvtWord kuribo3_talk[];
+extern EvtWord chusan1_init[];
+extern EvtWord chusan1_regl[];
+extern EvtWord chusan1_dead[];
+extern EvtWord chusan1_naguru[];
+extern EvtWord chusan1_talk[];
+extern EvtWord chusan2_init[];
+extern EvtWord chusan2_talk[];
+extern EvtWord bomhei_talk[];
+extern EvtWord bottakuru_init[];
+extern EvtWord bottakuru_talk[];
+extern EvtWord kick_init[];
+extern EvtWord kick_talk[];
 NpcSetupInfo kickEnt[2];
-EvtWord torque_init[12];
-EvtWord torque_talk[8];
+extern EvtWord torque_init[];
+extern EvtWord torque_talk[];
 NpcSetupInfo torqueEnt[2];
-EvtWord kick2_init[25];
-EvtWord kick2_talk[8];
+extern EvtWord kick2_init[];
+extern EvtWord kick2_talk[];
 NpcSetupInfo kick2Ent[2];
-static EvtWord borodo2_init[51];
 static EvtWord borodo2_talk[280];
-EvtWord thief_init[13];
-EvtWord thief_talk[163];
+extern EvtWord thief_init[];
+extern EvtWord thief_talk[];
 static NpcSetupInfo npcEnt[22];
-EvtWord christine_nakama_before[18];
+extern EvtWord christine_nakama_before[];
 static BeroEntry bero_entry_data[4];
-static EvtWord evt_door_01_00[12];
-static EvtWord evt_door_01_01[12];
-static EvtWord evt_wall_01[28];
 static const char* door_data_01_npc[2];
 const char* door_data_01_item[2];
-static EvtWord evt_door_01_open[12];
-static EvtWord evt_door_01_close[14];
 static DoorParam door_data_01;
 DoorParam door_data_01_01;
-EvtWord evt_door_02_00_f1[12];
-EvtWord evt_wall_02_f1[41];
+extern EvtWord evt_door_02_00_f1[];
+extern EvtWord evt_wall_02_f1[];
 static const char* door_data_02_npc[3];
 const char* door_data_02_npc_01[2];
-EvtWord evt_door_02f1_open[12];
-EvtWord evt_door_02f1_close[14];
+extern EvtWord evt_door_02f1_open[];
+extern EvtWord evt_door_02f1_close[];
 DoorParam door_data_02_f1;
 DoorParam door_data_02_f1_01;
-EvtWord evt_door_02_f2_junbityu[14];
-EvtWord evt_door_02_00_f2[12];
-EvtWord evt_wall_02_f2[41];
+extern EvtWord evt_door_02_f2_junbityu[];
+extern EvtWord evt_door_02_00_f2[];
+extern EvtWord evt_wall_02_f2[];
 const char* badgemise_npc[3];
-EvtWord evt_badge_dummy[VERSION_PICK(128, 139)];
+extern EvtWord evt_badge_dummy[];
 UnitWinSell uwnobj_list[6];
-EvtWord evt_open_02_01_f2[22];
-EvtWord evt_close_sub[6];
-EvtWord evt_close_02_01_f2[16];
+extern EvtWord evt_open_02_01_f2[];
+extern EvtWord evt_close_sub[];
+extern EvtWord evt_close_02_01_f2[];
 DoorParam door_data_02_f2;
-EvtWord house03_f1f2_fade[41];
-EvtWord luigi_f1_fade_check[27];
-EvtWord house03_f1_fade[54];
-EvtWord luigi_f2_fade_check[27];
-EvtWord house03_f2_fade[54];
-EvtWord house03_suiteki[49];
-EvtWord marco_hitorigoto[67];
-EvtWord evt_door_03_00_f1[12];
-EvtWord evt_door_03_01_f1[12];
-EvtWord house_03_f1_open[64];
-EvtWord house_03_f1_close[54];
-EvtWord evt_wall_03_f1[47];
+extern EvtWord house03_f1f2_fade[];
+extern EvtWord luigi_f1_fade_check[];
+extern EvtWord house03_f1_fade[];
+extern EvtWord luigi_f2_fade_check[];
+extern EvtWord house03_f2_fade[];
+extern EvtWord house03_suiteki[];
+extern EvtWord marco_hitorigoto[];
+extern EvtWord evt_door_03_00_f1[];
+extern EvtWord evt_door_03_01_f1[];
+extern EvtWord house_03_f1_open[];
+extern EvtWord house_03_f1_close[];
+extern EvtWord evt_wall_03_f1[];
 static const char* door_data_03_npc[10];
 const char* door_data_03_item[2];
 DoorParam door_data_03_f1;
-EvtWord evt_door_03_00_f2[12];
-EvtWord house_03_f2_open[48];
-EvtWord house_03_f2_close[VERSION_PICK(46, 52)];
-EvtWord evt_wall_03_f2[54];
+extern EvtWord evt_door_03_00_f2[];
+extern EvtWord house_03_f2_open[];
+extern EvtWord house_03_f2_close[];
+extern EvtWord evt_wall_03_f2[];
 DoorParam door_data_03_f2;
-static EvtWord evt_door_04_00[12];
-static EvtWord evt_door_04_01[12];
-static EvtWord evt_wall_04[28];
-static EvtWord evt_door_04_open[18];
-static EvtWord evt_door_04_close[21];
 static const char* door_data_04_npc[2];
 static const char* door_data_04_item[2];
 static DoorParam door_data_04;
-static EvtWord koushukei_dai[63];
 static ShopObj obj_list[6];
 static ShopItem goods_list[6];
 ShopItem goods_list2[6];
@@ -424,47 +390,37 @@ ShopItem goods_luigi4[6];
 ShopItem goods_luigi5[6];
 static ShopDb trade_list[19];
 static ShopperData35 shopper_data;
-EvtWord gor_01_shop_setup[156];
+extern EvtWord gor_01_shop_setup[];
 static KinopioData kino_dt;
-EvtWord bar_door_anime[99];
-EvtWord christine_nakama_init[58];
-EvtWord christine_nakama[760];
-EvtWord maffia_turn[84];
-EvtWord maffia_assault[797];
-EvtWord christine_nakama_after[82];
-EvtWord box_copy[19];
-EvtWord ultrahammer_check[222];
-EvtWord ultrahammer_get[39];
-EvtWord keijiban_omote_joho[93];
-EvtWord keijiban_ura_joho[93];
-EvtWord gate_disp[42];
-static EvtWord gor_goki1_urouro[109];
-static EvtWord gor_goki2_urouro[109];
-static EvtWord koopa_npc_entry[38];
-EvtWord gor_01_koopa_evt[584];
-static EvtWord sekai_yami_npc[59];
-static EvtWord sekai_yami_evt[185];
-static EvtWord minnnanokoe_evt[397];
-EvtWord iri_09_init[10];
-EvtWord iri_09_tentyo_talk[172];
+extern EvtWord bar_door_anime[];
+extern EvtWord christine_nakama_init[];
+extern EvtWord christine_nakama[];
+extern EvtWord maffia_turn[];
+extern EvtWord maffia_assault[];
+extern EvtWord christine_nakama_after[];
+extern EvtWord box_copy[];
+extern EvtWord ultrahammer_check[];
+extern EvtWord ultrahammer_get[];
+extern EvtWord keijiban_omote_joho[];
+extern EvtWord keijiban_ura_joho[];
+extern EvtWord gate_disp[];
+extern EvtWord gor_01_koopa_evt[];
+extern EvtWord iri_09_init[];
+extern EvtWord iri_09_tentyo_talk[];
 s32 iri_16_item_tbl[2];
-static EvtWord iri_16_init[34];
-EvtWord iri_16_tyutyu_talk[445];
-EvtWord marco_jewel[22];
-static EvtWord epilogue_npc_entry[48];
-static EvtWord epilogue_evt_sub[160];
-static EvtWord epilogue_evt[313];
+extern EvtWord iri_16_tyutyu_talk[];
+extern EvtWord marco_jewel[];
 #ifdef VERSION_G8ME01
-EvtWord dai_disp[52];
+extern EvtWord dai_disp[];
 #endif
-EvtWord gor_01_init_evt[VERSION_PICK(546, 548)];
+extern EvtWord gor_01_init_evt[];
 SimpleRecipe R_simple_recipe_table[26];
 CookRecipe R_cookbook_recipe_table[VERSION_PICK(289, 292)];
 s32 R_mystery_cook_list[20];
 s32 special_cook_list[16];
-EvtWord cooking_evt_sub[284];
+extern EvtWord cooking_evt_sub[];
 s32 iri_18_item_tbl[2];
-EvtWord cooking_evt[852];
+extern EvtWord cooking_evt[];
 
 USER_FUNC(badgeshop_special_cnt) {
     EvtWord* args = event->args;
@@ -474,7 +430,7 @@ USER_FUNC(badgeshop_special_cnt) {
 }
 
 USER_FUNC(nancy_block_init_func) {
-    NpcEntry* npc = evtNpcNameToPtr(event, "\203i\203\223\203V\201[");
+    NpcEntry* npc = evtNpcNameToPtr(event, "ナンシー");
     f32 z;
 
     z = npc->position.z;
@@ -486,7 +442,7 @@ USER_FUNC(nancy_block_init_func) {
 
 USER_FUNC(nancy_block_func) {
     MarioWork* mario = marioGetPtr();
-    NpcEntry* npc = evtNpcNameToPtr(event, "\203i\203\223\203V\201[");
+    NpcEntry* npc = evtNpcNameToPtr(event, "ナンシー");
     f32 z;
     f32 base;
     f32 limit;
@@ -572,34 +528,6 @@ static USER_FUNC(mario_keyoff_wait) {
             return EVT_RETURN_YIELD;
     }
 }
-
-f32 fd_gor_01_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
-
-f32 fd_gor_01_neg_one_382 = -1.0f;
-
-f32 fd_gor_01___local_PI_383 = 3.1415927f;
-
-f32 fd_gor_01___local_3PIO2_385 = 4.712389f;
-
-f32 fd_gor_01_one_negone_373[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
-
-f32 fd_gor_01___local_PIO2_384 = 1.5707964f;
-
-f32 fd_gor_01_one_381 = 1.0f;
-
-f32 fd_gor_01_negone_one_360[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
-
-f32 fd_gor_01_neg_one_365 = -1.0f;
-
-f32 fd_gor_01___local_PI_366 = 3.1415927f;
-
-f32 fd_gor_01___local_3PIO2_368 = 4.712389f;
-
-f32 fd_gor_01_one_negone_359[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
-
-f32 fd_gor_01___local_PIO2_367 = 1.5707964f;
-
-f32 fd_gor_01_one_364 = 1.0f;
 
 #ifdef VERSION_G8ME01
 static EVT_BEGIN(sell_evt)
@@ -1810,7 +1738,13 @@ EVT_BEGIN(master_talk)
         WAIT_MS(1000)
         CALL(evt_npc_reverse_ry, STRING("me"))
         WAIT_MS(1000)
+#ifdef VERSION_G8MP01
+        CALL(evt_party_stop, 0)
+#endif
         CALL(evt_msg_print_party, STRING("mac_4_069"))
+#ifdef VERSION_G8MP01
+        CALL(evt_party_run, 0)
+#endif
         SET_VALUE(GSWF(1194), 1)
         CALL(evt_cam3d_evt_off, 0, 11)
         CALL(evt_msg_print, 0, STRING("mac_4_070"), 0, STRING("me"))
@@ -1854,7 +1788,13 @@ EVT_BEGIN(master_talk)
         CALL(evt_cam3d_evt_off, 500, 11)
         WAIT_MS(800)
         CALL(evt_msg_print, 0, STRING("mac_4_076"), 0, STRING("me"))
+#ifdef VERSION_G8MP01
+        CALL(evt_party_stop, 0)
+#endif
         CALL(evt_msg_print_party, STRING("mac_4_077"))
+#ifdef VERSION_G8MP01
+        CALL(evt_party_run, 0)
+#endif
         CALL(evt_mario_get_pos, 0, LW(0), LW(1), LW(2))
         CALL(evt_snd_sfxon_3d, STRING("SFX_VOICE_MARIO_NOD1_4"), LW(0), LW(1), LW(2), 0)
         CALL(evt_mario_set_pose, STRING("M_N_2"))
@@ -3569,7 +3509,7 @@ USER_FUNC(chk_marco_fuki) {
     EvtWord* args = event->args;
     NpcEntry* npc = fbatNpcTalkCheck(marioGetPtr());
 
-    if (npc != NULL && strcmp(npc->description, "\203}\203\213\203R") == 0) {
+    if (npc != NULL && strcmp(npc->description, "マルコ") == 0) {
         evtSetValue(event, args[0], 1);
         return EVT_RETURN_DONE;
     }
@@ -7498,14 +7438,30 @@ EVT_BEGIN(cooking_evt)
     IF_INT_EQUAL(LW(15), 0)
         CALL(get_item_name, LW(14), LW(0))
         IF_INT_EQUAL(LF(0), 0)
+#ifdef VERSION_G8MP01
+            CALL(evt_msg_fmt_str, 0, LW(2), STRING("gor_01_cook_012"), LW(0))
+            CALL(evt_msg_print, 1, LW(2), 0, STRING("ナンシー"))
+#else
             CALL(evt_msg_print_insert, 0, STRING("gor_01_cook_012"), 0, STRING("ナンシー"), LW(0))
+#endif
             ELSE
+#ifdef VERSION_G8MP01
+            CALL(evt_msg_fmt_str, 0, LW(2), STRING("gor_01_cook_012"), LW(0))
+            CALL(evt_msg_print_add, 1, LW(2))
+#else
             CALL(evt_msg_print_add_insert, 0, STRING("gor_01_cook_012"), LW(0))
+#endif
         END_IF
         ELSE
         CALL(get_item_name, LW(14), LW(0))
         CALL(get_item_name, LW(15), LW(1))
+#ifdef VERSION_G8MP01
+        CALL(evt_msg_fmt_str, 0, LW(2), STRING("gor_01_cook_013"), LW(0))
+        CALL(evt_msg_fmt_str, 1, LW(2), LW(2), LW(1))
+        CALL(evt_msg_print, 1, LW(2), 0, STRING("ナンシー"))
+#else
         CALL(evt_msg_print_insert, 0, STRING("gor_01_cook_013"), 0, STRING("ナンシー"), LW(0), LW(1))
+#endif
     END_IF
     CALL(evt_msg_select, 0, STRING("gor_01_select"))
     IF_INT_EQUAL(LW(0), 1)

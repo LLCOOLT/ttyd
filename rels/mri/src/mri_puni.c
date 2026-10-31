@@ -7,15 +7,12 @@
 #include "driver/camdrv.h"
 #include "memory.h"
 #include <string.h>
-#include "forcedata.h"
 #include "mario/mariost.h"
 #include "mario/mario.h"
 #include "driver/icondrv.h"
 
 #include "driver/swdrv.h"
 
-// FAKE: the original REL kept every function; force_active stops the linker dead-stripping unreferenced ones
-#pragma force_active on
 #include "evt/evt_seq.h"
 #include "evt/evt_npc.h"
 #include "pmario_sound.h"
@@ -30,6 +27,8 @@
 #include "libc_decls.h"
 #include "eff/eff_magic1_n64.h"
 #include "evt/evt_cmd.h"
+#include "driver/animdrv.h"
+#include "eff/eff_n64.h"
 void PuniDokuritsu(PuniData* p);
 void puniHagurePos(PuniData* p);
 void puniMapdata_MRI_06_getidx(f32 x, f32 z, s32* bx, s32* bz);
@@ -40,26 +39,6 @@ extern int abs(int);
 EffectEntry* effPuniBalloonEntry(s32 type, f32 x, f32 y, f32 z, f32 scale);
 void envSetYami(MapTevCallbackInfo* info);
 
-
-//.data
-// clang-format off
-extend_data(0,
-     u64, negone_one, 0xBF8000003F800000,
-     u32, neg_one, 0xBF800000,
-     f32, __local_PI, 3.1415926535897932384626433832795f,
-     f32, __local_3PIO2, 3.0f * 1.57079632679489661923132169163975f,
-     u64, one_negone, 0x3F800000BF800000,
-     f32, __local_PIO2, 1.57079632679489661923132169163975f,
-     f32, one, 1.0f);
-extend_data(1,
-     u64, negone_one, 0xBF8000003F800000,
-     u32, neg_one, 0xBF800000,
-     f32, __local_PI, 3.1415926535897932384626433832795f,
-     f32, __local_3PIO2, 3.0f * 1.57079632679489661923132169163975f,
-     u64, one_negone, 0x3F800000BF800000,
-     f32, __local_PIO2, 1.57079632679489661923132169163975f,
-     f32, one, 1.0f)
-// clang-format on
 u16 puni_nom_patern_data[] = {
     0,  1,  2,  3,  4,  5,  6,  7,  8,  9,  10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20,    21, 22, 23, 24,
     25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 0,  1,  2,  3,  4,  5,     6,  7,  8,  9,
@@ -272,19 +251,19 @@ void puniAnimation(PuniData* p, PunidrvPose* t) {
     if (!(p->flags & 0x40000)) {
     if (p->flags & 0x1E0) {
         if (p->flags & 0x20) {
-            npc = npcNameToPtr("\203K\203C\203hsp");
+            npc = npcNameToPtr("ガイドsp");
             names = (char*)( &Punigp->animNames[0]) ;
         } else if (p->flags & 0x40) {
-            npc = npcNameToPtr("\203K\203C\203h\226\205sp");
+            npc = npcNameToPtr("ガイド妹sp");
             names = (char*)( &Punigp->animNames[160]) ;
         } else if (p->flags & 0x80) {
-            npc = npcNameToPtr("\202\277\202\321\203g\203Qsp");
+            npc = npcNameToPtr("ちびトゲsp");
             names = (char*)( &Punigp->animNames[320]) ;
         } else if (p->flags & 0x100) {
-            npc = npcNameToPtr("\203\211\203C\203o\203\213sp");
+            npc = npcNameToPtr("ライバルsp");
             names = (char*)( &Punigp->animNames[480]) ;
         } else {
-            npc = npcNameToPtr("\203\211\203C\203o\203\213sp");
+            npc = npcNameToPtr("ライバルsp");
             names = (char*)( &Punigp->animNames[480]) ;
         }
         ofs = p->marioDist;
@@ -411,15 +390,15 @@ BOOL _areacheck(f32 x, f32 z, f32 r, f32 px, f32 pz) {
         if (t > 0.5f) {                           \
             u = (t - 0.5f) / 0.5f;                \
         } else {                                  \
-            u = new_var;                             \
+            u = floorY;                             \
         }                                         \
         p->pos.y = 10.0f * u + (base);            \
     }
 
 void _ymode_mri_09(PuniData* p) {
-    float new_var;
-    new_var = 0.0f;
-    if (p->pos.x <= 400.0f && p->pos.x > 200.0f && p->pos.y <= 100.0f && p->pos.y >= new_var) {
+    float floorY;
+    floorY = 0.0f;
+    if (p->pos.x <= 400.0f && p->pos.x > 200.0f && p->pos.y <= 100.0f && p->pos.y >= floorY) {
         if (p->pos.z <= -55.0f) {
             p->pos.y = 100.0f;
         } else YSTEP(-35.0f, 90.0f)
@@ -431,9 +410,9 @@ void _ymode_mri_09(PuniData* p) {
         else YSTEP(85.0f, 30.0f)
         else YSTEP(105.0f, 20.0f)
         else YSTEP(125.0f, 10.0f)
-        else YSTEP(145.0f, new_var)
+        else YSTEP(145.0f, floorY)
         else {
-            p->pos.y = new_var;
+            p->pos.y = floorY;
         }
     }
     if (p->pos.x >= -170.0f && p->pos.x <= 170.0f && p->pos.z >= -80.0f && p->pos.z <= 140.0f) {
@@ -2300,7 +2279,7 @@ void puniModeSearch(PuniData* p) {
     m3 = cd & 0xFF;
     switch (find) {
         case 0x000:
-            /* TODO: block at 0x0c19c-0x0c844: verify neighbour order/subset */
+            /* block at 0x0c19c-0x0c844 */
             if (m0 == move && __abs((s32)h0 - (s32)takasa) <= 0x1000) {
                 PSEARCH_POS(bz, bx - 1);
             } else if (m1 == move && __abs((s32)h1 - (s32)takasa) <= 0x1000) {
@@ -2315,7 +2294,7 @@ void puniModeSearch(PuniData* p) {
             }
             break;
         case 0x100:
-            /* TODO: block at 0x0c844-0x0ceec: verify neighbour order/subset */
+            /* block at 0x0c844-0x0ceec */
             if (m1 == move && __abs((s32)h1 - (s32)takasa) <= 0x1000) {
                 PSEARCH_POS(bz - 1, bx);
             } else if (m2 == move && __abs((s32)h2 - (s32)takasa) <= 0x1000) {
@@ -2330,7 +2309,7 @@ void puniModeSearch(PuniData* p) {
             }
             break;
         case 0x200:
-            /* TODO: block at 0x0ceec-0x0d594: verify neighbour order/subset */
+            /* block at 0x0ceec-0x0d594 */
             if (m2 == move && __abs((s32)h2 - (s32)takasa) <= 0x1000) {
                 PSEARCH_POS(bz, bx + 1);
             } else if (m3 == move && __abs((s32)h3 - (s32)takasa) <= 0x1000) {
@@ -2345,7 +2324,7 @@ void puniModeSearch(PuniData* p) {
             }
             break;
         case 0x300:
-            /* TODO: block at 0x0d594-0x0dc44: verify neighbour order/subset */
+            /* block at 0x0d594-0x0dc44 */
             if (m3 == move && __abs((s32)h3 - (s32)takasa) <= 0x1000) {
                 PSEARCH_POS(bz + 1, bx);
             } else if (m0 == move && __abs((s32)h0 - (s32)takasa) <= 0x1000) {
@@ -3725,7 +3704,7 @@ void puniModeDodai(PuniData* p) {
 void puniModeTrap_sub(PuniData* p) {
     NpcEntry* n;
     if (p->flags & 0x20) {
-        n = npcNameToPtr("\203K\203C\203h");
+        n = npcNameToPtr("ガイド");
         p->flags &= ~0x800;
         p->flags |= 0x100000;
         n->flags &= ~0x20;
@@ -3734,7 +3713,7 @@ void puniModeTrap_sub(PuniData* p) {
         n->position.z = 0.0f;
     }
     if (p->flags & 0x40) {
-        n = npcNameToPtr("\203K\203C\203h\226\205");
+        n = npcNameToPtr("ガイド妹");
         p->flags &= ~0x800;
         p->flags |= 0x100000;
         n->flags &= ~0x20;
@@ -3743,7 +3722,7 @@ void puniModeTrap_sub(PuniData* p) {
         n->position.z = 0.0f;
     }
     if (p->flags & 0x100) {
-        n = npcNameToPtr("\203\211\203C\203o\203\213");
+        n = npcNameToPtr("ライバル");
         p->flags &= ~0x800;
         p->flags |= 0x100000;
         n->flags &= ~0x20;
@@ -3779,9 +3758,9 @@ void puniModeTrap(PuniData* p) {
     NpcEntry* n;
     if (p->modeStep == 0) {
         p->flags |= 0x100000;
-        if (p->flags & 0x20) TRAP_NPC("\203K\203C\203h", 0)
-        if (p->flags & 0x40) TRAP_NPC("\203K\203C\203h\226\205", 0)
-        if (p->flags & 0x100) TRAP_NPC("\203\211\203C\203o\203\213", 0)
+        if (p->flags & 0x20) TRAP_NPC("ガイド", 0)
+        if (p->flags & 0x40) TRAP_NPC("ガイド妹", 0)
+        if (p->flags & 0x100) TRAP_NPC("ライバル", 0)
         {
             Vec v_ = {0.0f, 0.0f, 0.0f};
             p->vel = v_;
@@ -3789,18 +3768,18 @@ void puniModeTrap(PuniData* p) {
         p->prevMode = p->mode;
     }
     if (p->breathPower > 10.0f) {
-        if (p->flags & 0x20) TRAP_HIDE("\203K\203C\203h")
-        if (p->flags & 0x40) TRAP_HIDE("\203K\203C\203h\226\205")
-        if (p->flags & 0x100) TRAP_HIDE("\203\211\203C\203o\203\213")
+        if (p->flags & 0x20) TRAP_HIDE("ガイド")
+        if (p->flags & 0x40) TRAP_HIDE("ガイド妹")
+        if (p->flags & 0x100) TRAP_HIDE("ライバル")
         PuniDokuritsu(p);
         p->target = Punigp->marioPuni;
         p->prevMode = p->mode;
         p->mode = 13;
         p->modeStep = 0;
     } else if (p->massTarget != -1) {
-        if (p->flags & 0x20) TRAP_HIDE("\203K\203C\203h")
-        if (p->flags & 0x40) TRAP_HIDE("\203K\203C\203h\226\205")
-        if (p->flags & 0x100) TRAP_HIDE("\203\211\203C\203o\203\213")
+        if (p->flags & 0x20) TRAP_HIDE("ガイド")
+        if (p->flags & 0x40) TRAP_HIDE("ガイド妹")
+        if (p->flags & 0x100) TRAP_HIDE("ライバル")
         PuniDokuritsu(p);
         p->prevMode = p->mode;
         p->mode = 4;
@@ -4553,8 +4532,6 @@ void puniMoveMain(PuniData* p) {
     }
 }
 
-#pragma push
-#pragma dont_inline on
 void puniOption(void) {
     PuniData* p;
     PuniData* q;
@@ -4695,7 +4672,6 @@ void puniCollideAll(void) {
         }
     }
 }
-#pragma pop
 
 
 void psndSFX_pos(s32 id, Vec* pos);
@@ -4873,15 +4849,15 @@ void puniSound(void)
     switch (Punigp->togeMoveLevel)
     {
       case 1:
-        Punigp->sfx468 = ((s32 (*)(const char *)) psndSFXOn)("SFX_STG2_TOGE_MOVE1");
+        Punigp->sfx468 = psndSFXOn("SFX_STG2_TOGE_MOVE1");
         break;
 
       case 2:
-        Punigp->sfx468 = ((s32 (*)(const char *)) psndSFXOn)("SFX_STG2_TOGE_MOVE2");
+        Punigp->sfx468 = psndSFXOn("SFX_STG2_TOGE_MOVE2");
         break;
 
       case 3:
-        Punigp->sfx468 = ((s32 (*)(const char *)) psndSFXOn)("SFX_STG2_TOGE_MOVE3");
+        Punigp->sfx468 = psndSFXOn("SFX_STG2_TOGE_MOVE3");
         break;
 
     }
@@ -6492,7 +6468,6 @@ USER_FUNC(evt_puni_force_se_off) {
 
 static const Vec puni_save_zero = { 0.0f, 0.0f, 0.0f };
 #pragma push
-#pragma opt_dead_assignments off
 static const Vec puni_fall_dir;
 // FAKE: the zero-position branch of evt_puni_all_save inlines its own copy of puni_exit_swset with another local
 // declaration order (register colouring only)
@@ -6596,7 +6571,7 @@ s32 puni_piders_check_func(EventEntry *event, BOOL isFirstCall)
   k = 2;
   for (i = 0; i < count; i++, npc++)
   {
-    if ((npc->flags & 1) && (npc->flags & 2) && npc->tribe != NULL && strcmp(npc->tribe->nameJp, "\203p\203C\203_\201[\203X") == 0)
+    if ((npc->flags & 1) && (npc->flags & 2) && npc->tribe != NULL && strcmp(npc->tribe->nameJp, "パイダース") == 0)
     {
       Vec v;
       BOOL found = 0;
@@ -6799,13 +6774,13 @@ EVT_BEGIN(mri_puni_position_init)
             CALL(evt_puni_puninum_alpha, 255)
         END_IF
     END_INLINE_EVENT
-    DEBUG_PUT_MSG(STRING("\203v\203j\212\326\214W\201F\217\211\212\372\202\314\216\300\215s\222\206\221\322\202\277"))
+    DEBUG_PUT_MSG(STRING("プニ関係：初期の実行中待ち"))
     CALL(evt_bero_exec_wait, 1)
     LOOP(0)
         CALL(evt_puni_set_systemmode, 1)
-        DEBUG_PUT_MSG(STRING("\203v\203j\212\326\214W\201F\215\300\225W\203Z\203b\203g\221\322\202\277"))
+        DEBUG_PUT_MSG(STRING("プニ関係：座標セット待ち"))
         CALL(evt_bero_exec_wait, 2)
-        DEBUG_PUT_MSG(STRING("\203v\203j\212\326\214W\201F\217\254\223\256\225\250\212\326\214W\217\211\212\372\211\273"))
+        DEBUG_PUT_MSG(STRING("プニ関係：小動物関係初期化"))
         DEBUG_PUT_REG(4124967961)
         DEBUG_PUT_REG(4124967962)
         CALL(evt_bero_get_now_number, 4264967306)
@@ -6819,19 +6794,19 @@ EVT_BEGIN(mri_puni_position_init)
         CALL(evt_puni_setup, 4264967296, 4264967297, 4264967298)
         CALL(evt_toge_setup, 4264967302, 4264967303, 4264967304, 4264967305)
         CALL(evt_puni_set_systemmode, 2)
-        DEBUG_PUT_MSG(STRING("\203v\203j\212\326\214W\201F\217I\227\271\221\322\202\277"))
+        DEBUG_PUT_MSG(STRING("プニ関係：終了待ち"))
         CALL(evt_bero_exec_wait, 65536)
         CALL(evt_puni_set_systemmode, 3)
-        DEBUG_PUT_MSG(STRING("\203v\203j\212\326\214W\201F\216\237\202\314\216\300\215s\222\206\221\322\202\277"))
+        DEBUG_PUT_MSG(STRING("プニ関係：次の実行中待ち"))
         CALL(evt_bero_exec_wait, 1)
         SET_VALUE(4124967962, 4124967961)
         CALL(evt_bero_get_now_number, 4264967306)
         CALL(evt_bero_get_info_kinddir, 4264967306, 4264967296, 4264967297, 4264967298)
         CALL(evt_bero_get_info_nextarea, 4264967306, 4264967299, 4264967300)
         IF_INT_EQUAL(4264967296, 1)
-            DEBUG_PUT_MSG(STRING("\203v\203j\212\326\214W\201F\224\340\221\322\202\277"))
+            DEBUG_PUT_MSG(STRING("プニ関係：扉待ち"))
             CALL(evt_bero_exec_wait, 268435456)
-            DEBUG_PUT_MSG(STRING("\203v\203j\212\326\214W\201F\224\340\221\322\202\277\217I\202\355\202\350"))
+            DEBUG_PUT_MSG(STRING("プニ関係：扉待ち終わり"))
             CALL(evt_bero_exec_onoff, 1, 268435456)
         END_IF
         IF_INT_EQUAL(4264967296, 2)
@@ -6840,9 +6815,9 @@ EVT_BEGIN(mri_puni_position_init)
             END_IF
         END_IF
         BEGIN_INLINE_EVENT
-            DEBUG_PUT_MSG(STRING("\203v\203j\212\326\214W\201F\203G\203\212\203A\203`\203F\203\223\203W\222\274\221O\221\322\202\277"))
+            DEBUG_PUT_MSG(STRING("プニ関係：エリアチェンジ直前待ち"))
             CALL(evt_bero_exec_wait, 8)
-            DEBUG_PUT_MSG(STRING("\203v\203j\212\326\214W\201F\203v\203j\221\260\203g\203Q\221\260SE\213\255\220\247\203I\203t"))
+            DEBUG_PUT_MSG(STRING("プニ関係：プニ族トゲ族SE強制オフ"))
             CALL(evt_puni_force_se_off)
         END_INLINE_EVENT
         CALL(evt_puni_exit, 4264967296, 4264967297, 4264967298, 4264967299)
@@ -6857,30 +6832,30 @@ EVT_BEGIN(mri_puni_main)
 EVT_END()
 
 EVT_BEGIN(mri_puni_init_dvd)
-    CALL(evt_npc_entry, STRING("\203v\203jsp"), STRING("c_puni"))
-    CALL(evt_npc_set_tribe, STRING("\203v\203jsp"), STRING("\203v\203j\221\260"))
-    CALL(evt_npc_entry, STRING("\203g\203Qsp"), STRING("c_toge"))
-    CALL(evt_npc_set_tribe, STRING("\203g\203Qsp"), STRING("\203g\203Q\221\260"))
-    CALL(evt_npc_entry, STRING("\203K\203C\203hsp"), STRING("c_pguide"))
-    CALL(evt_npc_set_tribe, STRING("\203K\203C\203hsp"), STRING("\203K\203C\203h"))
-    CALL(evt_npc_entry, STRING("\203K\203C\203h\226\205sp"), STRING("c_psister"))
-    CALL(evt_npc_set_tribe, STRING("\203K\203C\203h\226\205sp"), STRING("\203K\203C\203h\226\205"))
-    CALL(evt_npc_entry, STRING("\202\277\202\321\203g\203Qsp"), STRING("c_tchibi"))
-    CALL(evt_npc_set_tribe, STRING("\202\277\202\321\203g\203Qsp"), STRING("\202\277\202\321\203g\203Q"))
-    CALL(evt_npc_entry, STRING("\203\211\203C\203o\203\213sp"), STRING("c_prival"))
-    CALL(evt_npc_set_tribe, STRING("\203\211\203C\203o\203\213sp"), STRING("\203\211\203C\203o\203\213"))
-    CALL(evt_npc_set_position, STRING("\203v\203jsp"), 0, 4294966296, 0)
-    CALL(evt_npc_set_position, STRING("\203g\203Qsp"), 0, 4294966296, 0)
-    CALL(evt_npc_set_position, STRING("\203K\203C\203hsp"), 0, 4294966296, 0)
-    CALL(evt_npc_set_position, STRING("\203K\203C\203h\226\205sp"), 0, 4294966296, 0)
-    CALL(evt_npc_set_position, STRING("\202\277\202\321\203g\203Qsp"), 0, 4294966296, 0)
-    CALL(evt_npc_set_position, STRING("\203\211\203C\203o\203\213sp"), 0, 4294966296, 0)
-    CALL(evt_npc_flag_onoff, 1, STRING("\203v\203jsp"), 1074266144)
-    CALL(evt_npc_flag_onoff, 1, STRING("\203g\203Qsp"), 1074266144)
-    CALL(evt_npc_flag_onoff, 1, STRING("\203K\203C\203hsp"), 1074266144)
-    CALL(evt_npc_flag_onoff, 1, STRING("\203K\203C\203h\226\205sp"), 1074266144)
-    CALL(evt_npc_flag_onoff, 1, STRING("\202\277\202\321\203g\203Qsp"), 1074266144)
-    CALL(evt_npc_flag_onoff, 1, STRING("\203\211\203C\203o\203\213sp"), 1074266144)
+    CALL(evt_npc_entry, STRING("プニsp"), STRING("c_puni"))
+    CALL(evt_npc_set_tribe, STRING("プニsp"), STRING("プニ族"))
+    CALL(evt_npc_entry, STRING("トゲsp"), STRING("c_toge"))
+    CALL(evt_npc_set_tribe, STRING("トゲsp"), STRING("トゲ族"))
+    CALL(evt_npc_entry, STRING("ガイドsp"), STRING("c_pguide"))
+    CALL(evt_npc_set_tribe, STRING("ガイドsp"), STRING("ガイド"))
+    CALL(evt_npc_entry, STRING("ガイド妹sp"), STRING("c_psister"))
+    CALL(evt_npc_set_tribe, STRING("ガイド妹sp"), STRING("ガイド妹"))
+    CALL(evt_npc_entry, STRING("ちびトゲsp"), STRING("c_tchibi"))
+    CALL(evt_npc_set_tribe, STRING("ちびトゲsp"), STRING("ちびトゲ"))
+    CALL(evt_npc_entry, STRING("ライバルsp"), STRING("c_prival"))
+    CALL(evt_npc_set_tribe, STRING("ライバルsp"), STRING("ライバル"))
+    CALL(evt_npc_set_position, STRING("プニsp"), 0, 4294966296, 0)
+    CALL(evt_npc_set_position, STRING("トゲsp"), 0, 4294966296, 0)
+    CALL(evt_npc_set_position, STRING("ガイドsp"), 0, 4294966296, 0)
+    CALL(evt_npc_set_position, STRING("ガイド妹sp"), 0, 4294966296, 0)
+    CALL(evt_npc_set_position, STRING("ちびトゲsp"), 0, 4294966296, 0)
+    CALL(evt_npc_set_position, STRING("ライバルsp"), 0, 4294966296, 0)
+    CALL(evt_npc_flag_onoff, 1, STRING("プニsp"), 1074266144)
+    CALL(evt_npc_flag_onoff, 1, STRING("トゲsp"), 1074266144)
+    CALL(evt_npc_flag_onoff, 1, STRING("ガイドsp"), 1074266144)
+    CALL(evt_npc_flag_onoff, 1, STRING("ガイド妹sp"), 1074266144)
+    CALL(evt_npc_flag_onoff, 1, STRING("ちびトゲsp"), 1074266144)
+    CALL(evt_npc_flag_onoff, 1, STRING("ライバルsp"), 1074266144)
     RETURN
 EVT_END()
 

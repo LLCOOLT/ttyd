@@ -10,9 +10,9 @@
 #include <stdlib.h>
 
 
-u8 col_r[4] = {0xFF, 0xFF, 0x40, 0x00};
-u8 col_g[4] = {0xFF, 0x40, 0x40, 0x00};
-u8 col_b[4] = {0xFF, 0x40, 0xFF, 0x00};
+u8 col_r[3] = {0xFF, 0xFF, 0x40};
+u8 col_g[3] = {0xFF, 0x40, 0x40};
+u8 col_b[3] = {0xFF, 0x40, 0xFF};
 
 effN64Vtx eff_whirlwind_v[] = {
     {-5, -2, 9, 939, 0, 0xFF, 0xFF, 0xFF, 0xFF},
@@ -53,7 +53,7 @@ EffectEntry* effWhirlwindN64Entry(s32 type, MarioWork* target, f32 scale, s32 li
     s32 i;
 
     effect = effEntry();
-    effect->type = "WhirlwindN64\0\0\0";
+    effect->type = "WhirlwindN64";
     effect->count = 5;
     work = __memAlloc(HEAP_EFFECT, sizeof(EffWhirlwindN64Work) * 5);
     effect->userdata = work;

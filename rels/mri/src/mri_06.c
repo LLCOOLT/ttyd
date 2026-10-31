@@ -6,8 +6,6 @@
 #include "evt/evt_npc.h"
 #include "data_tables.h"
 
-#pragma force_active on
-
 USER_FUNC(evt_bero_exec_wait);
 USER_FUNC(evt_bero_get_info);
 USER_FUNC(evt_cam3d_evt_off);
@@ -58,77 +56,28 @@ USER_FUNC(evt_target_set_position);
 USER_FUNC(urouro_init_func);
 USER_FUNC(urouro_main_func);
 
-f32 fd_mri_06_negone_one_374[2] __attribute__((aligned(8)));
-f32 fd_mri_06_neg_one_382;
-f32 fd_mri_06___local_PI_383;
-f32 fd_mri_06___local_3PIO2_385;
-f32 fd_mri_06_one_negone_373[2] __attribute__((aligned(8)));
-f32 fd_mri_06___local_PIO2_384;
-f32 fd_mri_06_one_381;
-f32 fd_mri_06_negone_one_360[2] __attribute__((aligned(8)));
-f32 fd_mri_06_neg_one_365;
-f32 fd_mri_06___local_PI_366;
-f32 fd_mri_06___local_3PIO2_368;
-f32 fd_mri_06_one_negone_359[2] __attribute__((aligned(8)));
-f32 fd_mri_06___local_PIO2_367;
-f32 fd_mri_06_one_364;
-static EvtWord rival_init[21];
-static EvtWord rival_talk[20];
-EvtWord puni_6_init[21];
-EvtWord puni_6_talk[20];
-EvtWord puni_7_init[21];
-EvtWord puni_7_talk[20];
-EvtWord puni_8_init[17];
-EvtWord puni_8_talk[20];
-EvtWord puni_9_init[21];
-EvtWord puni_9_talk[20];
-EvtWord puni_10_init[17];
-EvtWord puni_10_regl[19];
-EvtWord puni_10_talk[20];
-EvtWord puni_11_init[17];
-EvtWord puni_11_regl[19];
-EvtWord puni_11_talk[20];
+extern EvtWord puni_6_init[];
+extern EvtWord puni_6_talk[];
+extern EvtWord puni_7_init[];
+extern EvtWord puni_7_talk[];
+extern EvtWord puni_8_init[];
+extern EvtWord puni_8_talk[];
+extern EvtWord puni_9_init[];
+extern EvtWord puni_9_talk[];
+extern EvtWord puni_10_init[];
+extern EvtWord puni_10_regl[];
+extern EvtWord puni_10_talk[];
+extern EvtWord puni_11_init[];
+extern EvtWord puni_11_regl[];
+extern EvtWord puni_11_talk[];
 static NpcSetupInfo npcEnt[8];
-static EvtWord bero_s_doa_close[10];
-static EvtWord bero_s_doa_open[10];
 static BeroEntry bero_entry_data[8];
-static EvtWord door_switch_init[17];
-EvtWord ueki_evt_02[20];
+extern EvtWord ueki_evt_02[];
 static KusaAccess ueki_access_data[7];
-EvtWord paiders_a[84];
-EvtWord paiders_b[86];
-static EvtWord puni_lose[82];
-EvtWord apper_toge[252];
-static EvtWord cloud_wind_event[5];
-EvtWord mri_06_init_evt[207];
-
-f32 fd_mri_06_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
-
-f32 fd_mri_06_neg_one_382 = -1.0f;
-
-f32 fd_mri_06___local_PI_383 = 3.1415927f;
-
-f32 fd_mri_06___local_3PIO2_385 = 4.712389f;
-
-f32 fd_mri_06_one_negone_373[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
-
-f32 fd_mri_06___local_PIO2_384 = 1.5707964f;
-
-f32 fd_mri_06_one_381 = 1.0f;
-
-f32 fd_mri_06_negone_one_360[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
-
-f32 fd_mri_06_neg_one_365 = -1.0f;
-
-f32 fd_mri_06___local_PI_366 = 3.1415927f;
-
-f32 fd_mri_06___local_3PIO2_368 = 4.712389f;
-
-f32 fd_mri_06_one_negone_359[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
-
-f32 fd_mri_06___local_PIO2_367 = 1.5707964f;
-
-f32 fd_mri_06_one_364 = 1.0f;
+extern EvtWord paiders_a[];
+extern EvtWord paiders_b[];
+extern EvtWord apper_toge[];
+extern EvtWord mri_06_init_evt[];
 
 static EVT_BEGIN(rival_init)
     SWITCH(GSW(0))
@@ -736,7 +685,7 @@ EVT_BEGIN(mri_06_init_evt)
         CALL(evt_hitobj_onoff, STRING("A_nisekabe"), 1, 0)
     END_IF
     CALL(evt_mapobj_flag_onoff, 1, 0, STRING("S_oku_ha"), 2)
-    CALL(evt_hitobj_onoff, STRING("A_futa\0"), 1, 0)
+    CALL(evt_hitobj_onoff, STRING("A_futa"), 1, 0)
     RETURN
 EVT_END()
 

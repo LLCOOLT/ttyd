@@ -2,7 +2,6 @@
 #include "battle/battle_unit.h"
 #include "evt/evt_cmd.h"
 
-#pragma force_active on
 #include "battle/battle.h"
 #include "battle/battle_unit.h"
 #include "battle/battle_sub.h"
@@ -18,6 +17,7 @@
 #include "party/party_motion.h"
 #include "evt/evt_snd.h"
 #include "battle/battle_database_common.h"
+#include "manager/evtmgr_cmd.h"
 
 EffectEntry* effOpukuJetwN64Entry(s32 type, s32 count, f32 x, f32 y, f32 z, f32 scale);
 
@@ -58,20 +58,6 @@ USER_FUNC(_ikasumi_effect);
 extern BattleUnitKind unit_boss_gesso_left_arm;
 extern BattleUnitKind unit_boss_gesso_right_arm;
 
-f32 fd_boss_gesso_negone_one_374[2] __attribute__((aligned(8)));
-f32 fd_boss_gesso_neg_one_382;
-f32 fd_boss_gesso___local_PI_383;
-f32 fd_boss_gesso___local_3PIO2_385;
-f32 fd_boss_gesso_one_negone_373[2] __attribute__((aligned(8)));
-f32 fd_boss_gesso___local_PIO2_384;
-f32 fd_boss_gesso_one_381;
-f32 fd_boss_gesso_negone_one_360[2] __attribute__((aligned(8)));
-f32 fd_boss_gesso_neg_one_365;
-f32 fd_boss_gesso___local_PI_366;
-f32 fd_boss_gesso___local_3PIO2_368;
-f32 fd_boss_gesso_one_negone_359[2] __attribute__((aligned(8)));
-f32 fd_boss_gesso___local_PIO2_367;
-f32 fd_boss_gesso_one_364;
 BattleUnitKind unit_boss_gesso;
 static BattleUnitDefense defence;
 static BattleUnitDefenseAttr defence_attr;
@@ -88,12 +74,7 @@ PoseTableEntry gesso_pose_table_turn[10];
 static BattleDataEntry data_table[2];
 static BattleUnitKindPart parts[1];
 #ifndef VERSION_G8ME01
-EvtWord gesso_arm_wait_event[4];
-#endif
-#ifdef VERSION_G8ME01
-static EvtWord battle_entry_event[313];
-#else
-static EvtWord battle_entry_event[315];
+extern EvtWord gesso_arm_wait_event[];
 #endif
 static EvtWord init_event[121];
 BattleUnitSetup entry_gesso_left_arm_entry_data;
@@ -106,37 +87,9 @@ static EvtWord phase_event[488];
 #endif
 static EvtWord attack_event[48];
 BattleWeapon weapon_gesso_ikasumi_attack;
-EvtWord gesso_ikasumi_attack[193];
+extern EvtWord gesso_ikasumi_attack[];
 static EvtWord wait_event[6];
-EvtWord dead_subevent[48];
-
-f32 fd_boss_gesso_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
-
-f32 fd_boss_gesso_neg_one_382 = -1.0f;
-
-f32 fd_boss_gesso___local_PI_383 = 3.1415927f;
-
-f32 fd_boss_gesso___local_3PIO2_385 = 4.712389f;
-
-f32 fd_boss_gesso_one_negone_373[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
-
-f32 fd_boss_gesso___local_PIO2_384 = 1.5707964f;
-
-f32 fd_boss_gesso_one_381 = 1.0f;
-
-f32 fd_boss_gesso_negone_one_360[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
-
-f32 fd_boss_gesso_neg_one_365 = -1.0f;
-
-f32 fd_boss_gesso___local_PI_366 = 3.1415927f;
-
-f32 fd_boss_gesso___local_3PIO2_368 = 4.712389f;
-
-f32 fd_boss_gesso_one_negone_359[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
-
-f32 fd_boss_gesso___local_PIO2_367 = 1.5707964f;
-
-f32 fd_boss_gesso_one_364 = 1.0f;
+extern EvtWord dead_subevent[];
 
 BattleUnitKind unit_boss_gesso = {
     8,
@@ -339,8 +292,7 @@ static EVT_BEGIN(battle_entry_event)
         CALL(btlevtcmd_AnimeWaitPlayComplete, LW(3), 1)
         CALL(btlevtcmd_StartWaitEvent, LW(3))
     END_INLINE_EVENT
-#ifdef VERSION_G8ME01
-#else
+#ifndef VERSION_G8ME01
     SPAWN_EVENT(gesso_arm_wait_event)
 #endif
     CALL(btlevtcmd_WaitEventEnd, LW(14))

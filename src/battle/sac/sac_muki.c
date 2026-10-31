@@ -22,6 +22,7 @@
 #include "battle/sac/sac_common.h"
 #include "party/party_motion.h"
 #include "battle/battle_database_common.h"
+#include "pmario_sound.h"
 // US battle texture ids are 0x16 higher for these entries.
 #define BTL_TEX(id) ((id) + VERSION_PICK(0, 0x16))
 
@@ -37,9 +38,8 @@ void BtlUnit_SetAnim(BattleUnitPart* part, const char* anim);
 void BattleAudienceSoundHandBeat(void);
 void BattleAudienceSoundCallKind(s32 kind);
 void BattleAudienceSoundBooingKind(s32 kind);
-void psndSFXOn(const char* name);
 EffectEntry* effStarStoneEntry(s32 type, f32 x, f32 y, f32 z, f32 size);
-EffectEntry* effHitEntry(s32 type, s32 arg1, f32 x, f32 y, f32 z, f32 arg5);
+EffectEntry* effHitEntry(s32 type, s32 size, f32 x, f32 y, f32 z, f32 scale);
 
 #define INTPL(mode, cur, steps, a, b) ((f32(*)(f32, f32, s32, s32, s32))intplGetValue)(a, b, mode, cur, steps)
 
@@ -139,8 +139,8 @@ void main_cursor(void);
 
 
 static BattleWeapon weapon;
-EvtWord nice_event_pow[8];
-EvtWord marioAttackEvent_Muki[254];
+extern EvtWord nice_event_pow[];
+extern EvtWord marioAttackEvent_Muki[];
 
 static BattleWeapon weapon = {
     "btl_wn_sac_mukimuki_body", // name
@@ -492,7 +492,7 @@ void main_cursor(void) {
         w->t3c = 0;
         w->cfrom = w->cpos;
         w->cto = w->o3d[w->idx].pos;
-        psndSFXOn("SFX_BTL_SAC_BODY3\0\0");
+        psndSFXOn("SFX_BTL_SAC_BODY3");
     case 4:
         w->t3c++;
         w->col74 = (GXColor){0x0, 0x0, 0xFF, 0xFF};
@@ -1056,12 +1056,22 @@ EVT_BEGIN(marioAttackEvent_Muki)
         CALL(evt_btl_camera_set_zoomSpeedLv, 0, 2)
         WAIT_MS(1000)
         CALL(sac_wao)
+#ifdef VERSION_G8MP01
+        BEGIN_INLINE_EVENT_GET_ID(LW(12))
+#else
         BEGIN_INLINE_EVENT
+#endif
             WAIT_MS(1000)
             CALL(evt_btl_camera_set_mode, 0, 0)
             CALL(sac_enemy_slide_return)
             CALL(end_muki)
         END_INLINE_EVENT
+#ifdef VERSION_G8MP01
+        SET_VALUE(LW(13), 0)
+        IF_INT_NOT_EQUAL(LW(1), 0)
+            SET_VALUE(LW(13), 1)
+        END_IF
+#endif
         BEGIN_INLINE_EVENT
             WAIT_MS(400)
             IF_INT_NOT_EQUAL(LW(1), 0)
@@ -1073,6 +1083,9 @@ EVT_BEGIN(marioAttackEvent_Muki)
             END_IF
         END_INLINE_EVENT
         IF_INT_NOT_EQUAL(LW(0), 0)
+#ifdef VERSION_G8MP01
+            SET_VALUE(LW(13), 1)
+#endif
             CALL(set_weapon, 0, LW(0), LW(9))
             IF_INT_NOT_EQUAL(LW(14), -1)
                 CALL(btlevtcmd_CheckDamage, -2, LW(14), LW(15), LW(9), 256, LW(5))
@@ -1081,10 +1094,20 @@ EVT_BEGIN(marioAttackEvent_Muki)
             RETURN
         END_IF
     END_IF
+#ifdef VERSION_G8MP01
+    // PAL: LW(13) is set when only the second hit (LW(1)) is left, whose path already returns the
+    // enemies through the inline event; US ran sac_enemy_slide_return and end_muki twice there
+    IF_INT_EQUAL(LW(13), 0)
+        DELETE_EVENT(LW(12))
+#endif
     CALL(sac_enemy_slide_return)
     WAIT_MS(1000)
     CALL(end_muki)
     WAIT_MS(1000)
     CALL(btlevtcmd_StartWaitEvent, -2)
+#ifdef VERSION_G8MP01
+    ELSE
+    END_IF
+#endif
     RETURN
 EVT_END()

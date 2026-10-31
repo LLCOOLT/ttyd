@@ -27,8 +27,6 @@ const f32 float_0_8041f774 = 0.0f;
 double tan(double);
 s32 evt_img_alloc_capture(EventEntry* event, BOOL isFirstCall);
 
-#pragma force_active on
-u32 gap_fd_sbss;
 static FadeWork* wp;
 
 //local prototypes
@@ -427,7 +425,7 @@ static inline void fadeCapture(const char* name, const char* off, s32 mode) {
 }
 
 #define FADE_DURATION(e) (*(s64*)&(e)->durationHi)
-#define SFX_ON(id) ((s32 (*)(s32))psndSFXOn)(id)
+#define SFX_ON(id) psndSFXOn(SFX_NAME_WORD(id))
 
 void fadeMain(void) {
 	FadeEntry* entry;
@@ -1254,13 +1252,16 @@ void disp_dummy_black(CameraId camId, void* param) {
 }
 
 BOOL fadeIsFinish(void) {
+	FadeEntry* entry;
+
 	if (wp->lastEntryId == -1) {
 		return TRUE;
 	}
-	return (*(u16*)((u8*)wp + wp->lastEntryId * sizeof(FadeEntry) + offsetof(FadeWork, entries[0].flags)) >> 1) & 1; // FAKE: byte-offset load so the entries offset folds into the index (mulli/addi/lhzx), as in the target
+	entry = &wp->entries[wp->lastEntryId];
+	return (entry->flags >> 1) & 1;
 }
 
-void fadeReset(s32 id) { //TODO: better param name?
+void fadeReset(s32 id) {
 	FadeEntry* entry;
 
 	entry = &wp->entries[id];
@@ -1291,6 +1292,4 @@ void fadeSetNarrowFast(void) {
 	wp->entries[1].flags |= 8;
 }
 
-__declspec(section ".sdata") u32 gap_fd_sdata2[7] = {0};
 
-#pragma force_active reset

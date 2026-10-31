@@ -1,7 +1,6 @@
 #include "battle/battle_unit.h"
 #include "evt/evt_cmd.h"
 
-#pragma force_active on
 #include "driver/npcdrv.h"
 #include "driver/animdrv.h"
 #include "evt/evt_bero.h"
@@ -28,58 +27,15 @@ USER_FUNC(evt_snd_sfxon_3d);
 USER_FUNC(urouro_init_func);
 USER_FUNC(urouro_main_func);
 
-f32 fd_gra_02_negone_one_374[2] __attribute__((aligned(8)));
-f32 fd_gra_02_neg_one_382;
-f32 fd_gra_02___local_PI_383;
-f32 fd_gra_02___local_3PIO2_385;
-f32 fd_gra_02_one_negone_373[2] __attribute__((aligned(8)));
-f32 fd_gra_02___local_PIO2_384;
-f32 fd_gra_02_one_381;
-f32 fd_gra_02_negone_one_360[2] __attribute__((aligned(8)));
-f32 fd_gra_02_neg_one_365;
-f32 fd_gra_02___local_PI_366;
-f32 fd_gra_02___local_3PIO2_368;
-f32 fd_gra_02_one_negone_359[2] __attribute__((aligned(8)));
-f32 fd_gra_02___local_PIO2_367;
-f32 fd_gra_02_one_364;
-EvtWord shopmaster_pig_init[14];
-EvtWord shopmaster_talk[33];
-static EvtWord urouro_move[24];
+extern EvtWord shopmaster_pig_init[];
+extern EvtWord shopmaster_talk[];
 static NpcSetupInfo npcEnt[2];
-EvtWord w_bero_2_in[5];
+extern EvtWord w_bero_2_in[];
 static BeroEntry bero_entry_data[5];
-EvtWord gra02_get_key[5];
-EvtWord gra02_straw_blow_evt[23];
+extern EvtWord gra02_get_key[];
+extern EvtWord gra02_straw_blow_evt[];
 static const char* booboo_name[1];
-EvtWord gra_02_init_evt[86];
-
-f32 fd_gra_02_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
-
-f32 fd_gra_02_neg_one_382 = -1.0f;
-
-f32 fd_gra_02___local_PI_383 = 3.1415927f;
-
-f32 fd_gra_02___local_3PIO2_385 = 4.712389f;
-
-f32 fd_gra_02_one_negone_373[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
-
-f32 fd_gra_02___local_PIO2_384 = 1.5707964f;
-
-f32 fd_gra_02_one_381 = 1.0f;
-
-f32 fd_gra_02_negone_one_360[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
-
-f32 fd_gra_02_neg_one_365 = -1.0f;
-
-f32 fd_gra_02___local_PI_366 = 3.1415927f;
-
-f32 fd_gra_02___local_3PIO2_368 = 4.712389f;
-
-f32 fd_gra_02_one_negone_359[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
-
-f32 fd_gra_02___local_PIO2_367 = 1.5707964f;
-
-f32 fd_gra_02_one_364 = 1.0f;
+extern EvtWord gra_02_init_evt[];
 
 EVT_BEGIN(shopmaster_pig_init)
     SWITCH(GSW(0))

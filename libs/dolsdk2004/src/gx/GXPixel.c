@@ -1,6 +1,4 @@
-#define MATH_NO_SQRTF 1
 #include <math.h>
-float sqrtf(float x);
 #include <dolphin/gx.h>
 #include <dolphin/os.h>
 
@@ -113,7 +111,6 @@ void GXSetFog(GXFogType type, f32 startz, f32 endz, f32 nearz, f32 farz, GXColor
     __GXData->bpSentNot = 0;
 }
 
-#ifdef GXPIXEL_UNUSED_FUNCS // FAKE: dead-stripped in the original binary; excluded to keep data layout
 void GXSetFogColor(GXColor color) {
     u32 rgba;
     u32 fogclr = 0xF2000000;
@@ -123,9 +120,7 @@ void GXSetFogColor(GXColor color) {
     GX_WRITE_RAS_REG(fogclr);
     __GXData->bpSentNot = 0;
 }
-#endif
 
-#ifdef GXPIXEL_UNUSED_FUNCS // FAKE: dead-stripped in the original binary; excluded to keep data layout
 void GXInitFogAdjTable(GXFogAdjTable *table, u16 width, const f32 projmtx[4][4]) {
     f32 xi;
     f32 iw;
@@ -155,7 +150,6 @@ void GXInitFogAdjTable(GXFogAdjTable *table, u16 width, const f32 projmtx[4][4])
         table->r[i] = (u32)(256.0f * rangeVal) & 0xFFF;
     }
 }
-#endif
 
 void GXSetFogRangeAdj(GXBool enable, u16 center, const GXFogAdjTable *table) {
     u32 i;

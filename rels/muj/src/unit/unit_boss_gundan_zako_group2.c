@@ -1,7 +1,6 @@
 #include "battle/battle_unit.h"
 #include "evt/evt_cmd.h"
 
-#pragma force_active on
 #include "battle/battle.h"
 #include "battle/battle_unit.h"
 #include "battle/battle_stage_object.h"
@@ -9,26 +8,26 @@
 #include "battle/battle_event_default.h"
 #include "battle/battle_event_cmd.h"
 #include "battle/battle_weapon_power.h"
+#include "pmario_sound.h"
 f32 intplGetValue(f32 start, f32 end, s32 mode, s32 cur, s32 steps);
 s32 irand(s32 scalar);
 #include "dolphin/mtx.h"
 #include "battle/battle_database_common.h"
 #include "driver/extdrv.h"
 
-typedef struct ZakoGun { s8 field_0x0; s8 state; s32 timer; s32 timerMax; Vec pos; Vec home; s32 poseBase; s32 poseNum; s32 poseDiv; s32 poseCount; Vec start; Vec target; Vec vel; u8 field_0x58[0x64 - 0x58]; Vec rot; } ZakoGun;
+typedef struct ZakoGun { s8 flags; s8 state; s32 timer; s32 timerMax; Vec pos; Vec home; s32 poseBase; s32 poseNum; s32 poseDiv; s32 poseCount; Vec start; Vec target; Vec vel; u8 ofs[0x64 - 0x58]; Vec rot; } ZakoGun;
 #ifdef VERSION_G8ME01
 #define ZAKOGUNWORK_PAD 0x54
 #else
 #define ZAKOGUNWORK_PAD 0x48
 #endif
 #ifdef VERSION_G8ME01
-typedef struct ZakoGunWork { s32 flag; s32 targetId; Vec targetPos; u8 field_0x14[ZAKOGUNWORK_PAD - 0x14]; Vec start; Vec end; s32 timer; s32 steps; s32 count; s32 sfx; } ZakoGunWork;
+typedef struct ZakoGunWork { s32 flag; s32 targetId; Vec targetPos; u8 otherGroupWork[ZAKOGUNWORK_PAD - 0x14]; Vec start; Vec end; s32 timer; s32 steps; s32 count; s32 sfx; } ZakoGunWork; /* otherGroupWork: fields only the other zako group units use */
 #else
-typedef struct ZakoGunWork { s32 flag; s32 targetId; u8 field_0x8[ZAKOGUNWORK_PAD - 0x8]; Vec start; Vec end; s32 timer; s32 steps; s32 count; s32 sfx; } ZakoGunWork;
+typedef struct ZakoGunWork { s32 flag; s32 targetId; u8 otherGroupWork[ZAKOGUNWORK_PAD - 0x8]; Vec start; Vec end; s32 timer; s32 steps; s32 count; s32 sfx; } ZakoGunWork; /* otherGroupWork: fields only the other zako group units use */
 #endif
 extern ZakoGun* zakogun;
 extern ZakoGunWork* work;
-s32 psndSFXOn(const char* name);
 void psndSFXOff(s32 id);
 void zakogun_ext_init123_common(ExtdrvPose* pose, s32 i);
 BattleUnit* zakogun_get_ptr(void);
@@ -81,20 +80,6 @@ USER_FUNC(zakogun_ext_init2);
 USER_FUNC(up_ceil);
 USER_FUNC(down_ceil);
 
-f32 fd_boss_gundan_zako_group2_negone_one_374[2] __attribute__((aligned(8)));
-f32 fd_boss_gundan_zako_group2_neg_one_382;
-f32 fd_boss_gundan_zako_group2___local_PI_383;
-f32 fd_boss_gundan_zako_group2___local_3PIO2_385;
-f32 fd_boss_gundan_zako_group2_one_negone_373[2] __attribute__((aligned(8)));
-f32 fd_boss_gundan_zako_group2___local_PIO2_384;
-f32 fd_boss_gundan_zako_group2_one_381;
-f32 fd_boss_gundan_zako_group2_negone_one_360[2] __attribute__((aligned(8)));
-f32 fd_boss_gundan_zako_group2_neg_one_365;
-f32 fd_boss_gundan_zako_group2___local_PI_366;
-f32 fd_boss_gundan_zako_group2___local_3PIO2_368;
-f32 fd_boss_gundan_zako_group2_one_negone_359[2] __attribute__((aligned(8)));
-f32 fd_boss_gundan_zako_group2___local_PIO2_367;
-f32 fd_boss_gundan_zako_group2_one_364;
 BattleUnitKind unit_boss_gundan_zako_group2;
 static BattleUnitDefense defence;
 static BattleUnitDefenseAttr defence_attr;
@@ -108,40 +93,12 @@ static EvtWord init_event[21];
 static EvtWord damage_event[129];
 static EvtWord dead_event[136];
 static EvtWord attack_event[32];
-EvtWord fall_attack_event[93];
+extern EvtWord fall_attack_event[];
 static EvtWord shake_attack_event[281];
 static EvtWord hit_check_event[34];
-EvtWord hit_check_event2[7];
-EvtWord hit_check_event_sub[123];
+extern EvtWord hit_check_event2[];
+extern EvtWord hit_check_event_sub[];
 static EvtWord wait_event[6];
-
-f32 fd_boss_gundan_zako_group2_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
-
-f32 fd_boss_gundan_zako_group2_neg_one_382 = -1.0f;
-
-f32 fd_boss_gundan_zako_group2___local_PI_383 = 3.1415927f;
-
-f32 fd_boss_gundan_zako_group2___local_3PIO2_385 = 4.712389f;
-
-f32 fd_boss_gundan_zako_group2_one_negone_373[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
-
-f32 fd_boss_gundan_zako_group2___local_PIO2_384 = 1.5707964f;
-
-f32 fd_boss_gundan_zako_group2_one_381 = 1.0f;
-
-f32 fd_boss_gundan_zako_group2_negone_one_360[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
-
-f32 fd_boss_gundan_zako_group2_neg_one_365 = -1.0f;
-
-f32 fd_boss_gundan_zako_group2___local_PI_366 = 3.1415927f;
-
-f32 fd_boss_gundan_zako_group2___local_3PIO2_368 = 4.712389f;
-
-f32 fd_boss_gundan_zako_group2_one_negone_359[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
-
-f32 fd_boss_gundan_zako_group2___local_PIO2_367 = 1.5707964f;
-
-f32 fd_boss_gundan_zako_group2_one_364 = 1.0f;
 
 BattleUnitKind unit_boss_gundan_zako_group2 = {
     101,

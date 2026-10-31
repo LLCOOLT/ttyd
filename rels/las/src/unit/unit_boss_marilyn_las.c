@@ -11,8 +11,6 @@
 #include "unit/party/unit_party_vivian.h"
 #include "battle/battle_database_common.h"
 
-#pragma force_active on
-
 USER_FUNC(btlevtcmd_AnimeChangePose);
 USER_FUNC(btlevtcmd_AnimeChangePoseFromTable);
 USER_FUNC(btlevtcmd_AnimeChangePoseType);
@@ -45,20 +43,6 @@ extern EvtWord btl_marilyn_zoom[];
 extern EvtWord majo3_shadow_tail_event[];
 extern EvtWord majo_unison_phase_event[];
 
-f32 fd_boss_marilyn_las_negone_one_374[2] __attribute__((aligned(8)));
-f32 fd_boss_marilyn_las_neg_one_382;
-f32 fd_boss_marilyn_las___local_PI_383;
-f32 fd_boss_marilyn_las___local_3PIO2_385;
-f32 fd_boss_marilyn_las_one_negone_373[2] __attribute__((aligned(8)));
-f32 fd_boss_marilyn_las___local_PIO2_384;
-f32 fd_boss_marilyn_las_one_381;
-f32 fd_boss_marilyn_las_negone_one_360[2] __attribute__((aligned(8)));
-f32 fd_boss_marilyn_las_neg_one_365;
-f32 fd_boss_marilyn_las___local_PI_366;
-f32 fd_boss_marilyn_las___local_3PIO2_368;
-f32 fd_boss_marilyn_las_one_negone_359[2] __attribute__((aligned(8)));
-f32 fd_boss_marilyn_las___local_PIO2_367;
-f32 fd_boss_marilyn_las_one_364;
 BattleUnitKind unit_boss_marilyn_las;
 static BattleUnitDefense defence;
 static BattleUnitDefenseAttr defence_attr;
@@ -69,12 +53,9 @@ static BattleUnitKindPart parts[1];
 static BattleWeapon weapon_marilyn_kagenuke_attack1;
 static BattleWeapon weapon_marilyn_thunder_attack1;
 static BattleWeapon weapon_marilyn_charge1;
-static EvtWord marilyn_down[19];
-static EvtWord marilyn_up[27];
 static EvtWord init_event[37];
 static EvtWord damage_event[22];
 static EvtWord dead_event[152];
-static EvtWord unison_phase_event[83];
 static EvtWord phase_event[2];
 static EvtWord attack_event[93];
 #ifdef VERSION_G8ME01
@@ -89,34 +70,6 @@ static EvtWord wait_event[7];
 #else
 static EvtWord wait_event[6];
 #endif
-
-f32 fd_boss_marilyn_las_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
-
-f32 fd_boss_marilyn_las_neg_one_382 = -1.0f;
-
-f32 fd_boss_marilyn_las___local_PI_383 = 3.1415927f;
-
-f32 fd_boss_marilyn_las___local_3PIO2_385 = 4.712389f;
-
-f32 fd_boss_marilyn_las_one_negone_373[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
-
-f32 fd_boss_marilyn_las___local_PIO2_384 = 1.5707964f;
-
-f32 fd_boss_marilyn_las_one_381 = 1.0f;
-
-f32 fd_boss_marilyn_las_negone_one_360[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
-
-f32 fd_boss_marilyn_las_neg_one_365 = -1.0f;
-
-f32 fd_boss_marilyn_las___local_PI_366 = 3.1415927f;
-
-f32 fd_boss_marilyn_las___local_3PIO2_368 = 4.712389f;
-
-f32 fd_boss_marilyn_las_one_negone_359[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
-
-f32 fd_boss_marilyn_las___local_PIO2_367 = 1.5707964f;
-
-f32 fd_boss_marilyn_las_one_364 = 1.0f;
 
 BattleUnitKind unit_boss_marilyn_las = {
     134,
@@ -670,7 +623,7 @@ static EVT_BEGIN(charge_attack_event)
     CALL(evt_btl_camera_set_zoom, 0, 400)
     WAIT_MS(300)
     CALL(btlevtcmd_AnimeChangePose, -2, 1, STRING("MRR_A3_1"))
-    CALL(btlevtcmd_snd_se, -2, STRING("SFX_BOSS_MARI_CHARGE1\0\0"), -250000000, 0, LW(15))
+    CALL(btlevtcmd_snd_se, -2, STRING("SFX_BOSS_MARI_CHARGE1"), -250000000, 0, LW(15))
     WAIT_MS(800)
     BEGIN_INLINE_EVENT
         WAIT_MS(1000)

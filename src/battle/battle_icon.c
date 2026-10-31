@@ -19,7 +19,7 @@ BattleIcon* BtlIconGetPtr(s32 index) {
 	for (i = 0; i < 16; i++) {
 		icon = &_battleWorkPointer->icons[i];
 		if (icon->flags & 1 && icon->index == index) {
-			return icon; //TODO: redo bwp->iconWork?
+			return icon;
 		}
 	}
 	return NULL;
@@ -84,7 +84,7 @@ BattleIcon* BtlIcon_Entry(u16 iconId, f32 x, f32 y, f32 z) {
 	icon->position.y = y;
 	icon->position.z = z;
 	icon->iconId = iconId;
-	sprintf(name, "_biu_%02x\0\0", icon->index);
+	sprintf(name, "_biu_%02x", icon->index);
 	((void (*)(const char*, u16))iconEntry)(name, icon->iconId);
 	icon->base = iconNameToPtr(name);
 	iconSetPos(icon->base->name, icon->position.x, icon->position.y, icon->position.z);

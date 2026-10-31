@@ -1,7 +1,6 @@
 #include "battle/battle_unit.h"
 #include "evt/evt_cmd.h"
 
-#pragma force_active on
 #include "manager/evtmgr_cmd.h"
 #include "system.h"
 #include "mario/mario.h"
@@ -26,6 +25,7 @@
 #include "data_tables.h"
 #include "mario/mario_pouch.h"
 #include "driver/extdrv.h"
+#include <math.h>
 
 int rand(void);
 s32 _kurokaron_run_away(f32 x, f32 z, f32 tx, f32 tz);
@@ -33,13 +33,10 @@ void npcTuningRy(NpcEntry* npc, f32 ry);
 double sin(double x);
 double cos(double x);
 s32 psndSFXOn_3D(const char* name, Vec* position);
-static inline s32 k_fpclassifyf(f32 x) { switch (*(s32*)&x & 0x7F800000) { case 0x7F800000: if (*(s32*)&x & 0x007FFFFF) { return 1; } else { return 2; } break; case 0: if (*(s32*)&x & 0x007FFFFF) { return 5; } else { return 3; } break; default: return 4; } }
-static inline f32 k_sqrtf(f32 x) { const f64 _half = .5; const f64 _three = 3.0; if (x > 0.0f) { f64 guess = __frsqrte(x); guess = _half * guess * (_three - guess * guess * x); guess = _half * guess * (_three - guess * guess * x); guess = _half * guess * (_three - guess * guess * x); return x * guess; } else if (x < 0.0) { return *(f32*)__float_nan; } else if (k_fpclassifyf(x) == 1) { return *(f32*)__float_nan; } return x; }
 s32 kurokaron_move2(NpcEntry* npc, MarioWork* mario);
 void _kurokaron_next_move_index(void);
 typedef struct Senkaron { s8 state; u16 area; s32 timer; f32 vx; f32 vy; f32 vz; u32 flags; } Senkaron;
 typedef struct SenkaronWork { s32 attackStart; s32 escape; s32 mesPushing; u32 frameCount; s32 marioPushed; s32 hammerFrame; Senkaron* sk; } SenkaronWork;
-s32 gap_05_0000004C_bss;
 SenkaronWork* skwp;
 static f32 randf(f32 min, f32 max);
 s32 nokonokoGetStatus(void);
@@ -157,38 +154,16 @@ void _kurokaron_next_move_index(void);
 s32 kurokaron_move2(NpcEntry* npc, MarioWork* mario);
 s32 _kurokaron_run_away(f32 x, f32 z, f32 tx, f32 tz);
 
-f32 fd_las_05_negone_one_374[2] __attribute__((aligned(8)));
-f32 fd_las_05_neg_one_382;
-f32 fd_las_05___local_PI_383;
-f32 fd_las_05___local_3PIO2_385;
-f32 fd_las_05_one_negone_373[2] __attribute__((aligned(8)));
-f32 fd_las_05___local_PIO2_384;
-f32 fd_las_05_one_381;
-f32 fd_las_05_negone_one_360[2] __attribute__((aligned(8)));
-f32 fd_las_05_neg_one_365;
-f32 fd_las_05___local_PI_366;
-f32 fd_las_05___local_3PIO2_368;
-f32 fd_las_05_one_negone_359[2] __attribute__((aligned(8)));
-f32 fd_las_05___local_PIO2_367;
-f32 fd_las_05_one_364;
-static EvtWord w_door_close[22];
-static EvtWord w_door_open[22];
-static EvtWord e_door_close[22];
-static EvtWord e_door_open[22];
 static BeroEntry bero_entry_data[3];
-EvtWord kurokaron_move[103];
+extern EvtWord kurokaron_move[];
 static ExtTexInfo senkaron_ext_entry_data[26];
 s32 move_check_list[20];
-static EvtWord senkaron_event[917];
-EvtWord kurokaron_init[29];
-EvtWord kurokaron_talk[13];
+extern EvtWord kurokaron_init[];
+extern EvtWord kurokaron_talk[];
 static NpcSetupInfo npcEnt[3];
 static EvtWord key_evt[5];
 static s32 key_tbl[2];
-static EvtWord key_check_evt[23];
-static EvtWord unlock_evt[10];
-static EvtWord shan_init[68];
-EvtWord las_05_init_evt[63];
+extern EvtWord las_05_init_evt[];
 
 USER_FUNC(kurokaron_flag_check) {
     EvtWord* args = event->args;
@@ -266,7 +241,6 @@ s32 _kurokaron_run_away(f32 x, f32 z, f32 tx, f32 tz) {
     }
     return result;
 }
-
 
 u8 kurokaron_move_index = 0;
 u8 kurokaron_move_flag = 0;
@@ -366,7 +340,7 @@ USER_FUNC(kurokaron_move_position) {
         npc->jumpTargetPos.z = z;
         npc->jumpStartPos = npc->position;
         PSVECSubtract(&npc->jumpTargetPos, &npc->jumpStartPos, &diff);
-        dist = k_sqrtf(diff.x * diff.x + diff.z * diff.z);
+        dist = sqrtf(diff.x * diff.x + diff.z * diff.z);
         npc->moveDir = angleABf(0.0f, 0.0f, diff.x, diff.z);
         npc->moveSpeed = speed;
         npc->moveOffset.y = 0.0f;
@@ -378,10 +352,10 @@ USER_FUNC(kurokaron_move_position) {
     }
     mario = marioGetPtr();
     PSVECSubtract(&npc->jumpTargetPos, &npc->position, &diff);
-    dist = k_sqrtf(diff.x * diff.x + diff.z * diff.z);
+    dist = sqrtf(diff.x * diff.x + diff.z * diff.z);
     step = (20.0f * npc->moveSpeed) / 1000.0f;
     PSVECSubtract(&mario->position, &npc->position, &diff);
-    marioDist = k_sqrtf(diff.x * diff.x + diff.z * diff.z);
+    marioDist = sqrtf(diff.x * diff.x + diff.z * diff.z);
     if (marioDist < 80.0f && kurokaron_vivian_prev_sts == 3 && vivianGetStatus() == 0) {
         kurokaron_stop_cnt = 60;
     }
@@ -600,34 +574,6 @@ s32 party_hit_check(f32 x, f32 z, f32* dir) {
     }
     return hit;
 }
-
-f32 fd_las_05_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
-
-f32 fd_las_05_neg_one_382 = -1.0f;
-
-f32 fd_las_05___local_PI_383 = 3.1415927f;
-
-f32 fd_las_05___local_3PIO2_385 = 4.712389f;
-
-f32 fd_las_05_one_negone_373[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
-
-f32 fd_las_05___local_PIO2_384 = 1.5707964f;
-
-f32 fd_las_05_one_381 = 1.0f;
-
-f32 fd_las_05_negone_one_360[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
-
-f32 fd_las_05_neg_one_365 = -1.0f;
-
-f32 fd_las_05___local_PI_366 = 3.1415927f;
-
-f32 fd_las_05___local_3PIO2_368 = 4.712389f;
-
-f32 fd_las_05_one_negone_359[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
-
-f32 fd_las_05___local_PIO2_367 = 1.5707964f;
-
-f32 fd_las_05_one_364 = 1.0f;
 
 static EVT_BEGIN(w_door_close)
     MULTIPLY_FLOAT(LW(0), FLOAT(-0.38867188f))
@@ -985,9 +931,9 @@ static void senkaron_ext_main(void) {
                         guess = .5 * guess * (3.0 - guess * guess * d2);
                         d2 = d2 * guess;
                     } else if (d2 < 0.0) {
-                        d2 = *(f32*)__float_nan;
-                    } else if (k_fpclassifyf(d2) == 1) {
-                        d2 = *(f32*)__float_nan;
+                        d2 = NAN;
+                    } else if (isnan(d2)) {
+                        d2 = NAN;
                     }
 
                     s->vx = push + 3.0f * dx / d2;
@@ -1116,9 +1062,9 @@ static void senkaron_ext_main(void) {
             guess = .5 * guess * (3.0 - guess * guess * dist);
             dist = dist * guess;
         } else if (dist < 0.0) {
-            dist = *(f32*)__float_nan;
-        } else if (k_fpclassifyf(dist) == 1) {
-            dist = *(f32*)__float_nan;
+            dist = NAN;
+        } else if (isnan(dist)) {
+            dist = NAN;
         }
 
         switch (mario->currMotionId) {

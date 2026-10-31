@@ -8,6 +8,7 @@
 #include "system.h"
 #include <string.h>
 #include "icon_ids.h"
+#include "pmario_sound.h"
 
 #pragma optimize_for_size on
 
@@ -22,7 +23,6 @@ typedef struct SklWork {
 #define SKL_W(w) ((SklWork*)(w)->actionCommands.work)
 #define SKL_D(w) (&(w)->actionCommands.disp)
 
-s32 psndSFXOn(const char* name);
 
 s32 ac_stickkeepleft_ok_frame[7] = {80, 70, 60, 40, 20, 10, 5};
 
@@ -54,7 +54,7 @@ s32 battleAcMain_StickKeepLeft(BattleWork* work) {
         }
     }
     sfx[0] = "SFX_AC_PI1";
-    sfx[1] = "SFX_AC_PONE1\0\0\0";
+    sfx[1] = "SFX_AC_PONE1";
     do {
         loop = 0;
         if (SKL_P(work)->params[3] != 0) {
@@ -100,7 +100,7 @@ s32 battleAcMain_StickKeepLeft(BattleWork* work) {
                     }
                     return 0;
                 }
-                if (!((s32(*)(s32))BattlePadCheckNow)(0x40000) && (&(work)->actionCommands)->countdown <= 0 && autoCommand == 0) {
+                if (!BattlePadCheckNow(0x40000) && (&(work)->actionCommands)->countdown <= 0 && autoCommand == 0) {
                     if (--cw->timer <= 0) {
                         work->actionCommands.result = 0;
                         loop = 1;
@@ -149,7 +149,7 @@ s32 battleAcMain_StickKeepLeft(BattleWork* work) {
                     }
                     cw->timer = SKL_P(work)->params[1];
                 } else {
-                    if (((s32(*)(s32))BattlePadCheckNow)(0x40000) && autoCommand == 0) {
+                    if (BattlePadCheckNow(0x40000) && autoCommand == 0) {
                         break;
                     }
                     ok = 0;

@@ -1,15 +1,6 @@
 #define iconNumberDispGx iconNumberDispGx_f32
 #define iconNumberDispGx3D iconNumberDispGx3D_f32
-#ifdef VERSION_G8ME01
-/* FAKE: the header declares these with s16 ids; the US definitions take s32 (only the low 16 bits are used) */
-#define iconGetTexObj iconGetTexObj_hdr
-#define iconGetWidthHight iconGetWidthHight_hdr
-#endif
 #include "driver/icondrv.h"
-#ifdef VERSION_G8ME01
-#undef iconGetTexObj
-#undef iconGetWidthHight
-#endif
 #undef iconNumberDispGx
 #undef iconNumberDispGx3D
 #include "driver/camdrv.h"
@@ -52,7 +43,7 @@ typedef struct IconBinData {
     IconFrame frames[1]; // 0x8
 } IconBinData;
 
-void iconDispGxCol(Mtx pos, s16 flags, s32 iconId, GXColor color);
+void iconDispGxCol(Mtx pos, s16 flags, u16 iconId, GXColor color);
 
 #define ICON_ANIM_TPL(data, dst)                                   \
     if ((data)->numIcons > 1) {                                    \
@@ -468,14 +459,13 @@ void iconDispGx(Vec* position, s16 flags, u16 iconId, f32 scale) {
     iconDispGxAlpha(position, flags, iconId, 0xFF, scale);
 }
 
-void iconDispGx2(Mtx mtx, s16 flags, s16 iconId)
+void iconDispGx2(Mtx mtx, s16 flags, u16 iconId)
 {
   IconEntry entry;
   Mtx m;
   CameraEntry *camera;
   IconBinData *data;
   IconEntry *ep;
-  u16 id;
   camera = camGetCurPtr();
   ep = &entry;
   if ((!icon_tpl_ok) || (!icon_bin_ok))
@@ -487,14 +477,8 @@ void iconDispGx2(Mtx mtx, s16 flags, s16 iconId)
   if (icon_bin_ok && icon_bin_ok)
   {
   }
-#ifdef VERSION_G8ME01
-  /* FAKE: (u16)(s16) round-trip is a no-op on the u16 field (the s32 id goes through s16 first); it steers MWCC's register choice */
-  ep->iconId = (u16)(s16)iconId;
-  data = iconGetBinData((u16)iconId);
-#else
-  entry.iconId = (id = iconId);
-  data = iconGetBinData(id);
-#endif
+  ep->iconId = iconId;
+  data = iconGetBinData(ep->iconId);
   entry.width = data->width;
   entry.height = data->height;
   entry.tplId = data->frames[0].tplId;
@@ -526,15 +510,12 @@ void iconDispGx2(Mtx mtx, s16 flags, s16 iconId)
   iconGX(m, ep);
 }
 
-void iconDispGxCol(Mtx pos, s16 flags, s32 iconId, GXColor color) {
+void iconDispGxCol(Mtx pos, s16 flags, u16 iconId, GXColor color) {
     IconEntry entry;
     Mtx m;
     CameraEntry* camera;
     IconBinData* data;
     IconEntry* ep;
-#ifndef VERSION_G8ME01
-    u16 id;
-#endif
 
     camera = camGetCurPtr();
     ep = &entry;
@@ -545,14 +526,8 @@ void iconDispGxCol(Mtx pos, s16 flags, s32 iconId, GXColor color) {
     entry.color = color;
     if (icon_bin_ok && icon_bin_ok) {
     }
-#ifdef VERSION_G8ME01
-    /* FAKE: (u16)(s16) round-trip is a no-op on the u16 field (the s32 id goes through s16 first); it steers MWCC's register choice */
-    ep->iconId = (u16)(s16)iconId;
-    data = iconGetBinData((u16)iconId);
-#else
-    entry.iconId = (id = iconId);
-    data = iconGetBinData(id);
-#endif
+    ep->iconId = iconId;
+    data = iconGetBinData(ep->iconId);
     entry.width = data->width;
     entry.height = data->height;
     entry.tplId = data->frames[0].tplId;
@@ -866,7 +841,7 @@ s32 iconNumberDispGx(Mtx mtx, s32 number, BOOL small, GXColor color) {
     for (dp = digits, i = 0; i < count; dp++, i++) {
         MTXTrans(m, (f32)-i * width, 0.0f, 0.0f);
         MTXConcat(mtx, m, m);
-        iconDispGxCol(m, 0x10, !small ? (s32)suuji[*dp] : (s32)suuji_s[*dp], color);
+        iconDispGxCol(m, 0x10, !small ? suuji[*dp] : suuji_s[*dp], color);
         ret += width;
     }
     return ret;
@@ -910,7 +885,7 @@ s32 iconNumberDispGx3D(Mtx mtx, s32 number, BOOL small, GXColor color) {
     for (dp = digits, i = 0; i < count; dp++, i++) {
         MTXTrans(m, (f32)-i * width, 0.0f, 0.0f);
         MTXConcat(mtx, m, m);
-        iconDispGxCol(m, 0, !small ? (s32)suuji[*dp] : (s32)suuji_s[*dp], color);
+        iconDispGxCol(m, 0, !small ? suuji[*dp] : suuji_s[*dp], color);
         ret += width;
     }
     return ret;

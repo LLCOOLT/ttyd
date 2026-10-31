@@ -1,7 +1,6 @@
 #include "battle/battle_unit.h"
 #include "evt/evt_cmd.h"
 
-#pragma force_active on
 #include "data/mapdata.h"
 #include "manager/evtmgr_cmd.h"
 #include "mario/mariost.h"
@@ -135,81 +134,29 @@ void _epilog(void) {
 void _unresolved(void) {
 }
 
-f32 fd_mri_negone_one_374[2] __attribute__((aligned(8)));
-f32 fd_mri_neg_one_382;
-f32 fd_mri___local_PI_383;
-f32 fd_mri___local_3PIO2_385;
-f32 fd_mri_one_negone_373[2] __attribute__((aligned(8)));
-f32 fd_mri___local_PIO2_384;
-f32 fd_mri_one_381;
-f32 fd_mri_negone_one_360[2] __attribute__((aligned(8)));
-f32 fd_mri_neg_one_365;
-f32 fd_mri___local_PI_366;
-f32 fd_mri___local_3PIO2_368;
-f32 fd_mri_one_negone_359[2] __attribute__((aligned(8)));
-f32 fd_mri___local_PIO2_367;
-f32 fd_mri_one_364;
-f64 fd_mri__three_localstatic4_sqrtf;
-f64 fd_mri__half_localstatic3_sqrtf;
-EvtWord evt_mri_door_open_pure[95];
-EvtWord evt_mri_door_open[14];
-EvtWord evt_mri_door_close_pure[104];
-EvtWord evt_mri_door_close[10];
-EvtWord evt_mri_door_naname_open_pure[52];
-EvtWord evt_mri_door_naname_open[10];
-EvtWord evt_mri_door_naname_close_pure[61];
-EvtWord evt_mri_door_naname_close[10];
-EvtWord _ueki_anime[64];
-EvtWord mri_ueki_entry[32];
-EvtWord mri_puni_save[6];
+extern EvtWord evt_mri_door_open_pure[];
+extern EvtWord evt_mri_door_open[];
+extern EvtWord evt_mri_door_close_pure[];
+extern EvtWord evt_mri_door_close[];
+extern EvtWord evt_mri_door_naname_open_pure[];
+extern EvtWord evt_mri_door_naname_open[];
+extern EvtWord evt_mri_door_naname_close_pure[];
+extern EvtWord evt_mri_door_naname_close[];
+extern EvtWord _ueki_anime[];
+extern EvtWord mri_ueki_entry[];
+extern EvtWord mri_puni_save[];
 s32 mri_itemsel_table[2];
-EvtWord mri_punipuni_setup[16];
-EvtWord mri_punipuni_itemselect[40];
-EvtWord mri_punipuni_itemset[36];
-EvtWord mri_punipuni_itemremove[29];
-EvtWord mri_hikari_color[66];
-#ifdef VERSION_G8ME01
-EvtWord mri_countdown[176];
-#else
-EvtWord mri_countdown[174];
-#endif
-EvtWord mri_waterfall_effect[26];
-EvtWord mri_guide_hagure_check[50];
-EvtWord mri_guide_goryu[63];
-EvtWord mri_puni_walk_se[20];
-EvtWord mri_puni_jump_se[15];
-
-f32 fd_mri_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
-
-f32 fd_mri_neg_one_382 = -1.0f;
-
-f32 fd_mri___local_PI_383 = 3.1415927f;
-
-f32 fd_mri___local_3PIO2_385 = 4.712389f;
-
-f32 fd_mri_one_negone_373[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
-
-f32 fd_mri___local_PIO2_384 = 1.5707964f;
-
-f32 fd_mri_one_381 = 1.0f;
-
-f32 fd_mri_negone_one_360[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
-
-f32 fd_mri_neg_one_365 = -1.0f;
-
-f32 fd_mri___local_PI_366 = 3.1415927f;
-
-f32 fd_mri___local_3PIO2_368 = 4.712389f;
-
-f32 fd_mri_one_negone_359[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
-
-f32 fd_mri___local_PIO2_367 = 1.5707964f;
-
-f32 fd_mri_one_364 = 1.0f;
-
-f64 fd_mri__three_localstatic4_sqrtf = 3.0;
-
-f64 fd_mri__half_localstatic3_sqrtf = 0.5;
+extern EvtWord mri_punipuni_setup[];
+extern EvtWord mri_punipuni_itemselect[];
+extern EvtWord mri_punipuni_itemset[];
+extern EvtWord mri_punipuni_itemremove[];
+extern EvtWord mri_hikari_color[];
+extern EvtWord mri_countdown[];
+extern EvtWord mri_waterfall_effect[];
+extern EvtWord mri_guide_hagure_check[];
+extern EvtWord mri_guide_goryu[];
+extern EvtWord mri_puni_walk_se[];
+extern EvtWord mri_puni_jump_se[];
 
 EVT_BEGIN(evt_mri_door_open_pure)
     IF_INT_EQUAL(LW(9), 0)

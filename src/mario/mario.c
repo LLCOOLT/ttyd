@@ -17,6 +17,7 @@
 #include "memory.h"
 #include <string.h>
 #include "libc_decls.h"
+#include <math.h>
 
 #ifdef VERSION_G8ME01
 BOOL partyGetAppearPos(PartyEntry* party, Vec* out);
@@ -147,6 +148,13 @@ static inline s32 marioBadgeColor(void) {
 	return 0;
 }
 
+// Mario's automatic talk pose: PAL uses M_I_3
+#ifdef VERSION_G8MP01
+#define MARIO_TALK_POSE "M_I_3"
+#else
+#define MARIO_TALK_POSE "M_I_2"
+#endif
+
 void marioSetCharMode(s32 mode) {
 	MarioWork* wp = mp;
 	u32 matFlag;
@@ -203,7 +211,7 @@ void marioSetCharMode(s32 mode) {
 		animPoseSetMaterialLightFlagOn(wp->paperAnimGroupId[0], lightFlag);
 		animPoseSetMaterialLightFlagOn(wp->paperAnimGroupId[1], lightFlag);
 		animPoseSetMaterialLightFlagOn(wp->paperAnimGroupId[2], lightFlag);
-		npcSetMarioAutoTalkPose("M_S_1", "M_I_2");
+		npcSetMarioAutoTalkPose("M_S_1", MARIO_TALK_POSE);
 		wp->trigFlags |= 0x1000;
 	}
 	else {
@@ -257,7 +265,7 @@ void marioSetFamicomMode(s32 mode) {
 			wp->paperAnimGroupId[0] = animPoseEntry("d_mario", 2);
 			wp->paperAnimGroupId[1] = animPoseEntry(marioAnimeGroupData[mp->colorId][1], 2);
 			wp->characterId = 0;
-			npcSetMarioAutoTalkPose("M_S_1", "M_I_2");
+			npcSetMarioAutoTalkPose("M_S_1", MARIO_TALK_POSE);
 			wp->animName = NULL;
 			marioChgPose("M_S_1");
 		}
@@ -278,7 +286,7 @@ void marioSetFamicomMode(s32 mode) {
 			wp->paperAnimGroupId[0] = animPoseEntry(marioAnimeGroupData[mp->colorId][0], 2);
 			wp->paperAnimGroupId[1] = animPoseEntry(marioAnimeGroupData[mp->colorId][1], 2);
 			wp->characterId = 0;
-			npcSetMarioAutoTalkPose("M_S_1", "M_I_2");
+			npcSetMarioAutoTalkPose("M_S_1", MARIO_TALK_POSE);
 			wp->animName = NULL;
 			marioChgPose("M_S_1");
 		}
@@ -808,7 +816,7 @@ void marioInit(void) {
 	marioResetCamShift();
 	marioResetCamShiftRate();
 	marioResetCamFollowRate();
-	if (!((s32 (*)(s32))pouchCheckItem)(9)) {
+	if (!pouchCheckItem(9)) {
 		pouchGetItem(9);
 	}
 	partyInit();
@@ -937,7 +945,7 @@ void marioReInit(void) {
 	marioResetCamShift();
 	marioResetCamShiftRate();
 	marioResetCamFollowRate();
-	if (!((s32 (*)(s32))pouchCheckItem)(9)) {
+	if (!pouchCheckItem(9)) {
 		pouchGetItem(9);
 	}
 	wp->returnPos = (Vec){0.0f, -10000.0f, 0.0f};
@@ -974,7 +982,7 @@ static inline void marioMainBlur(MarioWork* wp) {
 static inline void marioMainEnd(MarioWork* wp) {
 	wp->prevAirTimer = wp->airTimer;
 	wp->prevHitobjStandOn = wp->hitobjStandOn;
-	if (((s32 (*)(void))pouchGetHP)() <= 0) {
+	if (pouchGetHP() <= 0) {
 		seqSetSeq(SEQ_GAME_OVER, NULL, NULL);
 	}
 	wp->basePos = wp->position;
@@ -1347,9 +1355,6 @@ void marioMove(void) {
 	}
 }
 
-static inline s32 mm_fpclassifyf(f32 x) { switch (*(s32*)&x & 0x7F800000) { case 0x7F800000: if (*(s32*)&x & 0x007FFFFF) { return 1; } else { return 2; } break; case 0: if (*(s32*)&x & 0x007FFFFF) { return 5; } else { return 3; } break; default: return 4; } }
-static inline f32 mm_sqrtf(f32 x) { if (x > 0.0f) { f64 guess = __frsqrte(x); guess = 0.5 * guess * (3.0 - guess * guess * x); guess = 0.5 * guess * (3.0 - guess * guess * x); guess = 0.5 * guess * (3.0 - guess * guess * x); return x * guess; } else if (x < 0.0) { return *(f32*)__float_nan; } else if (mm_fpclassifyf(x) == 1) { return *(f32*)__float_nan; } return x; }
-
 void marioMoveMain(void) {
 	MarioWork* wp = mp;
 	PartyEntry* party;
@@ -1473,7 +1478,7 @@ void marioMoveMain(void) {
 	vz2 += wp->floorMove.z;
 	vy = 0.0f;
 	wp->position.y += vy + wp->floorMove.y;
-	dist = mm_sqrtf(vx * vx + vz2 * vz2);
+	dist = sqrtf(vx * vx + vz2 * vz2);
 	if (dist != vy) {
 		spd = angleABf(0.0f, 0.0f, vx, vz2);
 	}
@@ -2372,6 +2377,11 @@ const char* toRearPose(const char* name) { //1:1
 		else if (!strcmp(name, "M_I_2")) {
 			rear = "M_I_2R";
 		}
+#ifdef VERSION_G8MP01
+		else if (!strcmp(name, "M_I_3")) {
+			rear = "M_I_3R";
+		}
+#endif
 		else if (!strcmp(name, "M_U_2")) {
 			rear = "M_U_2R";
 		}
@@ -2511,6 +2521,11 @@ const char* toFrontPose(const char* name) { //1:1
 		else if (!strcmp(name, "M_I_2R")) {
 			front = "M_I_2";
 		}
+#ifdef VERSION_G8MP01
+		else if (!strcmp(name, "M_I_3R")) {
+			front = "M_I_3";
+		}
+#endif
 		else if (!strcmp(name, "M_U_2R")) {
 			front = "M_U_2";
 		}

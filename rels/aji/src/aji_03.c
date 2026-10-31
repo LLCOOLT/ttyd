@@ -3,7 +3,6 @@
 #include "evt/evt_cmd.h"
 #include "manager/evtmgr_cmd.h"
 
-#pragma force_active on
 #include "driver/dispdrv.h"
 #include "driver/camdrv.h"
 #include "driver/icondrv.h"
@@ -63,78 +62,31 @@ USER_FUNC(item_chk);
 void icon_disp(CameraId camera, void* param);
 USER_FUNC(evt_itemNameToItemID);
 
-f32 fd_aji_03_negone_one_374[2] __attribute__((aligned(8)));
-f32 fd_aji_03_neg_one_382;
-f32 fd_aji_03___local_PI_383;
-f32 fd_aji_03___local_3PIO2_385;
-f32 fd_aji_03_one_negone_373[2] __attribute__((aligned(8)));
-f32 fd_aji_03___local_PIO2_384;
-f32 fd_aji_03_one_381;
-f32 fd_aji_03_negone_one_360[2] __attribute__((aligned(8)));
-f32 fd_aji_03_neg_one_365;
-f32 fd_aji_03___local_PI_366;
-f32 fd_aji_03___local_3PIO2_368;
-f32 fd_aji_03_one_negone_359[2] __attribute__((aligned(8)));
-f32 fd_aji_03___local_PIO2_367;
-f32 fd_aji_03_one_364;
-static EvtWord e_door_close[22];
-static EvtWord e_door_open[22];
 static BeroEntry bero_entry_data[2];
-EvtWord evt_kaitentou[44];
-EvtWord evt_kaitentou2[44];
-static EvtWord evt_hari[125];
-EvtWord ufo_hand[129];
-EvtWord move_left[5];
-EvtWord move_left2[5];
-EvtWord move_up[5];
-EvtWord move_up2[5];
-EvtWord hand_success[65];
-EvtWord hand_fail[128];
-EvtWord hand_release[65];
-EvtWord ufo_main[525];
-EvtWord evt_ufo_init[115];
-EvtWord evt_zenmai[141];
-EvtWord blink_sw[33];
-EvtWord evt_ufo_sousaban[VERSION_PICK(267, 279)];
-static EvtWord evt_sw[141];
-EvtWord evt_sw_reinit[88];
-EvtWord evt_sw0[72];
-EvtWord evt_sw1[72];
-EvtWord evt_sw2[72];
+extern EvtWord evt_kaitentou[];
+extern EvtWord evt_kaitentou2[];
+extern EvtWord ufo_hand[];
+extern EvtWord move_left[];
+extern EvtWord move_left2[];
+extern EvtWord move_up[];
+extern EvtWord move_up2[];
+extern EvtWord hand_success[];
+extern EvtWord hand_fail[];
+extern EvtWord hand_release[];
+extern EvtWord ufo_main[];
+extern EvtWord evt_ufo_init[];
+extern EvtWord evt_zenmai[];
+extern EvtWord blink_sw[];
+extern EvtWord evt_ufo_sousaban[];
+extern EvtWord evt_sw_reinit[];
+extern EvtWord evt_sw0[];
+extern EvtWord evt_sw1[];
+extern EvtWord evt_sw2[];
 s32 haguruma_tbl[2];
-static EvtWord evt_haguruma[132];
-EvtWord badge_evt[5];
-EvtWord badge_evt2[5];
-EvtWord badge_evt3[5];
-EvtWord aji_03_init_evt[525];
-
-f32 fd_aji_03_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
-
-f32 fd_aji_03_neg_one_382 = -1.0f;
-
-f32 fd_aji_03___local_PI_383 = 3.1415927f;
-
-f32 fd_aji_03___local_3PIO2_385 = 4.712389f;
-
-f32 fd_aji_03_one_negone_373[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
-
-f32 fd_aji_03___local_PIO2_384 = 1.5707964f;
-
-f32 fd_aji_03_one_381 = 1.0f;
-
-f32 fd_aji_03_negone_one_360[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
-
-f32 fd_aji_03_neg_one_365 = -1.0f;
-
-f32 fd_aji_03___local_PI_366 = 3.1415927f;
-
-f32 fd_aji_03___local_3PIO2_368 = 4.712389f;
-
-f32 fd_aji_03_one_negone_359[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
-
-f32 fd_aji_03___local_PIO2_367 = 1.5707964f;
-
-f32 fd_aji_03_one_364 = 1.0f;
+extern EvtWord badge_evt[];
+extern EvtWord badge_evt2[];
+extern EvtWord badge_evt3[];
+extern EvtWord aji_03_init_evt[];
 
 static EVT_BEGIN(e_door_close)
     MULTIPLY_FLOAT(LW(0), FLOAT(-0.25f))
@@ -1282,7 +1234,7 @@ USER_FUNC(item_chk) {
     ItemEntry* item;
 
     for (i = 0; i < 32; i++) {
-        sprintf(name, "keihin%02d\0", i);
+        sprintf(name, "keihin%02d", i);
         item = itemNameToPtr(name);
         if (item != NULL) {
             f32 dist = distABf(item->position.x, item->position.z, x, z);

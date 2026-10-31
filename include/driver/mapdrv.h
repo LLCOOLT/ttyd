@@ -36,7 +36,7 @@ typedef struct MapVtxRec {
     s16 pos;     // 0x0
     s16 nrm;     // 0x2
     s16 clr;     // 0x4
-    s16 unk6;    // 0x6
+    s16 clr1;    // 0x6, second color index (never read)
     s16 tex[8];  // 0x8
 } MapVtxRec;
 
@@ -139,8 +139,8 @@ typedef struct MapFileJoint {
 typedef struct MapFileHeader {
     s32 fileSize;     // 0x0
     s32 dataSize;     // 0x4
-    s32 relCount;     // 0x8, TODO: rename?
-    s32 chunkCount;   // 0xC, TODO: rename?
+    s32 relCount;     // 0x8
+    s32 chunkCount;   // 0xC
     s32 unused;       // 0x10
     u8 reserved[0xC]; // 0x14
 } MapFileHeader;
@@ -194,7 +194,7 @@ typedef struct MapObject {
 
 typedef struct MapError {
     char name[32]; // 0x0, map object name that was not found
-    s32 type;      // 0x20, mapErrorEntry arg0 (0 for missing objects)
+    s32 type;      // 0x20, mapErrorEntry type (0 for missing objects)
 } MapError;
 
 // "animation_table" entry in map.dat (SPM MapFileAnimData)
@@ -301,8 +301,8 @@ typedef struct MapEntry {
     struct HitEntry* rootHitObj;     // 0xAC
     Vec bbox[8];                   // 0xB0
     void* tevCallbacks[16];        // 0x110
-    s32 numJoints;                 // 0x150, TODO: rename? see: hitNumJoints
-    MapObject* objects;            // 0x154, TODO: rename? see: hitNumJoints
+    s32 numJoints;                 // 0x150, one MapObject per joint
+    MapObject* objects;            // 0x154, numJoints entries
     s32 hitNumJoints;              // 0x158
     struct HitEntry* hitEntries;     // 0x15C
     s32 numAnims;                  // 0x160
@@ -322,7 +322,7 @@ typedef struct MapWork {
 // tpl ARAM copy of a map entry: stored in the word after it (the next entry's count slot, or lastTplAram)
 #define MAPENT_TPLARAM(entry) ((entry) + 1)->prevTplAram
 
-void mapErrorEntry(s32 arg0, const char* arg1);
+void mapErrorEntry(s32 type, const char* name);
 const char* getMapDataDvdRoot(void);
 void N_mapDispOff(void);
 void N_mapDispOn(void);
@@ -368,3 +368,5 @@ void mapGrpFlagOn(const char* name, u32 flags);
 
 extern const GXCullMode culling[4];
 extern s32 fog_type[5];
+
+void mapGrpFlagOff(const char* name, u32 flags);

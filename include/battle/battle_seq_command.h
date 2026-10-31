@@ -7,7 +7,7 @@ struct BattleWeapon;
 typedef struct BattleCommandCursor {
     s32 absPos; // 0x0, absolute cursor index
     s32 relPos; // 0x4, first visible row
-    s32 count;  // 0x8, number of options
+    int count;  // 0x8, number of options
 } BattleCursor;
 
 typedef struct BattleCommandAct {

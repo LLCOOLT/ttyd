@@ -4,7 +4,6 @@
 #include "battle/battle_unit.h"
 #include "evt/evt_cmd.h"
 
-#pragma force_active on
 #include "battle/battle.h"
 #include "battle/battle_sub.h"
 #include "battle/battle_unit.h"
@@ -28,11 +27,11 @@
 USER_FUNC(btlevtcmd_WaitEventEnd);
 #endif
 
-typedef struct HandElem { u16 flip; u8 field_0x2[2]; s32 animIdx; OSTime time; s16 ofs; s16 phase; f32 speed; Vec pos; s32 field_0x24; } HandElem;
+typedef struct HandElem { u16 flip; u8 pad_2[2]; s32 animIdx; OSTime time; s16 ofs; s16 phase; f32 speed; Vec pos; s32 poseId; } HandElem; /* poseId: never accessed */
 typedef struct HandAnim { char name[16]; char anim[8]; f32 rate; s32 start; s32 count; } HandAnim;
-typedef struct HandWork { HandElem* elems; s32 num; HandAnim anim[32]; u8 field_0x488[0x49C - 0x488]; f32 y; u8 field_0x4a0[4]; s32 animNum; s32 timer; s32 state; } HandWork;
+typedef struct HandWork { HandElem* elems; s32 num; HandAnim anim[32]; u8 groupPos[0x49C - 0x488]; f32 y; u8 ySpeed[4]; s32 animNum; s32 timer; s32 state; } HandWork; /* groupPos/ySpeed: never accessed */
 typedef struct HandData { const char* name; const char* anim; f32 rate; } HandData;
-typedef struct QueenConnect { s32 poseId[3]; u8 field_0xc[0x40 - 0xC]; s32 idx[2]; } QueenConnect;
+typedef struct QueenConnect { s32 poseId[3]; u8 locatorWork[0x40 - 0xC]; s32 idx[2]; } QueenConnect; /* locatorWork: never accessed */
 HandData hand_data[32];
 HandWork* hand_wp;
 s32 psndSFXOn_3D(const char* name, Vec* position);
@@ -42,7 +41,7 @@ void BattleAudienceAddTargetNum(f32 a, f32 b);
 u8* lightGetPaperCraft(void);
 EffectEntry* effShockN64Entry(s32 type, f32 x, f32 y, f32 z, f32 a, f32 b);
 EffectEntry* effPokopiThunderN64Entry(s32 type, s32 lifetime, f32 x, f32 y, f32 z, f32 tx, f32 ty, f32 tz, f32 scale);
-EffectEntry* effStardust2N64Entry(s32 type, s32 arg1, s32 arg2, f32 x, f32 y, f32 z, f32 arg6, f32 arg7);
+EffectEntry* effStardust2N64Entry(s32 type, s32 count, s32 camera, f32 x, f32 y, f32 z, f32 vx, f32 vy);
 void btl_camera_shake_w(s32 a, s32 b, s32 c, f32 d, f32 e);
 void BtlUnit_SetAnim(BattleUnitPart* part, const char* anim);
 double cos(double);
@@ -180,20 +179,6 @@ static void hand_init(void);
 static void pose_main(void);
 static void pose_init(void);
 
-f32 fd_boss_black_peach_negone_one_374[2] __attribute__((aligned(8)));
-f32 fd_boss_black_peach_neg_one_382;
-f32 fd_boss_black_peach___local_PI_383;
-f32 fd_boss_black_peach___local_3PIO2_385;
-f32 fd_boss_black_peach_one_negone_373[2] __attribute__((aligned(8)));
-f32 fd_boss_black_peach___local_PIO2_384;
-f32 fd_boss_black_peach_one_381;
-f32 fd_boss_black_peach_negone_one_360[2] __attribute__((aligned(8)));
-f32 fd_boss_black_peach_neg_one_365;
-f32 fd_boss_black_peach___local_PI_366;
-f32 fd_boss_black_peach___local_3PIO2_368;
-f32 fd_boss_black_peach_one_negone_359[2] __attribute__((aligned(8)));
-f32 fd_boss_black_peach___local_PIO2_367;
-f32 fd_boss_black_peach_one_364;
 BattleUnitKind unit_boss_black_peach;
 BattleUnitDefense peach_defence;
 BattleUnitDefenseAttr peach_defence_attr;
@@ -225,7 +210,7 @@ PoseTableEntry queen_hand_pose_table[4];
 BattleDataEntry queen_data_table[2];
 BattleUnitKindPart queen_parts[5];
 f32 hair_offset[36];
-EvtWord shadow_queen_1000[25];
+extern EvtWord shadow_queen_1000[];
 BattleUnitKind unit_boss_shadow_hand_1;
 BattleUnitDefense queen_hand_1_defence;
 BattleUnitDefenseAttr queen_hand_1_defence_attr;
@@ -251,92 +236,64 @@ BattleUnitSetup entry_shadow_queen;
 BattleUnitSetup entry_shadow_hand_1;
 BattleUnitSetup entry_shadow_hand_2;
 BattleUnitSetup entry_shadow_hand_small;
-EvtWord peach_init_event[170];
-EvtWord peach_entry_event[62];
-EvtWord peach_damage_event[17];
-EvtWord peach_change_evt[556];
-EvtWord peach_phase_event[46];
-EvtWord peach_dead_event[11];
-EvtWord peack_attack_black_thunder[147];
-EvtWord peack_attack_black_energy[125];
-EvtWord peack_attack_dark_drag[525];
-EvtWord peack_attack_drain[526];
-EvtWord peach_attack_event[85];
-EvtWord peach_wait_event[6];
-EvtWord queen_init_event[225];
-EvtWord queen_first_attack_message_evt[55];
-EvtWord queen_next_attack_message_evt[55];
-EvtWord queen_last_attack_message_evt[56];
-EvtWord queen_change_hand_small_evt[75];
-EvtWord queen_change_hand_big_evt[90];
-EvtWord queen_hand_big_life_check_evt[75];
-EvtWord queen_hand_small_life_check_evt[40];
-EvtWord queen_hp_drain_evt[316];
-EvtWord queen_hp_drain_evt_miss[41];
-EvtWord queen_first_damage_evt[74];
-EvtWord queen_2_hp_msg_evt[39];
-EvtWord queen_4_hp_msg_evt[39];
-EvtWord queen_dead_hp_msg_evt[88];
-EvtWord queen_phase_event[208];
-EvtWord queen_attack_black_thunder[197];
-EvtWord queen_attack_charge[166];
-EvtWord queen_attack_black_wave[445];
-EvtWord queen_attack_black_energy[164];
-EvtWord queen_attack_bress1[276];
-EvtWord queen_attack_bress2[276];
-EvtWord queen_attack_bress3[278];
-EvtWord queen_attack_event[163];
-EvtWord queen_damage_event[63];
-EvtWord queen_dead_event[347];
-EvtWord queen_wait_event[10];
-EvtWord queen_entry_event[62];
-EvtWord queen_hand_1_init_event[107];
-EvtWord queen_hand_1_press_attack[343];
-EvtWord queen_hand_1_drain_attack[408];
-EvtWord queen_hand_1_attack_event[41];
-EvtWord queen_hand_1_damage_event[24];
-EvtWord queen_hand_1_dead_event[41];
-EvtWord queen_hand_1_wait_event[6];
-EvtWord queen_hand_2_init_event[113];
-EvtWord queen_hand_2_attack_event[41];
-EvtWord queen_hand_2_damage_event[24];
-EvtWord queen_hand_2_dead_event[41];
-EvtWord queen_hand_2_wait_event[6];
-EvtWord queen_hand_small_init_event[96];
-EvtWord queen_hand_small_drag_attack[385];
-EvtWord queen_hand_small_1000hand_attack[VERSION_PICK(266, 274)];
-EvtWord queen_hand_small_attack_event[35];
-EvtWord queen_hand_small_damage_event[48];
-EvtWord queen_hand_small_dead_event[32];
-EvtWord queen_hand_small_wait_event[6];
-
-f32 fd_boss_black_peach_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
-
-f32 fd_boss_black_peach_neg_one_382 = -1.0f;
-
-f32 fd_boss_black_peach___local_PI_383 = 3.1415927f;
-
-f32 fd_boss_black_peach___local_3PIO2_385 = 4.712389f;
-
-f32 fd_boss_black_peach_one_negone_373[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
-
-f32 fd_boss_black_peach___local_PIO2_384 = 1.5707964f;
-
-f32 fd_boss_black_peach_one_381 = 1.0f;
-
-f32 fd_boss_black_peach_negone_one_360[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
-
-f32 fd_boss_black_peach_neg_one_365 = -1.0f;
-
-f32 fd_boss_black_peach___local_PI_366 = 3.1415927f;
-
-f32 fd_boss_black_peach___local_3PIO2_368 = 4.712389f;
-
-f32 fd_boss_black_peach_one_negone_359[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
-
-f32 fd_boss_black_peach___local_PIO2_367 = 1.5707964f;
-
-f32 fd_boss_black_peach_one_364 = 1.0f;
+extern EvtWord peach_init_event[];
+extern EvtWord peach_entry_event[];
+extern EvtWord peach_damage_event[];
+extern EvtWord peach_change_evt[];
+extern EvtWord peach_phase_event[];
+extern EvtWord peach_dead_event[];
+extern EvtWord peack_attack_black_thunder[];
+extern EvtWord peack_attack_black_energy[];
+extern EvtWord peack_attack_dark_drag[];
+extern EvtWord peack_attack_drain[];
+extern EvtWord peach_attack_event[];
+extern EvtWord peach_wait_event[];
+extern EvtWord queen_init_event[];
+extern EvtWord queen_first_attack_message_evt[];
+extern EvtWord queen_next_attack_message_evt[];
+extern EvtWord queen_last_attack_message_evt[];
+extern EvtWord queen_change_hand_small_evt[];
+extern EvtWord queen_change_hand_big_evt[];
+extern EvtWord queen_hand_big_life_check_evt[];
+extern EvtWord queen_hand_small_life_check_evt[];
+extern EvtWord queen_hp_drain_evt[];
+extern EvtWord queen_hp_drain_evt_miss[];
+extern EvtWord queen_first_damage_evt[];
+extern EvtWord queen_2_hp_msg_evt[];
+extern EvtWord queen_4_hp_msg_evt[];
+extern EvtWord queen_dead_hp_msg_evt[];
+extern EvtWord queen_phase_event[];
+extern EvtWord queen_attack_black_thunder[];
+extern EvtWord queen_attack_charge[];
+extern EvtWord queen_attack_black_wave[];
+extern EvtWord queen_attack_black_energy[];
+extern EvtWord queen_attack_bress1[];
+extern EvtWord queen_attack_bress2[];
+extern EvtWord queen_attack_bress3[];
+extern EvtWord queen_attack_event[];
+extern EvtWord queen_damage_event[];
+extern EvtWord queen_dead_event[];
+extern EvtWord queen_wait_event[];
+extern EvtWord queen_entry_event[];
+extern EvtWord queen_hand_1_init_event[];
+extern EvtWord queen_hand_1_press_attack[];
+extern EvtWord queen_hand_1_drain_attack[];
+extern EvtWord queen_hand_1_attack_event[];
+extern EvtWord queen_hand_1_damage_event[];
+extern EvtWord queen_hand_1_dead_event[];
+extern EvtWord queen_hand_1_wait_event[];
+extern EvtWord queen_hand_2_init_event[];
+extern EvtWord queen_hand_2_attack_event[];
+extern EvtWord queen_hand_2_damage_event[];
+extern EvtWord queen_hand_2_dead_event[];
+extern EvtWord queen_hand_2_wait_event[];
+extern EvtWord queen_hand_small_init_event[];
+extern EvtWord queen_hand_small_drag_attack[];
+extern EvtWord queen_hand_small_1000hand_attack[];
+extern EvtWord queen_hand_small_attack_event[];
+extern EvtWord queen_hand_small_damage_event[];
+extern EvtWord queen_hand_small_dead_event[];
+extern EvtWord queen_hand_small_wait_event[];
 
 BattleUnitKind unit_boss_black_peach = {
     148,
@@ -4005,7 +3962,11 @@ EVT_BEGIN(queen_hand_small_drag_attack)
     CALL(evt_btl_camera_set_zoom, 0, 200)
     CALL(btlevtcmd_GetPos, LW(3), LW(0), LW(1), LW(2))
     CALL(evt_snd_sfxon_3d, STRING("SFX_BOSS_QWENH_HAND_APPEAR1"), LW(0), LW(1), LW(2), 0)
+#ifdef VERSION_G8MP01
+    BEGIN_INLINE_EVENT_GET_ID(LW(15))
+#else
     BEGIN_INLINE_EVENT
+#endif
         CALL(queen_hand_small_drag_1_evt)
     END_INLINE_EVENT
     CALL(evt_eff, STRING("m_h_s1_"), STRING("mist2"), 0, -100, 15, 0, 100, 0, -1, 0, 0, 0, 0, 0)
@@ -4072,6 +4033,11 @@ EVT_BEGIN(queen_hand_small_drag_attack)
     CALL(evt_eff, STRING("m_h_s2"), STRING("mist2"), 0, 100, 15, 0, 150, 0, -1, 0, 0, 0, 0, 0)
     CALL(evt_eff, STRING("m_h_s3"), STRING("mist2"), 0, 100, 15, 0, 150, 0, -1, 0, 0, 0, 0, 0)
     CALL(evt_snd_sfxon, STRING("SFX_BOSS_QWEN_HAND_APPEAR1_2"), 0)
+#ifdef VERSION_G8MP01
+    IF_INT_NOT_EQUAL(LW(15), 0)
+        CALL(btlevtcmd_WaitEventEnd, LW(15))
+    END_IF
+#endif
     CALL(queen_hand_small_drag_3_evt)
     RETURN
 EVT_END()

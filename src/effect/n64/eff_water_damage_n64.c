@@ -21,23 +21,15 @@ typedef struct EffWaterDamageN64Work {
     f32 velZ;     // 0x18
     s32 lifetime; // 0x1C
     s32 frame;    // 0x20
-    s32 unk24;    // 0x24
-    s32 unk28;    // 0x28
-    s32 unk2C;    // 0x2C
+    s32 r;        // 0x24, color set at entry; never read
+    s32 g;        // 0x28
+    s32 b;        // 0x2C
     s32 alpha;    // 0x30
     f32 scale;    // 0x34
     s32 variant;  // 0x38
 } EffWaterDamageN64Work;
 
 #ifdef __MWERKS__
-static __declspec(section ".data") f32 negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
-__declspec(section ".data") f32 eff_water_damage_n64_negone_one_a[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
-static __declspec(section ".data") f32 one_negone_373[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
-__declspec(section ".data") f32 eff_water_damage_n64_one_negone_a[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
-static __declspec(section ".data") f32 negone_one_360[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
-__declspec(section ".data") f32 eff_water_damage_n64_negone_one_b[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
-static __declspec(section ".data") f32 one_negone_359[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
-__declspec(section ".data") f32 eff_water_damage_n64_one_negone_b[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
 #endif
 
 effN64Vtx size8x8_tex16x16_0_vtx[] = {
@@ -102,7 +94,7 @@ EffectEntry* effWaterDamageN64Entry(s32 type, s32 lifetime, f32 x, f32 y, f32 z,
         count = 11;
         break;
     }
-    effect->type = "WaterDamageN64\0";
+    effect->type = "WaterDamageN64";
     effect->count = count;
     work = __memAlloc(HEAP_EFFECT, count * sizeof(EffWaterDamageN64Work));
     effect->userdata = work;
@@ -120,9 +112,9 @@ EffectEntry* effWaterDamageN64Entry(s32 type, s32 lifetime, f32 x, f32 y, f32 z,
     work->position.y = y;
     work->position.z = z;
     work->scale = scale;
-    work->unk24 = 70;
-    work->unk28 = 180;
-    work->unk2C = 255;
+    work->r = 70;
+    work->g = 180;
+    work->b = 255;
     work->variant = variant;
     p = work + 1;
     for (i = 1, j = 3; i < effect->count; j += 3, i++, p++) {
@@ -328,7 +320,7 @@ void effWaterDamageDisp(CameraId cameraId, EffectEntry* effect) {
             break;
         }
         GXBegin(GX_TRIANGLES, GX_VTXFMT0, 6);
-        ((void (*)())tri2)(0, 1, 2, 0, 0, 2, 3, 0);
+        tri2(0, 1, 2, 0, 0, 2, 3, 0);
     }
 }
 
@@ -397,6 +389,6 @@ void effWaterDamageDisp2(CameraId cameraId, EffectEntry* effect) {
             break;
         }
         GXBegin(GX_TRIANGLES, GX_VTXFMT0, 6);
-        ((void (*)())tri2)(0, 1, 2, 0, 0, 2, 3, 0);
+        tri2(0, 1, 2, 0, 0, 2, 3, 0);
     }
 }

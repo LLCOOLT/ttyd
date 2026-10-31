@@ -11,7 +11,6 @@
 double sqrt(double);
 #pragma dont_inline on
 #pragma optimize_for_size on
-#pragma fp_contract on
 
 void btl_camera_nomove_x_onoff(s32 pri, s32 on);
 void btl_camera_nomove_y_onoff(s32 pri, s32 on);
@@ -106,16 +105,16 @@ void battleCameraMain(void) {
   switch (wp->cameraWork.mode) {
   case 0:
     battleCameraMoveTo(1, 1, 0.0f, 110.0f, 750.0f, 0.0f, 60.0f, 0.0f, &dX, &dY, &dZ, &dAtX, &dAtY, &dAtZ);
-    strcpy(name, "\202\251\202\337\202\347\201\100\202\305\202\323\202\247\202\351\202\306");
+    strcpy(name, "かめら　でふぉると");
     break;
   case 1:
     zz = 0.5f * wp->cameraWork.zoom;
     battleCameraMoveTo(1, 1, 0.0f, 110.0f, 750.0f - zz, 0.0f, 60.0f, -zz, &dX, &dY, &dZ, &dAtX, &dAtY, &dAtZ);
-    strcpy(name, "\202\251\202\337\202\347\201\100\202\305\202\323\202\247\202\351\202\306\203\131\201\133\203\200");
+    strcpy(name, "かめら　でふぉるとズーム");
     break;
   case 2:
     battleCameraMoveTo(1, 1, 0.0f, 160.0f, 750.0f, 0.0f, 110.0f, 0.0f, &dX, &dY, &dZ, &dAtX, &dAtY, &dAtZ);
-    strcpy(name, "\202\251\202\337\202\347\201\100\202\251\201\133\202\273\202\351\202\252\202\244\202\246\202\311");
+    strcpy(name, "かめら　かーそるがうえに");
   case 3:
     if (wp->cameraWork.moveToTimer > 0) {
       moveLv3 = wp->cameraWork.moveSpeedLv;
@@ -131,15 +130,15 @@ void battleCameraMain(void) {
       battleCameraMoveTo(0, 0, pos.x, pos.y, pos.z, atX, atY, atZ, &dX, &dY, &dZ, &dAtX, &dAtY, &dAtZ);
       wp->cameraWork.moveSpeedLv = moveLv3;
     }
-    strcpy(name, "\202\251\202\337\202\347\201\100\202\323\202\350\201\133");
+    strcpy(name, "かめら　ふりー");
     break;
   case 4:
     battleCameraMoveTo(1, 1, 0.0f, 110.0f, -750.0f, 0.0f, 60.0f, 0.0f, &dX, &dY, &dZ, &dAtX, &dAtY, &dAtZ);
-    strcpy(name, "\202\251\202\337\202\347\201\100\202\324\202\275\202\242\202\244\202\347");
+    strcpy(name, "かめら　ぶたいうら");
     break;
   case 5:
     battleCameraMoveTo(1, 1, 0.0f, 400.0f, -617.0f, 0.0f, 60.0f, 0.0f, &dX, &dY, &dZ, &dAtX, &dAtY, &dAtZ);
-    strcpy(name, "\202\251\202\337\202\347\201\100\202\324\202\275\202\242\202\244\202\347\202\121");
+    strcpy(name, "かめら　ぶたいうら２");
     break;
   case 6:
     switch (pouchGetPtr()->rank) {
@@ -157,7 +156,7 @@ void battleCameraMain(void) {
       break;
     }
     battleCameraMoveTo(1, 1, 0.0f, 110.0f, zoomZ, 0.0f, 60.0f, 0.0f, &dX, &dY, &dZ, &dAtX, &dAtY, &dAtZ);
-    strcpy(name, "\202\251\202\337\202\347\201\100\202\251\202\361\202\253\202\341\202\255");
+    strcpy(name, "かめら　かんきゃく");
     break;
   case 7:
     unit2 = (0, BattleGetUnitPtr(wp, wp->cameraWork.unitId)); // FAKE: comma makes this unit2 web a compiler temp coloured early (target r28)
@@ -185,7 +184,7 @@ void battleCameraMain(void) {
       t = 0.0f;
     }
     battleCameraMoveTo(1, 1, pos.x, 110.0f + t + ofs, 750.0f - zz, pos.x, 60.0f + t + ofs, -zz, &dX, &dY, &dZ, &dAtX, &dAtY, &dAtZ);
-    strcpy(name, "\202\251\202\337\202\347\201\100\202\344\202\311\202\301\202\306\202\302\202\242\202\321");
+    strcpy(name, "かめら　ゆにっとついび");
     break;
   case 8: {f32 w, w2, d, ofs, t, zz, yy, atX, y;
     unit = BattleGetUnitPtr(wp, wp->cameraWork.unitId);
@@ -232,7 +231,7 @@ void battleCameraMain(void) {
     }
     y = 20.0 * -(1.0 - t) + yy;
     battleCameraMoveTo(1, 1, atX, 110.0f + y + zz, 750.0f - ofs, atX, 60.0f + y + zz, -ofs, &dX, &dY, &dZ, &dAtX, &dAtY, &dAtZ);
-    strcpy(name, "\202\251\202\337\202\347\201\100\202\121\202\344\202\311\202\301\202\306\202\251\202\361\202\302\202\242\202\321");
+    strcpy(name, "かめら　２ゆにっとかんついび");
     break;
   }
   case 9:
@@ -263,7 +262,7 @@ void battleCameraMain(void) {
     }
     atY = 0.5f * (pos.x + hit.x);
     battleCameraMoveTo(1, 1, atY, 110.0f + atX + ofs, 750.0f - zz, atY, 60.0f + atX + ofs, -zz, &dX, &dY, &dZ, &dAtX, &dAtY, &dAtZ);
-    strcpy(name, "\202\251\202\337\202\347\201\100\202\344\202\311\202\301\202\306\202\302\202\242\202\321");
+    strcpy(name, "かめら　ゆにっとついび");
     break;
   case 10:
     unit = BattleGetUnitPtr(wp, wp->cameraWork.unitId);
@@ -295,7 +294,7 @@ void battleCameraMain(void) {
       y = 0.0f;
     }
     battleCameraMoveTo(1, 1, pos.x, 110.0f + y + ofs, 750.0f - zz, pos.x, 60.0f + y + ofs, -zz, &dX, &dY, &dZ, &dAtX, &dAtY, &dAtZ);
-    strcpy(name, "\202\251\202\337\202\347\201\100\202\317\201\133\202\302\202\302\202\242\202\321");
+    strcpy(name, "かめら　ぱーつついび");
     break;
   case 11: {f32 w, w2, t, zz, yy, d, ofs, y, atX;
     unit = BattleGetUnitPtr(wp, wp->cameraWork.unitId);
@@ -344,7 +343,7 @@ void battleCameraMain(void) {
     }
     y = 20.0 * -(1.0 - t) + yy;
     battleCameraMoveTo(1, 1, atX, 110.0f + y + ofs, 750.0f - zz, atX, 60.0f + y + ofs, -zz, &dX, &dY, &dZ, &dAtX, &dAtY, &dAtZ);
-    strcpy(name, "\202\251\202\337\202\347\201\100\202\121\202\317\201\133\202\302\202\251\202\361\202\302\202\242\202\321");
+    strcpy(name, "かめら　２ぱーつかんついび");
     break;
   }
   case 12:
@@ -352,7 +351,7 @@ void battleCameraMain(void) {
       BattleAudienceMember* m = &aud->members[wp->cameraWork.audienceId];
       battleCameraMoveTo(1, 0, m->position.x, 200.0f, 400.0f + m->position.z, m->position.x, 0.0f, m->position.z, &dX, &dY, &dZ, &dAtX, &dAtY, &dAtZ);
     }
-    strcpy(name, "\202\251\202\337\202\347\201\100\202\251\202\361\202\253\202\341\202\255\202\302\202\242\202\321");
+    strcpy(name, "かめら　かんきゃくついび");
     break;
   case 13:
     unit = BattleGetUnitPtr(wp, wp->cameraWork.unitId);
@@ -365,7 +364,6 @@ void battleCameraMain(void) {
       break;
     }
     wp->cameraWork.audienceId = 10;
-    aud->mAudienceDeltaMultiplier = aud->mAudienceDeltaMultiplier; // FAKE: no code; keeps aud live into case 13 (target unit r27)
     d = wp->cameraWork.homingOffset2.x - wp->cameraWork.homingOffset.x;
     BtlUnit_GetPos(unit, &pos.x, &pos.y, &pos.z);
     ofs = wp->cameraWork.homingOffset2.x - pos.x;
@@ -393,7 +391,7 @@ void battleCameraMain(void) {
     zz = (1.0f - t) * d;
     y = -(1.0 - t) * (125.0f - ofs);
     battleCameraMoveTo(1, 1, atX, 110.0f + y, 750.0f - zz, atX, 60.0f + y, -zz, &dX, &dY, &dZ, &dAtX, &dAtY, &dAtZ);
-    strcpy(name, "\202\251\202\337\202\347\201\100\202\344\202\311\202\301\202\306\202\251\202\361\202\253\202\341\202\255\202\251\202\361\202\302\202\242\202\321");
+    strcpy(name, "かめら　ゆにっとかんきゃくかんついび");
     break;
   case 14:
     wp->cameraWork.modeFrame++;
@@ -421,27 +419,27 @@ void battleCameraMain(void) {
       btl_camera_set_mode(0, 3);
       btl_camera_set_moveto(0, 0.0f, 110.0f, 750.0f, 0.0f, 60.0f, 0.0f, 120, 4);
     }
-    strcpy(name, "\202\251\202\337\202\347\201\100\202\323\202\302\202\244\202\311\202\315\202\242\202\301\202\275");
+    strcpy(name, "かめら　ふつうにはいった");
     break;
   case 15:
     wp->cameraWork.moveSpeedLv = 3;
     wp->cameraWork.zoomSpeedLv = 3;
     battleCameraMoveTo(1, 1, 0.0f, 110.0f, 500.0f, 0.0f, 60.0f, 0.0f, &dX, &dY, &dZ, &dAtX, &dAtY, &dAtZ);
-    strcpy(name, "\202\251\202\337\202\347\201\100\202\244\202\334\202\255\202\315\202\242\202\301\202\275");
+    strcpy(name, "かめら　うまくはいった");
     break;
   case 16:
     wp->cameraWork.moveSpeedLv = 3;
     wp->cameraWork.zoomSpeedLv = 3;
     battleCameraMoveTo(1, 1, -100.0f, 110.0f, 500.0f, -100.0f, 60.0f, 0.0f, &dX, &dY, &dZ, &dAtX, &dAtY, &dAtZ);
-    strcpy(name, "\202\251\202\337\202\347\201\100\202\276\202\337\202\311\202\315\202\242\202\301\202\275");
+    strcpy(name, "かめら　だめにはいった");
     break;
   case 17:
   case 18:
     mario = BattleGetMarioPtr(wp);
-    part = (BattleUnitPart*)BattleGetPartyPtr(wp); // FAKE: party held in part (role swap)
-    if ((BattleUnit*)part != NULL) {
+    party = BattleGetPartyPtr(wp);
+    if (party != NULL) {
       BtlUnit_GetHomePos(mario, &mx, &my, &mz);
-      BtlUnit_GetHomePos((BattleUnit*)part, &px, &py, &pz);
+      BtlUnit_GetHomePos(party, &px, &py, &pz);
       atX = 0.5f * (mx + px);
       atY = 0.5f * (my + py);
       atZ = 0.5f * (mz + pz);
@@ -457,19 +455,19 @@ void battleCameraMain(void) {
     wp->cameraWork.moveSpeedLv = 1;
     wp->cameraWork.zoomSpeedLv = 1;
     battleCameraMoveTo(0, 1, atX, 100.0f + atY, 350.0f + atZ, atX, 50.0f + atY, 0.0f, &dX, &dY, &dZ, &dAtX, &dAtY, &dAtZ);
-    strcpy(name, "\202\251\202\337\202\347\201\100\202\265\202\345\202\244\202\350");
+    strcpy(name, "かめら　しょうり");
     break;
   case 19:
-    strcpy(name, "\202\251\202\337\202\347\201\100\202\315\202\242\202\332\202\255");
+    strcpy(name, "かめら　はいぼく");
     break;
   case 20:
     wp->cameraWork.moveSpeedLv = 2;
     wp->cameraWork.zoomSpeedLv = 2;
     battleCameraMoveTo(1, 1, -100.0f, 100.0f, 400.0f, -100.0f, 50.0f, 0.0f, &dX, &dY, &dZ, &dAtX, &dAtY, &dAtZ);
-    strcpy(name, "\202\251\202\337\202\347\201\100\202\311\202\260\202\304\202\351");
+    strcpy(name, "かめら　にげてる");
     break;
   default:
-    strcpy(name, "\202\251\202\337\202\347\201\100\202\250\202\251\202\265\202\242\0\0\0\0\0\0\0");
+    strcpy(name, "かめら　おかしい");
     break;
   }
   if (cam->cameraPos.z >= 1000.0f) {

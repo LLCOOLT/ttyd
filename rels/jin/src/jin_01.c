@@ -5,8 +5,6 @@
 #include "jin.h"
 #include "data_tables.h"
 
-#pragma force_active on
-
 USER_FUNC(evt_bero_get_info);
 USER_FUNC(evt_cam_shake);
 USER_FUNC(evt_eff_fukidashi);
@@ -30,58 +28,10 @@ USER_FUNC(evt_sub_intpl_get_value);
 USER_FUNC(evt_sub_intpl_init);
 USER_FUNC(evt_sub_random);
 
-f32 fd_jin_01_negone_one_374[2] __attribute__((aligned(8)));
-f32 fd_jin_01_neg_one_382;
-f32 fd_jin_01___local_PI_383;
-f32 fd_jin_01___local_3PIO2_385;
-f32 fd_jin_01_one_negone_373[2] __attribute__((aligned(8)));
-f32 fd_jin_01___local_PIO2_384;
-f32 fd_jin_01_one_381;
-f32 fd_jin_01_negone_one_360[2] __attribute__((aligned(8)));
-f32 fd_jin_01_neg_one_365;
-f32 fd_jin_01___local_PI_366;
-f32 fd_jin_01___local_3PIO2_368;
-f32 fd_jin_01_one_negone_359[2] __attribute__((aligned(8)));
-f32 fd_jin_01___local_PIO2_367;
-f32 fd_jin_01_one_364;
-static EvtWord s1_close[12];
-static EvtWord s1_open[12];
-static EvtWord s2_close[12];
-static EvtWord s2_open[12];
 static BeroEntry bero_entry_data[3];
-static EvtWord cam_shake[62];
-EvtWord evt_kaidan_oku[144];
-static EvtWord ki_data_evt_01[20];
+extern EvtWord evt_kaidan_oku[];
 static TreeAccess ki_data[2];
-EvtWord jin_01_init_evt[41];
-
-f32 fd_jin_01_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
-
-f32 fd_jin_01_neg_one_382 = -1.0f;
-
-f32 fd_jin_01___local_PI_383 = 3.1415927f;
-
-f32 fd_jin_01___local_3PIO2_385 = 4.712389f;
-
-f32 fd_jin_01_one_negone_373[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
-
-f32 fd_jin_01___local_PIO2_384 = 1.5707964f;
-
-f32 fd_jin_01_one_381 = 1.0f;
-
-f32 fd_jin_01_negone_one_360[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
-
-f32 fd_jin_01_neg_one_365 = -1.0f;
-
-f32 fd_jin_01___local_PI_366 = 3.1415927f;
-
-f32 fd_jin_01___local_3PIO2_368 = 4.712389f;
-
-f32 fd_jin_01_one_negone_359[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
-
-f32 fd_jin_01___local_PIO2_367 = 1.5707964f;
-
-f32 fd_jin_01_one_364 = 1.0f;
+extern EvtWord jin_01_init_evt[];
 
 static EVT_BEGIN(s1_close)
     MULTIPLY_FLOAT(LW(0), FLOAT(0.44433594f))
@@ -242,7 +192,7 @@ EVT_BEGIN(jin_01_init_evt)
     CALL(evt_bero_get_info)
     CALL_CHILD(PTR(evt_bero_info_run))
     CALL_CHILD(PTR(evt_usu_kagemario_party_kill))
-    CALL(evt_mobj_switch_red, 0, STRING("mobj_switch1\0\0\0"), 485, 30, 10, PTR(evt_kaidan_oku), 0)
+    CALL(evt_mobj_switch_red, 0, STRING("mobj_switch1"), 485, 30, 10, PTR(evt_kaidan_oku), 0)
     SET_VALUE(LSWF(2), 0)
     SET_VALUE(LW(0), PTR(ki_data))
     CALL_CHILD(PTR(evt_sub_tree_access_entry))

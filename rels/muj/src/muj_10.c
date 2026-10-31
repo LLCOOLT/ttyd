@@ -2,7 +2,6 @@
 #include "battle/battle_unit.h"
 #include "evt/evt_cmd.h"
 
-#pragma force_active on
 #include "driver/effdrv.h"
 #include "manager/evtmgr_cmd.h"
 #include "mario/mariost.h"
@@ -20,7 +19,6 @@
 #include "muj.h"
 #include "driver/hitdrv.h"
 #include "data_tables.h"
-
 
 USER_FUNC(N_evt_bero_set_mario_bottomless_respawn_pos_to_current_mario_pos);
 USER_FUNC(evt_bero_exec_wait);
@@ -82,52 +80,21 @@ USER_FUNC(evt_sub_intpl_msec_init);
 USER_FUNC(evt_sub_random);
 USER_FUNC(suifu_option_func);
 USER_FUNC(suifu_option_init_func);
-#ifdef VERSION_G8ME01
-#endif
 static USER_FUNC(tornade_alpha_func);
 void elmosalpha_func(NanNPC* npc);
 
-f32 fd_muj_10_negone_one_374[2] __attribute__((aligned(8)));
-f32 fd_muj_10_neg_one_382;
-f32 fd_muj_10___local_PI_383;
-f32 fd_muj_10___local_3PIO2_385;
-f32 fd_muj_10_one_negone_373[2] __attribute__((aligned(8)));
-f32 fd_muj_10___local_PIO2_384;
-f32 fd_muj_10_one_381;
-f32 fd_muj_10_negone_one_360[2] __attribute__((aligned(8)));
-f32 fd_muj_10_neg_one_365;
-f32 fd_muj_10___local_PI_366;
-f32 fd_muj_10___local_3PIO2_368;
-f32 fd_muj_10_one_negone_359[2] __attribute__((aligned(8)));
-f32 fd_muj_10___local_PIO2_367;
-f32 fd_muj_10_one_364;
-static EvtWord megane_init[18];
-static EvtWord megane_talk[8];
 static NpcSetupInfo npcEnt[2];
-static EvtWord e_close[12];
-static EvtWord e_open[12];
-static EvtWord door_custom[53];
-static EvtWord bero_in_event[80];
 static BeroEntry bero_entry_data[3];
-EvtWord nazo_event[178];
-EvtWord oidasare_event[156];
+extern EvtWord nazo_event[];
+extern EvtWord oidasare_event[];
 ExtTexInfo test_ext_entry_data[31];
 static s16 suifu_animtbl[42];
 static s16 elmos_animtbl[22];
 s32 senin_event_suifupos[380];
 s32 senin_event_erumospos[180];
-#ifdef VERSION_G8ME01
-EvtWord senin_event[282];
-#else
-EvtWord senin_event[374];
-#endif
-static EvtWord dai3_shurai_after[46];
+extern EvtWord senin_event[];
 static HitDamageReturn hitDmgRetPoints[7];
-#ifdef VERSION_G8ME01
-EvtWord muj_10_init_evt[207];
-#else
-EvtWord muj_10_init_evt[204];
-#endif
+extern EvtWord muj_10_init_evt[];
 
 static USER_FUNC(tornade_alpha_func) {
     EvtWord* args = event->args;
@@ -159,34 +126,6 @@ USER_FUNC(suifu_option_init_func) {
     }
     return EVT_RETURN_DONE;
 }
-
-f32 fd_muj_10_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
-
-f32 fd_muj_10_neg_one_382 = -1.0f;
-
-f32 fd_muj_10___local_PI_383 = 3.1415927f;
-
-f32 fd_muj_10___local_3PIO2_385 = 4.712389f;
-
-f32 fd_muj_10_one_negone_373[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
-
-f32 fd_muj_10___local_PIO2_384 = 1.5707964f;
-
-f32 fd_muj_10_one_381 = 1.0f;
-
-f32 fd_muj_10_negone_one_360[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
-
-f32 fd_muj_10_neg_one_365 = -1.0f;
-
-f32 fd_muj_10___local_PI_366 = 3.1415927f;
-
-f32 fd_muj_10___local_3PIO2_368 = 4.712389f;
-
-f32 fd_muj_10_one_negone_359[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
-
-f32 fd_muj_10___local_PIO2_367 = 1.5707964f;
-
-f32 fd_muj_10_one_364 = 1.0f;
 
 static EVT_BEGIN(megane_init)
     SWITCH(GSW(0))

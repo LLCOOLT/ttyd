@@ -20,19 +20,11 @@ typedef struct AirGaugeWork {
     f32 gauge;      // 0x4, 0..100, drained by _GetGaugeDecValue
     u32 presses;    // 0x8, A presses (1 = success when auto)
     s32 holdFrames; // 0xC, frames A held since the last press
-    s32 unk10;      // 0x10
+    s32 releaseFrames; // 0x10, cleared at init, never read
     s32 endWait;    // 0x14, frames before the result
 } AirGaugeWork;
 
 // static data from inlined header functions
-__declspec(section ".data") f32 air_lbl_0[] = {-1.0f, 1.0f};
-__declspec(section ".data") f32 air_negone_one_374[] = {-1.0f, 1.0f};
-__declspec(section ".data") f32 air_lbl_1[] = {1.0f, -1.0f};
-__declspec(section ".data") f32 air_one_negone_373[] = {1.0f, -1.0f};
-__declspec(section ".data") f32 air_lbl_2[] = {-1.0f, 1.0f};
-__declspec(section ".data") f32 air_negone_one_360[] = {-1.0f, 1.0f};
-__declspec(section ".data") f32 air_lbl_3[] = {1.0f, -1.0f};
-__declspec(section ".data") f32 air_one_negone_359[] = {1.0f, -1.0f};
 
 typedef struct GaugeKey {
     s32 frame;
@@ -82,7 +74,7 @@ s32 battleAcMain_AirGauge(BattleWork* work) {
             pw->gauge = 0.0f;
             pw->presses = 0;
             pw->holdFrames = 0;
-            pw->unk10 = 0;
+            pw->releaseFrames = 0;
             break;
         case 99:
             break;
@@ -119,7 +111,7 @@ s32 battleAcMain_AirGauge(BattleWork* work) {
             ac->mAcState = 1000;
         case 1000:
             pw->frame++;
-            if (((s32(*)(s32))BattlePadCheckNow)(0x100)) {
+            if (BattlePadCheckNow(0x100)) {
                 ac->outputParams[1] = 1;
                 if (((s32(*)(s32))BattlePadCheckTrigger)(0x100)) {
                     pw->presses++;
@@ -249,17 +241,16 @@ s32 battleAcResult_AirGauge(BattleWork* work) {
 
 void battleAcDisp_AirGauge(CameraId cameraId, void* param) {
     BattleWork* work = (BattleWork*)param;
-    BattleACDispParams* disp = (BattleACDispParams*)&work->actionCommands.disp;
-    s32 i;
-    switch (work->actionCommands.mAcState) {
+    BattleActions* ac = &work->actionCommands;
+    BattleACDispParams* disp = &ac->disp;
+    switch (ac->mAcState) {
         case 99:
             disp->iconX = intplGetValue(4, 20 - disp->slideTimer, 20, -300.0f, 30.0f);
         case 100:
-            i = 4;
         case 1000:
             actionCommandDisp(disp->iconX, disp->iconY);
-            if (AC_SLIDE_TIMER_AT(disp, i) > 0) {
-                (AC_SLIDE_TIMER_AT(disp, i))--;
+            if (disp->slideTimer > 0) {
+                disp->slideTimer--;
             }
             break;
         case 1002:

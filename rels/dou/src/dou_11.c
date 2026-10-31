@@ -2,7 +2,6 @@
 #include "evt/evt_cmd.h"
 #include "manager/evtmgr_cmd.h"
 
-#pragma force_active on
 #include "driver/hitdrv.h"
 #include "string.h"
 #include "mario/mario.h"
@@ -118,98 +117,53 @@ USER_FUNC(evt_sub_random);
 static BOOL hitIsGroup(HitEntry* target, HitEntry* group);
 static BOOL _hitIsGroupSub(HitEntry* target, HitEntry* node, BOOL checkSibling);
 
-f32 fd_dou_11_negone_one_374[2] __attribute__((aligned(8)));
-f32 fd_dou_11_neg_one_382;
-f32 fd_dou_11___local_PI_383;
-f32 fd_dou_11___local_3PIO2_385;
-f32 fd_dou_11_one_negone_373[2] __attribute__((aligned(8)));
-f32 fd_dou_11___local_PIO2_384;
-f32 fd_dou_11_one_381;
-f32 fd_dou_11_negone_one_360[2] __attribute__((aligned(8)));
-f32 fd_dou_11_neg_one_365;
-f32 fd_dou_11___local_PI_366;
-f32 fd_dou_11___local_3PIO2_368;
-f32 fd_dou_11_one_negone_359[2] __attribute__((aligned(8)));
-f32 fd_dou_11___local_PIO2_367;
-f32 fd_dou_11_one_364;
 static ExtTexInfo ext_entry_data[31];
 static s16 suifu_animtbl[42];
 static s16 suifu_run_animtbl[22];
-static EvtWord suifu_c_init[22];
-static EvtWord suifu_c_talk[22];
-static EvtWord suifu_d_init[22];
-static EvtWord suifu_d_talk[22];
-static EvtWord suifu_e_init[22];
-static EvtWord suifu_e_talk[22];
-static EvtWord mony_init[14];
-static EvtWord mony_talk[42];
-static EvtWord peton_init[14];
-static EvtWord peton_talk[58];
 static NpcSetupInfo npcEnt[6];
 static BeroEntry bero_entry_data[12];
 s32 suifudata[400];
 s32 suifudata_after[400];
-EvtWord watarikiri_suifu_init[128];
-EvtWord ukishima_watari_run[458];
-EvtWord ukishima_watari[186];
-EvtWord ukishima_check[40];
-static EvtWord ukishima_apper[286];
-EvtWord ukishima_init1[34];
-EvtWord ukishima_part1[50];
-EvtWord ukishima_init2[34];
-EvtWord ukishima_part2[50];
-EvtWord ukishima_switch1_evt[23];
-EvtWord ukishima_switch2_evt[23];
-EvtWord torinoko_suifu_pukapuka[69];
-EvtWord _suifu_sakebu[101];
-EvtWord torinoko_suifu_sakebu[103];
-EvtWord torinoko_suifu_init[192];
-EvtWord torinoko_suifu[172];
-EvtWord suifu_orei[339];
-EvtWord escapeway_event[98];
-EvtWord bombwall_escape_move[58];
-static EvtWord bombwall_bomb[187];
-static EvtWord bombwall_init[128];
-EvtWord bombwall_suifuout_secheck[77];
-EvtWord bombwall_suifuout[212];
-EvtWord bombwall_after[410];
-static EvtWord dai3_shurai_after[46];
-EvtWord haikei_funeyure[100];
-static EvtWord evt_ride_taru[15];
-static EvtWord dou_puka_event_main0[60];
-EvtWord dou_puka_event_main10[60];
-EvtWord dou_puka_event_main11[60];
-EvtWord dou_puka_event_main12[60];
-EvtWord dou_puka_event_main13[60];
-EvtWord dou_puka_event_main14[60];
-EvtWord dou_puka_event_main15[60];
-EvtWord dou_puka_event_main16[60];
-EvtWord dou_puka_event_main17[60];
-static EvtWord dou_puka_event_init1[8];
-static EvtWord dou_puka_event_1[24];
-static EvtWord dou_puka_event_rev_1[10];
-static EvtWord dou_puka_event_main1[21];
-static EvtWord dou_puka_event_sub1[45];
-static EvtWord dou_puka_event_init2[8];
-static EvtWord dou_puka_event_2[24];
-static EvtWord dou_puka_event_rev_2[10];
-static EvtWord dou_puka_event_main2[21];
-static EvtWord dou_puka_event_sub2[45];
-static EvtWord dou_puka_event_init3[8];
-static EvtWord dou_puka_event_3[24];
-static EvtWord dou_puka_event_rev_3[10];
-static EvtWord dou_puka_event_main3[21];
-static EvtWord dou_puka_event_sub3[45];
-EvtWord dou_puka_event_init4[8];
-EvtWord dou_puka_event_4[24];
-EvtWord dou_puka_event_rev_4[10];
-EvtWord dou_puka_event_main4[21];
-EvtWord dou_puka_event_sub4[45];
-EvtWord pukapuka_watari_init01[70];
-EvtWord pukapuka_watari_init02[70];
+extern EvtWord watarikiri_suifu_init[];
+extern EvtWord ukishima_watari_run[];
+extern EvtWord ukishima_watari[];
+extern EvtWord ukishima_check[];
+extern EvtWord ukishima_init1[];
+extern EvtWord ukishima_part1[];
+extern EvtWord ukishima_init2[];
+extern EvtWord ukishima_part2[];
+extern EvtWord ukishima_switch1_evt[];
+extern EvtWord ukishima_switch2_evt[];
+extern EvtWord torinoko_suifu_pukapuka[];
+extern EvtWord _suifu_sakebu[];
+extern EvtWord torinoko_suifu_sakebu[];
+extern EvtWord torinoko_suifu_init[];
+extern EvtWord torinoko_suifu[];
+extern EvtWord suifu_orei[];
+extern EvtWord escapeway_event[];
+extern EvtWord bombwall_escape_move[];
+extern EvtWord bombwall_suifuout_secheck[];
+extern EvtWord bombwall_suifuout[];
+extern EvtWord bombwall_after[];
+extern EvtWord haikei_funeyure[];
+extern EvtWord dou_puka_event_main10[];
+extern EvtWord dou_puka_event_main11[];
+extern EvtWord dou_puka_event_main12[];
+extern EvtWord dou_puka_event_main13[];
+extern EvtWord dou_puka_event_main14[];
+extern EvtWord dou_puka_event_main15[];
+extern EvtWord dou_puka_event_main16[];
+extern EvtWord dou_puka_event_main17[];
+extern EvtWord dou_puka_event_init4[];
+extern EvtWord dou_puka_event_4[];
+extern EvtWord dou_puka_event_rev_4[];
+extern EvtWord dou_puka_event_main4[];
+extern EvtWord dou_puka_event_sub4[];
+extern EvtWord pukapuka_watari_init01[];
+extern EvtWord pukapuka_watari_init02[];
 HitDamageReturn hitDmgRetPoints_1st[17];
 static HitDamageReturn hitDmgRetPoints[17];
-EvtWord dou_11_init_evt[307];
+extern EvtWord dou_11_init_evt[];
 
 static BOOL _hitIsGroupSub(HitEntry* target, HitEntry* node, BOOL checkSibling) {
     if (strcmp(target->joint->name, node->joint->name) == 0) {
@@ -228,34 +182,6 @@ static BOOL hitIsGroup(HitEntry* target, HitEntry* group) {
     // whether target is group or one of its descendants
     return _hitIsGroupSub(target, group, FALSE);
 }
-
-f32 fd_dou_11_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
-
-f32 fd_dou_11_neg_one_382 = -1.0f;
-
-f32 fd_dou_11___local_PI_383 = 3.1415927f;
-
-f32 fd_dou_11___local_3PIO2_385 = 4.712389f;
-
-f32 fd_dou_11_one_negone_373[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
-
-f32 fd_dou_11___local_PIO2_384 = 1.5707964f;
-
-f32 fd_dou_11_one_381 = 1.0f;
-
-f32 fd_dou_11_negone_one_360[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
-
-f32 fd_dou_11_neg_one_365 = -1.0f;
-
-f32 fd_dou_11___local_PI_366 = 3.1415927f;
-
-f32 fd_dou_11___local_3PIO2_368 = 4.712389f;
-
-f32 fd_dou_11_one_negone_359[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
-
-f32 fd_dou_11___local_PIO2_367 = 1.5707964f;
-
-f32 fd_dou_11_one_364 = 1.0f;
 
 static ExtTexInfo ext_entry_data[] = {
     {"c_boro_k", "S_1", 0.0f},
@@ -352,7 +278,11 @@ static EVT_BEGIN(suifu_e_init)
     SWITCH(GSW(0))
         CASE_BETWEEN(250, 255)
 #ifdef VERSION_G8ME01
+#ifdef VERSION_G8MP01
+        CALL(evt_npc_set_position, STRING("水夫E"), 736, 50, 113)
+#else
         CALL(evt_npc_set_position, STRING("me"), 736, 50, 113)
+#endif
 #else
         CALL(evt_npc_set_position, STRING("me"), 750, 50, -25)
 #endif

@@ -2,7 +2,6 @@
 #include "eff/eff_starstone.h"
 #include "evt/evt_cmd.h"
 
-#pragma force_active on
 #include "mario/mario.h"
 #include "manager/evtmgr_cmd.h"
 #include "dolphin/mtx.h"
@@ -127,63 +126,38 @@ void test_tev2(MapTevCallbackInfo* info);
 void test_tev(MapTevCallbackInfo* info);
 extern s32 envSetYami[];
 
-f32 fd_pik_01_negone_one_374[2] __attribute__((aligned(8)));
-f32 fd_pik_01_neg_one_382;
-f32 fd_pik_01___local_PI_383;
-f32 fd_pik_01___local_3PIO2_385;
-f32 fd_pik_01_one_negone_373[2] __attribute__((aligned(8)));
-f32 fd_pik_01___local_PIO2_384;
-f32 fd_pik_01_one_381;
-f32 fd_pik_01_negone_one_360[2] __attribute__((aligned(8)));
-f32 fd_pik_01_neg_one_365;
-f32 fd_pik_01___local_PI_366;
-f32 fd_pik_01___local_3PIO2_368;
-f32 fd_pik_01_one_negone_359[2] __attribute__((aligned(8)));
-f32 fd_pik_01___local_PIO2_367;
-f32 fd_pik_01_one_364;
 static HitDamageReturn dmgReturnPt[9];
-static EvtWord n_door_open[22];
-static EvtWord n_door_close[22];
 static BeroEntry bero_data[4];
 static const char* name_tbl[2];
-EvtWord evt_powan[346];
-static EvtWord init_powan[18];
-static EvtWord talk_powan[8];
-EvtWord miyageya_talk[563];
-EvtWord miyageya_init[24];
+extern EvtWord evt_powan[];
+extern EvtWord miyageya_talk[];
+extern EvtWord miyageya_init[];
 s32 iri_29_item_tbl1[2];
 s32 iri_29_item_tbl2[2];
 s32 iri_29_item_tbl3[2];
-EvtWord konarikin_talk[426];
-EvtWord konarikin_init[29];
-EvtWord narikin_papa_mama_talk[55];
-EvtWord narikin_papa_init[23];
-EvtWord narikin_mama_init[23];
-EvtWord madam_talk[19];
-EvtWord madam_init[18];
-static EvtWord baba_talk[8];
-static EvtWord baba_init[9];
-EvtWord takun4_init[7];
-EvtWord takun4_talk[37];
-EvtWord takun5_init[25];
-EvtWord takun5_talk[28];
-EvtWord takun6_init[25];
-EvtWord takun6_talk[28];
+extern EvtWord konarikin_talk[];
+extern EvtWord konarikin_init[];
+extern EvtWord narikin_papa_mama_talk[];
+extern EvtWord narikin_papa_init[];
+extern EvtWord narikin_mama_init[];
+extern EvtWord madam_talk[];
+extern EvtWord madam_init[];
+extern EvtWord takun4_init[];
+extern EvtWord takun4_talk[];
+extern EvtWord takun5_init[];
+extern EvtWord takun5_talk[];
+extern EvtWord takun6_init[];
+extern EvtWord takun6_talk[];
 static NpcSetupInfo npc_data[8];
-EvtWord teresa_fuwafuwa[54];
-EvtWord resaresa_talk[8];
-EvtWord resaresa_entry[35];
-EvtWord sebaschan_talk[8];
-EvtWord sebaschan_entry[35];
-EvtWord koopa_door_evt[227];
-EvtWord pik_01_koopa_evt[241];
-static EvtWord delete_npc_regl_evt[35];
-static EvtWord sekai_yami_shake[11];
-static EvtWord sekai_yami_evt[140];
-static EvtWord minnnanokoe_evt[391];
-static EvtWord evt_switch_init[17];
-EvtWord iri_27_npc_entry[26];
-EvtWord pik_01_init_evt[486];
+extern EvtWord teresa_fuwafuwa[];
+extern EvtWord resaresa_talk[];
+extern EvtWord resaresa_entry[];
+extern EvtWord sebaschan_talk[];
+extern EvtWord sebaschan_entry[];
+extern EvtWord koopa_door_evt[];
+extern EvtWord pik_01_koopa_evt[];
+extern EvtWord iri_27_npc_entry[];
+extern EvtWord pik_01_init_evt[];
 
 USER_FUNC(chk_luigi_color) {
     EvtWord* args = event->args;
@@ -195,34 +169,6 @@ USER_FUNC(chk_luigi_color) {
     }
     return EVT_RETURN_DONE;
 }
-
-f32 fd_pik_01_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
-
-f32 fd_pik_01_neg_one_382 = -1.0f;
-
-f32 fd_pik_01___local_PI_383 = 3.1415927f;
-
-f32 fd_pik_01___local_3PIO2_385 = 4.712389f;
-
-f32 fd_pik_01_one_negone_373[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
-
-f32 fd_pik_01___local_PIO2_384 = 1.5707964f;
-
-f32 fd_pik_01_one_381 = 1.0f;
-
-f32 fd_pik_01_negone_one_360[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
-
-f32 fd_pik_01_neg_one_365 = -1.0f;
-
-f32 fd_pik_01___local_PI_366 = 3.1415927f;
-
-f32 fd_pik_01___local_3PIO2_368 = 4.712389f;
-
-f32 fd_pik_01_one_negone_359[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
-
-f32 fd_pik_01___local_PIO2_367 = 1.5707964f;
-
-f32 fd_pik_01_one_364 = 1.0f;
 
 static HitDamageReturn dmgReturnPt[] = {
     {"mod_00", {0.0f, -1000.0f, 0.0f}},

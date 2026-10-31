@@ -2,7 +2,6 @@
 #include "battle/battle_unit.h"
 #include "evt/evt_cmd.h"
 
-#pragma force_active on
 #include "driver/effdrv.h"
 #include "manager/evtmgr_cmd.h"
 #include "evt/evt_bero.h"
@@ -107,71 +106,21 @@ USER_FUNC(evt_sub_intpl_msec_get_value);
 USER_FUNC(evt_sub_intpl_msec_get_value_para);
 USER_FUNC(evt_sub_intpl_msec_init);
 
-f32 fd_las_09_negone_one_374[2] __attribute__((aligned(8)));
-f32 fd_las_09_neg_one_382;
-f32 fd_las_09___local_PI_383;
-f32 fd_las_09___local_3PIO2_385;
-f32 fd_las_09_one_negone_373[2] __attribute__((aligned(8)));
-f32 fd_las_09___local_PIO2_384;
-f32 fd_las_09_one_381;
-f32 fd_las_09_negone_one_360[2] __attribute__((aligned(8)));
-f32 fd_las_09_neg_one_365;
-f32 fd_las_09___local_PI_366;
-f32 fd_las_09___local_3PIO2_368;
-f32 fd_las_09_one_negone_359[2] __attribute__((aligned(8)));
-f32 fd_las_09___local_PIO2_367;
-f32 fd_las_09_one_364;
-static EvtWord w_door_close[22];
-static EvtWord w_door_open[22];
-static EvtWord e_door_close[22];
-static EvtWord e_door_open[22];
-static EvtWord n_door_close[22];
-static EvtWord n_door_open[22];
 static BeroEntry bero_entry_data[8];
 static HitDamageReturn dmgRetPoint[58];
-static EvtWord first_evt[210];
-EvtWord bomb_wanwan[149];
-EvtWord bomb_wanwan1_evt[27];
-EvtWord bomb_wanwan2_evt[27];
-EvtWord switch_1_evt[279];
-EvtWord switch_2_evt[280];
-EvtWord goikkou_talk[31];
-EvtWord majyorin_init[12];
-static EvtWord maririn_init[12];
-EvtWord ranpel_init[12];
+extern EvtWord bomb_wanwan[];
+extern EvtWord bomb_wanwan1_evt[];
+extern EvtWord bomb_wanwan2_evt[];
+extern EvtWord switch_1_evt[];
+extern EvtWord switch_2_evt[];
+extern EvtWord goikkou_talk[];
+extern EvtWord majyorin_init[];
+extern EvtWord ranpel_init[];
 static NpcSetupInfo npcEnt[4];
-EvtWord majyorin_evt_npc_entry[26];
-EvtWord majyorin_evt_main[652];
-EvtWord majyorin_evt[55];
-EvtWord las_09_init_evt[257];
-
-f32 fd_las_09_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
-
-f32 fd_las_09_neg_one_382 = -1.0f;
-
-f32 fd_las_09___local_PI_383 = 3.1415927f;
-
-f32 fd_las_09___local_3PIO2_385 = 4.712389f;
-
-f32 fd_las_09_one_negone_373[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
-
-f32 fd_las_09___local_PIO2_384 = 1.5707964f;
-
-f32 fd_las_09_one_381 = 1.0f;
-
-f32 fd_las_09_negone_one_360[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
-
-f32 fd_las_09_neg_one_365 = -1.0f;
-
-f32 fd_las_09___local_PI_366 = 3.1415927f;
-
-f32 fd_las_09___local_3PIO2_368 = 4.712389f;
-
-f32 fd_las_09_one_negone_359[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
-
-f32 fd_las_09___local_PIO2_367 = 1.5707964f;
-
-f32 fd_las_09_one_364 = 1.0f;
+extern EvtWord majyorin_evt_npc_entry[];
+extern EvtWord majyorin_evt_main[];
+extern EvtWord majyorin_evt[];
+extern EvtWord las_09_init_evt[];
 
 static EVT_BEGIN(w_door_close)
     MULTIPLY_FLOAT(LW(0), FLOAT(-0.38867188f))
@@ -1068,7 +1017,7 @@ EVT_BEGIN(las_09_init_evt)
     RETURN
 EVT_END()
 
-EffectEntry* effGuruguruN64Entry(s32 type, s32 arg1, f32 x, f32 y, f32 z, f32 arg5);
+EffectEntry* effGuruguruN64Entry(s32 type, s32 num, f32 x, f32 y, f32 z, f32 radius);
 
 static USER_FUNC(eff_guruguru) {
     EvtWord* args = event->args;

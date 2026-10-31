@@ -1,7 +1,6 @@
 #include "battle/battle_unit.h"
 #include "evt/evt_cmd.h"
 
-#pragma force_active on
 #include "stdio.h"
 #include "memory.h"
 #include "stdlib.h"
@@ -9,6 +8,7 @@
 #include "evt/evt_sub.h"
 #include "evt/evt_npc.h"
 #include "mario/mario_pouch.h"
+#include "manager/evtmgr_cmd.h"
 
 s32* tbl;
 
@@ -18,6 +18,7 @@ USER_FUNC(evt_bero_get_info);
 USER_FUNC(evt_bero_mapchange);
 USER_FUNC(evt_cam3d_evt_off);
 USER_FUNC(evt_cam3d_evt_set);
+USER_FUNC(evt_cam_letter_box_disable);
 USER_FUNC(evt_cam_road_reset);
 USER_FUNC(evt_cloud_ent);
 USER_FUNC(evt_cloud_init);
@@ -73,6 +74,7 @@ USER_FUNC(evt_npc_set_ry);
 USER_FUNC(evt_npc_setup);
 USER_FUNC(evt_paper_entry);
 USER_FUNC(evt_party_cont_onoff);
+USER_FUNC(evt_party_get_pos);
 USER_FUNC(evt_party_run);
 USER_FUNC(evt_party_set_dir);
 USER_FUNC(evt_party_set_pos);
@@ -100,69 +102,19 @@ static USER_FUNC(get_pos);
 USER_FUNC(iri_13_make_name);
 USER_FUNC(make_tbl);
 
-f32 fd_tou_06_negone_one_374[2] __attribute__((aligned(8)));
-f32 fd_tou_06_neg_one_382;
-f32 fd_tou_06___local_PI_383;
-f32 fd_tou_06___local_3PIO2_385;
-f32 fd_tou_06_one_negone_373[2] __attribute__((aligned(8)));
-f32 fd_tou_06___local_PIO2_384;
-f32 fd_tou_06_one_381;
-f32 fd_tou_06_negone_one_360[2] __attribute__((aligned(8)));
-f32 fd_tou_06_neg_one_365;
-f32 fd_tou_06___local_PI_366;
-f32 fd_tou_06___local_3PIO2_368;
-f32 fd_tou_06_one_negone_359[2] __attribute__((aligned(8)));
-f32 fd_tou_06___local_PIO2_367;
-f32 fd_tou_06_one_364;
-static EvtWord n_door_open[12];
-static EvtWord n_door_close[12];
-static EvtWord w_door_open[12];
-static EvtWord w_door_close[12];
 static BeroEntry bero_data[3];
-EvtWord evt_ana[9];
-EvtWord evt_kontena[21];
-EvtWord evt_kaidan[91];
+extern EvtWord evt_ana[];
+extern EvtWord evt_kontena[];
+extern EvtWord evt_kaidan[];
 const char* cloud_kontena2_list[5];
-EvtWord evt_kontena2[23];
-static EvtWord evt_block_broken[5];
+extern EvtWord evt_kontena2[];
 static s32 key_tbl[2];
-static EvtWord evt_chk[23];
-static EvtWord evt_lock[14];
-EvtWord evt_chuchu[626];
+extern EvtWord evt_chuchu[];
 static s32 list[75];
-EvtWord iri_13_pants_00_evt[5];
-EvtWord iri_13_init[124];
+extern EvtWord iri_13_pants_00_evt[];
+extern EvtWord iri_13_init[];
 static NpcSetupInfo npcEnt[2];
-static EvtWord mobj_box00[34];
-EvtWord tou_06_init_evt[544];
-
-f32 fd_tou_06_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
-
-f32 fd_tou_06_neg_one_382 = -1.0f;
-
-f32 fd_tou_06___local_PI_383 = 3.1415927f;
-
-f32 fd_tou_06___local_3PIO2_385 = 4.712389f;
-
-f32 fd_tou_06_one_negone_373[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
-
-f32 fd_tou_06___local_PIO2_384 = 1.5707964f;
-
-f32 fd_tou_06_one_381 = 1.0f;
-
-f32 fd_tou_06_negone_one_360[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
-
-f32 fd_tou_06_neg_one_365 = -1.0f;
-
-f32 fd_tou_06___local_PI_366 = 3.1415927f;
-
-f32 fd_tou_06___local_3PIO2_368 = 4.712389f;
-
-f32 fd_tou_06_one_negone_359[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
-
-f32 fd_tou_06___local_PIO2_367 = 1.5707964f;
-
-f32 fd_tou_06_one_364 = 1.0f;
+extern EvtWord tou_06_init_evt[];
 
 static EVT_BEGIN(n_door_open)
     MULTIPLY_FLOAT(LW(0), FLOAT(0.44433594f))
@@ -668,14 +620,36 @@ EVT_BEGIN(tou_06_init_evt)
         BEGIN_INLINE_EVENT
             CALL(evt_seq_wait, 2)
             CALL(evt_mario_cont_onoff, 1)
+#ifdef VERSION_G8MP01
+            CALL(evt_party_cont_onoff, 0, 1)
+#endif
             CALL(evt_mario_wait_landon)
+#ifdef VERSION_G8MP01
+            LOOP(30)
+                CALL(evt_mario_get_pos, 0, LW(0), LW(1), LW(2))
+                CALL(evt_party_get_pos, 0, LW(3), LW(4), LW(5))
+                ADD(LW(1), 20)
+                IF_INT_LESS(LW(1), LW(4))
+                    SUBTRACT(LW(4), 10)
+                    CALL(evt_party_set_pos, 0, LW(3), LW(4), LW(5))
+                ELSE
+                    BREAK_LOOP
+                END_IF
+                WAIT_FRAMES(1)
+            END_LOOP
+#endif
             CALL(evt_mario_key_onoff, 1)
             CALL(evt_mario_cam_on)
+#ifdef VERSION_G8MP01
+            CALL(evt_cam_letter_box_disable, 0)
+        END_INLINE_EVENT
+#else
         END_INLINE_EVENT
         BEGIN_INLINE_EVENT
             CALL(evt_seq_wait, 2)
             CALL(evt_party_cont_onoff, 0, 1)
         END_INLINE_EVENT
+#endif
     END_IF
     CALL(evt_map_playanim, STRING("anm_hae"), 1, 0)
     CALL(evt_mapobj_flag_onoff, 1, 1, STRING("gor_hae"), 1)
@@ -716,7 +690,7 @@ USER_FUNC(iri_13_make_name) {
     static char name[8];
     EvtWord* args = event->args;
 
-    sprintf(name, "pants%02d\0\0", evtGetValue(event, args[0]));
+    sprintf(name, "pants%02d", evtGetValue(event, args[0]));
     evtSetValue(event, args[1], (EvtWord)name);
     return EVT_RETURN_DONE;
 }

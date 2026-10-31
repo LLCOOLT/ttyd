@@ -3,7 +3,6 @@
 #include "battle/battle_unit.h"
 #include "evt/evt_cmd.h"
 
-#pragma force_active on
 #include "data/mapdata.h"
 #include "driver/swdrv.h"
 #include "memory.h"
@@ -46,10 +45,8 @@ typedef struct DispWork { f32 y; f32 targetY; s32 page; } DispWork;
 typedef struct FighterData { u16 flags; const char* name; const char* name2; s32 info; const char* msg1; const char* msg2; s16 score; } FighterData;
 typedef struct RuleData { const char* name; const char* msg; s32 id; s32 a; s32 b; } RuleData;
 static DispWork* dwp;
-static FighterData fighterDt_raw[23];
-#define fighterDt (fighterDt_raw)
-static FighterData fighterDt_re_raw[21];
-#define fighterDt_re (fighterDt_re_raw)
+static FighterData fighterDt[23];
+static FighterData fighterDt_re[21];
 static void rankingControll(void);
 #define GET_RANK(rank, i) rank = 0; for (i = 0; i < rank_wp->num; i++) { if (!(rank_wp->entries[i].flags & 2)) { if (rank_wp->entries[i].flags & 4) { break; } rank++; } }
 static void insert(s32* list, s32 num, s32 from, s32 to);
@@ -58,12 +55,9 @@ static void insert(s32* list, s32 num, s32 from, s32 to);
 #define FIND_FLAG(k, list, n, flag) for (k = 0; k < n; k++) { if (fighterDt[rank_wp->entries[list[k]].id].flags & flag) { break; } }
 #define MOVE_FLAG(list, n, flag, pos) FIND_FLAG(k, list, n, flag); if (k < n) { insert(list, n, k, pos); }
 static void printRanking(void);
-static RuleData ruleDt_2bu_raw[10];
-#define ruleDt_2bu (ruleDt_2bu_raw)
-static RuleData ruleDt_1bu_raw[14];
-#define ruleDt_1bu (ruleDt_1bu_raw)
-static RuleData ruleDt_re_raw[14];
-#define ruleDt_re (ruleDt_re_raw)
+static RuleData ruleDt_2bu[10];
+static RuleData ruleDt_1bu[14];
+static RuleData ruleDt_re[14];
 static s32 tou_bss_1C;
 static RankWork rank_work;
 static DispWork disp_work;
@@ -76,7 +70,7 @@ GansWork* gans_wp;
 void gans_tex(CameraId cameraId, void* param);
 BOOL partyChkJoin(s32 id);
 double atan2(double y, double x);
-typedef struct StarStoneWork { u8 field_0x0[8]; Vec pos; u8 field_0x14[8]; f32 rot; } StarStoneWork;
+typedef struct StarStoneWork { u8 typeFlags[8]; Vec pos; u8 scaleParams[8]; f32 rot; } StarStoneWork; /* mirrors EffStarStoneWork: type + flags, then scale + f18 */
 EffectEntry* effStarStoneEntry(s32 type, f32 x, f32 y, f32 z, f32 scale);
 static s32 champion_belt_onoff;
 
@@ -215,69 +209,49 @@ void _unresolved(void);
 void _epilog(void);
 void _prolog(void);
 
-f32 fd_tou_negone_one_374[2] __attribute__((aligned(8)));
-f32 fd_tou_neg_one_382;
-f32 fd_tou___local_PI_383;
-f32 fd_tou___local_3PIO2_385;
-f32 fd_tou_one_negone_373[2] __attribute__((aligned(8)));
-f32 fd_tou___local_PIO2_384;
-f32 fd_tou_one_381;
-f32 fd_tou_negone_one_360[2] __attribute__((aligned(8)));
-f32 fd_tou_neg_one_365;
-f32 fd_tou___local_PI_366;
-f32 fd_tou___local_3PIO2_368;
-f32 fd_tou_one_negone_359[2] __attribute__((aligned(8)));
-f32 fd_tou___local_PIO2_367;
-f32 fd_tou_one_364;
-f64 fd_tou__three_localstatic4_sqrtf;
-f64 fd_tou__half_localstatic3_sqrtf;
 const char* lockerDt[46];
-EvtWord evt_close[188];
+extern EvtWord evt_close[];
 static EvtWord evt_open[VERSION_PICK(165, 173)];
-EvtWord evt_tou_locker_init[109];
-EvtWord evt_tou_monitor_on[18];
-EvtWord evt_tou_monitor_off[18];
-EvtWord evt_tou_monitor_init[69];
-EvtWord talk_gardman_doku[18];
-EvtWord dummy_party_msg_pkr[10];
-EvtWord dummy_party_msg_pnk[10];
-EvtWord dummy_party_msg_yos[10];
-EvtWord dummy_party_msg_win[10];
-EvtWord party_npc_replace[139];
-static EvtWord evt_tamago_scale[89];
-static EvtWord evt_tamago_scale2[83];
-EvtWord evt_tamago_byebye[160];
-EvtWord talk_gardman[191];
-static EvtWord evt_gardman[VERSION_PICK(318, 335)];
-EvtWord evt_gardman_spawn[4];
-EvtWord evt_tou_match_make_default_sub[406];
-EvtWord evt_tou_match_make_default[303];
-EvtWord evt_talk_doku_cake[14];
-EvtWord evt_eat_doku_cake[270];
-EvtWord evt_doku_cake[234];
-EvtWord evt_michel_1[39];
-EvtWord evt_michel_2[42];
-EvtWord evt_michel_3_sub[97];
-EvtWord evt_michel_3[256];
-EvtWord evt_michel_4[312];
-EvtWord evt_michel_5[42];
-EvtWord evt_michel_6[42];
-EvtWord evt_michel_7[42];
-EvtWord evt_michel_8[VERSION_PICK(620, 616)];
-EvtWord evt_michel_9[40];
-EvtWord evt_mail_1[157];
-EvtWord evt_mail_2[154];
-EvtWord evt_eat_cake[157];
-EvtWord evt_cake_init[31];
-EvtWord evt_cake[37];
-static EvtWord evt_koopa_after[5];
-EvtWord evt_mail_3[157];
-EvtWord evt_mail_4[151];
-EvtWord evt_mail_5[157];
-EvtWord evt_tamago_hello[41];
-EvtWord evt_tamago_hello2[75];
-EvtWord evt_tou_ranking_msg[62];
-EvtWord evt_tou_match_after_default[VERSION_PICK(1474, 1621)];
+extern EvtWord evt_tou_locker_init[];
+extern EvtWord evt_tou_monitor_on[];
+extern EvtWord evt_tou_monitor_off[];
+extern EvtWord evt_tou_monitor_init[];
+extern EvtWord talk_gardman_doku[];
+extern EvtWord dummy_party_msg_pkr[];
+extern EvtWord dummy_party_msg_pnk[];
+extern EvtWord dummy_party_msg_yos[];
+extern EvtWord dummy_party_msg_win[];
+extern EvtWord party_npc_replace[];
+extern EvtWord evt_tamago_byebye[];
+extern EvtWord talk_gardman[];
+extern EvtWord evt_gardman_spawn[];
+extern EvtWord evt_tou_match_make_default_sub[];
+extern EvtWord evt_tou_match_make_default[];
+extern EvtWord evt_talk_doku_cake[];
+extern EvtWord evt_eat_doku_cake[];
+extern EvtWord evt_doku_cake[];
+extern EvtWord evt_michel_1[];
+extern EvtWord evt_michel_2[];
+extern EvtWord evt_michel_3_sub[];
+extern EvtWord evt_michel_3[];
+extern EvtWord evt_michel_4[];
+extern EvtWord evt_michel_5[];
+extern EvtWord evt_michel_6[];
+extern EvtWord evt_michel_7[];
+extern EvtWord evt_michel_8[];
+extern EvtWord evt_michel_9[];
+extern EvtWord evt_mail_1[];
+extern EvtWord evt_mail_2[];
+extern EvtWord evt_eat_cake[];
+extern EvtWord evt_cake_init[];
+extern EvtWord evt_cake[];
+extern EvtWord evt_mail_3[];
+extern EvtWord evt_mail_4[];
+extern EvtWord evt_mail_5[];
+extern EvtWord evt_tamago_hello[];
+extern EvtWord evt_tamago_hello2[];
+extern EvtWord evt_tou_ranking_msg[];
+extern EvtWord evt_tou_match_after_default[];
 
 void _prolog(void) {
     voidfunctionptr* ctor;
@@ -298,7 +272,7 @@ void _prolog(void) {
     relSetEvtAddr("tou_11", tou_11_init_evt);
     relSetEvtAddr("tou_12", tou_12_init_evt);
     relSetEvtAddr("tou_13", tou_13_init_evt);
-    relSetEvtAddr("tou_20\0", tou_20_init_evt);
+    relSetEvtAddr("tou_20", tou_20_init_evt);
     rankingInit();
 }
 
@@ -773,39 +747,7 @@ static void printRanking(void) {
     }
 }
 
-f32 fd_tou_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
-
-f32 fd_tou_neg_one_382 = -1.0f;
-
-f32 fd_tou___local_PI_383 = 3.1415927f;
-
-f32 fd_tou___local_3PIO2_385 = 4.712389f;
-
-f32 fd_tou_one_negone_373[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
-
-f32 fd_tou___local_PIO2_384 = 1.5707964f;
-
-f32 fd_tou_one_381 = 1.0f;
-
-f32 fd_tou_negone_one_360[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
-
-f32 fd_tou_neg_one_365 = -1.0f;
-
-f32 fd_tou___local_PI_366 = 3.1415927f;
-
-f32 fd_tou___local_3PIO2_368 = 4.712389f;
-
-f32 fd_tou_one_negone_359[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
-
-f32 fd_tou___local_PIO2_367 = 1.5707964f;
-
-f32 fd_tou_one_364 = 1.0f;
-
-f64 fd_tou__three_localstatic4_sqrtf = 3.0;
-
-f64 fd_tou__half_localstatic3_sqrtf = 0.5;
-
-static FighterData fighterDt_raw[] = {
+static FighterData fighterDt[] = {
     {4, "stg3_tou_sensyu_00", "stg3_tou_sensyu2_00", 22, "stg3_tou_400_02", "stg3_tou_400_03", 250},
     {4097, "stg3_tou_sensyu_01", "stg3_tou_sensyu2_01", 19, "stg3_tou_118_00", "stg3_tou_118_01", 200},
     {1, "stg3_tou_sensyu_02", "stg3_tou_sensyu2_02", 18, "stg3_tou_118_02", "stg3_tou_118_03", 180},
@@ -831,7 +773,7 @@ static FighterData fighterDt_raw[] = {
     {2, "stg3_tou_sensyu_22", "stg3_tou_sensyu2_22", 21, "stg3_tou_118_36_04", "stg3_tou_118_36_05", 0},
 };
 
-static FighterData fighterDt_re_raw[] = {
+static FighterData fighterDt_re[] = {
     {4, "stg3_tou_re_315", "stg3_tou_re_338", 22, "stg3_tou_re_289", "stg3_tou_re_290", 250},
     {4097, "stg3_tou_re_316", "stg3_tou_re_339", 19, "stg3_tou_re_179", "stg3_tou_re_180", 200},
     {1, "stg3_tou_re_317", "stg3_tou_re_340", 18, "stg3_tou_re_181", "stg3_tou_re_182", 180},
@@ -855,7 +797,7 @@ static FighterData fighterDt_re_raw[] = {
     {8, "stg3_tou_re_335", "stg3_tou_re_358", 1, 0, 0, 0},
 };
 
-static RuleData ruleDt_2bu_raw[] = {
+static RuleData ruleDt_2bu[] = {
     {"stg3_tou_107_01", "stg3_tou_cp_000", 18, 3, 3},
     {"stg3_tou_107_02", "stg3_tou_cp_001", 1, 1, 1},
     {"stg3_tou_107_03", "stg3_tou_cp_002", 3, 1, 1},
@@ -868,7 +810,7 @@ static RuleData ruleDt_2bu_raw[] = {
     {"stg3_tou_107_16", "stg3_tou_cp_009", 43, 1, 1},
 };
 
-static RuleData ruleDt_1bu_raw[] = {
+static RuleData ruleDt_1bu[] = {
     {"stg3_tou_107_01", "stg3_tou_cp_010", 18, 5, 5},
     {"stg3_tou_107_02", "stg3_tou_cp_011", 1, 1, 1},
     {"stg3_tou_107_03", "stg3_tou_cp_012", 3, 1, 1},
@@ -885,7 +827,7 @@ static RuleData ruleDt_1bu_raw[] = {
     {"stg3_tou_107_20", "stg3_tou_cp_024", 63, 255, 255},
 };
 
-static RuleData ruleDt_re_raw[] = {
+static RuleData ruleDt_re[] = {
     {"stg3_tou_re_362", "stg3_tou_cp_040", 18, 5, 5},
     {"stg3_tou_re_363", "stg3_tou_cp_041", 1, 1, 1},
     {"stg3_tou_re_364", "stg3_tou_cp_042", 3, 1, 1},
@@ -945,7 +887,7 @@ static void disp_proc(CameraId cameraId, void* param) {
     windowDispGX_System(0, 0xFF, x - 30.0f, 165.0f, 310.0f, 330.0f);
 #ifdef VERSION_G8ME01
     if ((u32)gp->language == 0) {
-        title = "\203\211\203\223\203L\203\223\203O";
+        title = "ランキング";
     } else {
         title = msgSearch("stg3_ranking");
     }
@@ -955,7 +897,7 @@ static void disp_proc(CameraId cameraId, void* param) {
 #else
     FontDrawStart();
     FontDrawScale(1.0f);
-    w = (u16)FontGetMessageWidth("\203\211\203\223\203L\203\223\203O");
+    w = (u16)FontGetMessageWidth("ランキング");
 #endif
     {
         GXColor color = {0xDC, 0xC8, 0xDC, 0xFF};
@@ -965,7 +907,7 @@ static void disp_proc(CameraId cameraId, void* param) {
 #ifdef VERSION_G8ME01
     FontDrawMessage(-w / 2, top, title);
 #else
-    FontDrawMessage(-w / 2, top, "\203\211\203\223\203L\203\223\203O");
+    FontDrawMessage(-w / 2, top, "ランキング");
 #endif
     sx = 304.0f + x;
     sw = winW;
@@ -1362,7 +1304,7 @@ void gans_tex(CameraId cameraId, void* param) {
         C_MTXLookAt(lookAt, &pos, &up, &target);
     }
     saved = *camGetPtr(cameraId);
-    npc = npcNameToPtr(evtGetValue(NULL, GSW(0)) < 0xAC ? "\203K\203\223\203X" : "\203L\203m\203V\203R\203\217");
+    npc = npcNameToPtr(evtGetValue(NULL, GSW(0)) < 0xAC ? "ガンス" : "キノシコワ");
     PSMTXCopy(lookAt, camGetCurPtr()->view);
     animPosePeraOff(npc->poseId);
     PSMTXIdentity(ident);
@@ -1813,7 +1755,6 @@ static EVT_BEGIN(evt_gardman)
     RETURN
 EVT_END()
 
-
 EVT_BEGIN(evt_gardman_spawn)
     CALL_CHILD(PTR(evt_gardman))
     RETURN
@@ -1833,6 +1774,13 @@ EVT_BEGIN(evt_tou_match_make_default_sub)
     IF_STR_EQUAL(LW(0), STRING("tou_07"))
         SET_VALUE(LF(2), 1)
     END_IF
+#ifdef VERSION_G8MP01
+    SET_VALUE(LF(3), 0)
+    CALL(evt_sub_get_language, LW(0))
+    IF_INT_EQUAL(LW(0), 3)
+        SET_VALUE(LF(3), 1) // French: the two inserted values are swapped
+    END_IF
+#endif
     CALL(evt_party_stop, 0)
     WAIT_FRAMES(1)
     IF_INT_EQUAL(LF(2), 1)
@@ -1865,15 +1813,47 @@ EVT_BEGIN(evt_tou_match_make_default_sub)
         IF_INT_LESS(GSW(0), 172)
             IF_INT_EQUAL(LW(3), 10)
                 IF_INT_EQUAL(GSWF(2397), 0)
-                    CALL(evt_msg_print_insert, 0, STRING("stg3_tou_107_00_01"), 0, STRING("ガンス"), LW(3), LW(1))
+#ifdef VERSION_G8MP01
+                    IF_INT_EQUAL(LF(3), 0)
+                        CALL(evt_msg_print_insert, 0, STRING("stg3_tou_107_00_01"), 0, STRING("ガンス"), LW(3), LW(1))
                     ELSE
+                        CALL(evt_msg_print_insert, 0, STRING("stg3_tou_107_00_01"), 0, STRING("ガンス"), LW(1), LW(3))
+                    END_IF
+#else
+                    CALL(evt_msg_print_insert, 0, STRING("stg3_tou_107_00_01"), 0, STRING("ガンス"), LW(3), LW(1))
+#endif
+                    ELSE
+#ifdef VERSION_G8MP01
+                    IF_INT_EQUAL(LF(3), 0)
+                        CALL(evt_msg_print_insert, 0, STRING("stg3_tou_107_00"), 0, STRING("ガンス"), LW(3), LW(1))
+                    ELSE
+                        CALL(evt_msg_print_insert, 0, STRING("stg3_tou_107_00"), 0, STRING("ガンス"), LW(1), LW(3))
+                    END_IF
+#else
                     CALL(evt_msg_print_insert, 0, STRING("stg3_tou_107_00"), 0, STRING("ガンス"), LW(3), LW(1))
+#endif
                 END_IF
                 ELSE
+#ifdef VERSION_G8MP01
+                IF_INT_EQUAL(LF(3), 0)
+                    CALL(evt_msg_print_insert, 0, STRING("stg3_tou_107_00"), 0, STRING("ガンス"), LW(3), LW(1))
+                ELSE
+                    CALL(evt_msg_print_insert, 0, STRING("stg3_tou_107_00"), 0, STRING("ガンス"), LW(1), LW(3))
+                END_IF
+#else
                 CALL(evt_msg_print_insert, 0, STRING("stg3_tou_107_00"), 0, STRING("ガンス"), LW(3), LW(1))
+#endif
             END_IF
             ELSE
+#ifdef VERSION_G8MP01
+            IF_INT_EQUAL(LF(3), 0)
+                CALL(evt_msg_print_insert, 0, STRING("stg3_tou_re_361"), 0, STRING("キノシコワ"), LW(3), LW(1))
+            ELSE
+                CALL(evt_msg_print_insert, 0, STRING("stg3_tou_re_361"), 0, STRING("キノシコワ"), LW(1), LW(3))
+            END_IF
+#else
             CALL(evt_msg_print_insert, 0, STRING("stg3_tou_re_361"), 0, STRING("キノシコワ"), LW(3), LW(1))
+#endif
         END_IF
     END_IF
     IF_INT_EQUAL(LF(1), 1)
@@ -1887,13 +1867,29 @@ EVT_BEGIN(evt_tou_match_make_default_sub)
             IF_INT_EQUAL(LW(3), 0)
                 CALL(evt_msg_print_insert, 0, STRING("stg3_tou_107_00_01"), 0, STRING("ガンス"), LW(1))
                 ELSE
+#ifdef VERSION_G8MP01
+                IF_INT_EQUAL(LF(3), 0)
+                    CALL(evt_msg_print_insert, 0, STRING("stg3_tou_107_00"), 0, STRING("ガンス"), LW(3), LW(1))
+                ELSE
+                    CALL(evt_msg_print_insert, 0, STRING("stg3_tou_107_00"), 0, STRING("ガンス"), LW(1), LW(3))
+                END_IF
+#else
                 CALL(evt_msg_print_insert, 0, STRING("stg3_tou_107_00"), 0, STRING("ガンス"), LW(3), LW(1))
+#endif
             END_IF
             ELSE
             IF_INT_EQUAL(LW(3), 0)
                 CALL(evt_msg_print_insert, 0, STRING("stg3_tou_re_361_01"), 0, STRING("キノシコワ"), LW(1))
                 ELSE
+#ifdef VERSION_G8MP01
+                IF_INT_EQUAL(LF(3), 0)
+                    CALL(evt_msg_print_insert, 0, STRING("stg3_tou_re_361"), 0, STRING("キノシコワ"), LW(3), LW(1))
+                ELSE
+                    CALL(evt_msg_print_insert, 0, STRING("stg3_tou_re_361"), 0, STRING("キノシコワ"), LW(1), LW(3))
+                END_IF
+#else
                 CALL(evt_msg_print_insert, 0, STRING("stg3_tou_re_361"), 0, STRING("キノシコワ"), LW(3), LW(1))
+#endif
             END_IF
         END_IF
         IF_INT_EQUAL(GSW(501), 0)
@@ -1910,9 +1906,25 @@ EVT_BEGIN(evt_tou_match_make_default_sub)
         CALL(evt_tou_get_fighter_info, LW(0), LW(1), LW(2))
         CALL(evt_tou_get_fighter_rank, LW(0), LW(3))
         IF_INT_LESS(GSW(0), 172)
-            CALL(evt_msg_print_insert, 0, STRING("stg3_tou_107_00"), 0, STRING("ガンス"), LW(3), LW(1))
+#ifdef VERSION_G8MP01
+            IF_INT_EQUAL(LF(3), 0)
+                CALL(evt_msg_print_insert, 0, STRING("stg3_tou_107_00"), 0, STRING("ガンス"), LW(3), LW(1))
             ELSE
+                CALL(evt_msg_print_insert, 0, STRING("stg3_tou_107_00"), 0, STRING("ガンス"), LW(1), LW(3))
+            END_IF
+#else
+            CALL(evt_msg_print_insert, 0, STRING("stg3_tou_107_00"), 0, STRING("ガンス"), LW(3), LW(1))
+#endif
+            ELSE
+#ifdef VERSION_G8MP01
+            IF_INT_EQUAL(LF(3), 0)
+                CALL(evt_msg_print_insert, 0, STRING("stg3_tou_re_361"), 0, STRING("キノシコワ"), LW(3), LW(1))
+            ELSE
+                CALL(evt_msg_print_insert, 0, STRING("stg3_tou_re_361"), 0, STRING("キノシコワ"), LW(1), LW(3))
+            END_IF
+#else
             CALL(evt_msg_print_insert, 0, STRING("stg3_tou_re_361"), 0, STRING("キノシコワ"), LW(3), LW(1))
+#endif
         END_IF
     END_IF
     CALL(evt_tou_get_rule_info, GSW(501), LW(10), LW(13), LW(14), LW(15))
@@ -2445,7 +2457,7 @@ EVT_BEGIN(evt_michel_7)
 EVT_END()
 
 USER_FUNC(make_monitor) {
-    NpcEntry* npc = npcNameToPtr_NoAssert(evtGetValue(NULL, GSW(0)) < 0xAC ? "\203K\203\223\203X" : "\203L\203m\203V\203R\203\217");
+    NpcEntry* npc = npcNameToPtr_NoAssert(evtGetValue(NULL, GSW(0)) < 0xAC ? "ガンス" : "キノシコワ");
     GansWork* wp;
 
     if (isFirstCall) {
@@ -2502,7 +2514,6 @@ void monitor_tev(MapTevCallbackInfo* info) {
     }
 }
 
-
 USER_FUNC(onoff) {
     gans_wp->onoff = evtGetValue(event, event->args[0]);
     return EVT_RETURN_DONE;
@@ -2554,7 +2565,7 @@ USER_FUNC(tou_mario_keyoff_check) {
 #endif
 
 USER_FUNC(octo_stop) {
-    NpcEntry* npc = npcNameToPtr_NoAssert("\203I\203N\203g\201[\203\213");
+    NpcEntry* npc = npcNameToPtr_NoAssert("オクトール");
 
     if (npc != NULL) {
         evtStopID(npc->regularEvtId);
@@ -2566,15 +2577,13 @@ USER_FUNC(octo_stop) {
 }
 
 USER_FUNC(octo_start) {
-    NpcEntry* npc = npcNameToPtr_NoAssert("\203I\203N\203g\201[\203\213");
+    NpcEntry* npc = npcNameToPtr_NoAssert("オクトール");
 
     if (npc != NULL) {
         evtStartID(npc->regularEvtId);
     }
     return EVT_RETURN_DONE;
 }
-
-
 
 USER_FUNC(fight_money) {
     EvtWord* args = event->args;
@@ -2608,7 +2617,7 @@ static f32 camGetRy(void) {
 }
 
 USER_FUNC(tou_champion_belt) {
-    void** new_var2; // FAKE: alias of &eff->userdata; a typed StarStoneWork* local or direct eff->userdata changes codegen
+    void** udPtr; // FAKE: alias of &eff->userdata; a typed StarStoneWork* local or direct eff->userdata changes codegen
     EffectEntry* eff;
     s32 idx;
     Vec* positions;
@@ -2628,24 +2637,24 @@ USER_FUNC(tou_champion_belt) {
     idx = animPoseGetGroupIdx(npc->poseId, "locator8");
     angle = reviseAngle(camGetRy() - pose->rotationY);
     eff = event->userdatap[0];
-    new_var2 = &eff->userdata;
-    ((StarStoneWork*)(*new_var2))->pos.x = positions[idx].x;
-    ((StarStoneWork*)(*new_var2))->pos.y = positions[idx].y;
-    ((StarStoneWork*)(*new_var2))->pos.z = positions[idx].z;
+    udPtr = &eff->userdata;
+    ((StarStoneWork*)(*udPtr))->pos.x = positions[idx].x;
+    ((StarStoneWork*)(*udPtr))->pos.y = positions[idx].y;
+    ((StarStoneWork*)(*udPtr))->pos.z = positions[idx].z;
     if ((angle > 90.0f && angle <= 270.0f) || (angle < -90.0f && angle >= -270.0f)) {
-        ((StarStoneWork*)(*new_var2))->rot = 8.0f - (angle + camGetPtr(CAMERA_3D)->viewYaw);
+        ((StarStoneWork*)(*udPtr))->rot = 8.0f - (angle + camGetPtr(CAMERA_3D)->viewYaw);
     } else {
-        ((StarStoneWork*)(*new_var2))->rot = -(angle + camGetPtr(CAMERA_3D)->viewYaw) - 8.0f;
+        ((StarStoneWork*)(*udPtr))->rot = -(angle + camGetPtr(CAMERA_3D)->viewYaw) - 8.0f;
     }
     if (npc->position.y <= -1000.0f) {
-        ((StarStoneWork*)(*new_var2))->pos.x = 0.0f;
-        ((StarStoneWork*)(*new_var2))->pos.y = -1000.0f;
-        ((StarStoneWork*)(*new_var2))->pos.z = 0.0f;
+        ((StarStoneWork*)(*udPtr))->pos.x = 0.0f;
+        ((StarStoneWork*)(*udPtr))->pos.y = -1000.0f;
+        ((StarStoneWork*)(*udPtr))->pos.z = 0.0f;
     }
     if (champion_belt_onoff) {
-        ((StarStoneWork*)(*new_var2))->pos.x = 0.0f;
-        ((StarStoneWork*)(*new_var2))->pos.y = -1000.0f;
-        ((StarStoneWork*)(*new_var2))->pos.z = 0.0f;
+        ((StarStoneWork*)(*udPtr))->pos.x = 0.0f;
+        ((StarStoneWork*)(*udPtr))->pos.y = -1000.0f;
+        ((StarStoneWork*)(*udPtr))->pos.z = 0.0f;
     }
     return EVT_RETURN_BLOCK;
 }
@@ -2654,9 +2663,6 @@ static USER_FUNC(tou_champion_belt_onoff) {
     champion_belt_onoff = evtGetValue(event, event->args[0]);
     return EVT_RETURN_DONE;
 }
-
-
-
 
 EVT_BEGIN(evt_michel_8)
     CALL(evt_npc_set_position, STRING("オクトール"), 145, 0, 50)

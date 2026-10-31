@@ -1,7 +1,6 @@
 #include "battle/battle_unit.h"
 #include "evt/evt_cmd.h"
 
-#pragma force_active on
 #include "evt/evt_npc.h"
 #include "driver/msgdrv.h"
 #include "memory.h"
@@ -10,6 +9,8 @@
 #include "evt/evt_bero.h"
 #include "party/party_motion.h"
 #include "mario/mario_pouch.h"
+#include "manager/evtmgr_cmd.h"
+#include "manager/fontmgr.h"
 
 USER_FUNC(evt_bero_exec_wait);
 USER_FUNC(evt_bero_get_entername);
@@ -80,105 +81,70 @@ USER_FUNC(kemuri_stop);
 static USER_FUNC(make_list);
 USER_FUNC(memoryRY);
 
-f32 fd_tou_04_negone_one_374[2] __attribute__((aligned(8)));
-f32 fd_tou_04_neg_one_382;
-f32 fd_tou_04___local_PI_383;
-f32 fd_tou_04___local_3PIO2_385;
-f32 fd_tou_04_one_negone_373[2] __attribute__((aligned(8)));
-f32 fd_tou_04___local_PIO2_384;
-f32 fd_tou_04_one_381;
-f32 fd_tou_04_negone_one_360[2] __attribute__((aligned(8)));
-f32 fd_tou_04_neg_one_365;
-f32 fd_tou_04___local_PI_366;
-f32 fd_tou_04___local_3PIO2_368;
-f32 fd_tou_04_one_negone_359[2] __attribute__((aligned(8)));
-f32 fd_tou_04___local_PIO2_367;
-f32 fd_tou_04_one_364;
-static EvtWord w_door_open[12];
-static EvtWord w_door_close[12];
-EvtWord _1_door_open[12];
-EvtWord _1_door_close[12];
-EvtWord _2_door_open[12];
-EvtWord _2_door_close[12];
-EvtWord _3_door_open[12];
-EvtWord _3_door_close[12];
-EvtWord _4_door_open[12];
-EvtWord _4_door_close[12];
-EvtWord _5_door_open[12];
-EvtWord _5_door_close[12];
-EvtWord _6_door_open[12];
-EvtWord _6_door_close[12];
-EvtWord _7_door_open[12];
-EvtWord _7_door_close[12];
-static EvtWord e_door_open[12];
-static EvtWord e_door_close[12];
-static EvtWord n1_door_open[22];
-static EvtWord n1_door_close[22];
-static EvtWord n2_door_open[22];
-static EvtWord n2_door_close[22];
+extern EvtWord _1_door_open[];
+extern EvtWord _1_door_close[];
+extern EvtWord _2_door_open[];
+extern EvtWord _2_door_close[];
+extern EvtWord _3_door_open[];
+extern EvtWord _3_door_close[];
+extern EvtWord _4_door_open[];
+extern EvtWord _4_door_close[];
+extern EvtWord _5_door_open[];
+extern EvtWord _5_door_close[];
+extern EvtWord _6_door_open[];
+extern EvtWord _6_door_close[];
+extern EvtWord _7_door_open[];
+extern EvtWord _7_door_close[];
 static BeroEntry bero_data[12];
-EvtWord move_g[233];
-EvtWord move_g_1_dokimasen[25];
-EvtWord init_g_1[59];
-EvtWord move_g_1_dokimasu[51];
-EvtWord talk_g_1[90];
-EvtWord move_g_1[52];
-EvtWord init_g_2[26];
-EvtWord talk_g_2[59];
-EvtWord move_g_2[56];
-EvtWord init_g_3[30];
-EvtWord talk_g_3[39];
-EvtWord move_g_3[37];
-EvtWord move_g_4_dokimasen[36];
-EvtWord init_g_4[91];
-EvtWord talk_g_4[271];
-EvtWord move_g_4[81];
-EvtWord init_g_5[2];
-EvtWord talk_g_5[2];
-EvtWord move_g_5[2];
-EvtWord init_g_6[19];
-EvtWord talk_g_6[31];
-EvtWord move_g_6[30];
-EvtWord init_g_7[8];
-EvtWord talk_g_7[28];
-EvtWord move_g_7[2];
-EvtWord init_g_8[8];
-EvtWord talk_g_8[39];
-EvtWord move_g_8[2];
-EvtWord init_g_9[8];
-EvtWord talk_g_9[47];
-EvtWord move_g_9[11];
-EvtWord init_g_10[25];
-EvtWord talk_g_10[25];
-EvtWord init_g_11[29];
-EvtWord talk_g_11[25];
-static EvtWord init_champ[2];
-static EvtWord init_brots[58];
-static EvtWord talk_brots[149];
+extern EvtWord move_g[];
+extern EvtWord move_g_1_dokimasen[];
+extern EvtWord init_g_1[];
+extern EvtWord move_g_1_dokimasu[];
+extern EvtWord talk_g_1[];
+extern EvtWord move_g_1[];
+extern EvtWord init_g_2[];
+extern EvtWord talk_g_2[];
+extern EvtWord move_g_2[];
+extern EvtWord init_g_3[];
+extern EvtWord talk_g_3[];
+extern EvtWord move_g_3[];
+extern EvtWord move_g_4_dokimasen[];
+extern EvtWord init_g_4[];
+extern EvtWord talk_g_4[];
+extern EvtWord move_g_4[];
+extern EvtWord init_g_5[];
+extern EvtWord talk_g_5[];
+extern EvtWord move_g_5[];
+extern EvtWord init_g_6[];
+extern EvtWord talk_g_6[];
+extern EvtWord move_g_6[];
+extern EvtWord init_g_7[];
+extern EvtWord talk_g_7[];
+extern EvtWord move_g_7[];
+extern EvtWord init_g_8[];
+extern EvtWord talk_g_8[];
+extern EvtWord move_g_8[];
+extern EvtWord init_g_9[];
+extern EvtWord talk_g_9[];
+extern EvtWord move_g_9[];
+extern EvtWord init_g_10[];
+extern EvtWord talk_g_10[];
+extern EvtWord init_g_11[];
+extern EvtWord talk_g_11[];
 static NpcSetupInfo npcEnt[16];
-EvtWord evt_drop[33];
-EvtWord evt_gans[145];
-static EvtWord evt_kinoshikowa[193];
-EvtWord evt_kinoshikowa2[161];
-EvtWord evt_kinoshikowa3[179];
-static EvtWord evt_gardman[173];
-EvtWord evt_gardman2[164];
-EvtWord evt_gardman3[298];
-EvtWord evt_gardman4[177];
-static EvtWord evt_toile[107];
-static EvtWord evt_toile2[107];
+extern EvtWord evt_drop[];
+extern EvtWord evt_gans[];
+extern EvtWord evt_kinoshikowa2[];
+extern EvtWord evt_kinoshikowa3[];
+extern EvtWord evt_gardman2[];
+extern EvtWord evt_gardman3[];
+extern EvtWord evt_gardman4[];
 static s32 key_tbl[2];
-static EvtWord evt_chk[23];
-static EvtWord evt_lock[14];
-EvtWord evt_souko_talk[272];
-EvtWord evt_bred_nigeru[116];
-EvtWord boss_msg[14];
-EvtWord out_from_tou_10_re[22];
-#ifdef VERSION_G8ME01
-EvtWord tou_04_init_evt[652];
-#else
-EvtWord tou_04_init_evt[668];
-#endif
+extern EvtWord evt_souko_talk[];
+extern EvtWord evt_bred_nigeru[];
+extern EvtWord boss_msg[];
+extern EvtWord out_from_tou_10_re[];
+extern EvtWord tou_04_init_evt[];
 
 USER_FUNC(memoryRY) {
     NpcEntry* npc = evtNpcNameToPtr(event, "me");
@@ -186,34 +152,6 @@ USER_FUNC(memoryRY) {
     npc->savedDirection = npc->direction;
     return EVT_RETURN_DONE;
 }
-
-f32 fd_tou_04_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
-
-f32 fd_tou_04_neg_one_382 = -1.0f;
-
-f32 fd_tou_04___local_PI_383 = 3.1415927f;
-
-f32 fd_tou_04___local_3PIO2_385 = 4.712389f;
-
-f32 fd_tou_04_one_negone_373[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
-
-f32 fd_tou_04___local_PIO2_384 = 1.5707964f;
-
-f32 fd_tou_04_one_381 = 1.0f;
-
-f32 fd_tou_04_negone_one_360[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
-
-f32 fd_tou_04_neg_one_365 = -1.0f;
-
-f32 fd_tou_04___local_PI_366 = 3.1415927f;
-
-f32 fd_tou_04___local_3PIO2_368 = 4.712389f;
-
-f32 fd_tou_04_one_negone_359[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
-
-f32 fd_tou_04___local_PIO2_367 = 1.5707964f;
-
-f32 fd_tou_04_one_364 = 1.0f;
 
 static EVT_BEGIN(w_door_open)
     MULTIPLY_FLOAT(LW(0), FLOAT(-0.44433594f))
@@ -877,6 +815,15 @@ EVT_BEGIN(init_g_4)
         END_SWITCH
         IF_INT_EQUAL(LF(0), 1)
             SET_VALUE(LF(1), GSWF(2499))
+#ifdef VERSION_G8MP01
+            IF_INT_EQUAL(GSWF(2499), 0)
+                CALL(evt_bero_get_entername, LW(0))
+                IF_STR_EQUAL(LW(0), STRING("s_bero_5"))
+                    SET_VALUE(LF(1), 1)
+                    SET_VALUE(LF(2), 1)
+                END_IF
+            END_IF
+#endif
             ELSE
             IF_INT_EQUAL(GSWF(2500), 0)
                 SET_VALUE(LF(1), GSWF(2498))
@@ -894,6 +841,9 @@ EVT_BEGIN(init_g_4)
             CALL(evt_npc_set_position, STRING("me"), -350, 0, -530)
             ELSE
             CALL(evt_npc_set_position, STRING("me"), -300, 0, -530)
+#ifdef VERSION_G8MP01
+            CALL(evt_npc_set_ry, STRING("me"), 270)
+#endif
             IF_INT_EQUAL(LF(2), 1)
                 SPAWN_EVENT(PTR(move_g_4_dokimasen))
             END_IF
@@ -1255,7 +1205,7 @@ static USER_FUNC(make_list) {
     sprintf(tmp, "<select %d %d %d %d>", 0, 7, 300, 140);
 #endif
     for (i = 0; i < 7; i++) {
-        strcat(tmp, "\n\0\0");
+        strcat(tmp, "\n");
         strcat(tmp, msgSearch(list[i]));
     }
     evtSetValue(event, args[0], (EvtWord)tmp);

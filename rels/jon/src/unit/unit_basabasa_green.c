@@ -9,8 +9,6 @@
 #include "battle/battle_database_common.h"
 #include "data_tables.h"
 
-#pragma force_active on
-
 USER_FUNC(btlevtcmd_AddHomePos);
 USER_FUNC(btlevtcmd_AddPos);
 USER_FUNC(btlevtcmd_AnimeChangePoseFromTable);
@@ -40,20 +38,6 @@ USER_FUNC(btlevtcmd_SetStatusIconOffset);
 USER_FUNC(btlevtcmd_StartWaitEvent);
 USER_FUNC(btlevtcmd_WaitAttackEnd);
 
-f32 fd_basabasa_green_negone_one_374[2] __attribute__((aligned(8)));
-f32 fd_basabasa_green_neg_one_382;
-f32 fd_basabasa_green___local_PI_383;
-f32 fd_basabasa_green___local_3PIO2_385;
-f32 fd_basabasa_green_one_negone_373[2] __attribute__((aligned(8)));
-f32 fd_basabasa_green___local_PIO2_384;
-f32 fd_basabasa_green_one_381;
-f32 fd_basabasa_green_negone_one_360[2] __attribute__((aligned(8)));
-f32 fd_basabasa_green_neg_one_365;
-f32 fd_basabasa_green___local_PI_366;
-f32 fd_basabasa_green___local_3PIO2_368;
-f32 fd_basabasa_green_one_negone_359[2] __attribute__((aligned(8)));
-f32 fd_basabasa_green___local_PIO2_367;
-f32 fd_basabasa_green_one_364;
 BattleUnitKind unit_basabasa_green;
 static BattleUnitDefense defence;
 static BattleUnitDefenseAttr defence_attr;
@@ -65,7 +49,6 @@ static BattleUnitKindPart parts[1];
 static StatusVulnerability regist;
 static BattleWeapon weapon_basabasa_attack;
 static PoseSoundTiming pose_sound_timing_table[9];
-static EvtWord ceil_sky_event[98];
 static EvtWord init_event[78];
 static EvtWord dmg_first_attack_pos[12];
 static EvtWord damage_event[10];
@@ -74,34 +57,6 @@ static EvtWord counter_damage_event[16];
 static EvtWord ceil_fall_ready_event[23];
 static EvtWord attack_event[683];
 static EvtWord wait_event[6];
-
-f32 fd_basabasa_green_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
-
-f32 fd_basabasa_green_neg_one_382 = -1.0f;
-
-f32 fd_basabasa_green___local_PI_383 = 3.1415927f;
-
-f32 fd_basabasa_green___local_3PIO2_385 = 4.712389f;
-
-f32 fd_basabasa_green_one_negone_373[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
-
-f32 fd_basabasa_green___local_PIO2_384 = 1.5707964f;
-
-f32 fd_basabasa_green_one_381 = 1.0f;
-
-f32 fd_basabasa_green_negone_one_360[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
-
-f32 fd_basabasa_green_neg_one_365 = -1.0f;
-
-f32 fd_basabasa_green___local_PI_366 = 3.1415927f;
-
-f32 fd_basabasa_green___local_3PIO2_368 = 4.712389f;
-
-f32 fd_basabasa_green_one_negone_359[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
-
-f32 fd_basabasa_green___local_PIO2_367 = 1.5707964f;
-
-f32 fd_basabasa_green_one_364 = 1.0f;
 
 BattleUnitKind unit_basabasa_green = {
     167,
@@ -551,7 +506,7 @@ static EVT_BEGIN(attack_event)
         CALL(btlevtcmd_GetPos, -2, LW(5), LW(6), LW(7))
         ADD(LW(6), 20)
         ADD(LW(7), 10)
-        CALL(evt_eff, STRING(""), STRING("recovery\0\0\0"), 7, LW(5), LW(6), LW(7), LW(10), 0, 0, 0, 0, 0, 0, 0)
+        CALL(evt_eff, STRING(""), STRING("recovery"), 7, LW(5), LW(6), LW(7), LW(10), 0, 0, 0, 0, 0, 0, 0)
         SET_VALUE(LW(0), 0)
         LOOP(0)
             IF_INT_GREATER_OR_EQUAL(LW(0), 5)

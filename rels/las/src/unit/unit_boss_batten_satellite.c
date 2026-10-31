@@ -1,7 +1,6 @@
 #include "battle/battle_unit.h"
 #include "evt/evt_cmd.h"
 
-#pragma force_active on
 #include "manager/evtmgr_cmd.h"
 #include "battle/battle_event_default.h"
 #include "battle/battle_event_cmd.h"
@@ -33,20 +32,6 @@ static USER_FUNC(bts_wariai_enzan_1f_intpl);
 static USER_FUNC(bts_wariai_enzan_1f);
 static USER_FUNC(bts_wariai_enzan_1);
 
-f32 fd_boss_batten_satellite_negone_one_374[2] __attribute__((aligned(8)));
-f32 fd_boss_batten_satellite_neg_one_382;
-f32 fd_boss_batten_satellite___local_PI_383;
-f32 fd_boss_batten_satellite___local_3PIO2_385;
-f32 fd_boss_batten_satellite_one_negone_373[2] __attribute__((aligned(8)));
-f32 fd_boss_batten_satellite___local_PIO2_384;
-f32 fd_boss_batten_satellite_one_381;
-f32 fd_boss_batten_satellite_negone_one_360[2] __attribute__((aligned(8)));
-f32 fd_boss_batten_satellite_neg_one_365;
-f32 fd_boss_batten_satellite___local_PI_366;
-f32 fd_boss_batten_satellite___local_3PIO2_368;
-f32 fd_boss_batten_satellite_one_negone_359[2] __attribute__((aligned(8)));
-f32 fd_boss_batten_satellite___local_PIO2_367;
-f32 fd_boss_batten_satellite_one_364;
 BattleWeapon weapon_batten_satellite_attack;
 BattleUnitKind unit_boss_batten_satellite;
 static BattleUnitDefense defence;
@@ -54,44 +39,14 @@ static BattleUnitDefenseAttr defence_attr;
 static StatusVulnerability regist;
 static PoseTableEntry pose_table[18];
 static BattleDataEntry data_table[15];
-EvtWord dmg_counter_event[149];
+extern EvtWord dmg_counter_event[];
 static BattleUnitKindPart parts[1];
 static EvtWord init_event[30];
-static EvtWord entry_event[2];
 static EvtWord damage_event[10];
-static EvtWord phase_event[2];
 static EvtWord dead_event[2];
 static EvtWord attack_event[10];
-EvtWord batten_satellite_attack_attack_event[304];
+extern EvtWord batten_satellite_attack_attack_event[];
 static EvtWord wait_event[6];
-
-f32 fd_boss_batten_satellite_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
-
-f32 fd_boss_batten_satellite_neg_one_382 = -1.0f;
-
-f32 fd_boss_batten_satellite___local_PI_383 = 3.1415927f;
-
-f32 fd_boss_batten_satellite___local_3PIO2_385 = 4.712389f;
-
-f32 fd_boss_batten_satellite_one_negone_373[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
-
-f32 fd_boss_batten_satellite___local_PIO2_384 = 1.5707964f;
-
-f32 fd_boss_batten_satellite_one_381 = 1.0f;
-
-f32 fd_boss_batten_satellite_negone_one_360[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
-
-f32 fd_boss_batten_satellite_neg_one_365 = -1.0f;
-
-f32 fd_boss_batten_satellite___local_PI_366 = 3.1415927f;
-
-f32 fd_boss_batten_satellite___local_3PIO2_368 = 4.712389f;
-
-f32 fd_boss_batten_satellite_one_negone_359[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
-
-f32 fd_boss_batten_satellite___local_PIO2_367 = 1.5707964f;
-
-f32 fd_boss_batten_satellite_one_364 = 1.0f;
 
 BattleWeapon weapon_batten_satellite_attack = {
     NULL, 0, // name..icon

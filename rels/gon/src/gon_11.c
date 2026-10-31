@@ -2,7 +2,6 @@
 #include "evt/evt_cmd.h"
 #include "manager/evtmgr_cmd.h"
 
-#pragma force_active on
 #include "driver/npcdrv.h"
 #include "driver/hitdrv.h"
 #include "driver/camdrv.h"
@@ -27,7 +26,7 @@ typedef struct CloudWork { s32 used; s32 state; char animName[0x20]; char imgNam
 void mapGrpSetOffScreen(const char* name, const char* offscreen);
 void mapGrpClearOffScreen(const char* name);
 static CloudWork* cloud;
-static u8 cloud_once_flag;
+static s8 cloud_once_flag;
 static void _mapsetofs_all(CloudWork* wp);
 static void _mapclsofs_all(CloudWork* wp);
 static BOOL _get_boundingbox(const char* name, s32* x, s32* y, s32* w, s32* h);
@@ -115,64 +114,15 @@ static BOOL _get_boundingbox(const char* name, s32* x, s32* y, s32* w, s32* h);
 static void _mapsetofs_all(CloudWork* wp);
 static void _mapclsofs_all(CloudWork* wp);
 
-f32 fd_gon_11_negone_one_374[2] __attribute__((aligned(8)));
-f32 fd_gon_11_neg_one_382;
-f32 fd_gon_11___local_PI_383;
-f32 fd_gon_11___local_3PIO2_385;
-f32 fd_gon_11_one_negone_373[2] __attribute__((aligned(8)));
-f32 fd_gon_11___local_PIO2_384;
-f32 fd_gon_11_one_381;
-f32 fd_gon_11_negone_one_360[2] __attribute__((aligned(8)));
-f32 fd_gon_11_neg_one_365;
-f32 fd_gon_11___local_PI_366;
-f32 fd_gon_11___local_3PIO2_368;
-f32 fd_gon_11_one_negone_359[2] __attribute__((aligned(8)));
-f32 fd_gon_11___local_PIO2_367;
-f32 fd_gon_11_one_364;
-EvtWord evt_sound[8];
-static EvtWord door01_close[22];
-static EvtWord door01_open[22];
+extern EvtWord evt_sound[];
 static BeroEntry bero_entry_data[2];
-static EvtWord gonbaba_standup_shake[23];
-static EvtWord gonbaba_fog_change[87];
-static EvtWord gonbaba_down_shake[83];
-EvtWord gonbaba_event[1410];
+extern EvtWord gonbaba_event[];
 static const char* capturemap[2];
 static Vec v_list[8];
-static EvtWord evt_cloud_main_evt[4];
-EvtWord iri_16_box_evt[33];
-EvtWord iri_16_cloud_evt[36];
-EvtWord iri_16_touch_evt[2];
-static EvtWord iri_16_init[57];
-EvtWord gon_11_init_evt[101];
-
-f32 fd_gon_11_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
-
-f32 fd_gon_11_neg_one_382 = -1.0f;
-
-f32 fd_gon_11___local_PI_383 = 3.1415927f;
-
-f32 fd_gon_11___local_3PIO2_385 = 4.712389f;
-
-f32 fd_gon_11_one_negone_373[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
-
-f32 fd_gon_11___local_PIO2_384 = 1.5707964f;
-
-f32 fd_gon_11_one_381 = 1.0f;
-
-f32 fd_gon_11_negone_one_360[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
-
-f32 fd_gon_11_neg_one_365 = -1.0f;
-
-f32 fd_gon_11___local_PI_366 = 3.1415927f;
-
-f32 fd_gon_11___local_3PIO2_368 = 4.712389f;
-
-f32 fd_gon_11_one_negone_359[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
-
-f32 fd_gon_11___local_PIO2_367 = 1.5707964f;
-
-f32 fd_gon_11_one_364 = 1.0f;
+extern EvtWord iri_16_box_evt[];
+extern EvtWord iri_16_cloud_evt[];
+extern EvtWord iri_16_touch_evt[];
+extern EvtWord gon_11_init_evt[];
 
 EVT_BEGIN(evt_sound)
     CALL(evt_snd_bgmoff, 513)
@@ -220,7 +170,7 @@ static BeroEntry bero_entry_data[] = {
 
 static USER_FUNC(gonbaba_wait_landon) {
     // ゴンババ
-    return npcNameToPtr("\203S\203\223\203o\203o")->groundHit ? EVT_RETURN_DONE : EVT_RETURN_BLOCK;
+    return npcNameToPtr("ゴンババ")->groundHit ? EVT_RETURN_DONE : EVT_RETURN_BLOCK;
 }
 
 static EVT_BEGIN(gonbaba_standup_shake)
@@ -774,195 +724,153 @@ static void _mapclsofs_all(CloudWork* wp) {
 }
 
 #pragma dont_inline on
-static s32 evt_cloud_main(EventEntry *event, BOOL isFirstCall)
-{
-  HitEntry *hit0;
-  HitEntry *hit1;
-  HitEntry *hit2;
-  HitEntry *hit3;
-  MarioWork *mario;
-  CloudWork *wp;
-  PartyEntry *party;
-  PartyEntry *ptmp;
-  HitEntry *hit;
-  OffscreenEntry *off;
-  ImageEntry *img;
-  BOOL inBattle;
-  wp = (CloudWork *) event->lwData[0];
-  inBattle = gp->inBattle != 0;
-  mario = marioGetPtr();
-  ptmp = partyGetPtr(0);
-  if (isFirstCall)
-  {
-    return 0;
-  }
-  if (ptmp == ((void *) 0))
-  {
-    return 0;
-  }
-  hit0 = (HitEntry *) cloudGetHitBreathout(0);
-  hit1 = (HitEntry *) cloudGetHitBreathout(1);
-  hit2 = (HitEntry *) cloudGetHitBreathout(2);
-  hit3 = (HitEntry *) cloudGetHitBreathout(3);
-  switch (wp->state)
-  {
-    case 0:
-      if (((s32) (cloud_once_flag & 0xFFFFFFFFFFFFFFFFu)) == 1) // FAKE: no-op 64-bit mask; needed for 100% (plain cloud_once_flag == 1 gives 97.9-98.1)
-    {
-      break;
+static USER_FUNC(evt_cloud_main) {
+    CloudWork* wp = (CloudWork*)event->lwData[0];
+    s32 group = gp->inBattle != 0;
+    MarioWork* mario = marioGetPtr();
+    PartyEntry* party = partyGetPtr(0);
+    HitEntry* hit0;
+    HitEntry* hit1;
+    HitEntry* hit2;
+    HitEntry* hit3;
+    HitEntry* hit;
+    OffscreenEntry* off;
+    ImageEntry* img;
+
+    if (isFirstCall) {
+        return EVT_RETURN_BLOCK;
     }
-      hit = hitNameToPtr(wp->hitName);
-      if ((((hit0 == hit) || (hit1 == hit)) || (hit2 == hit)) || (hit3 == hit))
-    {
-      wp->state++;
+    if (party == NULL) {
+        return EVT_RETURN_BLOCK;
     }
-      wp->counter = 0;
-      break;
-
-    case 1:
-      if ((mario->displayDirectionTarget > 90.0f) && ((mario->displayDirectionTarget <= 270.0f) ^ 0))
-    {
-      strcpy(wp->animName, "P_oof_cloud_2");
+    hit0 = (HitEntry*)cloudGetHitBreathout(0);
+    hit1 = (HitEntry*)cloudGetHitBreathout(1);
+    hit2 = (HitEntry*)cloudGetHitBreathout(2);
+    hit3 = (HitEntry*)cloudGetHitBreathout(3);
+    switch (wp->state) {
+        case 0:
+            if (cloud_once_flag == 1) {
+                break;
+            }
+            hit = hitNameToPtr(wp->hitName);
+            if (hit0 == hit || hit1 == hit || hit2 == hit || hit3 == hit) {
+                wp->state++;
+            }
+            wp->counter = 0;
+            break;
+        case 1:
+            if (mario->displayDirectionTarget > 90.0f && mario->displayDirectionTarget <= 270.0f) {
+                strcpy(wp->animName, "P_oof_cloud_2");
+            } else {
+                strcpy(wp->animName, "P_oof_cloud_1");
+            }
+            if (!animGroupBaseAsync(wp->animName, group, NULL)) {
+                break;
+            }
+            cloud_once_flag = 1;
+            animPaperPoseEntry(wp->animName, group);
+            offscreenEntry(wp->offscreenName);
+            off = offscreenNameToPtr(wp->offscreenName);
+            off->texFmt = off->copyFmt = 4;
+            _mapsetofs_all(wp);
+            wp->state++;
+            break;
+        case 2:
+            imgEntry(wp->imgName, group);
+            img = imgNameToPtr(wp->imgName, group);
+            img->poseId = animPaperPoseGetId(wp->animName, group);
+            img->animTime = animTimeGetTime(group);
+            imgClearVirtualPoint(img);
+            imgSetShadow(img, 2);
+            img->flags |= 2;
+            wp->state = 222;
+            break;
+        case 222:
+            if (!_get_boundingbox(wp->hitName, &wp->x, &wp->y, &wp->w, &wp->h)) {
+                break;
+            }
+            _img_alloc_capture(wp->imgName, 0, wp->offscreenName, 1, wp->x, wp->y, wp->w, wp->h);
+            wp->state = 223;
+            break;
+        case 223:
+            img = imgNameToPtr(wp->imgName, group);
+            img->flags &= ~2;
+            wp->state = 3;
+        case 3:
+            img = imgNameToPtr(wp->imgName, group);
+            img->animName = "A_1";
+            img->animTime = animTimeGetTime(group);
+            img->flags &= ~2;
+            wp->timer = 30;
+            wp->lastFrame = 0.0f;
+            wp->state++;
+            break;
+        case 4:
+            img = imgNameToPtr(wp->imgName, group);
+            if (wp->lastFrame == 0.0f || wp->lastFrame + 1.0f < img->loopTimes) {
+                psndSFXOn_3D("SFX_OFF_CLAUD_WIND2", &mario->position);
+                wp->lastFrame = img->loopTimes;
+            }
+            if (mario->currMotionId != 27) {
+                wp->state = 10;
+                break;
+            }
+            hit = hitNameToPtr(wp->hitName);
+            if (hit0 != hit && hit1 != hit && hit2 != hit && hit3 != hit) {
+                if (wp->timer == 0) {
+                    wp->state = 10;
+                } else {
+                    wp->timer--;
+                    wp->counter += 2;
+                }
+            } else {
+                wp->timer = 30;
+                wp->counter += 2;
+                if (wp->counter > wp->limit) {
+                    wp->state = 20;
+                }
+            }
+            break;
+        case 10:
+            wp->state = 99;
+            break;
+        case 20:
+            psndSFXOn_3D("SFX_OFF_CLAUD_WIND3", &mario->position);
+            if (wp->endEvt != NULL) {
+                evtEntry(wp->endEvt, 0, 0);
+            }
+            img = imgNameToPtr(wp->imgName, group);
+            img->animName = "A_2";
+            img->animTime = animTimeGetTime(group);
+            wp->timer = 60;
+            wp->state++;
+            break;
+        case 21:
+            if (wp->timer != 0) {
+                wp->timer--;
+                break;
+            }
+            wp->timer = 30;
+            wp->counter += 2;
+            wp->state = 100;
+            break;
+        case 99:
+        case 100:
+            img = imgNameToPtr(wp->imgName, group);
+            _mapclsofs_all(wp);
+            animPaperPoseRelease(img->poseId);
+            imgFreeCapture(img, 0);
+            imgSetShadow(img, 0);
+            imgRelease(img, group);
+            offscreenDelete(wp->offscreenName);
+            cloud_once_flag = 0;
+            if (wp->state == 99) {
+                wp->state = 0;
+                break;
+            }
+            return EVT_RETURN_DONE;
     }
-    else
-    {
-      strcpy(wp->animName, "P_oof_cloud_1");
-    }
-      if (!animGroupBaseAsync(wp->animName, inBattle, (void *) 0))
-    {
-      break;
-    }
-      cloud_once_flag = 1;
-      animPaperPoseEntry(wp->animName, inBattle);
-      offscreenEntry(wp->offscreenName);
-      off = offscreenNameToPtr(wp->offscreenName);
-      off->texFmt = (off->copyFmt = 4);
-      _mapsetofs_all(wp);
-      wp->state++;
-      break;
-
-    case 2:
-      imgEntry(wp->imgName, inBattle);
-      img = imgNameToPtr(wp->imgName, inBattle);
-      img->poseId = animPaperPoseGetId(wp->animName, inBattle);
-      *(&img->animTime) = animTimeGetTime(inBattle);
-      imgClearVirtualPoint(img);
-      imgSetShadow(img, 2);
-      img->flags |= 2;
-      wp->state = 222;
-      break;
-
-    case 222:
-      if (!_get_boundingbox(wp->hitName, &wp->x, &wp->y, &wp->w, &wp->h))
-    {
-      break;
-    }
-      _img_alloc_capture(wp->imgName, 0, wp->offscreenName, 1, wp->x, wp->y, wp->w, wp->h);
-      wp->state = 223;
-      break;
-
-    case 223:
-      img = imgNameToPtr(wp->imgName, inBattle);
-      img->flags &= ~2;
-      wp->state = 3;
-
-    case 3:
-      img = imgNameToPtr(wp->imgName, inBattle);
-      img->animName = "A_1";
-      *(&img->animTime) = animTimeGetTime(inBattle);
-      img->flags &= ~2;
-      wp->timer = 30;
-      wp->lastFrame = 0.0f;
-      wp->state++;
-      break;
-
-    case 4:
-    {
-      img = imgNameToPtr(wp->imgName, inBattle);
-      if ((wp->lastFrame == 0.0f) || ((wp->lastFrame + 1.0f) < img->loopTimes))
-      {
-        psndSFXOn_3D("SFX_OFF_CLAUD_WIND2", &mario->position);
-        wp->lastFrame = img->loopTimes;
-      }
-      if (mario->currMotionId != 27)
-      {
-        wp->state = 10;
-        break;
-      }
-      hit = hitNameToPtr(wp->hitName);
-      if ((((hit0 != hit) && (hit1 != hit)) && (hit2 != hit)) && (hit3 != hit))
-      {
-        if (wp->timer == 0)
-        {
-          wp->state = 10;
-        }
-        else
-        {
-          wp->timer--;
-          wp->counter += 2;
-        }
-      }
-      else
-      {
-        wp->timer = 30;
-        wp->counter += 2;
-        if (wp->counter > wp->limit)
-        {
-          wp->state = 20;
-        }
-      }
-      break;
-    }
-
-    case 10:
-      wp->state = 99;
-      break;
-
-    case 20:
-      psndSFXOn_3D("SFX_OFF_CLAUD_WIND3", &mario->position);
-      if (wp->endEvt != ((void *) 0))
-    {
-      evtEntry(wp->endEvt, 0, 0);
-    }
-      img = imgNameToPtr(wp->imgName, inBattle);
-      img->animName = "A_2";
-      *(&img->animTime) = animTimeGetTime(inBattle);
-      wp->timer = 60;
-      wp->state++;
-      break;
-
-    case 21:
-      if (wp->timer != 0)
-    {
-      wp->timer--;
-      break;
-    }
-      wp->timer = 30;
-      wp->counter += 2;
-      wp->state = 100;
-      break;
-
-    case 99:
-
-    case 100:
-      img = imgNameToPtr(wp->imgName, inBattle);
-      _mapclsofs_all(wp);
-      animPaperPoseRelease(img->poseId);
-      imgFreeCapture(img, 0);
-      imgSetShadow(img, 0);
-      imgRelease(img, inBattle);
-      offscreenDelete(wp->offscreenName);
-      cloud_once_flag = 0;
-      if (wp->state == 99)
-    {
-      wp->state = 0;
-      break;
-    }
-      return 2;
-
-  }
-
-  return 0;
+    return EVT_RETURN_BLOCK;
 }
 #pragma dont_inline reset
 
@@ -1079,7 +987,7 @@ EVT_BEGIN(gon_11_init_evt)
         CASE_DEFAULT
         CALL(evt_snd_bgmon, 512, STRING("BGM_STG1_GON1"))
     END_SWITCH
-    CALL(evt_snd_envon, 272, STRING("ENV_STG1_GON4\0\0"))
+    CALL(evt_snd_envon, 272, STRING("ENV_STG1_GON4"))
     CALL(evt_snd_set_rev_mode, 2)
     CALL(evt_npc_flag_onoff, 1, STRING("ノコタロウ父"), 1536)
     CALL(evt_npc_change_fbat_mode, 1)

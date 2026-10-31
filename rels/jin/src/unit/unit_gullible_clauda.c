@@ -9,8 +9,6 @@
 #include "unit/party/unit_party_clauda.h"
 #include "battle/battle_database_common.h"
 
-#pragma force_active on
-
 USER_FUNC(btlevtcmd_AnimeChangePoseFromTable);
 USER_FUNC(btlevtcmd_CheckDamageCode);
 USER_FUNC(btlevtcmd_SetDiveSound);
@@ -23,20 +21,6 @@ USER_FUNC(btlevtcmd_SetRunSound);
 USER_FUNC(btlevtcmd_SetWalkSound);
 USER_FUNC(btlevtcmd_StartWaitEvent);
 
-f32 fd_gullible_clauda_negone_one_374[2] __attribute__((aligned(8)));
-f32 fd_gullible_clauda_neg_one_382;
-f32 fd_gullible_clauda___local_PI_383;
-f32 fd_gullible_clauda___local_3PIO2_385;
-f32 fd_gullible_clauda_one_negone_373[2] __attribute__((aligned(8)));
-f32 fd_gullible_clauda___local_PIO2_384;
-f32 fd_gullible_clauda_one_381;
-f32 fd_gullible_clauda_negone_one_360[2] __attribute__((aligned(8)));
-f32 fd_gullible_clauda_neg_one_365;
-f32 fd_gullible_clauda___local_PI_366;
-f32 fd_gullible_clauda___local_3PIO2_368;
-f32 fd_gullible_clauda_one_negone_359[2] __attribute__((aligned(8)));
-f32 fd_gullible_clauda___local_PIO2_367;
-f32 fd_gullible_clauda_one_364;
 BattleUnitKind unit_gullible_clauda;
 static BattleWeapon enemyWeapon_ClaudaNormalAttack;
 static BattleUnitDefense defence_clauda;
@@ -45,38 +29,10 @@ static StatusVulnerability regist_clauda;
 static BattleDataEntry data_table_clauda[2];
 static BattleUnitKindPart parts_clauda[1];
 static EvtWord init_event_clauda[50];
-EvtWord damage_event_clauda[22];
+extern EvtWord damage_event_clauda[];
 static EvtWord dead_event_clauda[177];
 static EvtWord attack_event_clauda[393];
 static EvtWord wait_event_clauda[6];
-
-f32 fd_gullible_clauda_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
-
-f32 fd_gullible_clauda_neg_one_382 = -1.0f;
-
-f32 fd_gullible_clauda___local_PI_383 = 3.1415927f;
-
-f32 fd_gullible_clauda___local_3PIO2_385 = 4.712389f;
-
-f32 fd_gullible_clauda_one_negone_373[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
-
-f32 fd_gullible_clauda___local_PIO2_384 = 1.5707964f;
-
-f32 fd_gullible_clauda_one_381 = 1.0f;
-
-f32 fd_gullible_clauda_negone_one_360[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
-
-f32 fd_gullible_clauda_neg_one_365 = -1.0f;
-
-f32 fd_gullible_clauda___local_PI_366 = 3.1415927f;
-
-f32 fd_gullible_clauda___local_3PIO2_368 = 4.712389f;
-
-f32 fd_gullible_clauda_one_negone_359[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
-
-f32 fd_gullible_clauda___local_PIO2_367 = 1.5707964f;
-
-f32 fd_gullible_clauda_one_364 = 1.0f;
 
 BattleUnitKind unit_gullible_clauda = {
     83,
@@ -330,7 +286,7 @@ static EVT_BEGIN(attack_event_clauda)
         WAIT_FRAMES(30)
         GOTO(95)
     END_IF
-    CALL(btlevtcmd_snd_se, -2, STRING("SFX_BTL_CLAUD_ATTACK2\0\0"), -250000000, 0, -250000000)
+    CALL(btlevtcmd_snd_se, -2, STRING("SFX_BTL_CLAUD_ATTACK2"), -250000000, 0, -250000000)
     CALL(btlevtcmd_ResultACDefence, LW(3), LW(12))
     CALL(btlevtcmd_CheckDamage, -2, LW(3), LW(4), LW(12), 256, LW(5))
     CALL(btlevtcmd_JumpContinue, -2)

@@ -4,8 +4,6 @@
 #include "las.h"
 #include "mario/mario_pouch.h"
 
-#pragma force_active on
-
 USER_FUNC(evt_bero_get_info);
 USER_FUNC(evt_hit_bind_mapobj);
 USER_FUNC(evt_hit_bind_update);
@@ -42,67 +40,15 @@ USER_FUNC(evt_snd_sfxon_3d);
 USER_FUNC(evt_sub_get_sincos);
 USER_FUNC(evt_win_item_select);
 
-f32 fd_las_22_negone_one_374[2] __attribute__((aligned(8)));
-f32 fd_las_22_neg_one_382;
-f32 fd_las_22___local_PI_383;
-f32 fd_las_22___local_3PIO2_385;
-f32 fd_las_22_one_negone_373[2] __attribute__((aligned(8)));
-f32 fd_las_22___local_PIO2_384;
-f32 fd_las_22_one_381;
-f32 fd_las_22_negone_one_360[2] __attribute__((aligned(8)));
-f32 fd_las_22_neg_one_365;
-f32 fd_las_22___local_PI_366;
-f32 fd_las_22___local_3PIO2_368;
-f32 fd_las_22_one_negone_359[2] __attribute__((aligned(8)));
-f32 fd_las_22___local_PIO2_367;
-f32 fd_las_22_one_364;
-static EvtWord w_door_close[22];
-static EvtWord w_door_open[22];
-static EvtWord e_door_close[22];
-static EvtWord e_door_open[22];
-EvtWord door_dummy[2];
+extern EvtWord door_dummy[];
 static BeroEntry bero_entry_data[4];
 static const char* haguruma_hontai[13];
 static const char* haguruma_hontai2[7];
 static const char* haguruma_kage[11];
 static const char* haguruma_kage2[6];
-static EvtWord haguruma_evt[194];
-EvtWord kaitendai_evt[312];
-static EvtWord dai_evt[13];
+extern EvtWord kaitendai_evt[];
 static s32 key_tbl[2];
-static EvtWord key_evt[5];
-static EvtWord key_check_evt[23];
-static EvtWord unlock_evt[10];
-static EvtWord mobj_box00[34];
-EvtWord las_22_init_evt[150];
-
-f32 fd_las_22_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
-
-f32 fd_las_22_neg_one_382 = -1.0f;
-
-f32 fd_las_22___local_PI_383 = 3.1415927f;
-
-f32 fd_las_22___local_3PIO2_385 = 4.712389f;
-
-f32 fd_las_22_one_negone_373[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
-
-f32 fd_las_22___local_PIO2_384 = 1.5707964f;
-
-f32 fd_las_22_one_381 = 1.0f;
-
-f32 fd_las_22_negone_one_360[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
-
-f32 fd_las_22_neg_one_365 = -1.0f;
-
-f32 fd_las_22___local_PI_366 = 3.1415927f;
-
-f32 fd_las_22___local_3PIO2_368 = 4.712389f;
-
-f32 fd_las_22_one_negone_359[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
-
-f32 fd_las_22___local_PIO2_367 = 1.5707964f;
-
-f32 fd_las_22_one_364 = 1.0f;
+extern EvtWord las_22_init_evt[];
 
 static EVT_BEGIN(w_door_close)
     MULTIPLY_FLOAT(LW(0), FLOAT(-0.38867188f))
@@ -477,7 +423,7 @@ EVT_BEGIN(las_22_init_evt)
         CALL(evt_item_entry, STRING("key"), 47, -25, -80, -100, 16, -1, PTR(key_evt))
     END_IF
     IF_INT_LESS(GSW(0), 394)
-        CALL(evt_mobj_lock, STRING("lock\0\0\0"), 47, -695, 50, 0, 90, PTR(key_check_evt), PTR(unlock_evt), GSWF(4355))
+        CALL(evt_mobj_lock, STRING("lock"), 47, -695, 50, 0, 90, PTR(key_check_evt), PTR(unlock_evt), GSWF(4355))
         SET_VALUE(LW(0), STRING("w_bero"))
         CALL_CHILD(PTR(bero_case_switch_off))
     END_IF

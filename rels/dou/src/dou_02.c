@@ -5,8 +5,6 @@
 #include "dou.h"
 #include "driver/hitdrv.h"
 
-#pragma force_active on
-
 USER_FUNC(evt_bero_get_info);
 USER_FUNC(evt_hit_bind_mapobj);
 USER_FUNC(evt_hit_bind_update);
@@ -26,65 +24,13 @@ USER_FUNC(evt_snd_sfxon_3d);
 USER_FUNC(evt_sub_intpl_msec_get_value);
 USER_FUNC(evt_sub_intpl_msec_init);
 USER_FUNC(evt_sub_random);
+#ifdef VERSION_G8MP01
+USER_FUNC(evt_sub_get_framerate); // evt_sub.c (PAL only): writes gp->framerate (50 or 60) to arg 0
+#endif
 
-f32 fd_dou_02_negone_one_374[2] __attribute__((aligned(8)));
-f32 fd_dou_02_neg_one_382;
-f32 fd_dou_02___local_PI_383;
-f32 fd_dou_02___local_3PIO2_385;
-f32 fd_dou_02_one_negone_373[2] __attribute__((aligned(8)));
-f32 fd_dou_02___local_PIO2_384;
-f32 fd_dou_02_one_381;
-f32 fd_dou_02_negone_one_360[2] __attribute__((aligned(8)));
-f32 fd_dou_02_neg_one_365;
-f32 fd_dou_02___local_PI_366;
-f32 fd_dou_02___local_3PIO2_368;
-f32 fd_dou_02_one_negone_359[2] __attribute__((aligned(8)));
-f32 fd_dou_02___local_PIO2_367;
-f32 fd_dou_02_one_364;
 static BeroEntry bero_entry_data[4];
-static EvtWord yari_trap_sub[119];
-static EvtWord yari_trap[11];
-static EvtWord dou_puka_event_init0[8];
-static EvtWord dou_puka_event_0[24];
-static EvtWord dou_puka_event_rev_0[10];
-static EvtWord dou_puka_event_main0[21];
-static EvtWord dou_puka_event_sub0[45];
-static EvtWord dou_puka_event_init1[8];
-static EvtWord dou_puka_event_1[24];
-static EvtWord dou_puka_event_rev_1[10];
-static EvtWord dou_puka_event_main1[21];
-static EvtWord dou_puka_event_sub1[45];
 static HitDamageReturn hitDmgRetPoints[8];
-static EvtWord evt_ride_ship[15];
-EvtWord dou_02_init_evt[139];
-
-f32 fd_dou_02_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
-
-f32 fd_dou_02_neg_one_382 = -1.0f;
-
-f32 fd_dou_02___local_PI_383 = 3.1415927f;
-
-f32 fd_dou_02___local_3PIO2_385 = 4.712389f;
-
-f32 fd_dou_02_one_negone_373[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
-
-f32 fd_dou_02___local_PIO2_384 = 1.5707964f;
-
-f32 fd_dou_02_one_381 = 1.0f;
-
-f32 fd_dou_02_negone_one_360[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
-
-f32 fd_dou_02_neg_one_365 = -1.0f;
-
-f32 fd_dou_02___local_PI_366 = 3.1415927f;
-
-f32 fd_dou_02___local_3PIO2_368 = 4.712389f;
-
-f32 fd_dou_02_one_negone_359[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
-
-f32 fd_dou_02___local_PIO2_367 = 1.5707964f;
-
-f32 fd_dou_02_one_364 = 1.0f;
+extern EvtWord dou_02_init_evt[];
 
 static BeroEntry bero_entry_data[] = {
     {
@@ -171,7 +117,16 @@ static EVT_BEGIN(yari_trap_sub)
             WAIT_FRAMES(1)
         END_LOOP
         CALL(evt_hitobj_attr_onoff, 1, 0, STRING("bb"), 2048)
+#ifdef VERSION_G8MP01
+        CALL(evt_sub_get_framerate, LW(0))
+        IF_INT_EQUAL(LW(0), 50)
+            WAIT_MS(2800)
+        ELSE
+            WAIT_MS(2500)
+        END_IF
+#else
         WAIT_MS(2500)
+#endif
         IF_INT_EQUAL(GW(15), 2)
             BREAK_LOOP
         END_IF
@@ -363,7 +318,7 @@ EVT_BEGIN(dou_02_init_evt)
     CALL(evt_mobj_powerupblk, STRING("pblk1"), -300, 145, -130, 0, GSWF(5554), 0)
     CALL(evt_hit_damage_return_set, PTR(hitDmgRetPoints))
     CALL_CHILD(PTR(evt_gazigazi_entry))
-    CALL(evt_map_entry_airport_harbor, 1, STRING("S_Ship_Change\0\0"), STRING("Ship_Change"))
+    CALL(evt_map_entry_airport_harbor, 1, STRING("S_Ship_Change"), STRING("Ship_Change"))
     RETURN
 EVT_END()
 

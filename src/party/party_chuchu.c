@@ -13,34 +13,35 @@
 #include <string.h>
 #include "party/party_hit.h"
 #include "party/party_move.h"
+#include "manager/evtmgr_cmd.h"
 
 typedef struct ChuchuParty {
     u32 flags;                 // 0x0
     u8 pad4[0x8 - 0x4];        // 0x4
-    u32 field_8;               // 0x8
+    u32 trigFlags;             // 0x8
     u8 padC[0x24 - 0xC];       // 0xC
     s32 timer;                 // 0x24
     u8 pad28[0x32 - 0x28];     // 0x28
-    u8 field_32;               // 0x32
-    u8 field_33;               // 0x33
+    u8 moveKind;               // 0x32
+    u8 memberKind;             // 0x33
     u8 pad34[0x39 - 0x34];     // 0x34
     u8 state;                  // 0x39
     u8 pad3A;                  // 0x3A
-    u8 field_3B;               // 0x3B
+    u8 moveMode;               // 0x3B
     u8 pad3C[0x58 - 0x3C];     // 0x3C
     Vec position;              // 0x58
     u8 pad64[0x94 - 0x64];     // 0x64
     Vec target;                // 0x94
     u8 padA0[0xF0 - 0xA0];     // 0xA0
     f32 height;                // 0xF0
-    f32 field_F4;              // 0xF4
-    f32 field_F8;              // 0xF8
-    f32 field_FC;              // 0xFC
-    f32 field_100;             // 0x100
-    f32 field_104;             // 0x104
+    f32 width;                 // 0xF4
+    f32 camDir;                // 0xF8
+    f32 moveDir;               // 0xFC
+    f32 targetDir;             // 0x100
+    f32 moveSpeed;             // 0x104
     u8 pad108[0x10C - 0x108];  // 0x108
-    f32 field_10C;             // 0x10C
-    f32 field_110;             // 0x110
+    f32 displayDirection;      // 0x10C
+    f32 displayDirectionTarget;  // 0x110
     f32 velY;                  // 0x114
     u8 pad118[0x160 - 0x118];  // 0x118
     MarioWork* player;         // 0x160
@@ -250,21 +251,21 @@ USER_FUNC(set_msg) {
             tmp = ip;
             if (minDist > PSVECDistance(&tmp, &player->position)) {
                 minDist = PSVECDistance(&tmp, &player->position);
-                angle = revise360(angleABf(cp->position.x, cp->position.z, item->position.x, item->position.z) - cp->field_F8);
+                angle = revise360(angleABf(cp->position.x, cp->position.z, item->position.x, item->position.z) - cp->camDir);
                 type = 0;
             }
         }
         if (mobj) {
             if (minDist > PSVECDistance(&mobj->position, &player->position)) {
                 minDist = PSVECDistance(&mobj->position, &player->position);
-                angle = revise360(angleABf(cp->position.x, cp->position.z, mobj->position.x, mobj->position.z) - cp->field_F8);
+                angle = revise360(angleABf(cp->position.x, cp->position.z, mobj->position.x, mobj->position.z) - cp->camDir);
                 type = 1;
             }
         }
         if (found) {
             if (minDist > PSVECDistance(&bestPos, &player->position)) {
                 minDist = PSVECDistance(&bestPos, &player->position);
-                angle = revise360(angleABf(cp->position.x, cp->position.z, bestPos.x, bestPos.z) - cp->field_F8);
+                angle = revise360(angleABf(cp->position.x, cp->position.z, bestPos.x, bestPos.z) - cp->camDir);
                 type = 2;
             }
         }
@@ -281,9 +282,9 @@ USER_FUNC(set_msg) {
             event->lwData[0] = (EvtWord)"map_exist_far";
             event->lwData[1] = 1;
         }
-        cp->field_110 = (angle <= 180.0f) ? 180.0f : 0.0f;
-        cp->field_FC = partyToMovedir(party, cp->field_110);
-        cp->field_100 = cp->field_FC;
+        cp->displayDirectionTarget = (angle <= 180.0f) ? 180.0f : 0.0f;
+        cp->moveDir = partyToMovedir(party, cp->displayDirectionTarget);
+        cp->targetDir = cp->moveDir;
     } else {
         event->lwData[0] = (EvtWord)"map_no_exist";
         event->lwData[1] = 0;
@@ -352,10 +353,10 @@ BOOL chuchu_searchObject(void) {
 void chuchu_init(PartyEntry* party) {
     ChuchuParty* cp = (ChuchuParty*)party;
 
-    cp->field_33 = 7;
-    cp->field_32 = 0;
+    cp->memberKind = 7;
+    cp->moveKind = 0;
     cp->height = 20.0f;
-    cp->field_F4 = 24.0f;
+    cp->width = 24.0f;
 }
 
 void chuchu_reinit(PartyEntry* party) {
@@ -380,8 +381,8 @@ void chuchu_use(PartyEntry* party) {
     Vec pos;
     Vec pos1;
 
-    if (cp->field_8 & 8) {
-        cp->field_8 &= ~8;
+    if (cp->trigFlags & 8) {
+        cp->trigFlags &= ~8;
         cp->state = 0;
         marioStSystemLevel(1);
     }
@@ -391,11 +392,11 @@ void chuchu_use(PartyEntry* party) {
         partyGetAppearPos3(party, &pos);
         cp->target = pos;
         cp->timer = 4;
-        cp->field_FC = angleABf(cp->position.x, cp->position.z, cp->target.x, cp->target.z);
-        cp->field_100 = cp->field_FC;
-        cp->field_10C = player->displayDirection;
-        cp->field_110 = player->displayDirection;
-        cp->field_104 = distABf(cp->position.x, cp->position.z, cp->target.x, cp->target.z) / cp->timer;
+        cp->moveDir = angleABf(cp->position.x, cp->position.z, cp->target.x, cp->target.z);
+        cp->targetDir = cp->moveDir;
+        cp->displayDirection = player->displayDirection;
+        cp->displayDirectionTarget = player->displayDirection;
+        cp->moveSpeed = distABf(cp->position.x, cp->position.z, cp->target.x, cp->target.z) / cp->timer;
         cp->velY = 0.0f;
         cp->state = 1;
         break;
@@ -409,13 +410,13 @@ void chuchu_use(PartyEntry* party) {
             return;
         }
         partyChgPoseId(party, 1);
-        cp->field_104 = 0.0f;
+        cp->moveSpeed = 0.0f;
         cp->state = 10;
         break;
     case 10:
-        cp->field_110 = player->displayDirectionTarget;
-        cp->field_FC = toMovedir(cp->field_110);
-        cp->field_100 = cp->field_FC;
+        cp->displayDirectionTarget = player->displayDirectionTarget;
+        cp->moveDir = toMovedir(cp->displayDirectionTarget);
+        cp->targetDir = cp->moveDir;
         cp->state = 20;
         cp->timer = 25;
         break;
@@ -445,7 +446,7 @@ void chuchu_use(PartyEntry* party) {
     case 80:
         cp->flags &= ~0x100;
         partyChgRunMode(party, 2);
-        cp->field_3B = 0;
+        cp->moveMode = 0;
         marioChgMot(0);
         marioStSystemLevel(0);
         break;

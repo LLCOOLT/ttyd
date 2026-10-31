@@ -390,7 +390,7 @@ int strcmp(const char *s1, const char *s2);
 void _animPoseDrawMtx(AnimationPose* pose, Mtx matrix, s32 xluMode, f32 rotY, f32 scale);
 void animPose_AllocBuffer(AnimationPose* pose);
 void animSetMaterial_Texture(s32 texCount, s32 *texIdRemap, AnimPoseTexEntry *pTexEntries, AnimTexMtx *animEntries, s32 texBindsCapacity, AnimTexBind *texBinds, AnimationTextureFile *texFile);
-void dispProc(s32 parentId, s32 groupId, s32 xluStage, s32 arg3, f32 arg4);
+void dispProc(s32 parentId, s32 groupId, s32 xluStage, s32 nextKeyframe, f32 blend);
 void materialProc(s32 shapeId, s32 xluStage);
 void vivihimo(Mtx a, Mtx b, f32 speed, f32 scale, f32 offA, f32 offB);
 void animInit(void) {
@@ -479,7 +479,6 @@ void animPoseRefresh(void) {
     for (i = 0; i < wp->totalPoses; i++) {
         AnimationPose* pose = &wp->poses[i]; // inline
         if (pose->flags) {
-            // TODO: cleanup in rewrite?
             if ((!wp->inBattle || pose->type != 0) && (wp->inBattle || pose->type != 1)) {
                 animPose_AllocBuffer(pose);
                 pose->lastFrameZero = -1; // TODO: redundant?
@@ -899,7 +898,7 @@ void animPoseSetPaperAnim(s32 poseId, const char* animName, BOOL reset) {
     animPosePaperAnimId(pose) = idx;
     pose->mLocalTimeInit = animTimeGetTime(pose->type);
     id = pose->paperId;
-    if (id != -1 && !(*(u32*)((u8*)wp->poses + id * sizeof(AnimationPose) + offsetof(AnimationPose, typeFlags)) & 2)) { // FAKE: byte-offset load so the typeFlags offset folds into the index (mulli/addi/lwzx), as in the target
+    if (id != -1 && !(animPoseGetAnimPosePtr(id)->typeFlags & 2)) {
         animPoseMain(pose->paperId);
     }
 }
@@ -1077,6 +1076,7 @@ void animPoseMain(s32 poseId) {
     f32 t3;
     u8* p;
     s64 ms;
+    s32 paperId;
 
     poses = wp->poses;
     pose = &poses[poseId];
@@ -1090,8 +1090,9 @@ void animPoseMain(s32 poseId) {
         grpA = (u8*)pose->mpVtxArrayPos;
         grpB = (u8*)pose->mpVtxArrayNrm;
     }
-    if (pose->paperId != -1 && !(((AnimationPose*)((u8*)poses + pose->paperId * sizeof(AnimationPose)))->typeFlags & 2)) { // FAKE: the paper pose found by byte offset (base + id * size) so the typeFlags offset folds into the index (mulli/addi/lwzx), as in the target
-        animPoseMain(pose->paperId);
+    paperId = pose->paperId;
+    if (paperId != -1 && !(animPoseGetAnimPosePtr(paperId)->typeFlags & 2)) {
+        animPoseMain(paperId);
     }
     if (anim == NULL) return;
     loop = *(s32*)anim->loopInfo;
@@ -2136,10 +2137,9 @@ void renderProc(s32 shapeId, s32 unused) {
                 if (pose2->flags & 0x10) {
                     texObj = wp->mpTexObjs[0];
                     if (texObj) {
-                        buffer = (f32*)wp->paperMtxPtr[0]; // FAKE: the paper matrix pointer held in buffer (an earlier web) so it is a split @ web, not a named mtx local
-                        if (buffer) {
+                        if (wp->paperMtxPtr[0]) {
                             cd = wp->mpCurPoseData;
-                            animSetMaterial_ChangeTexture(cd, draw, pose2, texObj, wp->mpTexDatas[0], *(Mtx*)buffer, 1);
+                            animSetMaterial_ChangeTexture(cd, draw, pose2, texObj, wp->mpTexDatas[0], *wp->paperMtxPtr[0], 1);
                         }
                     }
                 }
@@ -2238,7 +2238,7 @@ void renderProc(s32 shapeId, s32 unused) {
 void materialProc(s32 shapeId, s32 xluStage);
 void vivihimo(Mtx a, Mtx b, f32 speed, f32 scale, f32 offA, f32 offB);
 
-void dispProc(s32 parentId, s32 groupId, s32 xluStage, s32 arg3, f32 arg4) {
+void dispProc(s32 parentId, s32 groupId, s32 xluStage, s32 nextKeyframe, f32 blend) {
     AnimPoseGroup* group;
     AnimPoseGroup* parent;
     AnimPoseNode* node;
@@ -2328,12 +2328,12 @@ void dispProc(s32 parentId, s32 groupId, s32 xluStage, s32 arg3, f32 arg4) {
                 ((void (*)(void*, s32, Mtx*))pose->dispCallback)(pose->dispUserDataCallback, groupId, g_modeling_mtx);
             }
             renderProc(group->shapeId, xluStage);
-            dispProc(groupId, group->childGroupId, xluStage, arg3, arg4);
+            dispProc(groupId, group->childGroupId, xluStage, nextKeyframe, blend);
         }
         g_modeling_mtx_lv--;
         g_modeling_mtx = &g_modeling_mtx_stack[g_modeling_mtx_lv];
     }
-    dispProc(groupId, group->brotherGroupId, xluStage, arg3, arg4);
+    dispProc(groupId, group->brotherGroupId, xluStage, nextKeyframe, blend);
 }
 
 void animPoseDraw(s32 poseId, f32 x, f32 y, f32 z, f32 rotY, f32 scale, s32 xluMode) {
@@ -2373,15 +2373,15 @@ void _animPoseDrawMtx(AnimationPose* pose, Mtx matrix, s32 xluMode, f32 rotY, f3
     GXColor col2;
     AnimationPoseData* data;
     AnimData* anim;
-    s32 arg3, arg4;
-    f32 argf;
+    s32 keyframeIdx, nextKeyframeIdx;
+    f32 keyframeBlend;
     f32 diff;
     s32 mode;
 
     data = animPoseGetBaseData(pose);
-    arg3 = pose->keyframeIdx;
-    arg4 = pose->nextKeyframeIdx;
-    argf = pose->keyframeBlend;
+    keyframeIdx = pose->keyframeIdx;
+    nextKeyframeIdx = pose->nextKeyframeIdx;
+    keyframeBlend = pose->keyframeBlend;
     anim = data->mpAnims[pose->animId].data;
     if (anim == NULL) {
         return;
@@ -2490,7 +2490,7 @@ void _animPoseDrawMtx(AnimationPose* pose, Mtx matrix, s32 xluMode, f32 rotY, f3
         DCFlushRange(pose->mpVtxArrayNrm, animPoseGetBaseData(pose)->mBufferNrmNum * sizeof(Vec));
     }
     GXInvalidateVtxCache();
-    dispProc(-1, data->groupCount - 1, arg3, arg4, argf);
+    dispProc(-1, data->groupCount - 1, keyframeIdx, nextKeyframeIdx, keyframeBlend);
 }
 
 
@@ -2564,7 +2564,7 @@ void animPoseDrawMtx(s32 poseId, Mtx matrix, s32 xluMode, f32 rotY, f32 scale)
   AnimationPoseData *data;
   AnimationPose *pose;
   AnimationPose *p2;
-  s32 new_var[2];
+  s32 scratchNum[2];
   AnimationPoseData *pd;
   pose = &wp->poses[poseId];
   if (pose->paperId != (-1))
@@ -2582,9 +2582,9 @@ void animPoseDrawMtx(s32 poseId, Mtx matrix, s32 xluMode, f32 rotY, f32 scale)
     }
     if (paper->typeFlags & 2)
     {
-      new_var[1] = pd->mBufferPosNum;
-      new_var[0] = pd->mBufferNrmNum;
-      apdScratchN(new_var[1], new_var[0]);
+      scratchNum[1] = pd->mBufferPosNum;
+      scratchNum[0] = pd->mBufferNrmNum;
+      apdScratchN(scratchNum[1], scratchNum[0]);
       name = ANIM_INDEX_NAME(pose->paperAnimIdx);
       if (ANIM_NAME_INDEX(name) != -1)
       {

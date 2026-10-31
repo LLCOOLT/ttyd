@@ -34,6 +34,10 @@
 #include <stdio.h>
 #include <string.h>
 #include "battle/battle_mario.h"
+#include "eff/eff_recovery.h"
+#include "battle/battle_actrecord.h"
+#include "battle/battle_camera.h"
+#include "battle/battle_seq.h"
 
 #ifdef VERSION_G8ME01
 #define EXP_ICON 0x194
@@ -67,11 +71,11 @@ typedef struct SeqEndWork {
     s16 expDisp;                   // 0xA, counts down while exp is added to the pouch
     s32 levelUp;                   // 0xC, set when the pouch exp reaches 100
     s32 selected;                  // 0x10
-    s32 unk14;                     // 0x14
+    s32 selectState;               // 0x14, cleared when the level-up menu opens, never read
     s32 objCount;                  // 0x18
-    u8 field_0x1C[0x24 - 0x1C];    // 0x1C
+    u8 pad_1C[0x24 - 0x1C];       // 0x1C, never accessed
     s32 cursor;                    // 0x24
-    s32 unk28;                     // 0x28
+    s32 prevCursor;                // 0x28, cleared with cursor, never read
     s32 cursorCount;               // 0x2C, number of level-up choices
     u32 flags;                     // 0x30
     IconEntry* icons[19];          // 0x34
@@ -89,7 +93,7 @@ void _GetExpIcon_Init(SeqEndWork* work);
 
 typedef struct SeqEndUnitSetup {
     u8* kind;                 // 0x0
-    u8 field_0x4[0x30 - 0x4]; // 0x4
+    u8 setupRest[0x30 - 0x4]; // 0x4, rest of the BattleUnitSetup, not read here
 } SeqEndUnitSetup;
 
 typedef struct SeqEndGroup {
@@ -177,21 +181,13 @@ USER_FUNC(evt_sub_intpl_get_value);
 USER_FUNC(evt_sub_intpl_init);
 USER_FUNC(evt_sub_intpl_init_float);
 
-__declspec(section ".data") f32 battle_seq_end_negone_one_a[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
 
-__declspec(section ".data") f32 fd_battle_seq_end_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
 
-__declspec(section ".data") f32 battle_seq_end_one_negone_a[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
 
-__declspec(section ".data") f32 fd_battle_seq_end_one_negone_373[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
 
-__declspec(section ".data") f32 battle_seq_end_negone_one_b[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
 
-__declspec(section ".data") f32 fd_battle_seq_end_negone_one_360[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
 
-__declspec(section ".data") f32 battle_seq_end_one_negone_b[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
 
-__declspec(section ".data") f32 fd_battle_seq_end_one_negone_359[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
 
 
 RankUpData _rank_up_data[] = {
@@ -222,7 +218,6 @@ EVT_END()
 
 
 
-#pragma dont_inline on
 RankUpData* _get_rank_data(s32 level) {
     RankUpData* rank;
 
@@ -233,7 +228,6 @@ RankUpData* _get_rank_data(s32 level) {
     }
     return rank;
 }
-#pragma dont_inline reset
 
 const char* BattleGetRankNameLabel(s32 level) {
     RankUpData* found = NULL;
@@ -574,7 +568,7 @@ void btlseqEnd(BattleWork* wp) {
         work->flags &= ~1;
         if (work->levelUp) {
             work->selected = 1;
-            work->unk14 = 0;
+            work->selectState = 0;
             work->objCount = 3;
             work->timer = 0;
             BattleAudience_WinSetActive(0);
@@ -652,7 +646,7 @@ void btlseqEnd(BattleWork* wp) {
             }
             if (ok) {
                 work->cursor = 0;
-                work->unk28 = 0;
+                work->prevCursor = 0;
                 work->cursorCount = 2;
                 work->flags &= ~0x20;
                 SS(0x7000014);
@@ -948,8 +942,8 @@ void _MarioExpDisp(CameraId camId, void* param) {
 }
 
 void _LvupParamConfirmDisp(CameraId camId, void* param) {
-    Vec pos; f32 zero = 0.0f; u32 len; s32 *new_var; f32 w; char buf[0x14]; SeqEndWork* work = SEW((BattleWork*)param);
-    new_var = &work->cursor; // FAKE: pointer to the field; direct work->cursor differs
+    Vec pos; f32 zero = 0.0f; u32 len; s32 *cursorPtr; f32 w; char buf[0x14]; SeqEndWork* work = SEW((BattleWork*)param);
+    cursorPtr = &work->cursor; // FAKE: pointer to the field; direct work->cursor differs
     pouchGetPtr();
     sprintf(buf, msgSearch("btl_msg_lvup_ok"));
     len = strlen(buf); ((void (*)(f32, f32, f32, f32, f32, u16, GXColor))windowDispGX_Waku_col)(-30.0f - (w = 6.25f * len), 30.0f, 12.5f * len + 65.0f, 32.0f, 10.0f, 0, (GXColor){0xFF, 0xFF, 0xFF, 0xFF});
@@ -959,7 +953,7 @@ void _LvupParamConfirmDisp(CameraId camId, void* param) {
     FontDrawString(-20.0f, -13.0f, msgSearch("btl_msg_lvup_yes"));
     FontDrawString(-20.0f, -38.0f, msgSearch("btl_msg_lvup_no"));
     pos.x = -40.0f;
-    pos.y = -50 - (*new_var) * 25;
+    pos.y = -50 - (*cursorPtr) * 25;
     pos.z = 0.0f;
     iconDispGx(&pos, 0x10, EXP_ICON, 1.0f);
 }
@@ -1003,7 +997,6 @@ void L__LvupParamHelpMsgDisp(CameraId camId, void* param) {
     FontDrawMessage(zero - width / 2, (s32)y + (lines - 1) * 29, msg);
 }
 
-#pragma dont_inline on
 void _GetExpIcon_Init(SeqEndWork* work) {
     s32 i;
     char name[16];
@@ -1036,14 +1029,12 @@ void _GetExpIcon_Init(SeqEndWork* work) {
 }
 
 void _GetExpIcon_Main(BattleWork* wp) {
-    s32 new_var[2]; // FAKE: register-promoted array (tens, ones); two scalars differ
     SeqEndWork* work = SEW(wp);
     s32 exp = work->expDisp;
     s32 i;
     f32 ofs;
 
-    new_var[1] = exp / 10;
-    for (i = 0; i < new_var[1]; i++) {
+    for (i = 0; i < exp / 10; i++) {
         iconFlagOff(work->icons[i]->name, 2);
         if (work->alpha[i] <= 0) {
             work->alpha[i] = 0x40;
@@ -1063,8 +1054,7 @@ void _GetExpIcon_Main(BattleWork* wp) {
         work->alpha[i] = 0;
         work->counter[i] = 0;
     }
-    new_var[0] = exp % 10;
-    for (i = 10; i - 10 < new_var[0]; i++) {
+    for (i = 10; i - 10 < exp % 10; i++) {
         iconFlagOff(work->icons[i]->name, 2);
         if (work->alpha[i] <= 0) {
             work->alpha[i] = 0x40;
@@ -1086,7 +1076,6 @@ void _GetExpIcon_Main(BattleWork* wp) {
     }
 }
 
-#pragma dont_inline reset
 void _GetExpIcon_Disp(CameraId camId, void* param) {
     windowDispGX_Waku_col(0, (GXColor){0xFF, 0xFF, 0xFF, 0x80}, -76.899994f, 21.0f, 165.79999f, 24.199999f, 10.0f);
 }
@@ -1959,7 +1948,6 @@ USER_FUNC(_lvup_select_object_init) {
     return 2;
 }
 
-#pragma dont_inline on
 s32 _keta_get(s32 n) {
 
     s32 k = 0;
@@ -2091,9 +2079,7 @@ void _lvup_select_object_disp(CameraId camId, void* param) {
         }
     }
 }
-#pragma dont_inline reset
 #pragma auto_inline reset
-#pragma dont_inline on
 void _check_audience_battle_end_exec(void) {
     BattleWork* wp = _battleWorkPointer;
     SeqEndGroup* group = (SeqEndGroup*)wp->fbatInfo->setup->groupSetup;
@@ -2162,7 +2148,6 @@ void _BattleMarioKouraDelete(void) {
 
     evt->unitId = mario->unitId;
 }
-#pragma dont_inline reset
 
 USER_FUNC(_check_guard_koura) {
     BattleWork* wp = _battleWorkPointer;

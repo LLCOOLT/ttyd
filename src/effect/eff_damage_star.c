@@ -348,7 +348,6 @@ s16 damageStar_effFace_pPlane168_0[] = {
     1024, -1024, 0, 512, 512,
     1024, 1024, 0, 512, 0,
     -1024, 1024, 0, 0, 0,
-    0, // pad
 };
 s16* damageStar_effFaceDt_pPlane168 = damageStar_effFace_pPlane168_0;
 MayaPoly damageStar_effAnimRST[] = {
@@ -379,7 +378,7 @@ EffectEntry* effDamageStarEntry(s32 type, s32 number, f32 x, f32 y, f32 z, f32 s
     if (number > 20) {
         number = 20;
     }
-    effect->type = "DamageStar\0";
+    effect->type = "DamageStar";
     effect->count = number + 2;
     work = __memAlloc(HEAP_EFFECT, size = (number + 2) * sizeof(DamageStarWork));
     effect->userdata = work;

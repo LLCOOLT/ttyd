@@ -13,12 +13,12 @@ typedef struct EffRadiationN64Work {
     s32 alpha;      // 0x24
     s32 life;       // 0x28
     s32 frame;      // 0x2C
-    f32 unk30;      // 0x30
+    f32 scrollSpare;    // 0x30, never used; spare slot before the four scrolls
     f32 scroll0;    // 0x34
     f32 scroll2;    // 0x38
     f32 scroll1;    // 0x3C
     f32 scroll3;    // 0x40
-    f32 unk44;      // 0x44
+    f32 scrollVelSpare; // 0x44, never used; spare slot before the four scroll speeds
     f32 scrollVel0; // 0x48
     f32 scrollVel2; // 0x4C
     f32 scrollVel1; // 0x50

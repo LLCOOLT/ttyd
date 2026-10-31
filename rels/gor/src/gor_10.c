@@ -1,7 +1,6 @@
 #include "battle/battle_unit.h"
 #include "evt/evt_cmd.h"
 
-#pragma force_active on
 #include "manager/evtmgr_cmd.h"
 #include "driver/camdrv.h"
 #include "mario/mariost.h"
@@ -14,6 +13,7 @@
 #include "manager/filemgr.h"
 #include "string.h"
 #include "win/win_main.h"
+#include "pmario_sound.h"
 static inline f32 dd_sin(f32 x) {
     f32 a = 0.00761f;
     f32 b = 0.16605f;
@@ -55,7 +55,6 @@ static inline f32 dd_cos(f32 x) {
 }
 
 double sin(double x);
-s32 psndSFXOn(const char* name);
 void mabutaDisp(CameraId camera, void* param);
 static void depthDisp(CameraId camera, void* param);
 typedef struct TegamiWork { s32 alpha; FileEntry* tpl; } TegamiWork;
@@ -107,7 +106,7 @@ USER_FUNC(tegami) {
         wp = _mapAlloc(sizeof(TegamiWork));
         memset(wp, 0, sizeof(TegamiWork));
         wp->alpha = 0;
-        wp->tpl = fileAllocf(4, "%s/mariost.tpl\0", getMarioStDvdRoot());
+        wp->tpl = fileAllocf(4, "%s/mariost.tpl", getMarioStDvdRoot());
     }
     wp->alpha += 2;
     if (wp->alpha > 128) {
@@ -199,52 +198,10 @@ static USER_FUNC(depth) {
     return EVT_RETURN_BLOCK;
 }
 
-f32 fd_gor_10_negone_one_374[2] __attribute__((aligned(8)));
-f32 fd_gor_10_neg_one_382;
-f32 fd_gor_10___local_PI_383;
-f32 fd_gor_10___local_3PIO2_385;
-f32 fd_gor_10_one_negone_373[2] __attribute__((aligned(8)));
-f32 fd_gor_10___local_PIO2_384;
-f32 fd_gor_10_one_381;
-f32 fd_gor_10_negone_one_360[2] __attribute__((aligned(8)));
-f32 fd_gor_10_neg_one_365;
-f32 fd_gor_10___local_PI_366;
-f32 fd_gor_10___local_3PIO2_368;
-f32 fd_gor_10_one_negone_359[2] __attribute__((aligned(8)));
-f32 fd_gor_10___local_PIO2_367;
-f32 fd_gor_10_one_364;
-EvtWord tegami_init_evt[78];
-EvtWord evt_mezame[226];
-EvtWord mezame_init_evt[61];
-EvtWord gor_10_init_evt[29];
-
-f32 fd_gor_10_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
-
-f32 fd_gor_10_neg_one_382 = -1.0f;
-
-f32 fd_gor_10___local_PI_383 = 3.1415927f;
-
-f32 fd_gor_10___local_3PIO2_385 = 4.712389f;
-
-f32 fd_gor_10_one_negone_373[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
-
-f32 fd_gor_10___local_PIO2_384 = 1.5707964f;
-
-f32 fd_gor_10_one_381 = 1.0f;
-
-f32 fd_gor_10_negone_one_360[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
-
-f32 fd_gor_10_neg_one_365 = -1.0f;
-
-f32 fd_gor_10___local_PI_366 = 3.1415927f;
-
-f32 fd_gor_10___local_3PIO2_368 = 4.712389f;
-
-f32 fd_gor_10_one_negone_359[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
-
-f32 fd_gor_10___local_PIO2_367 = 1.5707964f;
-
-f32 fd_gor_10_one_364 = 1.0f;
+extern EvtWord tegami_init_evt[];
+extern EvtWord evt_mezame[];
+extern EvtWord mezame_init_evt[];
+extern EvtWord gor_10_init_evt[];
 
 EVT_BEGIN(tegami_init_evt)
     CALL(evt_snd_envoff, 1024)

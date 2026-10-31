@@ -19,9 +19,6 @@ FileManagerWork fileWork;
 
 //.sdata
 FileManagerWork* afp = &fileWork;
-#pragma force_active on
-u32 gap_07_804125DC_sdata[1] = {0};
-#pragma force_active reset
 
 //local prototypes
 void fileGarbageDataAdrClear(FileEntry* entry);
@@ -136,7 +133,11 @@ void fileGarbageDataAdrClear(FileEntry* entry) {
 		case 4:
 			tpl = data;
 			if (tpl->versionNumber != 0x0020AF30) {
-				OSPanic("filemgr.c", VERSION_PICK(147, 153), "invalid version number for texture palette\0");
+#ifdef VERSION_G8MP01
+				OSPanic("filemgr.c", 150, "invalid version number for texture palette");
+#else
+				OSPanic("filemgr.c", VERSION_PICK(147, 153), "invalid version number for texture palette");
+#endif
 			}
 			if ((void*)tpl->descriptorArray >= tpl) {
 				for (i = 0; (u16)i < tpl->numDescriptors; i++) {
@@ -326,7 +327,11 @@ void fileGarbageDataAdrSet(void* data, s32 type) {
 		case 4:
 			tpl = data;
 			if (tpl->versionNumber != 0x0020AF30) {
-				OSPanic("filemgr.c", VERSION_PICK(106, 112), "invalid version number for texture palette\0");
+#ifdef VERSION_G8MP01
+				OSPanic("filemgr.c", 109, "invalid version number for texture palette");
+#else
+				OSPanic("filemgr.c", VERSION_PICK(106, 112), "invalid version number for texture palette");
+#endif
 			}
 			if ((void*)tpl->descriptorArray < tpl) {
 				ADDR_WORD(tpl->descriptorArray) += (AddrWord)tpl;

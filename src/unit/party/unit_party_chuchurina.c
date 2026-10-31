@@ -33,7 +33,6 @@ PoseTableEntry pose_table_chuchurina_stay[24];
 static BattleDataEntry data_table[8];
 BattleUnitKindPart unitpartsdata_Party_Chuchurina[4];
 BattleUnitKind unitdata_Party_Chuchurina;
-static EvtWord battle_entry_event[59];
 static EvtWord init_event[48];
 static EvtWord damage_event[16];
 BattleWeapon partyWeapon_ChuchurinaNormalAttackLeft;
@@ -43,11 +42,11 @@ BattleWeapon partyWeapon_ChuchurinaNormalAttackRightLast;
 BattleWeapon partyWeapon_ChuchurinaMadowaseAttack;
 BattleWeapon partyWeapon_ChuchurinaItemSteal;
 BattleWeapon partyWeapon_ChuchurinaKiss;
-EvtWord partyChuchurinaAttack_NormalAttack[1590];
-EvtWord partyChuchurinaAttack_MadowaseAttack[2020];
-EvtWord partyChuchurinaAttack_ItemSteal[VERSION_PICK(788, 961)];
-EvtWord partyChuchurinaAttack_Kiss[568];
-EvtWord chuchurina_appeal_event[86];
+extern EvtWord partyChuchurinaAttack_NormalAttack[];
+extern EvtWord partyChuchurinaAttack_MadowaseAttack[];
+extern EvtWord partyChuchurinaAttack_ItemSteal[];
+extern EvtWord partyChuchurinaAttack_Kiss[];
+extern EvtWord chuchurina_appeal_event[];
 static EvtWord party_win_reaction[18];
 static EvtWord attack_audience_event[VERSION_PICK(204, 205)];
 static BattleUnitDefense defence;
@@ -97,21 +96,13 @@ USER_FUNC(_get_binta_hit_position);
 USER_FUNC(_chuchu_make_extra_work_area);
 static void __makeTechMenuFunc(BattleCommand* command, s32* count);
 
-__declspec(section ".data") f32 unit_party_chuchurina_negone_one_a[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
 
-__declspec(section ".data") f32 fd_chuchurina_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
 
-__declspec(section ".data") f32 unit_party_chuchurina_one_negone_a[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
 
-__declspec(section ".data") f32 fd_chuchurina_one_negone_373[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
 
-__declspec(section ".data") f32 unit_party_chuchurina_negone_one_b[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
 
-__declspec(section ".data") f32 fd_chuchurina_negone_one_360[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
 
-__declspec(section ".data") f32 unit_party_chuchurina_one_negone_b[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
 
-__declspec(section ".data") f32 fd_chuchurina_one_negone_359[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
 
 PoseTableEntry pose_table_chuchurina_stay[] = {
     {9, "PCH_D_4"},

@@ -38,40 +38,40 @@ typedef struct ScissorTri {
 typedef struct ScissorWork {
     /* 0x000 */ u32 flags;
     /* 0x004 */ u8 pad0[8];
-    /* 0x00C */ s32 unk_0c;
-    /* 0x010 */ s32 unk_10;
-    /* 0x014 */ s32 unk_14;
+    /* 0x00C */ s32 cutCount;
+    /* 0x010 */ s32 blinkTimer;
+    /* 0x014 */ s32 triCount;
     /* 0x018 */ s32 unitIds[16];
     /* 0x058 */ s32 power[16];
-    /* 0x098 */ u8 unk_98;
+    /* 0x098 */ u8 audienceVol;
     /* 0x099 */ u8 pad99[3];
     /* 0x09C */ struct ScissorStars {
         /* 0x09C */ s32 count;
-        /* 0x0A0 */ s32 unkA0;
-        /* 0x0A4 */ f32 unkA4;
-        /* 0x0A8 */ f32 unkA8;
-        /* 0x0AC */ f32 unkAC;
-        /* 0x0B0 */ f32 unkB0;
-        /* 0x0B4 */ f32 unk_b4;
-        /* 0x0B8 */ f32 unk_b8;
-        /* 0x0BC */ f32 unkBC;
-        /* 0x0C0 */ f32 unkC0;
+        /* 0x0A0 */ s32 unusedA0; // only ever cleared
+        /* 0x0A4 */ f32 prevStickX;
+        /* 0x0A8 */ f32 prevStickY;
+        /* 0x0AC */ f32 stickX;
+        /* 0x0B0 */ f32 stickY;
+        /* 0x0B4 */ f32 headX;
+        /* 0x0B8 */ f32 headY;
+        /* 0x0BC */ f32 lastX;
+        /* 0x0C0 */ f32 lastY;
         /* 0x0C4 */ u8 padC4[0xD4 - 0xC4];
-        /* 0x0D4 */ f32 unkD4;
-        /* 0x0D8 */ f32 unkD8;
+        /* 0x0D4 */ f32 velX;
+        /* 0x0D8 */ f32 velY;
         /* 0x0DC */ f32 starX[4];  // other stars (idx 1..4), x
         /* 0x0EC */ f32 starY[4];  // other stars (idx 1..4), y
     } stars;
     /* 0x0FC */ s32 state;
     /* 0x100 */ s32 step;
     /* 0x104 */ s32 timer;
-    /* 0x108 */ f32 unk_108;
-    /* 0x10C */ f32 unk_10c;
+    /* 0x108 */ f32 timerX;
+    /* 0x10C */ f32 timerY;
     /* 0x110 */ u8 pad110[4];
     /* 0x114 */ void* buf114;
     /* 0x118 */ struct ScissorTri* tris; // triangle list (0x3000 bytes), drawn by scissor_ofscreen_ok
     /* 0x11C */ s32 phase;
-    /* 0x120 */ s32 unk_120;
+    /* 0x120 */ s32 phaseTimer;
     /* 0x124 */ Vec pos;
     /* 0x130 */ Vec from;
     /* 0x13C */ Vec to;
@@ -114,7 +114,7 @@ s32 scissor_tess();
 
 BattleWeapon weapon_scissor;
 BattleWeapon weapon_scissor_finish;
-EvtWord marioAttackEvent_Scissor[300];
+extern EvtWord marioAttackEvent_Scissor[];
 
 BattleWeapon weapon_scissor = {
     "btl_wn_sac_scissor", // name
@@ -551,7 +551,7 @@ s32 scissor_tess(void) {
     ScissorWork* w = GetScissorPtr();
     void* p = BattleAlloc(w->stars.count * 8);
     memcpy(p, w->buf114, w->stars.count * 8);
-    w->unk_14 = 0;
+    w->triCount = 0;
     tess(p, w->stars.count);
     DCFlushRange(w->tris, 0x3000);
     return 2;
@@ -565,12 +565,12 @@ void tess(Pt* pts, s32 n) {
     Pt* a;
     Pt* b;
     if (n == 3) {
-        ScissorTri* tri = &w->tris[w->unk_14];
+        ScissorTri* tri = &w->tris[w->triCount];
         for (k = 0; k < 3; k++) {
             tri->x[k] = pts[k].x;
             tri->y[k] = pts[k].y;
         }
-        w->unk_14++;
+        w->triCount++;
         BattleFree(pts);
         return;
     }
@@ -596,12 +596,12 @@ void tess(Pt* pts, s32 n) {
         }
     }
     {
-        ScissorTri* tri = &w->tris[w->unk_14];
+        ScissorTri* tri = &w->tris[w->triCount];
         for (k = 0; k < 3; k++) {
             tri->x[k] = pts[k].x;
             tri->y[k] = pts[k].y;
         }
-        w->unk_14++;
+        w->triCount++;
         BattleFree(pts);
     }
 }
@@ -660,7 +660,7 @@ s32 star_control(EventEntry* evt, BOOL first) {
     switch (w->phase) {
     case 1:
         w->phase = 2;
-        w->unk_120 = 0;
+        w->phaseTimer = 0;
         w->eff = effStarStoneEntry(3, 0.0f, -1000.0f, 0.0f, 1.0f);
         BtlUnit_GetPos(mario, &w->pos.x, &w->pos.y, &w->pos.z);
         w->pos.y += mario->mSizeMultiplier * (f32)mario->mHeight + 37.0f;
@@ -671,32 +671,32 @@ s32 star_control(EventEntry* evt, BOOL first) {
         w->scale = (Vec){0.0f, 0.0f, 0.0f};
         w->rot = (Vec){0.0f, 0.0f, 0.0f};
     case 2:
-        w->unk_120++;
-        if (w->unk_120 <= 100) {
-            w->pos.x = INTPL(0, w->unk_120, 100, w->from.x, w->to.x);
-            w->pos.y = INTPL(0, w->unk_120, 100, w->from.y, w->to.y);
-            w->pos.z = INTPL(0, w->unk_120, 100, w->from.z, w->to.z);
-            w->scale.x = w->scale.y = w->scale.z = INTPL(0, w->unk_120, 100, 0.0f, 2.0f);
+        w->phaseTimer++;
+        if (w->phaseTimer <= 100) {
+            w->pos.x = INTPL(0, w->phaseTimer, 100, w->from.x, w->to.x);
+            w->pos.y = INTPL(0, w->phaseTimer, 100, w->from.y, w->to.y);
+            w->pos.z = INTPL(0, w->phaseTimer, 100, w->from.z, w->to.z);
+            w->scale.x = w->scale.y = w->scale.z = INTPL(0, w->phaseTimer, 100, 0.0f, 2.0f);
         } else {
             w->pos.x = w->to.x;
             w->pos.y = w->to.y;
             w->pos.z = w->to.z;
             w->scale.x = w->scale.y = w->scale.z = 2.0f;
         }
-        w->rot.y = INTPL(4, w->unk_120, 120, 0.0f, 2160.0f);
-        if (w->unk_120 >= 120) {
+        w->rot.y = INTPL(4, w->phaseTimer, 120, 0.0f, 2160.0f);
+        if (w->phaseTimer >= 120) {
             w->phase = 3;
-            w->unk_120 = 0;
+            w->phaseTimer = 0;
             w->from = w->pos;
             w->to.y = 300.0f;
         }
         break;
     case 3:
-        w->unk_120++;
-        w->pos.y = INTPL(1, w->unk_120, 60, w->from.y, w->to.y);
-        if (w->unk_120 >= 60) {
+        w->phaseTimer++;
+        w->pos.y = INTPL(1, w->phaseTimer, 60, w->from.y, w->to.y);
+        if (w->phaseTimer >= 60) {
             w->phase = 4;
-            w->unk_120 = 0;
+            w->phaseTimer = 0;
             w->pos = (Vec){0.0f, 300.0f, 0.0f};
             w->scale = (Vec){1.0f, 1.0f, 1.0f};
             w->rot = (Vec){0.0f, 0.0f, 0.0f};
@@ -711,13 +711,13 @@ s32 star_control(EventEntry* evt, BOOL first) {
         }
         break;
     case 4:
-        w->unk_120++;
-        w->pos.y = INTPL(4, w->unk_120, 60, w->from.y, w->to.y);
+        w->phaseTimer++;
+        w->pos.y = INTPL(4, w->phaseTimer, 60, w->from.y, w->to.y);
         t->x = w->pos.x;
         t->y = w->pos.y;
-        if (w->unk_120 >= 60) {
+        if (w->phaseTimer >= 60) {
             w->phase = 5;
-            w->unk_120 = 0;
+            w->phaseTimer = 0;
         }
         break;
     case 5:
@@ -773,17 +773,17 @@ void star_disp2D_sub(s32 idx, s32 alpha) {
     f32 x, y, z;
     GXColor col;
     if (w->phase >= 6) {
-        w->unk_120++;
-        if (w->unk_120 > 30) {
-            w->unk_120 = 30;
+        w->phaseTimer++;
+        if (w->phaseTimer > 30) {
+            w->phaseTimer = 30;
         }
-        alpha = (s32)((f32(*)(f32, f32, s32, s32, s32))intplGetValue)((f32)(u8)alpha, 0.0f, 0, w->unk_120, 30);
+        alpha = (s32)((f32(*)(f32, f32, s32, s32, s32))intplGetValue)((f32)(u8)alpha, 0.0f, 0, w->phaseTimer, 30);
     }
     col = (GXColor){0xFF, 0xFF, 0xFF, 0x00};
     col.a = alpha;
     if (idx == 0) {
-        x = s->unk_b4;
-        y = s->unk_b8;
+        x = s->headX;
+        y = s->headY;
         z = 0.0f;
     } else {
         z = 0.0f;
@@ -817,12 +817,12 @@ s32 scissor_timer_main(void) {
     ScissorWork* w = GetScissorPtr();
     switch (w->state) {
     case 0:
-        w->unk_108 = 320.0f;
-        w->unk_10c = 185.0f;
+        w->timerX = 320.0f;
+        w->timerY = 185.0f;
         w->state = 5;
         w->step = 0;
     case 5:
-        w->unk_108 = ((f32(*)(f32, f32, s32, s32, s32))intplGetValue)(320.0f, 120.0f, 4, w->step, 15);
+        w->timerX = ((f32(*)(f32, f32, s32, s32, s32))intplGetValue)(320.0f, 120.0f, 4, w->step, 15);
         w->step++;
         if (w->step > 15) {
             w->state = 10;
@@ -836,7 +836,7 @@ s32 scissor_timer_main(void) {
         }
         break;
     case 15:
-        w->unk_108 = ((f32(*)(f32, f32, s32, s32, s32))intplGetValue)(120.0f, 320.0f, 4, w->step, 15);
+        w->timerX = ((f32(*)(f32, f32, s32, s32, s32))intplGetValue)(120.0f, 320.0f, 4, w->step, 15);
         w->step++;
         if (w->step > 15) {
             w->state = 20;
@@ -869,54 +869,54 @@ s32 scissor_control(EventEntry* evt, BOOL first) {
     s32 i, k;
     if (first) {
         w->stars.count = 0;
-        w->stars.unkA8 = 0.0f;
-        w->stars.unkA4 = 0.0f;
-        w->stars.unkB0 = 0.0f;
-        w->stars.unkAC = 0.0f;
-        w->stars.unkA0 = 0;
-        w->stars.unkD4 = 0.0f;
-        w->stars.unkD8 = 0.0f;
+        w->stars.prevStickY = 0.0f;
+        w->stars.prevStickX = 0.0f;
+        w->stars.stickY = 0.0f;
+        w->stars.stickX = 0.0f;
+        w->stars.unusedA0 = 0;
+        w->stars.velX = 0.0f;
+        w->stars.velY = 0.0f;
         memset(buf, 0, 0x1000);
         w->flags &= ~1;
     }
-    w->stars.unkA4 = w->stars.unkAC;
-    w->stars.unkA8 = w->stars.unkB0;
-    w->stars.unkAC = (f32)keyGetStickX(0);
-    w->stars.unkB0 = (f32)keyGetStickY(0);
-    sqrt(w->stars.unkA4 * w->stars.unkA4 + w->stars.unkA8 * w->stars.unkA8);
-    if ((f32)sqrt(w->stars.unkAC * w->stars.unkAC + w->stars.unkB0 * w->stars.unkB0) > 42.0f) {
-        w->stars.unkD4 += w->stars.unkAC / 50.0f;
-        w->stars.unkD8 += w->stars.unkB0 / 50.0f;
+    w->stars.prevStickX = w->stars.stickX;
+    w->stars.prevStickY = w->stars.stickY;
+    w->stars.stickX = (f32)keyGetStickX(0);
+    w->stars.stickY = (f32)keyGetStickY(0);
+    sqrt(w->stars.prevStickX * w->stars.prevStickX + w->stars.prevStickY * w->stars.prevStickY);
+    if ((f32)sqrt(w->stars.stickX * w->stars.stickX + w->stars.stickY * w->stars.stickY) > 42.0f) {
+        w->stars.velX += w->stars.stickX / 50.0f;
+        w->stars.velY += w->stars.stickY / 50.0f;
     }
-    w->stars.unkD4 *= 0.86f;
-    w->stars.unkD8 *= 0.86f;
-    w->stars.unk_b4 += w->stars.unkD4;
-    w->stars.unk_b8 += w->stars.unkD8;
-    if (w->stars.unk_b4 < -300.0f) {
-        w->stars.unk_b4 = -300.0f;
+    w->stars.velX *= 0.86f;
+    w->stars.velY *= 0.86f;
+    w->stars.headX += w->stars.velX;
+    w->stars.headY += w->stars.velY;
+    if (w->stars.headX < -300.0f) {
+        w->stars.headX = -300.0f;
     }
-    if (w->stars.unk_b4 > 300.0f) {
-        w->stars.unk_b4 = 300.0f;
+    if (w->stars.headX > 300.0f) {
+        w->stars.headX = 300.0f;
     }
-    if (w->stars.unk_b8 < -200.0f) {
-        w->stars.unk_b8 = -200.0f;
+    if (w->stars.headY < -200.0f) {
+        w->stars.headY = -200.0f;
     }
-    if (w->stars.unk_b8 > 200.0f) {
-        w->stars.unk_b8 = 200.0f;
+    if (w->stars.headY > 200.0f) {
+        w->stars.headY = 200.0f;
     }
     if (w->timer <= 59) {
         w->phase = 6;
         return 2;
     }
     if (gp->retraceCount % 6 == 0 && w->stars.count < 0x200) {
-        if (w->stars.unkBC != w->stars.unk_b4 || w->stars.unkC0 != w->stars.unk_b8) {
-            if (__fabs(w->stars.unk_b4 - w->stars.unkBC) >= 5.0 || __fabs(w->stars.unk_b8 - w->stars.unkC0) >= 5.0) {
+        if (w->stars.lastX != w->stars.headX || w->stars.lastY != w->stars.headY) {
+            if (__fabs(w->stars.headX - w->stars.lastX) >= 5.0 || __fabs(w->stars.headY - w->stars.lastY) >= 5.0) {
                 psndSFXOn("SFX_BTL_SAC_KAKONDEPON1");
             }
-            buf[w->stars.count].x = w->stars.unk_b4;
-            buf[w->stars.count].y = w->stars.unk_b8;
-            w->stars.unkBC = w->stars.unk_b4;
-            w->stars.unkC0 = w->stars.unk_b8;
+            buf[w->stars.count].x = w->stars.headX;
+            buf[w->stars.count].y = w->stars.headY;
+            w->stars.lastX = w->stars.headX;
+            w->stars.lastY = w->stars.headY;
             w->stars.count++;
         }
     }
@@ -998,8 +998,8 @@ s32 scissor_damage(EventEntry* evt, BOOL first) {
     }
     if (ok == 1) {
         s32 v;
-        w->unk_0c++;
-        v = w->unk_0c + 1;
+        w->cutCount++;
+        v = w->cutCount + 1;
         if (v >= 7) {
             v = 6;
         }
@@ -1022,11 +1022,11 @@ s32 scissor_damage(EventEntry* evt, BOOL first) {
             BattleAudienceSoundCallKind(2);
             BattleAudienceSoundHandBeat();
         }
-        w->unk_98 += 20;
-        if (w->unk_98 >= 100) {
-            w->unk_98 = 100;
+        w->audienceVol += 20;
+        if (w->audienceVol >= 100) {
+            w->audienceVol = 100;
         }
-        BattleAudienceSoundSetVol(4, w->unk_98, 30);
+        BattleAudienceSoundSetVol(4, w->audienceVol, 30);
     }
     return 2;
 }
@@ -1079,7 +1079,7 @@ void scissor_damage_sub(BattleUnit* unit, s32* out) {
 #pragma dont_inline on
 s32 scissor_damage_sub2(Vec pt) {
     ScissorWork* w = GetScissorPtr();
-    s32 n = w->unk_14;
+    s32 n = w->triCount;
     f32 y0, x0;
     f32* q;
     f32 c[3];
@@ -1124,14 +1124,14 @@ void scissor_disp_control(CameraId camera, void* param) {
     ScissorWork* w = GetScissorPtr();
     f32* pts = (f32*)w->buf114;
     s32 i;
-    w->unk_10 = w->unk_10 + 1;
-    if (w->unk_10 >= 60) {
-        w->unk_10 -= 60;
+    w->blinkTimer = w->blinkTimer + 1;
+    if (w->blinkTimer >= 60) {
+        w->blinkTimer -= 60;
     }
-    if (w->unk_10 <= 29) {
-        ((f32(*)(f32, f32, s32, s32, s32))intplGetValue)(0.0f, 255.0f, 0, w->unk_10, 29);
+    if (w->blinkTimer <= 29) {
+        ((f32(*)(f32, f32, s32, s32, s32))intplGetValue)(0.0f, 255.0f, 0, w->blinkTimer, 29);
     } else {
-        ((f32(*)(f32, f32, s32, s32, s32))intplGetValue)(255.0f, 0.0f, 0, w->unk_10 - 30, 59);
+        ((f32(*)(f32, f32, s32, s32, s32))intplGetValue)(255.0f, 0.0f, 0, w->blinkTimer - 30, 59);
     }
     GXSetCullMode(0);
     GXClearVtxDesc();
@@ -1196,8 +1196,8 @@ void scissor_disp_region(CameraId camera, void* param) {
     GXSetTevKAlphaSel(0, 0);
     GXLoadPosMtxImm(camGetPtr(8)->view, 0);
     t = w->tris;
-    GXBegin(0x90, 0, w->unk_14 * 3);
-    for (i = 0; i < w->unk_14; i++, t++) {
+    GXBegin(0x90, 0, w->triCount * 3);
+    for (i = 0; i < w->triCount; i++, t++) {
         GXPosition3f32(t->x[0], t->y[0], 0.0f);
         GXPosition3f32(t->x[1], t->y[1], 0.0f);
         GXPosition3f32(t->x[2], t->y[2], 0.0f);
@@ -1222,10 +1222,10 @@ s32 scissor_init(void) {
     w->timer = 0x3BF;
     w->buf114 = BattleAlloc(0x1000);
     w->tris = BattleAlloc(0x3000);
-    w->stars.unk_b4 = 0.0f;
-    w->stars.unk_b8 = 0.0f;
-    w->unk_0c = 0;
-    w->unk_98 = 0;
+    w->stars.headX = 0.0f;
+    w->stars.headY = 0.0f;
+    w->cutCount = 0;
+    w->audienceVol = 0;
     return 2;
 }
 

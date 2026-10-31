@@ -178,7 +178,6 @@ void effChargeMain(EffectEntry* effect) {
     dispEntry(CAMERA_3D, dispCalcZ(&position), 2, (DispCallback)effChargeDisp, effect);
 }
 
-#pragma opt_strength_reduction off
 EffectEntry* effChargeEntry(s32 type, s32 duration, f32 x, f32 y, f32 z, f32 scale) {
     EffectEntry* effect;
     EffChargeWork* work;
@@ -186,7 +185,7 @@ EffectEntry* effChargeEntry(s32 type, s32 duration, f32 x, f32 y, f32 z, f32 sca
     s32 i;
 
     effect = effEntry();
-    effect->type = "Charge\0";
+    effect->type = "Charge";
     effect->count = 31;
     work = __memAlloc(HEAP_EFFECT, 0x8b8);
     effect->userdata = work;
@@ -234,4 +233,3 @@ EffectEntry* effChargeEntry(s32 type, s32 duration, f32 x, f32 y, f32 z, f32 sca
     }
     return effect;
 }
-#pragma opt_strength_reduction reset

@@ -8,6 +8,7 @@
 #include "mario/mariost.h"
 #include <string.h>
 #include "data/party_data.h"
+#include "pmario_sound.h"
 
 //.data
 
@@ -564,7 +565,6 @@ static inline s32 partyGetFreeSlot2(void) {
     return -1;
 }
 
-#pragma force_active on
 char* yoshigroup[7] = {
         "c_babyyoshi",
         "c_babyyoshi2",
@@ -574,9 +574,6 @@ char* yoshigroup[7] = {
         "c_babyyoshi6",
         "c_babyyoshi7"
 };
-#pragma force_active on
-u32 gap_07_8041061C_sdata[1] = {0};
-#pragma force_active reset
 s32 partyEntryMain(s32 memberId) {
     MarioWork* player;
     s32 slot;

@@ -1,7 +1,6 @@
 #include "battle/battle_unit.h"
 #include "evt/evt_cmd.h"
 
-#pragma force_active on
 #include "battle/battle.h"
 #include "battle/battle_sub.h"
 #include "manager/evtmgr_cmd.h"
@@ -91,20 +90,6 @@ extern BattleUnitKind unit_boss_cortez_rapier;
 extern BattleUnitKind unit_boss_cortez_saber;
 extern BattleUnitKind unit_boss_cortez_sword;
 
-f32 fd_boss_cortez_negone_one_374[2] __attribute__((aligned(8)));
-f32 fd_boss_cortez_neg_one_382;
-f32 fd_boss_cortez___local_PI_383;
-f32 fd_boss_cortez___local_3PIO2_385;
-f32 fd_boss_cortez_one_negone_373[2] __attribute__((aligned(8)));
-f32 fd_boss_cortez___local_PIO2_384;
-f32 fd_boss_cortez_one_381;
-f32 fd_boss_cortez_negone_one_360[2] __attribute__((aligned(8)));
-f32 fd_boss_cortez_neg_one_365;
-f32 fd_boss_cortez___local_PI_366;
-f32 fd_boss_cortez___local_3PIO2_368;
-f32 fd_boss_cortez_one_negone_359[2] __attribute__((aligned(8)));
-f32 fd_boss_cortez___local_PIO2_367;
-f32 fd_boss_cortez_one_364;
 BattleUnitKind unit_boss_cortez;
 static StatusVulnerability regist;
 BattleUnitDefense defence_mode1;
@@ -161,60 +146,32 @@ static BattleDataEntry data_table[7];
 static BattleUnitKindPart parts[19];
 static EvtWord init_event[260];
 static EvtWord damage_event[70];
-EvtWord cortez_ac_counter_damage_event[98];
+extern EvtWord cortez_ac_counter_damage_event[];
 static EvtWord avoid_thorn_event[89];
 static EvtWord phase_event[196];
-EvtWord attack_event_mode1[44];
-EvtWord attack_event_mode2[47];
-EvtWord at2_head_bat_event[202];
-EvtWord at2_hone_charge_event[146];
-EvtWord at2_hone_rain_attack_event[605];
-EvtWord _bone_rain_event[114];
-EvtWord attack_event_mode3[52];
+extern EvtWord attack_event_mode1[];
+extern EvtWord attack_event_mode2[];
+extern EvtWord at2_head_bat_event[];
+extern EvtWord at2_hone_charge_event[];
+extern EvtWord at2_hone_rain_attack_event[];
+extern EvtWord _bone_rain_event[];
+extern EvtWord attack_event_mode3[];
 static EvtWord attack_audience_event[247];
-EvtWord at3_kamitsuki_attack[264];
-EvtWord at1_normal_attack[205];
-EvtWord at1_midaregiri_attack[251];
+extern EvtWord at3_kamitsuki_attack[];
+extern EvtWord at1_normal_attack[];
+extern EvtWord at1_midaregiri_attack[];
 static EvtWord wait_event[6];
 BattleUnitSetup entry_claw;
 BattleUnitSetup entry_rapier;
 BattleUnitSetup entry_sword;
 BattleUnitSetup entry_saber;
-EvtWord cortez_reset_pose_table[450];
+extern EvtWord cortez_reset_pose_table[];
 static EvtWord cortez_damage_sub_event[153];
 static EvtWord dead_event[1033];
-EvtWord mode2_rib_open_event[54];
-EvtWord mode2_rib_close_event[54];
-EvtWord mode2_honeduka_damage_event[76];
-EvtWord mode_change_event[111];
-
-f32 fd_boss_cortez_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
-
-f32 fd_boss_cortez_neg_one_382 = -1.0f;
-
-f32 fd_boss_cortez___local_PI_383 = 3.1415927f;
-
-f32 fd_boss_cortez___local_3PIO2_385 = 4.712389f;
-
-f32 fd_boss_cortez_one_negone_373[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
-
-f32 fd_boss_cortez___local_PIO2_384 = 1.5707964f;
-
-f32 fd_boss_cortez_one_381 = 1.0f;
-
-f32 fd_boss_cortez_negone_one_360[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
-
-f32 fd_boss_cortez_neg_one_365 = -1.0f;
-
-f32 fd_boss_cortez___local_PI_366 = 3.1415927f;
-
-f32 fd_boss_cortez___local_3PIO2_368 = 4.712389f;
-
-f32 fd_boss_cortez_one_negone_359[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
-
-f32 fd_boss_cortez___local_PIO2_367 = 1.5707964f;
-
-f32 fd_boss_cortez_one_364 = 1.0f;
+extern EvtWord mode2_rib_open_event[];
+extern EvtWord mode2_rib_close_event[];
+extern EvtWord mode2_honeduka_damage_event[];
+extern EvtWord mode_change_event[];
 
 BattleUnitKind unit_boss_cortez = {
     93,

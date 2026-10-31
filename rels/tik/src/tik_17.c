@@ -5,8 +5,6 @@
 #include "evt/evt_movefloor.h"
 #include "driver/hitdrv.h"
 
-#pragma force_active on
-
 USER_FUNC(evt_bero_get_info);
 USER_FUNC(evt_hit_bind_mapobj);
 USER_FUNC(evt_hit_bind_update);
@@ -32,58 +30,9 @@ USER_FUNC(evt_snd_sfxon_3d);
 USER_FUNC(evt_sub_intpl_msec_get_value_para);
 USER_FUNC(evt_sub_intpl_msec_init);
 
-f32 fd_tik_17_negone_one_374[2] __attribute__((aligned(8)));
-f32 fd_tik_17_neg_one_382;
-f32 fd_tik_17___local_PI_383;
-f32 fd_tik_17___local_3PIO2_385;
-f32 fd_tik_17_one_negone_373[2] __attribute__((aligned(8)));
-f32 fd_tik_17___local_PIO2_384;
-f32 fd_tik_17_one_381;
-f32 fd_tik_17_negone_one_360[2] __attribute__((aligned(8)));
-f32 fd_tik_17_neg_one_365;
-f32 fd_tik_17___local_PI_366;
-f32 fd_tik_17___local_3PIO2_368;
-f32 fd_tik_17_one_negone_359[2] __attribute__((aligned(8)));
-f32 fd_tik_17___local_PIO2_367;
-f32 fd_tik_17_one_364;
 static BeroEntry bero_entry_data[7];
 static HitDamageReturn hitDmgRetPoints[9];
-static EvtWord evt_switch_00_init[26];
-static EvtWord evt_switch_00_after[11];
-static EvtWord evt_switch_00[56];
-static EvtWord evt_switch_01_init[26];
-static EvtWord evt_switch_01_after[11];
-static EvtWord evt_switch_01[56];
-static EvtWord mobj_box01[34];
-EvtWord tik_17_init_evt[116];
-
-f32 fd_tik_17_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
-
-f32 fd_tik_17_neg_one_382 = -1.0f;
-
-f32 fd_tik_17___local_PI_383 = 3.1415927f;
-
-f32 fd_tik_17___local_3PIO2_385 = 4.712389f;
-
-f32 fd_tik_17_one_negone_373[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
-
-f32 fd_tik_17___local_PIO2_384 = 1.5707964f;
-
-f32 fd_tik_17_one_381 = 1.0f;
-
-f32 fd_tik_17_negone_one_360[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
-
-f32 fd_tik_17_neg_one_365 = -1.0f;
-
-f32 fd_tik_17___local_PI_366 = 3.1415927f;
-
-f32 fd_tik_17___local_3PIO2_368 = 4.712389f;
-
-f32 fd_tik_17_one_negone_359[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
-
-f32 fd_tik_17___local_PIO2_367 = 1.5707964f;
-
-f32 fd_tik_17_one_364 = 1.0f;
+extern EvtWord tik_17_init_evt[];
 
 static BeroEntry bero_entry_data[] = {
     {
@@ -315,7 +264,7 @@ EVT_BEGIN(tik_17_init_evt)
     SET_VALUE(LW(12), 0)
     SPAWN_EVENT(PTR(moving_floor))
     CALL(evt_mobj_tornadoswitch_blue, 0, STRING("switch00"), -125, 0, 0, PTR(evt_switch_00), GSWF(1348))
-    CALL(evt_mobj_tornadoswitch_blue, 0, STRING("switch01\0\0\0"), 125, 0, 0, PTR(evt_switch_01), GSWF(1349))
+    CALL(evt_mobj_tornadoswitch_blue, 0, STRING("switch01"), 125, 0, 0, PTR(evt_switch_01), GSWF(1349))
     RETURN
 EVT_END()
 

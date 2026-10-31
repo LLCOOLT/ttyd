@@ -40,8 +40,6 @@ void countDownFlagOff(u16);
 void evtMsgFmtInt(char* buf, s32 value);
 void statusWinForceUpdate(void);
 #endif
-#ifdef VERSION_G8ME01
-#endif
 
 int rand(void);
 double sin(double);
@@ -55,9 +53,6 @@ double cos(double);
 		return EVT_RETURN_DONE;                               \
 	}
 
-#pragma force_active on
-u32 gap_08_804186D4_sbss;
-#pragma force_active reset
 s32 stop;
 
 typedef struct SplineWork {
@@ -110,6 +105,9 @@ USER_FUNC(evt_mario_adjust_dir);
 USER_FUNC(evt_mario_balloon_bikkuri);
 USER_FUNC(evt_mario_balloon_off);
 USER_FUNC(evt_mario_get_pos);
+#ifdef VERSION_G8MP01
+USER_FUNC(evt_mario_get_motion);
+#endif
 USER_FUNC(evt_mario_init_camid);
 USER_FUNC(evt_mario_key_onoff);
 USER_FUNC(evt_mario_normalize);
@@ -159,6 +157,9 @@ USER_FUNC(evt_sub_countdown_flag_onoff);
 USER_FUNC(evt_sub_countdown_end);
 USER_FUNC(evt_sub_countdown_get_status);
 USER_FUNC(evt_sub_countdown_start);
+#ifdef VERSION_G8MP01
+USER_FUNC(evt_sub_get_framerate);
+#endif
 USER_FUNC(evt_sub_animgroup_async);
 USER_FUNC(evt_sub_get_language);
 USER_FUNC(evt_sub_load_progresstime);
@@ -196,7 +197,7 @@ extern EvtWord evt_sub_starstone[VERSION_PICK(1043, 1084)];
 extern EvtWord evt_sub_mail_vibration[26];
 extern EvtWord evt_sub_mail_event[VERSION_PICK(117, 123)];
 #ifndef VERSION_G8ME01
-__declspec(section ".data") s32 evt_sub_mail_event_end[1];
+s32 evt_sub_mail_event_end[1];
 #endif
 
 s32 tree_data[] = {
@@ -1389,7 +1390,14 @@ EVT_BEGIN(mail_evt_gor_02_2)
         CALL(evt_sub_check_intersect, LW(0), LW(2), LW(10), LW(12), -1000, -4226, 1000, 7374, LW(5))
         IF_INT_EQUAL(GSW(0), 348)
             IF_INT_EQUAL(LW(5), 1)
+#ifdef VERSION_G8MP01
+                CALL(evt_mario_get_motion, LW(5))
+                IF_INT_NOT_EQUAL(LW(5), 25)
+                    BREAK_LOOP
+                END_IF
+#else
                 BREAK_LOOP
+#endif
             END_IF
         END_IF
         WAIT_FRAMES(1)
@@ -1764,11 +1772,7 @@ __declspec(section ".data") s32 evt_sub_mail_event_end[] = {
 #endif
 #pragma force_active reset
 
-#pragma explicit_zero_data on
 USER_FUNC(evt_sub_intpl_init) {
-#pragma force_active on
-    static const u32 gap_09_80419DAC_sdata2 = 0;
-#pragma force_active reset
 	EvtWord* args = event->args;
 	s32 mode = evtGetValue(event, args[0]);
 	s32 start = evtGetValue(event, args[1]);
@@ -1779,10 +1783,8 @@ USER_FUNC(evt_sub_intpl_init) {
 	event->lwData[13] = end;
 	event->lwData[14] = 0;
 	event->lwData[15] = steps;
-	(void)&gap_09_80419DAC_sdata2;
 	return EVT_RETURN_DONE;
 }
-#pragma explicit_zero_data reset
 
 USER_FUNC(evt_sub_intpl_get_value) {
 	event->lwData[0] = intplGetValue(event->lwData[11], event->lwData[14], event->lwData[15], event->lwData[12], event->lwData[13]);
@@ -2182,6 +2184,13 @@ USER_FUNC(evt_sub_animgroup_async) {
 }
 
 
+#ifdef VERSION_G8MP01
+USER_FUNC(evt_sub_get_framerate) {
+	evtSetValue(event, event->args[0], gp->framerate);
+	return EVT_RETURN_DONE;
+}
+
+#endif
 USER_FUNC(evt_sub_countdown_start) {
 	EvtWord* args = event->args;
 	s32 limit = evtGetValue(event, args[0]);
@@ -2227,9 +2236,9 @@ void coingetDisp(WinMgrEntry* entry) {
 		s32 w;
 
 		if ((u32)gp->language == 0) {
-			sprintf(buf, msgSearch("msg_window_coin_get\0\0\0\0"), work[0]);
+			sprintf(buf, msgSearch("msg_window_coin_get"), work[0]);
 		} else {
-			strcpy(buf, msgSearch("msg_window_coin_get\0\0\0\0"));
+			strcpy(buf, msgSearch("msg_window_coin_get"));
 			evtMsgFmtInt(buf, work[0]);
 		}
 		w = FontGetMessageWidthLine(buf, &lines) + 20;
@@ -2498,24 +2507,10 @@ USER_FUNC(irai_mail_check) {
 	return EVT_RETURN_DONE;
 }
 
-#pragma force_active on
-#pragma explicit_zero_data on
 USER_FUNC(mail_evt_gor_04_keyoff_check) {
 	EvtWord* args = event->args;
 	s32 a = marioCtrlOffChk();
 	s32 b = marioKeyOffChk();
-	(void)"\0\0\0";
 	evtSetValue(event, args[0], b + a);
 	return EVT_RETURN_DONE;
 }
-#pragma explicit_zero_data reset
-#pragma force_active reset
-
-#pragma force_active on
-#pragma force_active reset
-
-#pragma explicit_zero_data on
-#pragma force_active on
-u32 gap_07_804101EC_sdata[1] = {0};
-#pragma force_active reset
-#pragma explicit_zero_data reset

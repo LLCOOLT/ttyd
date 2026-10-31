@@ -1,7 +1,6 @@
 #include "battle/battle_unit.h"
 #include "evt/evt_cmd.h"
 
-#pragma force_active on
 #include "battle/battle.h"
 #include "battle/battle_event_default.h"
 #include "battle/battle_event_cmd.h"
@@ -9,6 +8,7 @@
 #include "battle/battle_weapon_power.h"
 #include "battle/battle_database_common.h"
 #include "data_tables.h"
+#include "manager/evtmgr_cmd.h"
 
 USER_FUNC(btlevtcmd_AddScale);
 USER_FUNC(btlevtcmd_AnimeChangePose);
@@ -71,20 +71,6 @@ extern EvtWord chorogun_entry[];
 extern BattleUnitKind unit_chorobon_gundan;
 extern EvtWord chorogun_dead_reward[];
 
-f32 fd_gold_chorobon_negone_one_374[2] __attribute__((aligned(8)));
-f32 fd_gold_chorobon_neg_one_382;
-f32 fd_gold_chorobon___local_PI_383;
-f32 fd_gold_chorobon___local_3PIO2_385;
-f32 fd_gold_chorobon_one_negone_373[2] __attribute__((aligned(8)));
-f32 fd_gold_chorobon___local_PIO2_384;
-f32 fd_gold_chorobon_one_381;
-f32 fd_gold_chorobon_negone_one_360[2] __attribute__((aligned(8)));
-f32 fd_gold_chorobon_neg_one_365;
-f32 fd_gold_chorobon___local_PI_366;
-f32 fd_gold_chorobon___local_3PIO2_368;
-f32 fd_gold_chorobon_one_negone_359[2] __attribute__((aligned(8)));
-f32 fd_gold_chorobon___local_PIO2_367;
-f32 fd_gold_chorobon_one_364;
 BattleUnitKind unit_gold_chorobon;
 static BattleUnitDefense defence;
 static BattleUnitDefenseAttr defence_attr;
@@ -94,44 +80,16 @@ static BattleDataEntry data_table[15];
 static BattleUnitKindPart parts[1];
 BattleWeapon weapon_gold_chorobon_attack;
 static PoseSoundTiming pose_sound_timing_table[4];
-EvtWord gold_chorobon_rabbit_move[123];
+extern EvtWord gold_chorobon_rabbit_move[];
 BattleUnitSetup entry_chorogun;
-EvtWord call_chorogun_event[67];
-EvtWord escape_chorogun_event[50];
+extern EvtWord call_chorogun_event[];
+extern EvtWord escape_chorogun_event[];
 static EvtWord init_event[43];
 static EvtWord damage_event[131];
 static EvtWord counter_damage_event[30];
 static EvtWord return_event[24];
 static EvtWord attack_event[500];
 static EvtWord wait_event[6];
-
-f32 fd_gold_chorobon_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
-
-f32 fd_gold_chorobon_neg_one_382 = -1.0f;
-
-f32 fd_gold_chorobon___local_PI_383 = 3.1415927f;
-
-f32 fd_gold_chorobon___local_3PIO2_385 = 4.712389f;
-
-f32 fd_gold_chorobon_one_negone_373[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
-
-f32 fd_gold_chorobon___local_PIO2_384 = 1.5707964f;
-
-f32 fd_gold_chorobon_one_381 = 1.0f;
-
-f32 fd_gold_chorobon_negone_one_360[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
-
-f32 fd_gold_chorobon_neg_one_365 = -1.0f;
-
-f32 fd_gold_chorobon___local_PI_366 = 3.1415927f;
-
-f32 fd_gold_chorobon___local_3PIO2_368 = 4.712389f;
-
-f32 fd_gold_chorobon_one_negone_359[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
-
-f32 fd_gold_chorobon___local_PIO2_367 = 1.5707964f;
-
-f32 fd_gold_chorobon_one_364 = 1.0f;
 
 BattleUnitKind unit_gold_chorobon = {
     20,
@@ -398,7 +356,7 @@ static EVT_BEGIN(init_event)
     CALL(btlevtcmd_SetUnitWork, -2, 0, 0)
     CALL(btlevtcmd_SetUnitWork, -2, 1, 0)
     CALL(btlevtcmd_AnimeSetPoseSoundTable, -2, 1, PTR(pose_sound_timing_table))
-    CALL(btlevtcmd_SetJumpSound, -2, STRING("SFX_BOSS_G_CHORO_MOVE1"), STRING("SFX_BOSS_G_CHORO_LANDING1\0\0"))
+    CALL(btlevtcmd_SetJumpSound, -2, STRING("SFX_BOSS_G_CHORO_MOVE1"), STRING("SFX_BOSS_G_CHORO_LANDING1"))
     RETURN
 EVT_END()
 

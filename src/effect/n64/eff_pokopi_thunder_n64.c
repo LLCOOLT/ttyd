@@ -9,6 +9,7 @@
 #include "dolphin/os.h"
 #include "eff/eff_magic1_n64.h"
 #include "libc_decls.h"
+#include <math.h>
 typedef struct effN64Vtx {
     s16 x, y, z;
     s16 s, t;
@@ -17,57 +18,6 @@ typedef struct effN64Vtx {
 void effGetTexObjN64(u32 id, GXTexObj* obj);
 void effSetVtxDescN64(effN64Vtx* vtx);
 void tri2();
-
-#define NAN (*(f32*)__float_nan)
-
-#define FP_NAN 1
-#define FP_INFINITE 2
-#define FP_ZERO 3
-#define FP_NORMAL 4
-#define FP_SUBNORMAL 5
-
-static inline s32 __fpclassifyf(f32 x) {
-    switch (*(s32*)&x & 0x7F800000) {
-        case 0x7F800000:
-            if (*(s32*)&x & 0x007FFFFF) {
-                return FP_NAN;
-            } else {
-                return FP_INFINITE;
-            }
-            break;
-        case 0:
-            if (*(s32*)&x & 0x007FFFFF) {
-                return FP_SUBNORMAL;
-            } else {
-                return FP_ZERO;
-            }
-            break;
-        default:
-            return FP_NORMAL;
-    }
-}
-
-#define fpclassify(x) __fpclassifyf(x)
-#define isnan(x) (fpclassify(x) == FP_NAN)
-
-static inline f32 sqrtf(f32 x) {
-    const f64 _half = .5;
-    const f64 _three = 3.0;
-
-    if (x > 0.0f) {
-        f64 guess = __frsqrte(x);
-        guess = _half * guess * (_three - guess * guess * x);
-        guess = _half * guess * (_three - guess * guess * x);
-        guess = _half * guess * (_three - guess * guess * x);
-        return x * guess;
-    } else if (x < 0.0) {
-        return NAN;
-    } else if (isnan(x)) {
-        return NAN;
-    } else {
-        return x;
-    }
-}
 
 u8 yuragi_data[11][24] = {
 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 10, 9, 3, 1, 0, 0, 0, 0, 0, 0, 0, 0,
@@ -128,9 +78,9 @@ EffectEntry* effPokopiThunderN64Entry(s32 type, s32 duration, f32 x, f32 y, f32 
     work->type = type;
     work->frame = 0;
     if (duration <= 0) {
-        work->unk28 = 1000;
+        work->timeLeft = 1000;
     } else {
-        work->unk28 = duration;
+        work->timeLeft = duration;
     }
     work->alpha = 255;
     dy = y - y2;
@@ -165,7 +115,7 @@ EffectEntry* effPokopiThunderN64Entry(s32 type, s32 duration, f32 x, f32 y, f32 
     return effect;
 }
 
-inline float inline_fn(s32 arg0, float arg1) { return ((f32)arg0) * arg1; }
+inline float inline_fn(s32 i, float step) { return ((f32)i) * step; }
 
 void effPokopiThunderMain(EffectEntry* effect) {
     EffPokopiThunderN64Work* work = effect->userdata;
@@ -181,13 +131,13 @@ void effPokopiThunderMain(EffectEntry* effect) {
     type = work->type;
     if (effect->flags & 4) {
         effect->flags &= ~4;
-        work->unk28 = 16;
+        work->timeLeft = 16;
     }
-    if (work->unk28 < 1000) {
-        work->unk28--;
+    if (work->timeLeft < 1000) {
+        work->timeLeft--;
     }
     work->frame++;
-    if (work->unk28 < 0) {
+    if (work->timeLeft < 0) {
         effDelete(effect);
         return;
     }

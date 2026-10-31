@@ -5,8 +5,6 @@
 #include "win.h"
 #include "data_tables.h"
 
-#pragma force_active on
-
 USER_FUNC(evt_bero_exec_wait);
 USER_FUNC(evt_bero_get_info);
 USER_FUNC(evt_cam3d_evt_off);
@@ -49,56 +47,13 @@ USER_FUNC(evt_snd_envon);
 USER_FUNC(evt_snd_sfxon_3d);
 USER_FUNC(evt_sub_rumble_onoff);
 
-f32 fd_win_01_negone_one_374[2] __attribute__((aligned(8)));
-f32 fd_win_01_neg_one_382;
-f32 fd_win_01___local_PI_383;
-f32 fd_win_01___local_3PIO2_385;
-f32 fd_win_01_one_negone_373[2] __attribute__((aligned(8)));
-f32 fd_win_01___local_PIO2_384;
-f32 fd_win_01_one_381;
-f32 fd_win_01_negone_one_360[2] __attribute__((aligned(8)));
-f32 fd_win_01_neg_one_365;
-f32 fd_win_01___local_PI_366;
-f32 fd_win_01___local_3PIO2_368;
-f32 fd_win_01_one_negone_359[2] __attribute__((aligned(8)));
-f32 fd_win_01___local_PIO2_367;
-f32 fd_win_01_one_364;
-EvtWord evt_dokan1_message[52];
-EvtWord evt_dokan1[11];
+extern EvtWord evt_dokan1_message[];
+extern EvtWord evt_dokan1[];
 static BeroEntry bero_entry_data[6];
-EvtWord guide_bigtree[336];
-static EvtWord peach_mail[257];
-EvtWord ki_data_evt_03[20];
+extern EvtWord guide_bigtree[];
+extern EvtWord ki_data_evt_03[];
 static TreeAccess tree_access_data[5];
-EvtWord win_01_init_evt[46];
-
-f32 fd_win_01_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
-
-f32 fd_win_01_neg_one_382 = -1.0f;
-
-f32 fd_win_01___local_PI_383 = 3.1415927f;
-
-f32 fd_win_01___local_3PIO2_385 = 4.712389f;
-
-f32 fd_win_01_one_negone_373[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
-
-f32 fd_win_01___local_PIO2_384 = 1.5707964f;
-
-f32 fd_win_01_one_381 = 1.0f;
-
-f32 fd_win_01_negone_one_360[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
-
-f32 fd_win_01_neg_one_365 = -1.0f;
-
-f32 fd_win_01___local_PI_366 = 3.1415927f;
-
-f32 fd_win_01___local_3PIO2_368 = 4.712389f;
-
-f32 fd_win_01_one_negone_359[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
-
-f32 fd_win_01___local_PIO2_367 = 1.5707964f;
-
-f32 fd_win_01_one_364 = 1.0f;
+extern EvtWord win_01_init_evt[];
 
 EVT_BEGIN(evt_dokan1_message)
     CALL(evt_bero_exec_wait, 65536)

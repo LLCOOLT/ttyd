@@ -10,13 +10,13 @@
 
 typedef struct effKemuri1Data {
 	u16 type; //0x0
-	u8 align_2[2]; //0x2, TODO: verify align
+	u8 align_2[2]; //0x2, padding
 	Vec position; //0x4
-	u8 field_0x10[0x38 - 0x10]; //0x10
-	s32 field_0x38; //0x38
-	s32 field_0x3C; //0x3C
-	u8 field_0x40[0x4C - 0x40]; //0x40
-	s32 field_0x4C; //0x4C
+	u8 motion[0x38 - 0x10]; //0x10, per-particle speeds and direction
+	s32 variant; //0x38, set per type at entry; never read
+	s32 timer; //0x3C
+	u8 anim[0x4C - 0x40]; //0x40, animation frames and color
+	s32 duration; //0x4C
 } effKemuri1Data;
 
 //local prototypes
@@ -27,13 +27,13 @@ typedef struct effKemuri1EWork {
 	u8 pad_2[2];
 	Vec position; //0x4
 	f32 f10, f14, f18, f1C, f20, f24, f28, f2C, f30, f34; //0x10
-	s32 field_0x38;
+	s32 variant; //0x38, set per type; never read
 	s32 timer; //0x3C
-	s32 field_0x40;
+	s32 animFrame; //0x40
 	u8 r, g, b; //0x44
 	u8 pad_47;
-	s32 field_0x48;
-	s32 field_0x4C;
+	s32 nextAnimFrame; //0x48
+	s32 duration; //0x4C
 } effKemuri1EWork;
 
 EffectEntry* effKemuri1N64Entry(s32 type, f32 x, f32 y, f32 z, f32 a5) {
@@ -64,7 +64,7 @@ EffectEntry* effKemuri1N64Entry(s32 type, f32 x, f32 y, f32 z, f32 a5) {
 			break;
 	}
 
-	effect->type = "Kemuri1N64\0";
+	effect->type = "Kemuri1N64";
 	effect->count = effCount;
 	data = __memAlloc(HEAP_EFFECT, sizeof(effKemuri1EWork) * effCount);
 	effect->userdata = data;
@@ -72,23 +72,23 @@ EffectEntry* effKemuri1N64Entry(s32 type, f32 x, f32 y, f32 z, f32 a5) {
 	switch (type) {
 		case 0:
 		case 1:
-			data->field_0x38 = 0;
-			data->field_0x4C = 15;
+			data->variant = 0;
+			data->duration = 15;
 			break;
 		case 2:
-			data->field_0x38 = 3;
-			data->field_0x4C = 65;
+			data->variant = 3;
+			data->duration = 65;
 			break;
 		case 3:
-			data->field_0x38 = 2;
-			data->field_0x4C = 129;
+			data->variant = 2;
+			data->duration = 129;
 			break;
 		case 4:
 		case 5:
 		case 6:
 		case 7:
-			data->field_0x38 = 3;
-			data->field_0x4C = 65;
+			data->variant = 3;
+			data->duration = 65;
 			break;
 	}
 	data->timer = 0;
@@ -212,12 +212,12 @@ typedef struct effKemuri1MWork {
 	u8 pad_2[2];
 	Vec position; //0x4
 	f32 f10, f14, f18, f1C, f20, f24, f28, f2C, f30, f34; //0x10
-	s32 field_0x38;
+	s32 variant; //0x38
 	s32 timer; //0x3C
-	s32 field_0x40;
-	s32 field_0x44;
-	s32 field_0x48;
-	s32 field_0x4C;
+	s32 animFrame; //0x40
+	s32 color; //0x44, r, g, b in effKemuri1EWork
+	s32 nextAnimFrame; //0x48
+	s32 duration; //0x4C
 } effKemuri1MWork;
 
 void effKemuri1Main(EffectEntry* effect) {
@@ -233,8 +233,8 @@ void effKemuri1Main(EffectEntry* effect) {
 
 	t = work->timer;
 	type = work->type;
-	b = 16.0f * t / work->field_0x4C;
-	a = 16.0f * (t + 1) / work->field_0x4C;
+	b = 16.0f * t / work->duration;
+	a = 16.0f * (t + 1) / work->duration;
 	work->timer = t + 1;
 	if (a > 15) {
 		a = 15;
@@ -243,8 +243,8 @@ void effKemuri1Main(EffectEntry* effect) {
 		effDelete(effect);
 		return;
 	}
-	work->field_0x40 = b;
-	work->field_0x48 = a;
+	work->animFrame = b;
+	work->nextAnimFrame = a;
 	for (i = 1, work++; i < effect->count; i++, work++) {
 		switch (type) {
 			case 0:
@@ -289,11 +289,11 @@ typedef struct effKemuri1Work {
 	u16 type; //0x0
 	u8 pad_2[2];
 	Vec position; //0x4
-	u8 field_0x10[0x40 - 0x10];
+	u8 motion[0x40 - 0x10]; //0x10
 	s32 timer; //0x40
 	u8 r, g, b; //0x44
 	u8 pad_47;
-	s32 field_0x48;
+	s32 nextAnimFrame; //0x48
 	u8 pad_4C[4];
 } effKemuri1Work;
 
@@ -311,7 +311,7 @@ void effKemuri1Disp(CameraId cameraId, EffectEntry* effect) {
 	camera = camGetPtr(cameraId);
 	type = work->type;
 	a = work->timer;
-	b = work->field_0x48;
+	b = work->nextAnimFrame;
 	s = 1.0f;
 	switch (type) {
 		case 5:
@@ -409,5 +409,3 @@ void effKemuri1Disp(CameraId cameraId, EffectEntry* effect) {
 	}
 }
 
-#pragma force_active on
-#pragma force_active reset

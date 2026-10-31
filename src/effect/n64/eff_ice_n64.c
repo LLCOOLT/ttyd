@@ -11,7 +11,7 @@ double sin(double);
 double cos(double);
 
 typedef struct EffIceN64Piece {
-    s32 unk0;     // 0x0
+    s32 type;     // 0x0, unused; same slot as EffIceN64Work.type
     f32 x;        // 0x4
     f32 y;        // 0x8
     f32 z;        // 0xC
@@ -20,9 +20,9 @@ typedef struct EffIceN64Piece {
     f32 rotZ;     // 0x18
     f32 rotVel;   // 0x1C
     f32 rotY;     // 0x20
-    f32 unk24;    // 0x24
-    f32 unk28;    // 0x28
-    f32 unk2C;    // 0x2C
+    f32 reserved_24; // 0x24, unused; EffIceN64Work keeps alpha here
+    f32 reserved_28; // 0x28, unused; EffIceN64Work keeps lifetime here
+    f32 reserved_2C; // 0x2C, unused; EffIceN64Work keeps frame here
 } EffIceN64Piece;
 
 typedef struct EffIceN64Work {
@@ -58,7 +58,7 @@ EffectEntry* effIceN64Entry(s32 type, f32 x, f32 y, f32 z) {
     s32 i;
 
     effect = effEntry();
-    effect->type = "IceN64\0";
+    effect->type = "IceN64";
     effect->count = 9;
     work = __memAlloc(HEAP_EFFECT, sizeof(EffIceN64Work));
     effect->userdata = work;
@@ -84,7 +84,6 @@ EffectEntry* effIceN64Entry(s32 type, f32 x, f32 y, f32 z) {
     return effect;
 }
 
-#pragma opt_propagation off
 #pragma opt_lifetimes off
 static void effIceMain(EffectEntry* effect) {
     EffIceN64Work* work = effect->userdata;
@@ -136,7 +135,6 @@ static void effIceMain(EffectEntry* effect) {
     dispEntry(CAMERA_3D, dispCalcZ(&calcPos), 2, (DispCallback)effIceDisp, effect);
 }
 
-#pragma opt_propagation reset
 static void effIceDisp(CameraId cameraId, EffectEntry* effect) {
 
     EffIceN64Work* work;

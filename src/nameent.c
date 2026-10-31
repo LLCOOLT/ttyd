@@ -36,17 +36,6 @@ void nameEntDisp(CameraId cameraId, void* param);
 #define NAME_LANG_PICK(jp, en) (jp)
 #endif
 
-#ifdef VERSION_G8ME01
-/* US: eight unreferenced {+-1.0f, -+1.0f} pairs open nameent .data (r31 anchors here) */
-__declspec(section ".data") f32 nameent_unused_pm1_0[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
-__declspec(section ".data") f32 nameent_unused_pm1_1[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
-__declspec(section ".data") f32 nameent_unused_pm1_2[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
-__declspec(section ".data") f32 nameent_unused_pm1_3[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
-__declspec(section ".data") f32 nameent_unused_pm1_4[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
-__declspec(section ".data") f32 nameent_unused_pm1_5[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
-__declspec(section ".data") f32 nameent_unused_pm1_6[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
-__declspec(section ".data") f32 nameent_unused_pm1_7[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
-#endif
 #define NAMEENT_COLS 14 // characters per row of hiragana_tbl, katakana_tbl and latin_tbl
 
 const char* hiragana_tbl[] = {
@@ -151,7 +140,7 @@ BOOL nameEntPrepare(void) {
 	const char* lang[6] = {"jp", "us", "ge", "fr", "sp", "it"};
 	return fileAsyncf(4, NULL, "%s/w/%s/name.tpl", getMarioStDvdRoot(), lang[gp->language]) != 0;
 #else
-	return fileAsyncf(4, NULL, "%s/w/jp/name.tpl\0\0\0", getMarioStDvdRoot()) != 0;
+	return fileAsyncf(4, NULL, "%s/w/jp/name.tpl", getMarioStDvdRoot()) != 0;
 #endif
 }
 
@@ -178,7 +167,7 @@ void nameEntOn(s32 type) {
 	wp->y1 = wp->y2 = (f32)(112 - wp->cursorY * 28);
 	wp->caretX = wp->caretTargetX = -106.0f;
 	wp->caretY = wp->caretTargetY = 135.0f;
-	strcpy(wp->name, "\0\0\0");
+	strcpy(wp->name, "");
 	for (i = 0; i < 8; i++) {
 #ifdef VERSION_G8ME01
 		strcat(wp->name, (u32)gp->language == 0 ? "\x81\x40" : " ");
@@ -278,12 +267,12 @@ static inline BOOL nameEntLoad(void) {
 #ifdef VERSION_G8ME01
 	if (fileAsyncf(4, NULL, "%s/w/%s/name.tpl", getMarioStDvdRoot(), lang[gp->language]) != 0U) {
 #else
-	if (fileAsyncf(4, NULL, "%s/w/jp/name.tpl\0\0\0", getMarioStDvdRoot()) != 0U) {
+	if (fileAsyncf(4, NULL, "%s/w/jp/name.tpl", getMarioStDvdRoot()) != 0U) {
 #endif
 #ifdef VERSION_G8ME01
 		wp->tplFile = fileAllocf(4, "%s/w/%s/name.tpl", getMarioStDvdRoot(), lang[gp->language]);
 #else
-		wp->tplFile = fileAllocf(4, "%s/w/jp/name.tpl\0\0\0", getMarioStDvdRoot());
+		wp->tplFile = fileAllocf(4, "%s/w/jp/name.tpl", getMarioStDvdRoot());
 #endif
 		return TRUE;
 	}
@@ -367,6 +356,11 @@ s32 nameMain(void) {
 										if (wp->type == 1 && k >= n) {
 											strcpy(wp->name, msgSearch("name_party3"));
 											wp->nameLen = strlen(wp->name) / 2;
+#ifdef VERSION_G8MP01
+											if (wp->nameLen >= 8) {
+												wp->nameLen = 7;
+											}
+#endif
 										}
 									} else {
 										psndSFXOn((const char*)0x20014);
@@ -387,6 +381,11 @@ s32 nameMain(void) {
 										if (wp->type == 1 && m >= n) {
 											strcpy(wp->name, msgSearch("name_party3"));
 											wp->nameLen = strlen(wp->name);
+#ifdef VERSION_G8MP01
+											if (wp->nameLen >= 8) {
+												wp->nameLen = 7;
+											}
+#endif
 										}
 									} else {
 										psndSFXOn((const char*)0x20014);
@@ -462,6 +461,11 @@ s32 nameMain(void) {
 							if (wp->type == 1 && j >= len) {
 								strcpy(wp->name, msgSearch("name_party3"));
 								wp->nameLen = strlen(wp->name) / 2;
+#ifdef VERSION_G8MP01
+								if (wp->nameLen >= 8) {
+									wp->nameLen = 7;
+								}
+#endif
 							}
 						} else {
 							psndSFXOn((const char*)0x20014);
@@ -482,6 +486,11 @@ s32 nameMain(void) {
 							if (wp->type == 1 && m >= len) {
 								strcpy(wp->name, msgSearch("name_party3"));
 								wp->nameLen = strlen(wp->name);
+#ifdef VERSION_G8MP01
+								if (wp->nameLen >= 8) {
+									wp->nameLen = 7;
+								}
+#endif
 							}
 						} else {
 							psndSFXOn((const char*)0x20014);

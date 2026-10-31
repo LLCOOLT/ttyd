@@ -8,8 +8,6 @@
 #include "party/party_motion.h"
 #include "battle/battle_database_common.h"
 
-#pragma force_active on
-
 USER_FUNC(btlevtcmd_AnimeChangePoseFromTable);
 USER_FUNC(btlevtcmd_CheckPartsCounterAttribute);
 USER_FUNC(btlevtcmd_EnemyItemUseCheck);
@@ -29,20 +27,6 @@ USER_FUNC(btlevtcmd_WaitAttackEnd);
 USER_FUNC(evt_eff64);
 USER_FUNC(evt_sub_random);
 
-f32 fd_monochrome_kurokumorn_negone_one_374[2] __attribute__((aligned(8)));
-f32 fd_monochrome_kurokumorn_neg_one_382;
-f32 fd_monochrome_kurokumorn___local_PI_383;
-f32 fd_monochrome_kurokumorn___local_3PIO2_385;
-f32 fd_monochrome_kurokumorn_one_negone_373[2] __attribute__((aligned(8)));
-f32 fd_monochrome_kurokumorn___local_PIO2_384;
-f32 fd_monochrome_kurokumorn_one_381;
-f32 fd_monochrome_kurokumorn_negone_one_360[2] __attribute__((aligned(8)));
-f32 fd_monochrome_kurokumorn_neg_one_365;
-f32 fd_monochrome_kurokumorn___local_PI_366;
-f32 fd_monochrome_kurokumorn___local_3PIO2_368;
-f32 fd_monochrome_kurokumorn_one_negone_359[2] __attribute__((aligned(8)));
-f32 fd_monochrome_kurokumorn___local_PIO2_367;
-f32 fd_monochrome_kurokumorn_one_364;
 static BattleUnitKind unit_monochrome_kurokumorn;
 static BattleUnitDefense defence;
 static BattleUnitDefenseAttr defence_attr;
@@ -50,7 +34,6 @@ static StatusVulnerability regist;
 static BattleUnitKindPart parts[1];
 static BattleWeapon weapon_kurokumorn_attack;
 static BattleWeapon weapon_kurokumorn_thunder_attack;
-static EvtWord attack_event[69];
 static EvtWord thunder_event[493];
 static PoseTableEntry pose_table[17];
 static BattleDataEntry data_table[3];
@@ -63,34 +46,6 @@ static EvtWord unison_phase_event[140];
 static EvtWord normal_attack_event[386];
 static EvtWord charge_event[58];
 static EvtWord wait_event[12];
-
-f32 fd_monochrome_kurokumorn_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
-
-f32 fd_monochrome_kurokumorn_neg_one_382 = -1.0f;
-
-f32 fd_monochrome_kurokumorn___local_PI_383 = 3.1415927f;
-
-f32 fd_monochrome_kurokumorn___local_3PIO2_385 = 4.712389f;
-
-f32 fd_monochrome_kurokumorn_one_negone_373[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
-
-f32 fd_monochrome_kurokumorn___local_PIO2_384 = 1.5707964f;
-
-f32 fd_monochrome_kurokumorn_one_381 = 1.0f;
-
-f32 fd_monochrome_kurokumorn_negone_one_360[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
-
-f32 fd_monochrome_kurokumorn_neg_one_365 = -1.0f;
-
-f32 fd_monochrome_kurokumorn___local_PI_366 = 3.1415927f;
-
-f32 fd_monochrome_kurokumorn___local_3PIO2_368 = 4.712389f;
-
-f32 fd_monochrome_kurokumorn_one_negone_359[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
-
-f32 fd_monochrome_kurokumorn___local_PIO2_367 = 1.5707964f;
-
-f32 fd_monochrome_kurokumorn_one_364 = 1.0f;
 
 static BattleUnitKind unit_monochrome_kurokumorn = {
     24, // mUnitType
@@ -614,7 +569,7 @@ static EVT_BEGIN(normal_attack_event)
     CALL(btlevtcmd_FaceDirectionAdd, -2, LW(10), 40)
     CALL(btlevtcmd_DivePosition, -2, LW(10), LW(1), LW(12), 40, 0, 4, 0, -1)
     CALL(evt_btl_camera_set_mode, 0, 0)
-    CALL(btlevtcmd_snd_se, -2, STRING("SFX_ENM_KUMO_MOVE3\0"), -250000000, 0, LW(15))
+    CALL(btlevtcmd_snd_se, -2, STRING("SFX_ENM_KUMO_MOVE3"), -250000000, 0, LW(15))
     CALL(btlevtcmd_GetHomePos, -2, LW(0), LW(1), LW(2))
     CALL(btlevtcmd_DivePosition, -2, LW(0), LW(1), LW(2), 40, 40, 4, 0, -1)
     CALL(btlevtcmd_AnimeChangePose, -2, 1, STRING("S_1"))

@@ -1,4 +1,3 @@
-#pragma dollar_identifiers on
 #include "eff/n64/eff_snow_dust_n64.h"
 #include "eff/eff_n64.h"
 #include "driver/camdrv.h"
@@ -17,14 +16,6 @@ s32 irand(s32);
 void effSnowDustMain(EffectEntry* effect);
 void effSnowDustDisp(CameraId cameraId, EffectEntry* effect);
 
-__declspec(section ".data") f32 snowdust_negone_one_a[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
-__declspec(section ".data") static f32 negone_one$374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
-__declspec(section ".data") f32 snowdust_one_negone_a[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
-__declspec(section ".data") static f32 one_negone$373[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
-__declspec(section ".data") f32 snowdust_negone_one_b[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
-__declspec(section ".data") static f32 negone_one$360[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
-__declspec(section ".data") f32 snowdust_one_negone_b[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
-__declspec(section ".data") static f32 one_negone$359[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
 
 effN64Vtx size8x8_tex64x64_vtx[] = {
     {-4, -4, 0, 0, 0, 0, 0, 0, 255},
@@ -54,13 +45,13 @@ static effN64Vtx size16x16_tex64x64_vtx[] = {
     {-8, 8, 0, 0, 2048, 0, 0, 0, 255},
 };
 
-static struct { effN64Vtx v[5]; u8 pad[2]; } size32x32_tex32x32_vtx = { { // FAKE: padded to the original symbol size (trailing zero bytes, never read)
+static effN64Vtx size32x32_tex32x32_vtx[5] = {
     {-32, 0, 0, 0, 0, 255, 255, 255, 0},
     {0, -32, 0, 1024, 0, 255, 255, 255, 0},
     {32, 0, 0, 1024, 1024, 255, 255, 255, 0},
     {0, 32, 0, 0, 1024, 255, 255, 255, 0},
     {0, 0, 0, 0, 0, 255, 255, 255, 255},
-}, {0} };
+};
 
 static u8 scale_data[] = {
     2, 4, 8, 13, 15, 13, 9, 6, 4, 3, 2, 4, 8, 13, 15, 13, 9, 6, 4, 3, 2, 4, 8, 13, 15, 13, 9, 6, 4, 3,
@@ -72,7 +63,7 @@ static u8 scale_data2[] = {
 
 static u8 a_data[] = {
     200, 250, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255,
-    255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 250, 200, 0, 0 // FAKE: trailing zero padding to the original symbol size (never read)
+    255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 250, 200
 };
 
 EffectEntry* effSnowDustN64Entry(s32 type, s32 count, s32 lifetime, f32 x, f32 y, f32 z, f32 w, f32 h, f32 scale) {
@@ -455,18 +446,18 @@ void effSnowDustDisp(CameraId cameraId, EffectEntry* effect) {
             case 6:
                 effSetVtxDescN64(size4x4_tex64x64_vtx);
                 GXBegin(0x90, 0, 6);
-                ((void (*)())tri2)(0, 1, 2, 0, 0, 2, 3, 0);
+                tri2(0, 1, 2, 0, 0, 2, 3, 0);
                 break;
             case 1:
                 effSetVtxDescN64(size8x8_tex64x64_vtx);
                 GXBegin(0x90, 0, 6);
-                ((void (*)())tri2)(0, 1, 2, 0, 0, 2, 3, 0);
+                tri2(0, 1, 2, 0, 0, 2, 3, 0);
                 break;
             case 2:
             case 3:
                 effSetVtxDescN64(size12x12_tex64x64_vtx);
                 GXBegin(0x90, 0, 6);
-                ((void (*)())tri2)(0, 1, 2, 0, 0, 2, 3, 0);
+                tri2(0, 1, 2, 0, 0, 2, 3, 0);
                 break;
             case 4:
             case 5:
@@ -490,7 +481,7 @@ void effSnowDustDisp(CameraId cameraId, EffectEntry* effect) {
                 GXSetTevKColorSel(2, 0xc);
                 effSetVtxDescN64(size16x16_tex64x64_vtx);
                 GXBegin(0x90, 0, 6);
-                ((void (*)())tri2)(0, 1, 2, 0, 0, 2, 3, 0);
+                tri2(0, 1, 2, 0, 0, 2, 3, 0);
                 GXSetNumChans(1);
                 GXSetChanCtrl(4, 0, 0, 1, 0, 0, 2);
                 GXSetNumTevStages(1);
@@ -500,10 +491,10 @@ void effSnowDustDisp(CameraId cameraId, EffectEntry* effect) {
                 GXSetTevColorIn(0, 0xf, 0xf, 0xf, 0xc);
                 GXSetTevAlphaIn(0, 7, 5, 6, 7);
                 GXSetTevKAlphaSel(0, 0x1c);
-                effSetVtxDescN64(size32x32_tex32x32_vtx.v);
+                effSetVtxDescN64(size32x32_tex32x32_vtx);
                 GXBegin(0x90, 0, 12);
-                ((void (*)())tri2)(0, 1, 4, 0, 1, 2, 4, 0);
-                ((void (*)())tri2)(0, 4, 3, 0, 4, 2, 3, 0);
+                tri2(0, 1, 4, 0, 1, 2, 4, 0);
+                tri2(0, 4, 3, 0, 4, 2, 3, 0);
                 break;
         }
     }

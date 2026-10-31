@@ -53,9 +53,6 @@ static u8 a_data2[] = {
     0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
 };
 
-#pragma force_active on
-u8 gap_07_80412D70_sdata[16] = {0};
-#pragma force_active reset
 
 void effAkariPoseMain(EffectEntry* effect);
 void effAkariPoseDisp(CameraId cameraId, EffectEntry* effect);
@@ -68,7 +65,7 @@ EffectEntry* effAkariPoseN64Entry(s32 type, s32 count, s32 lifetime, f32 x, f32 
     s32 i;
 
     effect = effEntry();
-    effect->type = "AkariPoseN64\0\0\0";
+    effect->type = "AkariPoseN64";
     effect->count = count + 1;
     work = __memAlloc(HEAP_EFFECT, (count + 1) * sizeof(EffAkariPoseN64Work));
     effect->userdata = work;

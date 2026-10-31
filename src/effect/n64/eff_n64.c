@@ -190,7 +190,7 @@ void effTexSetupN64(void) {
 		lang = (u32)gp->language == 0 ? "jp" : "us";
 		sprintf(path, "%s/e/%s/effect_n64.tpl", getMarioStDvdRoot(), lang);
 #else
-		sprintf(path, "%s/e/jp/effect_n64.tpl\0", getMarioStDvdRoot());
+		sprintf(path, "%s/e/jp/effect_n64.tpl", getMarioStDvdRoot());
 #endif
 		entry = DVDMgrOpen(path, 2, 0);
 		length = OSRoundUp32B(DVDMgrGetLength(entry));
@@ -257,7 +257,7 @@ void tri1(u16 x, u16 y, u16 z, u16 flag) {
 	GXWGFifo.u16 = z;
 }
 
-void tri2(u16 x1, u16 y1, u16 z1, u16 flag1, u16 x2, u16 y2, u16 z2, u16 flag2) {
+void tri2(s32 x1, s32 y1, s32 z1, s32 flag1, s32 x2, s32 y2, s32 z2, s32 flag2) {
 	GXWGFifo.u16 = x1;
 	GXWGFifo.u16 = x1;
 	GXWGFifo.u16 = x1;

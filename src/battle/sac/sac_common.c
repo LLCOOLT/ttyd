@@ -88,7 +88,7 @@ EVT_BEGIN(sac_start_stardust)
     LOOP(6)
         CALL(btlevtcmd_GetPos, -2, LW(0), LW(1), LW(2))
         ADD(LW(1), 50)
-        CALL(evt_eff, STRING(""), STRING("stardust\0\0\0"), 5, LW(0), LW(1), LW(2), 30, 30, 10, 30, 0, 0, 0, 0)
+        CALL(evt_eff, STRING(""), STRING("stardust"), 5, LW(0), LW(1), LW(2), 30, 30, 10, 30, 0, 0, 0, 0)
         WAIT_FRAMES(10)
     END_LOOP
     RETURN
@@ -251,6 +251,9 @@ USER_FUNC(sac_enemy_slide_return) {
         if (unit && unit->mAlliance == 1) {
             evt = evtEntry(enemy_slide_return_evt, 0, 0x20);
             evt->unitId = i;
+#ifdef VERSION_G8MP01
+            unit->slideReturnEventId = evt->eventId;
+#endif
         }
     }
     return EVT_RETURN_DONE;

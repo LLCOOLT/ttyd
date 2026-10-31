@@ -2,7 +2,6 @@
 #include "evt/evt_cmd.h"
 #include "manager/evtmgr_cmd.h"
 
-#pragma force_active on
 #include "driver/mobjdrv.h"
 #include "driver/animdrv.h"
 #include "evt/evt_bero.h"
@@ -35,56 +34,9 @@ USER_FUNC(get_mobj_seq);
 USER_FUNC(switch_alpha_off);
 USER_FUNC(switch_set_alpha);
 
-f32 fd_las_18_negone_one_374[2] __attribute__((aligned(8)));
-f32 fd_las_18_neg_one_382;
-f32 fd_las_18___local_PI_383;
-f32 fd_las_18___local_3PIO2_385;
-f32 fd_las_18_one_negone_373[2] __attribute__((aligned(8)));
-f32 fd_las_18___local_PIO2_384;
-f32 fd_las_18_one_381;
-f32 fd_las_18_negone_one_360[2] __attribute__((aligned(8)));
-f32 fd_las_18_neg_one_365;
-f32 fd_las_18___local_PI_366;
-f32 fd_las_18___local_3PIO2_368;
-f32 fd_las_18_one_negone_359[2] __attribute__((aligned(8)));
-f32 fd_las_18___local_PIO2_367;
-f32 fd_las_18_one_364;
-static EvtWord w_door_close[12];
-static EvtWord w_door_open[12];
 static BeroEntry bero_entry_data[2];
-static EvtWord box_evt[30];
-EvtWord vivian_check[92];
-static EvtWord switch_evt[48];
-static EvtWord hint_plate[14];
-EvtWord las_18_init_evt[71];
-
-f32 fd_las_18_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
-
-f32 fd_las_18_neg_one_382 = -1.0f;
-
-f32 fd_las_18___local_PI_383 = 3.1415927f;
-
-f32 fd_las_18___local_3PIO2_385 = 4.712389f;
-
-f32 fd_las_18_one_negone_373[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
-
-f32 fd_las_18___local_PIO2_384 = 1.5707964f;
-
-f32 fd_las_18_one_381 = 1.0f;
-
-f32 fd_las_18_negone_one_360[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
-
-f32 fd_las_18_neg_one_365 = -1.0f;
-
-f32 fd_las_18___local_PI_366 = 3.1415927f;
-
-f32 fd_las_18___local_3PIO2_368 = 4.712389f;
-
-f32 fd_las_18_one_negone_359[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
-
-f32 fd_las_18___local_PIO2_367 = 1.5707964f;
-
-f32 fd_las_18_one_364 = 1.0f;
+extern EvtWord vivian_check[];
+extern EvtWord las_18_init_evt[];
 
 static EVT_BEGIN(w_door_close)
     MULTIPLY_FLOAT(LW(0), FLOAT(0.44433594f))
@@ -252,7 +204,7 @@ EVT_BEGIN(las_18_init_evt)
         CALL(evt_mobj_flag_onoff, 1, STRING("box"), 16384)
         CALL(evt_mobj_hit_onoff, STRING("box"), 0)
     END_IF
-    CALL(evt_run_case_evt, 9, 1, STRING("A_pure\0"), 0, PTR(hint_plate), 0)
+    CALL(evt_run_case_evt, 9, 1, STRING("A_pure"), 0, PTR(hint_plate), 0)
     RETURN
 EVT_END()
 

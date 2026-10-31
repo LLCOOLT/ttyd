@@ -4,8 +4,6 @@
 #include "npc_event.h"
 #include "evt/evt_npc.h"
 
-#pragma force_active on
-
 USER_FUNC(evt_bero_get_info);
 USER_FUNC(evt_cam3d_evt_off);
 USER_FUNC(evt_cam3d_evt_set);
@@ -38,58 +36,10 @@ USER_FUNC(evt_snd_sfxoff);
 USER_FUNC(evt_snd_sfxon);
 USER_FUNC(evt_snd_sfxon_3d);
 
-f32 fd_hei_03_negone_one_374[2] __attribute__((aligned(8)));
-f32 fd_hei_03_neg_one_382;
-f32 fd_hei_03___local_PI_383;
-f32 fd_hei_03___local_3PIO2_385;
-f32 fd_hei_03_one_negone_373[2] __attribute__((aligned(8)));
-f32 fd_hei_03___local_PIO2_384;
-f32 fd_hei_03_one_381;
-f32 fd_hei_03_negone_one_360[2] __attribute__((aligned(8)));
-f32 fd_hei_03_neg_one_365;
-f32 fd_hei_03___local_PI_366;
-f32 fd_hei_03___local_3PIO2_368;
-f32 fd_hei_03_one_negone_359[2] __attribute__((aligned(8)));
-f32 fd_hei_03___local_PIO2_367;
-f32 fd_hei_03_one_364;
 static BeroEntry bero_entry_data[3];
-static EvtWord dead_evt1[10];
-static EvtWord dead_evt2[10];
 static NpcSetupInfo npcEnt[3];
-static EvtWord door_open[96];
-static EvtWord shake_evt[39];
-static EvtWord hashira_evt_sub[56];
-static EvtWord hashira_evt[132];
-EvtWord mon_msg[14];
-EvtWord hei_03_init_evt[165];
-
-f32 fd_hei_03_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
-
-f32 fd_hei_03_neg_one_382 = -1.0f;
-
-f32 fd_hei_03___local_PI_383 = 3.1415927f;
-
-f32 fd_hei_03___local_3PIO2_385 = 4.712389f;
-
-f32 fd_hei_03_one_negone_373[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
-
-f32 fd_hei_03___local_PIO2_384 = 1.5707964f;
-
-f32 fd_hei_03_one_381 = 1.0f;
-
-f32 fd_hei_03_negone_one_360[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
-
-f32 fd_hei_03_neg_one_365 = -1.0f;
-
-f32 fd_hei_03___local_PI_366 = 3.1415927f;
-
-f32 fd_hei_03___local_3PIO2_368 = 4.712389f;
-
-f32 fd_hei_03_one_negone_359[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
-
-f32 fd_hei_03___local_PIO2_367 = 1.5707964f;
-
-f32 fd_hei_03_one_364 = 1.0f;
+extern EvtWord mon_msg[];
+extern EvtWord hei_03_init_evt[];
 
 static BeroEntry bero_entry_data[] = {
     {
@@ -334,7 +284,7 @@ EVT_BEGIN(hei_03_init_evt)
             SET_RAW_VALUE(LW(0), STRING("シンノスケ2"))
             SET_RAW_VALUE(LW(1), STRING("シンノスケ1"))
             SET_VALUE(LW(2), 1)
-            CALL(evt_run_case_evt, 9, 1, STRING("a_hasira_2\0"), 0, PTR(hashira_evt), GW(1))
+            CALL(evt_run_case_evt, 9, 1, STRING("a_hasira_2"), 0, PTR(hashira_evt), GW(1))
             SET_VALUE(GF(1), 1)
         END_IF
         BEGIN_INLINE_EVENT

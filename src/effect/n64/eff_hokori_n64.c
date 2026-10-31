@@ -10,14 +10,6 @@
 
 
 #ifdef __MWERKS__
-__declspec(section ".data") f32 eff_hokori_n64_negone_one_a[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
-static __declspec(section ".data") f32 negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
-__declspec(section ".data") f32 eff_hokori_n64_one_negone_a[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
-static __declspec(section ".data") f32 one_negone_373[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
-__declspec(section ".data") f32 eff_hokori_n64_negone_one_b[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
-static __declspec(section ".data") f32 negone_one_360[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
-__declspec(section ".data") f32 eff_hokori_n64_one_negone_b[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
-static __declspec(section ".data") f32 one_negone_359[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
 #endif
 
 effN64Vtx size16x32_tex32x64_vtx[] = {
@@ -53,7 +45,7 @@ EffectEntry* effHokoriN64Entry(s32 type, s32 lifetime, f32 x, f32 y, f32 z) {
 
     effect = effEntry();
     count = 4 + (type <= 1);
-    effect->type = "HokoriN64\0\0";
+    effect->type = "HokoriN64";
     effect->count = count;
     work = __memAlloc(HEAP_EFFECT, count * sizeof(EffHokoriN64Work));
     effect->userdata = work;

@@ -1,4 +1,3 @@
-#pragma defer_codegen on
 #include "dolphin/types.h"
 #include "driver/hitdrv.h"
 #include "mario/mario.h"
@@ -9,6 +8,7 @@
 #include "pmario_sound.h"
 #include <string.h>
 #include "libc_decls.h"
+#include <math.h>
 
 f32 revise360(f32);
 f32 distABf(f32, f32, f32, f32);
@@ -23,13 +23,11 @@ HitEntry* marioChkLandon(f32* outY, f32 y);
 f32 marioGetFallSpd(void);
 void marioLandOn(void);
 void marioClearJumpPara(void);
-void marioChgMotSub(s32 a, s32 b);
 void marioGetRubInit(void);
 void allPartyRideShip(void);
 void allPartyRideOff(void);
 void allPartyForceRideOn(void);
 s32 marioSlitChkWallAround(void);
-void marioUpdateCamCollision(Vec* pos);
 void camFollowYOff(void);
 void camFollowYOn(void);
 void marioOfsRotReset(void);
@@ -43,7 +41,7 @@ typedef struct MotRollWork {
 	f32 spdZ;           // 0x04: roll velocity z
 	s32 squashTrigger;  // 0x08: nonzero restarts the squash animation (-> squashState 1)
 	s32 squashState;    // 0x0C: y-scale squash state machine (1.4 / back to 1.0)
-	s32 field_0x10;     // 0x10
+	s32 squashTimer;    // 0x10: never used
 #ifdef VERSION_G8ME01
 	s32 sfxId;          // 0x14: US only, roll loop (0x17B), -1 when off
 #endif
@@ -57,42 +55,6 @@ s32 roll_flyout_flag2;
 static __declspec(section ".rodata") Vec rollOfs = {0.0f, 40.0f, 0.0f};
 
 f32 rollData[] = {3.0f, -0.05f, -0.5f, 0.5f, 7.0f, 180.0f, 140.0f, 10.0f, 1.2f, 2.0f, 0.8f};
-
-static inline s32 roll_fpclassifyf(f32 x) {
-    switch (*(s32*)&x & 0x7F800000) {
-    case 0x7F800000:
-        if (*(s32*)&x & 0x007FFFFF) {
-            return 1;
-        } else {
-            return 2;
-        }
-        break;
-    case 0:
-        if (*(s32*)&x & 0x007FFFFF) {
-            return 5;
-        } else {
-            return 3;
-        }
-        break;
-    default:
-        return 4;
-    }
-}
-
-static inline f32 roll_sqrtf(f32 x) {
-    if (x > 0.0f) {
-        f64 guess = __frsqrte(x);
-        guess = 0.5 * guess * (3.0 - guess * guess * x);
-        guess = 0.5 * guess * (3.0 - guess * guess * x);
-        guess = 0.5 * guess * (3.0 - guess * guess * x);
-        return x * guess;
-    } else if (x < 0.0) {
-        return *(f32*)__float_nan;
-    } else if (roll_fpclassifyf(x) == 1) {
-        return *(f32*)__float_nan;
-    }
-    return x;
-}
 
 static inline f32 trunc10(f32 x) {
     s32 i = (s32)(10.0f * x);
@@ -281,8 +243,6 @@ static inline s32 makeVec(f32 half) {
 void roll_upstairs(void);
 static inline void marioRollCan(void);
 
-#pragma inline_max_size(20000)
-#pragma inline_max_total_size(200000)
 
 void marioRollFixOn(void) {
     MarioWork* mario = marioGetPtr();
@@ -883,10 +843,7 @@ void mot_roll(void) {
                 camFollowYOff();
             }
         }
-        {
-            Vec pv = mario->position;
-            marioUpdateCamCollision(&pv);
-        }
+        marioUpdateCamCollision(mario->position);
         mario->airTimer = 0;
     }
     if (mario->flags & 0x30000) {
@@ -1272,7 +1229,7 @@ static inline void marioRollCan(void) {
         pos.y = pos.y + mario->wPlayerCollisionBox.y;
         dir = (Vec){0.0f, -1.0f, 0.0f};
         if (marioHitCheckVec(&pos, &dir, &out, &nrm, &dist)) {
-            f32 sq = roll_sqrtf(nrm.x * nrm.x + nrm.z * nrm.z);
+            f32 sq = sqrtf(nrm.x * nrm.x + nrm.z * nrm.z);
             f32 ang = angleABf(0.0f, 0.0f, sq, -nrm.y);
             f32 r = (f32)(s32)(0.5f + ang);
             if (rabs(ang) < 45.0) {
@@ -1315,7 +1272,7 @@ void marioRollStrippedPool(void) {
     mario->rot.z = 10.0f;
     mario->scale.x = 135.0f;
     mario->scale.y = 1.2f;
-    mario->scale.z = roll_sqrtf(mario->fallStartPos.x);
+    mario->scale.z = sqrtf(mario->fallStartPos.x);
     mario->fallStartPos.y = __fabsf(mario->fallStartPos.z) < 45.0;
 }
 

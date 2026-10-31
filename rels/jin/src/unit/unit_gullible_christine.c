@@ -1,7 +1,6 @@
 #include "battle/battle_unit.h"
 #include "evt/evt_cmd.h"
 
-#pragma force_active on
 #include "system.h"
 #include "manager/evtmgr_cmd.h"
 #include "battle/battle_event_default.h"
@@ -26,20 +25,6 @@ USER_FUNC(evt_btl_camera_set_mode);
 USER_FUNC(evt_btl_camera_set_moveto);
 static USER_FUNC(_krb_get_dir);
 
-f32 fd_gullible_christine_negone_one_374[2] __attribute__((aligned(8)));
-f32 fd_gullible_christine_neg_one_382;
-f32 fd_gullible_christine___local_PI_383;
-f32 fd_gullible_christine___local_3PIO2_385;
-f32 fd_gullible_christine_one_negone_373[2] __attribute__((aligned(8)));
-f32 fd_gullible_christine___local_PIO2_384;
-f32 fd_gullible_christine_one_381;
-f32 fd_gullible_christine_negone_one_360[2] __attribute__((aligned(8)));
-f32 fd_gullible_christine_neg_one_365;
-f32 fd_gullible_christine___local_PI_366;
-f32 fd_gullible_christine___local_3PIO2_368;
-f32 fd_gullible_christine_one_negone_359[2] __attribute__((aligned(8)));
-f32 fd_gullible_christine___local_PIO2_367;
-f32 fd_gullible_christine_one_364;
 BattleUnitKind unit_gullible_christine;
 static BattleWeapon enemyWeapon_ChristineNormalAttack;
 static BattleUnitDefense defence_christine;
@@ -47,41 +32,11 @@ static BattleUnitDefenseAttr defence_attr_christine;
 static StatusVulnerability regist_christine;
 static BattleDataEntry data_table_christine[2];
 static BattleUnitKindPart parts_christine[1];
-static EvtWord fmario_zoom_christine[19];
-static EvtWord gparty_zoom_christine[19];
 static EvtWord init_event_christine[42];
-EvtWord damage_event_christine[22];
+extern EvtWord damage_event_christine[];
 static EvtWord dead_event_christine[147];
 static EvtWord attack_event_christine[690];
 static EvtWord wait_event_christine[7];
-
-f32 fd_gullible_christine_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
-
-f32 fd_gullible_christine_neg_one_382 = -1.0f;
-
-f32 fd_gullible_christine___local_PI_383 = 3.1415927f;
-
-f32 fd_gullible_christine___local_3PIO2_385 = 4.712389f;
-
-f32 fd_gullible_christine_one_negone_373[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
-
-f32 fd_gullible_christine___local_PIO2_384 = 1.5707964f;
-
-f32 fd_gullible_christine_one_381 = 1.0f;
-
-f32 fd_gullible_christine_negone_one_360[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
-
-f32 fd_gullible_christine_neg_one_365 = -1.0f;
-
-f32 fd_gullible_christine___local_PI_366 = 3.1415927f;
-
-f32 fd_gullible_christine___local_3PIO2_368 = 4.712389f;
-
-f32 fd_gullible_christine_one_negone_359[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
-
-f32 fd_gullible_christine___local_PIO2_367 = 1.5707964f;
-
-f32 fd_gullible_christine_one_364 = 1.0f;
 
 BattleUnitKind unit_gullible_christine = {
     80,

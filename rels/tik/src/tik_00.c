@@ -2,7 +2,6 @@
 #include "battle/battle_unit.h"
 #include "evt/evt_cmd.h"
 
-#pragma force_active on
 #include "manager/evtmgr_cmd.h"
 #include "mario/mario.h"
 #include "party.h"
@@ -203,135 +202,79 @@ void card_tev(MapTevCallbackInfo* info);
 void uranai_cap(CameraId cameraId, void* param);
 static USER_FUNC(ss_check);
 
-f32 fd_tik_00_negone_one_374[2] __attribute__((aligned(8)));
-f32 fd_tik_00_neg_one_382;
-f32 fd_tik_00___local_PI_383;
-f32 fd_tik_00___local_3PIO2_385;
-f32 fd_tik_00_one_negone_373[2] __attribute__((aligned(8)));
-f32 fd_tik_00___local_PIO2_384;
-f32 fd_tik_00_one_381;
-f32 fd_tik_00_negone_one_360[2] __attribute__((aligned(8)));
-f32 fd_tik_00_neg_one_365;
-f32 fd_tik_00___local_PI_366;
-f32 fd_tik_00___local_3PIO2_368;
-f32 fd_tik_00_one_negone_359[2] __attribute__((aligned(8)));
-f32 fd_tik_00___local_PIO2_367;
-f32 fd_tik_00_one_364;
 static BeroEntry bero_entry_data[4];
 static ShopObj obj_list[6];
 static ShopItem goods_list[6];
 static ShopDb trade_list[12];
 static ShopperData35 shopper_data;
-EvtWord uranaisi_next_evt[152];
-EvtWord uranaisi_starpiece_evt[60];
-EvtWord uranaisi_supercoin_evt[60];
+extern EvtWord uranaisi_next_evt[];
+extern EvtWord uranaisi_starpiece_evt[];
+extern EvtWord uranaisi_supercoin_evt[];
 typedef struct CardName { const char* name; s32 value; } CardName;
 static CardName name_tbl[9];
-EvtWord evt_uranai_cap[4];
-EvtWord uranai_init[147];
-EvtWord uranai_main[595];
-EvtWord uranai_exit[98];
-EvtWord uranaisi_table_talk[226];
-EvtWord uranaisi_direct_talk[8];
-EvtWord uranaisi_init[10];
-EvtWord starmaniac_init[14];
-EvtWord starmaniac_get_event[5];
-EvtWord starmaniac_talk[VERSION_PICK(227, 238)];
-EvtWord johoyaketi_talk[VERSION_PICK(186, 209)];
-EvtWord kuribo5_init[2];
-EvtWord kuribo5_talk[76];
-EvtWord chusan4_init[13];
-EvtWord chusan4_regl[25];
-EvtWord chusan4_talk[76];
-EvtWord borodo3_init[2];
-EvtWord borodo3_regl[4];
-EvtWord borodo3_talk[76];
-EvtWord borodo4_init[2];
-EvtWord borodo4_talk[76];
-EvtWord pinkbom_init[2];
-EvtWord pinkbom_talk[76];
-EvtWord master_2_init[8];
-EvtWord master_2_talk[76];
+extern EvtWord evt_uranai_cap[];
+extern EvtWord uranai_init[];
+extern EvtWord uranai_main[];
+extern EvtWord uranai_exit[];
+extern EvtWord uranaisi_table_talk[];
+extern EvtWord uranaisi_direct_talk[];
+extern EvtWord uranaisi_init[];
+extern EvtWord starmaniac_init[];
+extern EvtWord starmaniac_get_event[];
+extern EvtWord starmaniac_talk[];
+extern EvtWord johoyaketi_talk[];
+extern EvtWord kuribo5_init[];
+extern EvtWord kuribo5_talk[];
+extern EvtWord chusan4_init[];
+extern EvtWord chusan4_regl[];
+extern EvtWord chusan4_talk[];
+extern EvtWord borodo3_init[];
+extern EvtWord borodo3_regl[];
+extern EvtWord borodo3_talk[];
+extern EvtWord borodo4_init[];
+extern EvtWord borodo4_talk[];
+extern EvtWord pinkbom_init[];
+extern EvtWord pinkbom_talk[];
+extern EvtWord master_2_init[];
+extern EvtWord master_2_talk[];
 static NpcSetupInfo npcEnt[11];
-static EvtWord evt_door_01_00[18];
-EvtWord evt_wall_01_00[62];
-EvtWord evt_wall_01_01[66];
-EvtWord evt_wall_01_02[66];
+extern EvtWord evt_wall_01_00[];
+extern EvtWord evt_wall_01_01[];
+extern EvtWord evt_wall_01_02[];
 static const char* door_data_01_npc[2];
-static EvtWord evt_wall_01[12];
-EvtWord evt_open_01[39];
-EvtWord evt_close_01[60];
+extern EvtWord evt_open_01[];
+extern EvtWord evt_close_01[];
 static DoorParam door_data_01;
-static EvtWord evt_door_02_00[12];
-EvtWord evt_wall_02_00[62];
-EvtWord evt_wall_02_01[66];
-EvtWord evt_wall_02_02[66];
-EvtWord evt_wall_02_03[62];
-static EvtWord evt_wall_02[14];
+extern EvtWord evt_wall_02_00[];
+extern EvtWord evt_wall_02_01[];
+extern EvtWord evt_wall_02_02[];
+extern EvtWord evt_wall_02_03[];
 static const char* mise_npc[2];
-EvtWord evt_open_02[12];
-EvtWord evt_close_02[14];
+extern EvtWord evt_open_02[];
+extern EvtWord evt_close_02[];
 static DoorParam door_data_02;
-static EvtWord evt_door_03_00[12];
-EvtWord evt_wall_03_00[62];
-EvtWord evt_wall_03_01[66];
-EvtWord evt_wall_03_02[66];
-EvtWord evt_wall_03_03[62];
-static EvtWord evt_wall_03[14];
+extern EvtWord evt_wall_03_00[];
+extern EvtWord evt_wall_03_01[];
+extern EvtWord evt_wall_03_02[];
+extern EvtWord evt_wall_03_03[];
 static const char* door_data_03_npc[5];
-EvtWord evt_open_03[12];
-EvtWord evt_close_03[14];
+extern EvtWord evt_open_03[];
+extern EvtWord evt_close_03[];
 static const char* door_data_03_mobj[2];
 static DoorParam door_data_03;
-static EvtWord evt_door_04_00[12];
-static EvtWord evt_door_04_01[12];
-static EvtWord evt_wall_04[15];
-EvtWord evt_open_04_open[179];
-static EvtWord evt_door_04_close[87];
+extern EvtWord evt_open_04_open[];
 static DoorParam door_data_04;
-EvtWord evt_door_stg7_open[27];
-EvtWord evt_door_stg7_close[7];
-static EvtWord evt_door_04_entry[64];
-EvtWord tensou_return[243];
-EvtWord tensou_init_event[182];
-EvtWord tensou_event[209];
-EvtWord tensou_anim_event[30];
-EvtWord tensou_sw_event[94];
-EvtWord kurihakase_event[221];
-EvtWord hashira_bomb_sub[144];
-EvtWord hashira_bomb[45];
-static EvtWord epilogue_npc_entry[25];
-static EvtWord epilogue_evt[127];
-static EvtWord mobj_box01[34];
-EvtWord tik_00_init_evt[214];
-
-f32 fd_tik_00_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
-
-f32 fd_tik_00_neg_one_382 = -1.0f;
-
-f32 fd_tik_00___local_PI_383 = 3.1415927f;
-
-f32 fd_tik_00___local_3PIO2_385 = 4.712389f;
-
-f32 fd_tik_00_one_negone_373[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
-
-f32 fd_tik_00___local_PIO2_384 = 1.5707964f;
-
-f32 fd_tik_00_one_381 = 1.0f;
-
-f32 fd_tik_00_negone_one_360[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
-
-f32 fd_tik_00_neg_one_365 = -1.0f;
-
-f32 fd_tik_00___local_PI_366 = 3.1415927f;
-
-f32 fd_tik_00___local_3PIO2_368 = 4.712389f;
-
-f32 fd_tik_00_one_negone_359[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
-
-f32 fd_tik_00___local_PIO2_367 = 1.5707964f;
-
-f32 fd_tik_00_one_364 = 1.0f;
+extern EvtWord evt_door_stg7_open[];
+extern EvtWord evt_door_stg7_close[];
+extern EvtWord tensou_return[];
+extern EvtWord tensou_init_event[];
+extern EvtWord tensou_event[];
+extern EvtWord tensou_anim_event[];
+extern EvtWord tensou_sw_event[];
+extern EvtWord kurihakase_event[];
+extern EvtWord hashira_bomb_sub[];
+extern EvtWord hashira_bomb[];
+extern EvtWord tik_00_init_evt[];
 
 static BeroEntry bero_entry_data[] = {
     {
@@ -427,7 +370,7 @@ static ShopperData35 shopper_data = {
 #ifdef VERSION_G8ME01
 // FAKE: "pos" lives here in .rodata (before the uranaisi scripts' strings); copied as a 4-byte struct
 typedef struct UranaiTag {
-    char s[4];
+    s8 s[4];
 } UranaiTag;
 static const UranaiTag uranaisi_pos_tag = { "pos" };
 #endif
@@ -588,7 +531,6 @@ USER_FUNC(evt_uranaisi_msg_set) {
     EvtWord* args = event->args;
     const char* msg = msgSearch((const char*)evtGetValue(event, args[0]));
     UranaiTag tag = uranaisi_pos_tag;
-    char* t = tag.s; // FAKE: reading the tag through a pointer keeps tag[0] from being hoisted out of the loop
     char num[20];
     s32 ofs[10];
     char buf[256];
@@ -599,7 +541,6 @@ USER_FUNC(evt_uranaisi_msg_set) {
     s32 k;
     s32 sign;
     s32 c;
-    s32 d;
 
     state = 0;
     count = 0;
@@ -615,9 +556,9 @@ USER_FUNC(evt_uranaisi_msg_set) {
             if (state == 1 && (s8)c != ' ') {
                 state = 2;
             }
-            if (state == 2 && (s8)t[0] == (s8)c) {
-                for (k = 1; (s8)(d = t[k]) != 0; k++) {
-                    if ((s8)d != (s8)msg[i + k]) {
+            if (state == 2 && tag.s[0] == (s8)c) {
+                for (k = 1; tag.s[k] != 0; k++) {
+                    if (tag.s[k] != (s8)msg[i + k]) {
                         state = 3;
                     }
                 }
@@ -776,7 +717,7 @@ void uranai_cap(CameraId cameraId, void* param) {
         C_MTXLookAt(lookAt, &pos, &up, &target);
     }
     saved = *camGetPtr(cameraId);
-    npc = npcNameToPtr("\202\244\202\347\202\310\202\242\216t");
+    npc = npcNameToPtr("うらない師");
     data = animPoseGetAnimBaseDataPtr(npc->poseId);
     bmin = (Vec){data->bboxMin.x, data->bboxMin.y, data->bboxMin.z};
     bmax = (Vec){data->bboxMax.x, data->bboxMax.y, data->bboxMax.z};

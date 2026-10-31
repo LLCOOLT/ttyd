@@ -42,7 +42,7 @@ void DrawMenuPinchMark(void);
 #include "driver/camdrv.h"
 #include "driver/icondrv.h"
 #include "pmario_sound.h"
-void DrawSubIconSub(BattleSubMenu* menu, s32 i, Mtx m, s32 enabled, s32 icon, const char* name, s32 cost, s32 p34, void* party, s32 y);
+void DrawSubIconSub(BattleSubMenu* menu, s32 i, Mtx m, s32 enabled, u16 icon, const char* name, s32 cost, s32 p34, void* party, s32 y);
 void DrawMainIconCircle(BattleSubMenu* menu, BattleCommandAct* act, Mtx m, Vec v, f32 s);
 void DrawMainIconHukidasi(BattleSubMenu* menu, BattleCommandAct* act, Mtx m, f32 s);
 BOOL BattleCommandCheckChangePositionEnable(BattleWork* wp);
@@ -118,7 +118,7 @@ void battleMenuDispInit(void) {
     BattleWork* wp = _battleWorkPointer;
     char path[256];
 
-    sprintf(path, "%s/battle/common/battle_common.tpl\0", getMarioStDvdRoot());
+    sprintf(path, "%s/battle/common/battle_common.tpl", getMarioStDvdRoot());
     wp->menuTex = fileAlloc(path, 4);
 }
 
@@ -288,7 +288,7 @@ void DrawMainIconCircle(BattleSubMenu* menu, BattleCommandAct* act, Mtx m, Vec v
     BattleWork* wp = _battleWorkPointer;
     CameraEntry* cam;
     u8 c;
-    u32 icon;
+    u16 icon;
     f32 rad;
     f32 ofs;
     f32 sc;
@@ -379,7 +379,7 @@ void DrawSubIcon(BattleSubMenu* menu, Mtx* a, s32* enabled, u16* icons, const ch
     }
 }
 
-void DrawSubIconSub(BattleSubMenu* menu, s32 i, Mtx m, s32 enabled, s32 icon, const char* name, s32 cost, s32 p34, void* party, s32 y) {
+void DrawSubIconSub(BattleSubMenu* menu, s32 i, Mtx m, s32 enabled, u16 icon, const char* name, s32 cost, s32 p34, void* party, s32 y) {
     BattleWork* wp = _battleWorkPointer;
     CameraEntry* cam;
     BattleCursor* cursor = menu->cursor;
@@ -455,9 +455,15 @@ void DrawSubIconSub(BattleSubMenu* menu, s32 i, Mtx m, s32 enabled, s32 icon, co
         FontDrawColor(fc);
     }
     PSMTXTrans(trn, -104.0f, 22.0f, 0.0f);
+#ifdef VERSION_G8MP01
+    if (y != 0) {
+        PSMTXScale(scl, ( FontGetMessageWidth(name) > y ) ? ( 0.8f * y / FontGetMessageWidth(name) ) : ( 0.8f) , 0.8f, 0.8f);
+    } else {
+#else
     if (y == 1) {
         PSMTXScale(scl, ( FontGetMessageWidth(name) > 150 ) ? ( 120.0f / FontGetMessageWidth(name) ) : ( 0.8f) , 0.8f, 0.8f);
     } else {
+#endif
         PSMTXScale(scl, 0.8f, 0.8f, 0.8f);
     }
     PSMTXConcat(m, trn, out);
@@ -913,7 +919,7 @@ void DrawMenuHelpWin(const char* msg, f32 x, f32 y) {
         }
         FontDrawString(tx, y - 52.0f, (char*)lines[2]);
     } else {
-        FontDrawString(10.0f + x, y - 4.0f, "\202\271\202\302\202\337\202\242\202\315\201@\202\310\202\242\202\314\202\276\201I\201I");
+        FontDrawString(10.0f + x, y - 4.0f, "せつめいは　ないのだ！！");
     }
 }
 
@@ -1094,8 +1100,7 @@ void DrawSubMenuCommonProcess(f32* x, f32* y, Mtx* a, Vec* b, f32* c, Mtx* d) {
     } else {
         mainCursor = &wp->commandMenu.cursor[1];
     }
-    // FAKE: no-op (s32) cast on the min, so n is a copy of a compiler temp (target `mr r6,r3`)
-    n = (s32)((6 <= cursor->count) ? 6 : cursor->count);
+    n = (6 <= cursor->count) ? 6 : cursor->count;
     prev = cursor->relPos;
     if (cursor->absPos <= cursor->relPos) {
         cursor->relPos = cursor->absPos - 1;
@@ -1644,7 +1649,11 @@ void DrawWeaponWin(void) {
         }
     }
     DrawMainIcon(menu, wp->commandMenu.act, iconMtx, iconPos, iconAngle);
+#ifdef VERSION_G8MP01
+    DrawSubIcon(menu, rowMtx, enabled, icons, names, costs, p34, NULL, 220); // name width that the label is scaled down to fit
+#else
     DrawSubIcon(menu, rowMtx, enabled, icons, names, costs, p34, NULL, 0);
+#endif
     v = (Vec){-60.0f, 35.0f, 0.0f};
     DrawMenuCursorAndScrollArrow(&v);
     if (weapon) {
@@ -1805,7 +1814,11 @@ void DrawChangePartyWin(void) {
         }
     }
     DrawMainIcon(menu, wp->commandMenu.act, iconMtx, iconPos, iconAngle);
+#ifdef VERSION_G8MP01
+    DrawSubIcon(menu, rowMtx, enabled, icons, names, costs, p34, items, 150); // name width that the label is scaled down to fit
+#else
     DrawSubIcon(menu, rowMtx, enabled, icons, names, costs, p34, items, 1);
+#endif
     v = (Vec){-60.0f, 35.0f, 0.0f};
     DrawMenuCursorAndScrollArrow(&v);
     if (items[cursor->absPos].help) {

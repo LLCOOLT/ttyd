@@ -13,19 +13,18 @@
 #include "system.h"
 #include <string.h>
 #include "driver/mobjdrv.h"
+#include "pmario_sound.h"
 
 double cos(float);
 void sincosf(f32* s, f32* c, f32 deg);
 f32 revise360(f32);
 void marioVoiceGlareOn(void);
 void marioVoiceGlareOff(void);
-s32 psndSFXOn_3D(s32 id, Vec* pos);
 f32 toMovedir(f32 angle);
 f32 toMovedir2(f32 angle, f32 off);
 USER_FUNC(evt_cam_shake);
 HitEntry* hitEstimate(s32* out);
 static HitEntry* hammerHitWall(f32 ang, f32* s, f32* co, f32* len, f32* hx, f32* hy, f32* hz, f32* nx, f32* ny, f32* nz);
-void marioChgMotSub(s32 a, s32 b);
 s32 marioGetRub(s32 mask, s32* a, s32* b, f32* c);
 
 
@@ -182,7 +181,7 @@ void mot_hammer(void) {
 				snd = 0x15D;
 				break;
 			}
-			psndSFXOn_3D(snd, &m->position);
+			psndSFXOn_3D(SFX_NAME_WORD(snd), &m->position);
 		}
 		mario->mot.hammer.hitKind = kind;
 	}
@@ -288,13 +287,13 @@ void mot_hammer(void) {
 			snd = 0x161;
 			switch (pouchGetHammerLv()) {
 			case 1:
-				psndSFXOn_3D(0x15E, &m->position);
+				psndSFXOn_3D(SFX_NAME_WORD(0x15E), &m->position);
 				break;
 			case 2:
-				psndSFXOn_3D(0x15F, &m->position);
+				psndSFXOn_3D(SFX_NAME_WORD(0x15F), &m->position);
 				break;
 			case 3:
-				psndSFXOn_3D(0x160, &m->position);
+				psndSFXOn_3D(SFX_NAME_WORD(0x160), &m->position);
 				break;
 			}
 			for (i = 0; (u32)i < 10; i++) {
@@ -312,7 +311,7 @@ void mot_hammer(void) {
 					}
 				}
 			}
-			psndSFXOn_3D(snd, &m->position);
+			psndSFXOn_3D(SFX_NAME_WORD(snd), &m->position);
 		}
 	}
 	if (++mario->multiTimer > 20) {
@@ -485,7 +484,7 @@ void mot_hammer2(void) {
 		marioPaperOn("p_kaiten_h");
 		marioChgPaper("P_H_1C");
 		marioPaperLightOff();
-		mario->mot.hammer2.sfxId = psndSFXOn_3D(0x162, (Vec*)&mario->position.x);
+		mario->mot.hammer2.sfxId = psndSFXOn_3D(SFX_NAME_WORD(0x162), (Vec*)&mario->position.x);
 		mario->mot.hammer2.animTime = 0.0f;
 		mario->poseTime = 0;
 		animPoseSetLocalTime(mario->paperAnimGroupId[marioAnimeId()], mario->mot.hammer2.animTime);
@@ -591,10 +590,10 @@ void mot_hammer2(void) {
 		}
 		mario->displayDirection = mario->mot.hammer2.spinSpeed * (mario->hammerDir ? -1.0f : 1.0f) + mario->displayDirection;
 		if ((s32)ang / 360 != (s32)mario->displayDirection / 360) {
-			psndSFXOn_3D(0x163, (Vec*)&mario->position.x);
+			psndSFXOn_3D(SFX_NAME_WORD(0x163), (Vec*)&mario->position.x);
 		}
 		if (mario->mot.hammer2.timer == 1) {
-			psndSFXOn_3D(0x163, (Vec*)&mario->position.x);
+			psndSFXOn_3D(SFX_NAME_WORD(0x163), (Vec*)&mario->position.x);
 		}
 		mario->multiTimer--;
 		if (mario->hammerChargeLv > 2 && (s32)mario->multiTimer == 10) {
@@ -685,7 +684,7 @@ HitEntry *hitEstimate(s32 *out)
   f32 c;
   f32 cy;
   f32 a;
-  Vec new_var;
+  Vec dir4Copy;
   f32 h;
   s32 i;
   f32 k5 = 5.0f;
@@ -765,9 +764,9 @@ HitEntry *hitEstimate(s32 *out)
   {
     Vec dir4 = {0.0f, 0.0f, 0.0f};
     dir4.y = -cy;
-    new_var = dir4; // FAKE: Vec copy through a temp; Vec dir4b = dir4 differs
+    dir4Copy = dir4; // FAKE: Vec copy through a temp; Vec dir4b = dir4 differs
     {
-      Vec dir4b = new_var;
+      Vec dir4b = dir4Copy;
       for (i = 0; i < 2; i++)
       {
         f32 m;

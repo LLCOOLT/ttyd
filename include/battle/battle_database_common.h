@@ -12,7 +12,7 @@ typedef struct BattleWeapon {
     const char* description;          // 0xC
     s8 baseAccuracy;                  // 0x10
     s8 baseFpCost;                    // 0x11
-    s8 baseSpCost;                    // 0x12
+    u8 baseSpCost;                    // 0x12
     u8 superguardsAllowed;            // 0x13
     f32 reserved_14;                  // 0x14, 1.0f in every weapon table, never read
     s8 mStylishCommandMultiplier;     // 0x18
@@ -21,7 +21,7 @@ typedef struct BattleWeapon {
     s8 reserved_1B;                   // 0x1B, 1 (50 on player moves), never read
     void* hpDamageFn;                 // 0x1C
     u32 hpDamageWork[8];              // 0x20
-    void* fpDamageFn;                 // 0x40, TODO rename
+    void* fpDamageFn;                 // 0x40
     u32 fpDamageWork[8];              // 0x44
     u32 targetClassFlags;             // 0x64
     u32 targetPropertyFlags;          // 0x68

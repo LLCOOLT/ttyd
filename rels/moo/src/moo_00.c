@@ -1,7 +1,6 @@
 #include "battle/battle_unit.h"
 #include "evt/evt_cmd.h"
 
-#pragma force_active on
 #include "party.h"
 #include "mario/mario.h"
 #include "manager/evtmgr_cmd.h"
@@ -72,75 +71,13 @@ USER_FUNC(party_reset);
 USER_FUNC(evt_offscreen_get_boundingbox2);
 #endif
 
-f32 fd_moo_00_negone_one_374[2] __attribute__((aligned(8)));
-f32 fd_moo_00_neg_one_382;
-f32 fd_moo_00___local_PI_383;
-f32 fd_moo_00___local_3PIO2_385;
-f32 fd_moo_00_one_negone_373[2] __attribute__((aligned(8)));
-f32 fd_moo_00___local_PIO2_384;
-f32 fd_moo_00_one_381;
-f32 fd_moo_00_negone_one_360[2] __attribute__((aligned(8)));
-f32 fd_moo_00_neg_one_365;
-f32 fd_moo_00___local_PI_366;
-f32 fd_moo_00___local_3PIO2_368;
-f32 fd_moo_00_one_negone_359[2] __attribute__((aligned(8)));
-f32 fd_moo_00___local_PIO2_367;
-f32 fd_moo_00_one_364;
-f64 fd_moo_00__three_localstatic4_sqrtf;
-f64 fd_moo_00__half_localstatic3_sqrtf;
 static BeroEntry bero_entry_data[3];
 static f32 spline_dt[9];
-static EvtWord party_damage_pose[52];
-EvtWord party_damage_pose2[52];
-static EvtWord evt_first[525];
+extern EvtWord party_damage_pose2[];
 #ifdef VERSION_G8ME01
-EvtWord rock_main[105];
-#else
-static EvtWord rock_main[79];
+extern EvtWord rock_main[];
 #endif
-#ifdef VERSION_G8ME01
-static EvtWord rock_evt0[15];
-#else
-static EvtWord rock_evt0[21];
-#endif
-#ifdef VERSION_G8ME01
-static EvtWord rock_evt1[15];
-#else
-static EvtWord rock_evt1[21];
-#endif
-EvtWord moo_00_init_evt[133];
-
-f32 fd_moo_00_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
-
-f32 fd_moo_00_neg_one_382 = -1.0f;
-
-f32 fd_moo_00___local_PI_383 = 3.1415927f;
-
-f32 fd_moo_00___local_3PIO2_385 = 4.712389f;
-
-f32 fd_moo_00_one_negone_373[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
-
-f32 fd_moo_00___local_PIO2_384 = 1.5707964f;
-
-f32 fd_moo_00_one_381 = 1.0f;
-
-f32 fd_moo_00_negone_one_360[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
-
-f32 fd_moo_00_neg_one_365 = -1.0f;
-
-f32 fd_moo_00___local_PI_366 = 3.1415927f;
-
-f32 fd_moo_00___local_3PIO2_368 = 4.712389f;
-
-f32 fd_moo_00_one_negone_359[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
-
-f32 fd_moo_00___local_PIO2_367 = 1.5707964f;
-
-f32 fd_moo_00_one_364 = 1.0f;
-
-f64 fd_moo_00__three_localstatic4_sqrtf = 3.0;
-
-f64 fd_moo_00__half_localstatic3_sqrtf = 0.5;
+extern EvtWord moo_00_init_evt[];
 
 static BeroEntry bero_entry_data[] = {
     {

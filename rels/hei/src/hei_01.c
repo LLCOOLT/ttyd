@@ -1,7 +1,6 @@
 #include "battle/battle_unit.h"
 #include "evt/evt_cmd.h"
 
-#pragma force_active on
 #include "party.h"
 #include "evt/evt_bero.h"
 #include "evt/evt_damage.h"
@@ -10,6 +9,7 @@
 #include "evt/evt_npc.h"
 #include "driver/hitdrv.h"
 #include "data_tables.h"
+#include "manager/evtmgr_cmd.h"
 
 USER_FUNC(evt_bero_exec_wait);
 USER_FUNC(evt_bero_get_info);
@@ -106,76 +106,24 @@ USER_FUNC(evt_party_move_behind_mario);
 #endif
 static USER_FUNC(set_dir);
 
-f32 fd_hei_01_negone_one_374[2] __attribute__((aligned(8)));
-f32 fd_hei_01_neg_one_382;
-f32 fd_hei_01___local_PI_383;
-f32 fd_hei_01___local_3PIO2_385;
-f32 fd_hei_01_one_negone_373[2] __attribute__((aligned(8)));
-f32 fd_hei_01___local_PIO2_384;
-f32 fd_hei_01_one_381;
-f32 fd_hei_01_negone_one_360[2] __attribute__((aligned(8)));
-f32 fd_hei_01_neg_one_365;
-f32 fd_hei_01___local_PI_366;
-f32 fd_hei_01___local_3PIO2_368;
-f32 fd_hei_01_one_negone_359[2] __attribute__((aligned(8)));
-f32 fd_hei_01___local_PIO2_367;
-f32 fd_hei_01_one_364;
-EvtWord bero_out_event[5];
+extern EvtWord bero_out_event[];
 static BeroEntry bero_entry_data[5];
-static EvtWord evt_kusa_2[20];
-static EvtWord evt_kusa_4[20];
-static EvtWord evt_kusa_7[20];
 static KusaAccess kusa_data[7];
-EvtWord kusa_dokan[59];
+extern EvtWord kusa_dokan[];
 static const char* name_tbl[25];
-EvtWord bridge_evt_02[192];
-EvtWord bridge_evt[30];
-#ifdef VERSION_G8ME01
-EvtWord nokotaro_get[73];
-#else
-EvtWord nokotaro_get[55];
-#endif
-EvtWord nokotaro_kanyu[40];
-EvtWord nokotaro_nakama[276];
-static EvtWord nokotarou_init[7];
-EvtWord nokotarou_reg[2];
-EvtWord nokotarou_talk_2[34];
-static EvtWord nokotarou_talk[4];
-EvtWord nokorin_pose[57];
-EvtWord evt_nokorin[869];
+extern EvtWord bridge_evt_02[];
+extern EvtWord bridge_evt[];
+extern EvtWord nokotaro_get[];
+extern EvtWord nokotaro_kanyu[];
+extern EvtWord nokotaro_nakama[];
+extern EvtWord nokotarou_reg[];
+extern EvtWord nokotarou_talk_2[];
+extern EvtWord nokorin_pose[];
+extern EvtWord evt_nokorin[];
 static NpcSetupInfo npcEnt[3];
 static HitDamageReturn hitDmgRetPoints[3];
-static EvtWord peach_mail[287];
-EvtWord christine_hei_01[46];
-EvtWord hei_01_init_evt[148];
-
-f32 fd_hei_01_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
-
-f32 fd_hei_01_neg_one_382 = -1.0f;
-
-f32 fd_hei_01___local_PI_383 = 3.1415927f;
-
-f32 fd_hei_01___local_3PIO2_385 = 4.712389f;
-
-f32 fd_hei_01_one_negone_373[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
-
-f32 fd_hei_01___local_PIO2_384 = 1.5707964f;
-
-f32 fd_hei_01_one_381 = 1.0f;
-
-f32 fd_hei_01_negone_one_360[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
-
-f32 fd_hei_01_neg_one_365 = -1.0f;
-
-f32 fd_hei_01___local_PI_366 = 3.1415927f;
-
-f32 fd_hei_01___local_3PIO2_368 = 4.712389f;
-
-f32 fd_hei_01_one_negone_359[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
-
-f32 fd_hei_01___local_PIO2_367 = 1.5707964f;
-
-f32 fd_hei_01_one_364 = 1.0f;
+extern EvtWord christine_hei_01[];
+extern EvtWord hei_01_init_evt[];
 
 EVT_BEGIN(bero_out_event)
     SET_VALUE(LW(0), 0)

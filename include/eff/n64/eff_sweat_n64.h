@@ -8,7 +8,7 @@ typedef struct EffSweatN64Work {
     s32 type;      // 0x0
     Vec position;  // 0x4
     f32 rot;       // 0x10
-    f32 unk_14;    // 0x14
+    f32 pad_14;    // 0x14, unused (also unused in the N64 effect)
     Vec velocity;  // 0x18
     s32 life;      // 0x24
     s32 age;       // 0x28

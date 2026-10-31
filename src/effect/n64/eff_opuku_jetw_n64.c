@@ -1,4 +1,3 @@
-#pragma dollar_identifiers on
 #include "eff/n64/eff_opuku_jetw_n64.h"
 #include "driver/camdrv.h"
 #include "driver/dispdrv.h"
@@ -14,14 +13,6 @@ typedef struct JetwEnt {
     u8 alpha, pad;
 } JetwEnt;
 
-static __declspec(section ".data") f32 eff_opuku_jetw_n64_negone_one_a[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
-static __declspec(section ".data") f32 negone_one$374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
-__declspec(section ".data") f32 eff_opuku_jetw_n64_one_negone_a[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
-static __declspec(section ".data") f32 one_negone$373[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
-__declspec(section ".data") f32 eff_opuku_jetw_n64_negone_one_b[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
-static __declspec(section ".data") f32 negone_one$360[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
-__declspec(section ".data") f32 eff_opuku_jetw_n64_one_negone_b[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
-static __declspec(section ".data") f32 one_negone$359[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
 
 static JetwEnt adata[] = {
     {0, 0, 30, 140, 0, 255, 0},
@@ -141,9 +132,6 @@ effN64Vtx size6x22_tex32x32_vtx[] = {
 
 
 static s32 jetw_ry_tbl[] = {0, 40, 55, 190, 20, 130, 270, 300};
-#pragma force_active on
-__declspec(section ".data") u32 gap_05_803A382C_data[1] = {0};
-#pragma force_active reset
 
 
 void effOpukuJetwMain(EffectEntry* effect);
@@ -154,7 +142,7 @@ EffectEntry* effOpukuJetwN64Entry(s32 type, s32 lifetime, f32 x, f32 y, f32 z, f
     EffOpukuJetwN64Work* work;
 
     effect = effEntry();
-    effect->type = "OpukuJetwN64\0\0\0";
+    effect->type = "OpukuJetwN64";
     effect->count = 1;
     work = __memAlloc(HEAP_EFFECT, sizeof(EffOpukuJetwN64Work));
     effect->userdata = work;

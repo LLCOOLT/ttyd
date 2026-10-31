@@ -2,7 +2,6 @@
 #include "eff/eff_starstone.h"
 #include "evt/evt_cmd.h"
 
-#pragma force_active on
 #include "driver/fadedrv.h"
 #include "mario/mariost.h"
 #include "driver/itemdrv.h"
@@ -96,44 +95,19 @@ USER_FUNC(evt_target_set_position);
 static USER_FUNC(evtflash);
 USER_FUNC(starstone_rotate_func);
 
-f32 fd_mri_14_negone_one_374[2] __attribute__((aligned(8)));
-f32 fd_mri_14_neg_one_382;
-f32 fd_mri_14___local_PI_383;
-f32 fd_mri_14___local_3PIO2_385;
-f32 fd_mri_14_one_negone_373[2] __attribute__((aligned(8)));
-f32 fd_mri_14___local_PIO2_384;
-f32 fd_mri_14_one_381;
-f32 fd_mri_14_negone_one_360[2] __attribute__((aligned(8)));
-f32 fd_mri_14_neg_one_365;
-f32 fd_mri_14___local_PI_366;
-f32 fd_mri_14___local_3PIO2_368;
-f32 fd_mri_14_one_negone_359[2] __attribute__((aligned(8)));
-f32 fd_mri_14___local_PIO2_367;
-f32 fd_mri_14_one_364;
-static EvtWord first_time_w_bero[60];
 static BeroEntry bero_entry_data[3];
-EvtWord npc_rotate[28];
-EvtWord kanbu_urouro[75];
-EvtWord dai3_kanbu[192];
-EvtWord flash_and_wait[16];
-EvtWord flash2_and_wait[26];
-EvtWord starstone_rotate[6];
-EvtWord starstone_rotate_exec[13];
-static EvtWord starstone_fuwafuwa[71];
-EvtWord npc_dokan[209];
-static EvtWord punipuni_mario_halt[33];
-#ifdef VERSION_G8ME01
-EvtWord time_bomb[931];
-#else
-EvtWord time_bomb[937];
-#endif
-EvtWord bomb_check[14];
-static EvtWord yuka_move[96];
-static EvtWord yuka_check[116];
+extern EvtWord npc_rotate[];
+extern EvtWord kanbu_urouro[];
+extern EvtWord dai3_kanbu[];
+extern EvtWord flash_and_wait[];
+extern EvtWord flash2_and_wait[];
+extern EvtWord starstone_rotate[];
+extern EvtWord starstone_rotate_exec[];
+extern EvtWord npc_dokan[];
+extern EvtWord time_bomb[];
+extern EvtWord bomb_check[];
 static KusaAccess ueki_access_data[7];
-static EvtWord punipuni_ball00_init[35];
-static EvtWord punipuni_ball00[57];
-EvtWord mri_14_init_evt[179];
+extern EvtWord mri_14_init_evt[];
 
 static USER_FUNC(evtflash) {
     if (isFirstCall) {
@@ -171,34 +145,6 @@ static USER_FUNC(evtflash) {
     }
     return EVT_RETURN_DONE;
 }
-
-f32 fd_mri_14_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
-
-f32 fd_mri_14_neg_one_382 = -1.0f;
-
-f32 fd_mri_14___local_PI_383 = 3.1415927f;
-
-f32 fd_mri_14___local_3PIO2_385 = 4.712389f;
-
-f32 fd_mri_14_one_negone_373[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
-
-f32 fd_mri_14___local_PIO2_384 = 1.5707964f;
-
-f32 fd_mri_14_one_381 = 1.0f;
-
-f32 fd_mri_14_negone_one_360[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
-
-f32 fd_mri_14_neg_one_365 = -1.0f;
-
-f32 fd_mri_14___local_PI_366 = 3.1415927f;
-
-f32 fd_mri_14___local_3PIO2_368 = 4.712389f;
-
-f32 fd_mri_14_one_negone_359[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
-
-f32 fd_mri_14___local_PIO2_367 = 1.5707964f;
-
-f32 fd_mri_14_one_364 = 1.0f;
 
 static EVT_BEGIN(first_time_w_bero)
     IF_INT_EQUAL(GSW(0), 108)
@@ -946,7 +892,7 @@ EVT_BEGIN(mri_14_init_evt)
         SET_VALUE(LW(0), STRING("dokan"))
         CALL_CHILD(PTR(bero_case_switch_off))
     END_IF
-    SET_VALUE(LW(0), STRING("S_sui\0\0"))
+    SET_VALUE(LW(0), STRING("S_sui"))
     SET_RAW_VALUE(LW(1), GW(0))
     SET_VALUE(LW(2), 100)
     SPAWN_EVENT(PTR(mri_hikari_color))

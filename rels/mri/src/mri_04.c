@@ -1,7 +1,6 @@
 #include "battle/battle_unit.h"
 #include "evt/evt_cmd.h"
 
-#pragma force_active on
 #include "driver/npcdrv.h"
 #include "evt/evt_npc.h"
 #include "mario/mariost.h"
@@ -11,6 +10,7 @@
 #include "npc_event.h"
 #include "mri.h"
 #include "data_tables.h"
+#include "manager/evtmgr_cmd.h"
 
 USER_FUNC(N_evt_bero_set_mario_bottomless_respawn_pos_to_current_mario_pos);
 USER_FUNC(bero_get_position_normal);
@@ -87,59 +87,12 @@ USER_FUNC(evt_snd_envon);
 USER_FUNC(evt_snd_sfxon_3d);
 USER_FUNC(mri_npc_buruburu);
 
-f32 fd_mri_04_negone_one_374[2] __attribute__((aligned(8)));
-f32 fd_mri_04_neg_one_382;
-f32 fd_mri_04___local_PI_383;
-f32 fd_mri_04___local_3PIO2_385;
-f32 fd_mri_04_one_negone_373[2] __attribute__((aligned(8)));
-f32 fd_mri_04___local_PIO2_384;
-f32 fd_mri_04_one_381;
-f32 fd_mri_04_negone_one_360[2] __attribute__((aligned(8)));
-f32 fd_mri_04_neg_one_365;
-f32 fd_mri_04___local_PI_366;
-f32 fd_mri_04___local_3PIO2_368;
-f32 fd_mri_04_one_negone_359[2] __attribute__((aligned(8)));
-f32 fd_mri_04___local_PIO2_367;
-f32 fd_mri_04_one_364;
-static EvtWord bero_custom[13];
 static BeroEntry bero_entry_data[2];
-static EvtWord chibitoge_init[21];
-static EvtWord chibitoge_talk[111];
 static NpcSetupInfo npcEnt[2];
-static EvtWord chuchurina_sogu[814];
-EvtWord black_shadow[341];
-static EvtWord evt_ueki_02[20];
+extern EvtWord black_shadow[];
 static KusaAccess ueki_access_data[5];
-EvtWord item_mri_04[34];
-EvtWord mri_04_init_evt[178];
-
-f32 fd_mri_04_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
-
-f32 fd_mri_04_neg_one_382 = -1.0f;
-
-f32 fd_mri_04___local_PI_383 = 3.1415927f;
-
-f32 fd_mri_04___local_3PIO2_385 = 4.712389f;
-
-f32 fd_mri_04_one_negone_373[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
-
-f32 fd_mri_04___local_PIO2_384 = 1.5707964f;
-
-f32 fd_mri_04_one_381 = 1.0f;
-
-f32 fd_mri_04_negone_one_360[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
-
-f32 fd_mri_04_neg_one_365 = -1.0f;
-
-f32 fd_mri_04___local_PI_366 = 3.1415927f;
-
-f32 fd_mri_04___local_3PIO2_368 = 4.712389f;
-
-f32 fd_mri_04_one_negone_359[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
-
-f32 fd_mri_04___local_PIO2_367 = 1.5707964f;
-
-f32 fd_mri_04_one_364 = 1.0f;
+extern EvtWord item_mri_04[];
+extern EvtWord mri_04_init_evt[];
 
 static EVT_BEGIN(bero_custom)
     IF_INT_EQUAL(GSW(0), 92)
@@ -586,7 +539,7 @@ EVT_BEGIN(mri_04_init_evt)
     IF_INT_GREATER_OR_EQUAL(GSW(0), 93)
         CALL(evt_item_entry, STRING("item_key"), 16, 60, 0, 0, 14, GSWF(2839), 0)
     END_IF
-    CALL(evt_mapobj_flag_onoff, 1, 0, STRING("S\0\0"), 2)
+    CALL(evt_mapobj_flag_onoff, 1, 0, STRING("S"), 2)
     RETURN
 EVT_END()
 

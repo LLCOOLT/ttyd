@@ -2,7 +2,6 @@
 #include "battle/battle_unit.h"
 #include "evt/evt_cmd.h"
 
-#pragma force_active on
 #include "manager/evtmgr.h"
 #include "driver/mapdrv.h"
 #include "string.h"
@@ -28,19 +27,16 @@
 #include "evt/evt_sub.h"
 #include "data_tables.h"
 #include "driver/extdrv.h"
-typedef struct SharinData { const char* name; s32 field_0x4; s32 field_0x8; EvtFloat speed; } SharinData;
-typedef struct ClankData { const char* name; s32 field_0x4; s32 field_0x8; EvtFloat x; EvtFloat y; } ClankData;
+typedef struct SharinData { const char* name; s32 wheelType; s32 speedSource; EvtFloat speed; } SharinData;
+typedef struct ClankData { const char* name; s32 wheelType; s32 speedSource; EvtFloat x; EvtFloat y; } ClankData;
 #undef EXT_LIT
 #define EXT_LIT(sym, val) (val)
 // target .bss/.sbss pad (uninitialised objects are emitted in reverse order, so this sits last)
-#pragma force_active on
-#pragma force_active reset
 
 typedef struct MoamoaPoseDef { char model[16]; char anim[8]; s16 loop; f32 speed; s32 start; s32 count; } MoamoaPoseDef;
-typedef struct Moamoa { u16 flags; s16 state; s16 timer; u8 field_0x6[2]; Vec target; f32 vy; s16 jumpTimer; u8 field_0x1a[2]; f32 speed; f32 gravity; s16 next; u8 field_0x26[2]; f32 lastX; f32 lastZ; Vec jitter; s16 pose; u8 field_0x3e[2]; OSTime startTime; s16 group; s16 order; u8 kind; u8 field_0x4d[3]; } Moamoa;
-typedef struct MoamoaWork { u16 flags; u8 field_0x2[2]; s32 count; Moamoa* moa; MapObject* mobj; f32 mobjY; Vec target[3]; s16 hitCount; s16 field_0x3a[2]; s16 field_0x3e; s16 field_0x40; s16 idleFrames; void* escapeEvt; s32 animPoseId; s32 numDefs; MoamoaPoseDef defs[32]; f32 angle; f32 dist; s32 bounceCount; f32 breathDir; f32 breathDist; Vec breathPos; s16 chainNum[128]; s16 chainIdx[128][2]; } MoamoaWork;
+typedef struct Moamoa { u16 flags; s16 state; s16 timer; u8 pad_6[2]; Vec target; f32 vy; s16 jumpTimer; u8 pad_1a[2]; f32 speed; f32 gravity; s16 next; u8 pad_26[2]; f32 lastX; f32 lastZ; Vec jitter; s16 pose; u8 pad_3e[2]; OSTime startTime; s16 group; s16 order; u8 kind; u8 pad_4d[3]; } Moamoa;
+typedef struct MoamoaWork { u16 flags; u8 pad_2[2]; s32 count; Moamoa* moa; MapObject* mobj; f32 mobjY; Vec target[3]; s16 hitCount; s16 targetHits[2]; s16 thirdTargetHits; s16 hammerFrames; s16 idleFrames; void* escapeEvt; s32 animPoseId; s32 numDefs; MoamoaPoseDef defs[32]; f32 angle; f32 dist; s32 bounceCount; f32 breathDir; f32 breathDist; Vec breathPos; s16 chainNum[128]; s16 chainIdx[128][2]; } MoamoaWork; /* thirdTargetHits is targetHits[2], reached by i % 3 */
 typedef struct MoamoaData { const char* model; const char* anim; f32 speed; } MoamoaData;
-static s32 bss_pad;
 static MoamoaWork* wp;
 int rand(void);
 static f32 randf(f32 min, f32 max);
@@ -57,14 +53,10 @@ void evalOn(void);
 static void ext_moamoa_main(void);
 static void ext_moamoa_main(void);
 #pragma inline_max_total_size(100000)
-#pragma opt_propagation off
-#pragma opt_lifetimes off
 static inline f32 moa_sin(f32 x) { f32 a = 0.00761f; f32 b = 0.16605f; f32 c = 1.0f; f32 x2; if (x <= 3.1415927f) { if (x <= 1.5707964f) { x2 = x * x; a = a * x2 - b; a = a * x2 + c; a = a * x; } else { x = 1.5707964f - (x - 1.5707964f); x2 = x * x; a = a * x2 - b; a = a * x2 + c; a = a * x; } } else if (x < 4.712389f) { x = x - 3.1415927f; x2 = x * x; a = a * x2 - b; a = a * x2 + c; a = a * x; a = -a; } else { x = 1.5707964f - (x - 4.712389f); x2 = x * x; a = a * x2 - b; a = a * x2 + c; a = a * x; a = -a; } return a; }
 static inline f32 moa_cos(f32 x) { f32 a = 0.03705f; f32 b = 0.4967f; f32 c = 1.0f; f32 x2; if (x <= 3.1415927f) { if (x <= 1.5707964f) { x2 = x * x; a = a * x2 - b; a = a * x2 + c; } else { x = 1.5707964f - (x - 1.5707964f); x2 = x * x; a = a * x2 - b; a = a * x2 + c; a = -a; } } else if (x < 4.712389f) { x = x - 3.1415927f; x2 = x * x; a = a * x2 - b; a = a * x2 + c; a = -a; } else { x = 1.5707964f - (x - 4.712389f); x2 = x * x; a = a * x2 - b; a = a * x2 + c; } return a; }
 static inline f32 moa_sinx(f32 x) { f32 a = 0.00761f; f32 b = 0.16605f; f32 c = 1.0f; f32 x2; if (x <= 3.1415927f) { if (x <= 1.5707964f) { x2 = x * x; a = a * x2 - b; a = a * x2 + c; a = a * x; } else { x = 1.5707964f - (x - 1.5707964f); x2 = x * x; a = a * x2 - b; a = a * x2 + c; a = a * x; } } else if (x < 4.712389f) { x = x - 3.1415927f; x2 = x * x; a = a * x2 - b; a = a * x2 + c; a = a * x; a = -a; } else { x = 1.5707964f - (x - 4.712389f); x2 = x * x; a = a * x2 - b; a = a * x2 + c; a = a * x; a = -a; } return a; }
 static inline f32 moa_cosx(f32 x) { f32 a = 0.03705f; f32 b = 0.4967f; f32 c = 1.0f; f32 x2; if (x <= 3.1415927f) { if (x <= 1.5707964f) { x2 = x * x; a = a * x2 - b; a = a * x2 + c; } else { x = 1.5707964f - (x - 1.5707964f); x2 = x * x; a = a * x2 - b; a = a * x2 + c; a = -a; } } else if (x < 4.712389f) { x = x - 3.1415927f; x2 = x * x; a = a * x2 - b; a = a * x2 + c; a = -a; } else { x = 1.5707964f - (x - 4.712389f); x2 = x * x; a = a * x2 - b; a = a * x2 + c; } return a; }
-#pragma opt_propagation reset
-#pragma opt_lifetimes reset
 s32 nokonokoGetStatus(PartyEntry* party);
 f32 cloudGetBreathDist(void);
 double sin(double x);
@@ -173,81 +165,20 @@ static void moamoa_pose_change(Moamoa* moa, const char* model, const char* anim)
 static void moamoa_pose_main(void);
 static void moamoa_pose_init(void);
 
-f32 fd_rsh_06_negone_one_374[2] __attribute__((aligned(8)));
-f32 fd_rsh_06_neg_one_382;
-f32 fd_rsh_06___local_PI_383;
-f32 fd_rsh_06___local_3PIO2_385;
-f32 fd_rsh_06_one_negone_373[2] __attribute__((aligned(8)));
-f32 fd_rsh_06___local_PIO2_384;
-f32 fd_rsh_06_one_381;
-f32 fd_rsh_06_negone_one_360[2] __attribute__((aligned(8)));
-f32 fd_rsh_06_neg_one_365;
-f32 fd_rsh_06___local_PI_366;
-f32 fd_rsh_06___local_3PIO2_368;
-f32 fd_rsh_06_one_negone_359[2] __attribute__((aligned(8)));
-f32 fd_rsh_06___local_PIO2_367;
-f32 fd_rsh_06_one_364;
 static ExtTexInfo ext_moamoa_data[71];
 static SharinData sharinDt[29];
-static EvtWord evt_sharin_main[87];
-static EvtWord evt_sharin[19];
 static ClankData clankDt[9];
-static EvtWord evt_clank_main[104];
-static EvtWord evt_clank[21];
-static EvtWord evt_bg[81];
-static EvtWord evt_hoshi[88];
-static EvtWord hom_10_evt_resha_start[244];
-static EvtWord hom_10_evt_resha_start2[259];
-static EvtWord hom_10_evt_resha_start3[11];
-static EvtWord hom_10_evt_resha_start4[11];
-static EvtWord stop_1[90];
-static EvtWord stop_2[90];
-static EvtWord hom_10_evt_resha_stop[36];
-static EvtWord evt_ramp[33];
 static const char* pika_tbl[15];
 static const char* pika_tbl_rsh_06[10];
-static EvtWord hom_10_evt_resha_sub[102];
-static EvtWord hom_10_evt_resha_right[35];
-static EvtWord hom_10_evt_resha_left[28];
-static EvtWord hom_10_init_evt[140];
-EvtWord evt_resha_init[13];
+extern EvtWord evt_resha_init[];
 static BeroEntry bero_data_a[2];
-static EvtWord evt_moamoa_init[187];
-EvtWord evt_great_moamoa[737];
+extern EvtWord evt_great_moamoa[];
 const char* pose_name[8];
-EvtWord moamoa_debug[230];
-EvtWord rsh_06_init_evt[84];
-EvtWord rsh_06_a_init_evt[32];
-EvtWord rsh_06_init_evt_nidome[41];
-EvtWord rsh_06_a_init_evt_nidome[11];
-
-f32 fd_rsh_06_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
-
-f32 fd_rsh_06_neg_one_382 = -1.0f;
-
-f32 fd_rsh_06___local_PI_383 = 3.1415927f;
-
-f32 fd_rsh_06___local_3PIO2_385 = 4.712389f;
-
-f32 fd_rsh_06_one_negone_373[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
-
-f32 fd_rsh_06___local_PIO2_384 = 1.5707964f;
-
-f32 fd_rsh_06_one_381 = 1.0f;
-
-f32 fd_rsh_06_negone_one_360[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
-
-f32 fd_rsh_06_neg_one_365 = -1.0f;
-
-f32 fd_rsh_06___local_PI_366 = 3.1415927f;
-
-f32 fd_rsh_06___local_3PIO2_368 = 4.712389f;
-
-f32 fd_rsh_06_one_negone_359[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
-
-f32 fd_rsh_06___local_PIO2_367 = 1.5707964f;
-
-f32 fd_rsh_06_one_364 = 1.0f;
+extern EvtWord moamoa_debug[];
+extern EvtWord rsh_06_init_evt[];
+extern EvtWord rsh_06_a_init_evt[];
+extern EvtWord rsh_06_init_evt_nidome[];
+extern EvtWord rsh_06_a_init_evt_nidome[];
 
 static ExtTexInfo ext_moamoa_data[] = {
     {((char*)"c_n_moa_a"), ((char*)"S_1"), 0.0f},
@@ -631,7 +562,7 @@ static s32 evt_moamoa_target_off(EventEntry* event, BOOL isFirstCall) {
     s32 i = evtGetValue(event, event->args[0]);
 
     wp->target[i] = wp->target[1 - i];
-    wp->field_0x3a[i] = 100;
+    wp->targetHits[i] = 100;
     if (i == 0) {
         wp->flags |= 0x1000;
     } else {
@@ -800,7 +731,7 @@ static s32 moamoa_hit_check(ExtdrvPose* pose, Moamoa* moa) {
     if (!(mario->flags & 0x30000)) {
         wp->bounceCount = 0;
     }
-    if (mario->currMotionId == 0x12 && wp->field_0x40 > 10) {
+    if (mario->currMotionId == 0x12 && wp->hammerFrames > 10) {
         cam = camGetPtr(CAMERA_3D);
         {
             f32 yaw = cam->viewYaw;
@@ -905,9 +836,9 @@ static void ext_moamoa_main(void) {
     f32 r;
 
     if (mario->currMotionId == 0x12) {
-        wp->field_0x40++;
+        wp->hammerFrames++;
     } else {
-        wp->field_0x40 = 0;
+        wp->hammerFrames = 0;
     }
     if (mario->currMotionId == 0) {
         wp->idleFrames++;
@@ -992,7 +923,7 @@ static void ext_moamoa_main(void) {
             }
         }
         if (((( wp->flags & 1) && ( !(m->flags & 0x444) )) && ( i == ( gp->retraceCount % wp->count ))) && ( irand(1000) < 200) ) {
-            /* FAKE: named Vec + static zero template instead of a compound literal (same values) */ { Vec tmp; static const Vec z0 = {0.0f, 0.0f, 0.0f}; tmp = z0; tmp.x = (*pose->mtx)[0][3]; tmp.y = (*pose->mtx)[1][3]; tmp.z = (*pose->mtx)[2][3]; sp = tmp; }
+            { Vec tmp = {0.0f, 0.0f, 0.0f}; tmp.x = (*pose->mtx)[0][3]; tmp.y = (*pose->mtx)[1][3]; tmp.z = (*pose->mtx)[2][3]; sp = tmp; }
             psndSFXOn_3D(SFX_NAME_WORD("SFX_STG6_MOAMOA_VOICE1"), &sp); /* FAKE: integer cast hoists the literal as an @ temp (sfx local removed) */
         }
         switch (m->state) {
@@ -1209,10 +1140,7 @@ static void ext_moamoa_main(void) {
       }
         if (!sndFlag)
       {
-        // FAKE: named Vec + static zero template instead of &(Vec){...} (drops one coalesced copy; same values)
-        Vec pos;
-        static const Vec z = {0.0f, 0.0f, 0.0f};
-        pos = z;
+        Vec pos = {0.0f, 0.0f, 0.0f};
         pos.x = (*pose->mtx)[0][3]; pos.y = (*pose->mtx)[1][3]; pos.z = (*pose->mtx)[2][3];
         psndSFXOn_3D((const char *) 0x6c3, &pos);
         sndFlag = 1;
@@ -2457,5 +2385,4 @@ void __div2u();
 
 // target pad words (G5: section sizes must match or later DOL addresses shift)
 // gap_04_000184F4_data removed: the switch jumptable is emitted after all .data, so the target word after it is link padding (see scratch/phase3/DATA.md D4)
-
 

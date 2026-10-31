@@ -3,7 +3,6 @@
 #include "eff/eff_puniballoon.h"
 #include "evt/evt_cmd.h"
 
-#pragma force_active on
 #include "mario/mario.h"
 #include "mario/mario_motion.h"
 #include "driver/effdrv.h"
@@ -64,41 +63,20 @@ USER_FUNC(mario_shabon_effdel);
 USER_FUNC(mario_shabon_effpos);
 USER_FUNC(mario_shabon_init);
 
-f32 fd_mri_05_negone_one_374[2] __attribute__((aligned(8)));
-f32 fd_mri_05_neg_one_382;
-f32 fd_mri_05___local_PI_383;
-f32 fd_mri_05___local_3PIO2_385;
-f32 fd_mri_05_one_negone_373[2] __attribute__((aligned(8)));
-f32 fd_mri_05___local_PIO2_384;
-f32 fd_mri_05_one_381;
-f32 fd_mri_05_negone_one_360[2] __attribute__((aligned(8)));
-f32 fd_mri_05_neg_one_365;
-f32 fd_mri_05___local_PI_366;
-f32 fd_mri_05___local_3PIO2_368;
-f32 fd_mri_05_one_negone_359[2] __attribute__((aligned(8)));
-f32 fd_mri_05___local_PIO2_367;
-f32 fd_mri_05_one_364;
-EvtWord puni_4_init[17];
-EvtWord puni_4_talk[20];
-EvtWord puni_5_init[17];
-EvtWord puni_5_talk[20];
+extern EvtWord puni_4_init[];
+extern EvtWord puni_4_talk[];
+extern EvtWord puni_5_init[];
+extern EvtWord puni_5_talk[];
 static NpcSetupInfo npcEnt[3];
-static EvtWord bero_s_doa_close[10];
-static EvtWord bero_s_doa_open[10];
 static BeroEntry bero_entry_data[6];
-static EvtWord door_switch_init[17];
-static EvtWord door_switch[59];
-static EvtWord evt_ueki_04[20];
 static KusaAccess ueki_access_data[6];
-static EvtWord punipuni_ball00_init[41];
-static EvtWord punipuni_ball00[51];
-EvtWord punipuni_ball01_init[41];
-EvtWord punipuni_ball01[51];
-EvtWord mario_shabon_move_sound[14];
-EvtWord mario_shabon_break_sound[9];
-EvtWord mario_shabon_check[251];
-EvtWord evt_shabon_s[312];
-EvtWord mri_05_init_evt[178];
+extern EvtWord punipuni_ball01_init[];
+extern EvtWord punipuni_ball01[];
+extern EvtWord mario_shabon_move_sound[];
+extern EvtWord mario_shabon_break_sound[];
+extern EvtWord mario_shabon_check[];
+extern EvtWord evt_shabon_s[];
+extern EvtWord mri_05_init_evt[];
 
 USER_FUNC(mario_shabon_init) {
     MarioWork* mario = marioGetPtr();
@@ -108,34 +86,6 @@ USER_FUNC(mario_shabon_init) {
     marioChgMot(8);
     return EVT_RETURN_DONE;
 }
-
-f32 fd_mri_05_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
-
-f32 fd_mri_05_neg_one_382 = -1.0f;
-
-f32 fd_mri_05___local_PI_383 = 3.1415927f;
-
-f32 fd_mri_05___local_3PIO2_385 = 4.712389f;
-
-f32 fd_mri_05_one_negone_373[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
-
-f32 fd_mri_05___local_PIO2_384 = 1.5707964f;
-
-f32 fd_mri_05_one_381 = 1.0f;
-
-f32 fd_mri_05_negone_one_360[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
-
-f32 fd_mri_05_neg_one_365 = -1.0f;
-
-f32 fd_mri_05___local_PI_366 = 3.1415927f;
-
-f32 fd_mri_05___local_3PIO2_368 = 4.712389f;
-
-f32 fd_mri_05_one_negone_359[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
-
-f32 fd_mri_05___local_PIO2_367 = 1.5707964f;
-
-f32 fd_mri_05_one_364 = 1.0f;
 
 EVT_BEGIN(puni_4_init)
     SWITCH(GSW(0))
@@ -719,7 +669,7 @@ EVT_BEGIN(mri_05_init_evt)
     CALL(evt_run_case_evt, 9, 1, STRING("A_dai_mae"), 0, PTR(punipuni_ball01), 0)
     SPAWN_EVENT(PTR(door_switch_init))
     CALL(evt_run_case_evt, 9, 1, STRING("A_sui"), 0, PTR(door_switch), 0)
-    CALL(evt_mobj_powerupblk, STRING("pblk00\0"), 250, -250, 100, 0, GSWF(5542), 0)
+    CALL(evt_mobj_powerupblk, STRING("pblk00"), 250, -250, 100, 0, GSWF(5542), 0)
     SPAWN_EVENT(PTR(mario_shabon_check))
     RETURN
 EVT_END()

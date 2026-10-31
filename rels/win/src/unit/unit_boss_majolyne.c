@@ -10,8 +10,6 @@
 #include "unit/party/unit_party_vivian.h"
 #include "battle/battle_database_common.h"
 
-#pragma force_active on
-
 typedef struct MajoSortEntry { s32 id; s32 value; } MajoSortEntry;
 
 USER_FUNC(btlevtcmd_AnimeChangePose);
@@ -55,20 +53,6 @@ USER_FUNC(evt_msg_print);
 USER_FUNC(evt_sub_random);
 static USER_FUNC(majo3_sort);
 
-f32 fd_boss_majolyne_negone_one_374[2] __attribute__((aligned(8)));
-f32 fd_boss_majolyne_neg_one_382;
-f32 fd_boss_majolyne___local_PI_383;
-f32 fd_boss_majolyne___local_3PIO2_385;
-f32 fd_boss_majolyne_one_negone_373[2] __attribute__((aligned(8)));
-f32 fd_boss_majolyne___local_PIO2_384;
-f32 fd_boss_majolyne_one_381;
-f32 fd_boss_majolyne_negone_one_360[2] __attribute__((aligned(8)));
-f32 fd_boss_majolyne_neg_one_365;
-f32 fd_boss_majolyne___local_PI_366;
-f32 fd_boss_majolyne___local_3PIO2_368;
-f32 fd_boss_majolyne_one_negone_359[2] __attribute__((aligned(8)));
-f32 fd_boss_majolyne___local_PIO2_367;
-f32 fd_boss_majolyne_one_364;
 BattleUnitKind unit_boss_majolyne;
 static BattleUnitDefense defence;
 static BattleUnitDefenseAttr defence_attr;
@@ -80,17 +64,13 @@ static BattleWeapon weapon_majolyne_kagenuke_attack1;
 static BattleWeapon weapon_majolyne_blizzard_attack1;
 static BattleWeapon weapon_majolyne_powder_attack1;
 static BattleWeapon weapon_majolyne_powder_attack2;
-static EvtWord majolyne_down[19];
-static EvtWord majolyne_up[27];
-static EvtWord majo3_zoom[25];
-EvtWord btl_vivian_zoom[7];
-EvtWord btl_marilyn_zoom[7];
-EvtWord btl_majolyne_zoom[7];
+extern EvtWord btl_vivian_zoom[];
+extern EvtWord btl_marilyn_zoom[];
+extern EvtWord btl_majolyne_zoom[];
 static EvtWord init_event[45];
 static EvtWord damage_event[22];
 static EvtWord dead_event[122];
-EvtWord majo_unison_phase_event[238];
-static EvtWord unison_phase_event[83];
+extern EvtWord majo_unison_phase_event[];
 static EvtWord phase_event[337];
 static EvtWord attack_event[241];
 #ifdef VERSION_G8ME01
@@ -102,39 +82,7 @@ static EvtWord blizzard_attack_event[243];
 static EvtWord powder_attack_check[16];
 static EvtWord powder_attack_event[179];
 static EvtWord wait_event[6];
-#ifdef VERSION_G8ME01
-EvtWord majo3_shadow_tail_event[79];
-#else
-EvtWord majo3_shadow_tail_event[78];
-#endif
-
-f32 fd_boss_majolyne_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
-
-f32 fd_boss_majolyne_neg_one_382 = -1.0f;
-
-f32 fd_boss_majolyne___local_PI_383 = 3.1415927f;
-
-f32 fd_boss_majolyne___local_3PIO2_385 = 4.712389f;
-
-f32 fd_boss_majolyne_one_negone_373[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
-
-f32 fd_boss_majolyne___local_PIO2_384 = 1.5707964f;
-
-f32 fd_boss_majolyne_one_381 = 1.0f;
-
-f32 fd_boss_majolyne_negone_one_360[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
-
-f32 fd_boss_majolyne_neg_one_365 = -1.0f;
-
-f32 fd_boss_majolyne___local_PI_366 = 3.1415927f;
-
-f32 fd_boss_majolyne___local_3PIO2_368 = 4.712389f;
-
-f32 fd_boss_majolyne_one_negone_359[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
-
-f32 fd_boss_majolyne___local_PIO2_367 = 1.5707964f;
-
-f32 fd_boss_majolyne_one_364 = 1.0f;
+extern EvtWord majo3_shadow_tail_event[];
 
 BattleUnitKind unit_boss_majolyne = {
     31,
@@ -1264,7 +1212,7 @@ static EVT_BEGIN(powder_attack_event)
     WAIT_MS(700)
     CALL(btlevtcmd_AnimeChangePose, -2, 1, STRING("MJR_A2_2"))
     WAIT_MS(100)
-    CALL(btlevtcmd_AnimeChangePose, -2, 1, STRING("MJR_A2_3\0\0\0"))
+    CALL(btlevtcmd_AnimeChangePose, -2, 1, STRING("MJR_A2_3"))
     CALL(evt_snd_sfxoff, LW(15))
     CALL(btlevtcmd_PreCheckDamage, -2, LW(3), LW(4), LW(9), 256, LW(5))
     SWITCH(LW(5))

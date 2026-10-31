@@ -9,7 +9,7 @@
 double sin(double);
 
 typedef struct EffStarPowerN64Work {
-    s16 unk0;      // 0x0
+    s16 active;    // 0x0, set to 1 at entry; never read
     s16 id;        // 0x2
     Vec position;  // 0x4
     s32 lifetime;  // 0x10
@@ -40,13 +40,13 @@ EffectEntry* effStarPowerN64Entry(s32 id, s32 lifetime, f32 x, f32 y, f32 z, f32
     EffStarPowerN64Work* work;
 
     effect = effEntry();
-    effect->type = "StarPowerN64\0\0\0";
+    effect->type = "StarPowerN64";
     effect->count = 1;
     work = __memAlloc(HEAP_EFFECT, sizeof(EffStarPowerN64Work));
     effect->userdata = work;
     effect->callback = effStarPowerMain;
     effect->flags |= 2;
-    work->unk0 = 1;
+    work->active = 1;
     work->id = id;
     work->frame = 0;
     if (lifetime <= 0) {

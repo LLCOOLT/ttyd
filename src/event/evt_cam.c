@@ -10,23 +10,15 @@
 #include "system.h"
 #include <dolphin/os.h>
 #include "libc_decls.h"
+#include "cam_road.h"
+#include <math.h>
 
-typedef struct CamRoadOut {
-    Vec f_0;
-    Vec pos; // 0xc
-    Vec at;  // 0x18
-} CamRoadOut;
-
-void camRoadMain(CamRoadOut* out, f32 a, f32 b, f32 c, f32 d, f32 e, f32 f, f32 g);
 void camRoadReset(void);
 void camShiftReset(void);
 void camShiftMain(CameraEntry* camera, MarioWork* mario, f32* out);
 void OSReport(const char* msg, ...);
 double sin(double);
 double cos(double);
-
-static inline s32 cam_fpclassifyf(f32 x) { switch (*(s32*)&x & 0x7F800000) { case 0x7F800000: if (*(s32*)&x & 0x007FFFFF) { return 1; } else { return 2; } break; case 0: if (*(s32*)&x & 0x007FFFFF) { return 5; } else { return 3; } break; default: return 4; } }
-static inline f32 cam_sqrtf(f32 x) { if (x > 0.0f) { f64 guess = __frsqrte(x); guess = 0.5 * guess * (3.0 - guess * guess * x); guess = 0.5 * guess * (3.0 - guess * guess * x); guess = 0.5 * guess * (3.0 - guess * guess * x); return x * guess; } else if (x < 0.0) { return *(f32*)__float_nan; } else if (cam_fpclassifyf(x) == 1) { return *(f32*)__float_nan; } return x; }
 
 // CameraId id, BOOL on
 USER_FUNC(evt_cam_ctrl_onoff) {
@@ -65,8 +57,8 @@ USER_FUNC(evt_cam_get_at) {
 // CameraId id, f32 x, f32 y, s32 msec
 USER_FUNC(evt_cam_shake) {
     EvtWord* args = event->args;
-    int new_var;
-    int new_var2;
+    int shift;
+    int camId;
     CameraId id;
     u64 now;
     s32 msec;
@@ -77,7 +69,7 @@ USER_FUNC(evt_cam_shake) {
 
     id = evtGetValue(event, args[0]);
     x = evtGetFloat(event, args[1]);
-    new_var2 = id;
+    camId = id;
     y = evtGetFloat(event, args[2]);
     msec = evtGetValue(event, args[3]);
     now = *(u64*)&event->lifetime;
@@ -92,12 +84,12 @@ USER_FUNC(evt_cam_shake) {
     event->userdata[0]++;
     event->userdata[0] %= 4;
     if (event->userdata[0] < 2) {
-        PSMTX44Trans(camGetPtr(new_var2)->projAdjust, x, y, 0.0f);
+        PSMTX44Trans(camGetPtr(camId)->projAdjust, x, y, 0.0f);
     }
     else {
-        PSMTX44Trans(camGetPtr(new_var2)->projAdjust, -x, -y, 0.0f);
+        PSMTX44Trans(camGetPtr(camId)->projAdjust, -x, -y, 0.0f);
     }
-    camGetPtr(new_var2)->flags |= 8;
+    camGetPtr(camId)->flags |= 8;
     if (msec) {
         if ((u64)msec < OSTicksToMilliseconds(now - *(u64*)&event->userdata[1])) {
             camGetPtr(id)->flags &= ~8;
@@ -105,7 +97,7 @@ USER_FUNC(evt_cam_shake) {
             return EVT_RETURN_DONE;
         }
     }
-    len = cam_sqrtf(x * x + y * y);
+    len = sqrtf(x * x + y * y);
     onTime = 13000.0f * len;
     offTime = 50.0f * (1.0f - len);
     last = event->wInterpRelatedTime;
@@ -121,9 +113,9 @@ USER_FUNC(evt_cam_shake) {
         if (!event->userWork[3]) {
             padRumbleOn(0);
             if (onTime < OSTicksToMilliseconds(now - last)) {
-                new_var = 32;
+                shift = 32;
                 event->userWork[3] = 1 - event->userWork[3];
-                ((u32*)&event->wInterpRelatedTime)[0] = (now >> new_var) & 0xFFFFFFFF;
+                ((u32*)&event->wInterpRelatedTime)[0] = (now >> shift) & 0xFFFFFFFF;
                 ((u32*)&event->wInterpRelatedTime)[1] = now & 0xFFFFFFFF;
             }
         }
@@ -478,7 +470,7 @@ USER_FUNC(evt_cam3d_evt_set_now) {
 USER_FUNC(evt_cam3d_event_from_road) {
     EvtWord* args = event->args;
     f32 x, y, z, w;
-    CamRoadOut out;
+    CameraParams out;
 
     x = evtGetFloat(event, args[0]);
     y = evtGetFloat(event, args[1]);

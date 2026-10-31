@@ -2,7 +2,6 @@
 #include "battle/battle_unit.h"
 #include "evt/evt_cmd.h"
 
-#pragma force_active on
 #include "manager/evtmgr_cmd.h"
 #include "driver/effdrv.h"
 #include "dolphin/mtx.h"
@@ -114,22 +113,7 @@ extern s32 bts_x_flag_set[];
 extern s32 bts_x_flag_wait[];
 extern BattleUnitKind unit_boss_batten_satellite;
 
-f32 fd_boss_batten_leader_negone_one_374[2] __attribute__((aligned(8)));
-f32 fd_boss_batten_leader_neg_one_382;
-f32 fd_boss_batten_leader___local_PI_383;
-f32 fd_boss_batten_leader___local_3PIO2_385;
-f32 fd_boss_batten_leader_one_negone_373[2] __attribute__((aligned(8)));
-f32 fd_boss_batten_leader___local_PIO2_384;
-f32 fd_boss_batten_leader_one_381;
-f32 fd_boss_batten_leader_negone_one_360[2] __attribute__((aligned(8)));
-f32 fd_boss_batten_leader_neg_one_365;
-f32 fd_boss_batten_leader___local_PI_366;
-f32 fd_boss_batten_leader___local_3PIO2_368;
-f32 fd_boss_batten_leader_one_negone_359[2] __attribute__((aligned(8)));
-f32 fd_boss_batten_leader___local_PIO2_367;
-f32 fd_boss_batten_leader_one_364;
-EvtWord batten_leader_zoom[34];
-static EvtWord mario_party_zoom[34];
+extern EvtWord batten_leader_zoom[];
 BattleWeapon weapon_batten_leader_thunder;
 BattleWeapon weapon_batten_leader_fire;
 BattleWeapon weapon_batten_leader_ice;
@@ -146,7 +130,7 @@ static PoseTableEntry pose_table[18];
 static PoseTableEntry pose_table_furafura[18];
 static BattleDataEntry data_table[3];
 static BattleUnitKindPart parts[7];
-EvtWord hakai_snd_event[9];
+extern EvtWord hakai_snd_event[];
 BattleUnitSetup entry_batten_satellite;
 /* light blink sequence read by the light event: {mapobj name, frames} steps, then a NULL name */
 typedef struct LightStep { const char* name; s32 time; } LightStep;
@@ -177,16 +161,16 @@ LightSeq1 btl_shuryolight_head_2_on;
 LightSeq1 btl_shuryolight_head_3_on;
 LightSeq4 btl_shuryolight_rod_normal;
 LightSeq1 btl_shuryolight_rod_off;
-EvtWord light_anim_rtn[488];
-EvtWord light_rod_anim_rtn[122];
-EvtWord light_pose_change[314];
-EvtWord maiframeanimcheck[21];
+extern EvtWord light_anim_rtn[];
+extern EvtWord light_rod_anim_rtn[];
+extern EvtWord light_pose_change[];
+extern EvtWord maiframeanimcheck[];
 static EvtWord init_event[149];
 static EvtWord entry_event[94];
 static EvtWord damage_event[47];
-EvtWord damage_sub_event[148];
+extern EvtWord damage_sub_event[];
 static EvtWord phase_event[28];
-EvtWord monster_before_phase_event[195];
+extern EvtWord monster_before_phase_event[];
 static EvtWord dead_event[165];
 static Vec splineTableIn1_1[5];
 static Vec splineTableIn2_1[5];
@@ -208,46 +192,16 @@ static Vec splineTableOut4_1[5];
 static Vec splineTableOut4_2[5];
 static Vec splineTableOut4_3[5];
 static Vec splineTableOut4_4[5];
-static EvtWord satellite_blur_on[42];
-static EvtWord satellite_blur_off[29];
-EvtWord sub_call_satellite[87];
-EvtWord player_before_phase_event[170];
+extern EvtWord sub_call_satellite[];
+extern EvtWord player_before_phase_event[];
 static EvtWord attack_event[141];
-EvtWord batten_leader_thunder_attack_event[377];
-EvtWord batten_leader_fire_attack_event[376];
-EvtWord batten_leader_ice_attack_event[321];
-EvtWord batten_leader_shikaeshi_attack_event[176];
-EvtWord batten_leader_yokeyoke_attack_event[176];
-EvtWord batten_leader_stop_attack_event[328];
+extern EvtWord batten_leader_thunder_attack_event[];
+extern EvtWord batten_leader_fire_attack_event[];
+extern EvtWord batten_leader_ice_attack_event[];
+extern EvtWord batten_leader_shikaeshi_attack_event[];
+extern EvtWord batten_leader_yokeyoke_attack_event[];
+extern EvtWord batten_leader_stop_attack_event[];
 static EvtWord wait_event[16];
-
-f32 fd_boss_batten_leader_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
-
-f32 fd_boss_batten_leader_neg_one_382 = -1.0f;
-
-f32 fd_boss_batten_leader___local_PI_383 = 3.1415927f;
-
-f32 fd_boss_batten_leader___local_3PIO2_385 = 4.712389f;
-
-f32 fd_boss_batten_leader_one_negone_373[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
-
-f32 fd_boss_batten_leader___local_PIO2_384 = 1.5707964f;
-
-f32 fd_boss_batten_leader_one_381 = 1.0f;
-
-f32 fd_boss_batten_leader_negone_one_360[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
-
-f32 fd_boss_batten_leader_neg_one_365 = -1.0f;
-
-f32 fd_boss_batten_leader___local_PI_366 = 3.1415927f;
-
-f32 fd_boss_batten_leader___local_3PIO2_368 = 4.712389f;
-
-f32 fd_boss_batten_leader_one_negone_359[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
-
-f32 fd_boss_batten_leader___local_PIO2_367 = 1.5707964f;
-
-f32 fd_boss_batten_leader_one_364 = 1.0f;
 
 EVT_BEGIN(batten_leader_zoom)
     CALL(evt_btl_camera_set_mode, 0, 3)
@@ -2583,7 +2537,6 @@ USER_FUNC(btlevtcmd_AnimeGetPose) {
     partNo = evtGetValue(event, args[1]);
     part = BattleGetUnitPartsPtr(id, partNo);
 
-
     evtSetValue(event, args[2], (EvtWord)animPoseGetCurrentAnim(part->poseId));
     return EVT_RETURN_DONE;
 }
@@ -2654,7 +2607,6 @@ USER_FUNC(btl_hitoffsetx) {
     partNo = evtGetValue(event, args[1]);
     part = BattleGetUnitPartsPtr(id, partNo);
 
-
     part->hitOffsetX = evtGetValue(event, args[2]);
     return EVT_RETURN_DONE;
 }
@@ -2688,10 +2640,8 @@ void _light_point_callback(BattleUnitPart* part, s32 group) {
     s32 idx;
     s32 shape;
 
-
     poseId = part->poseId;
     unit = part->mOwner;
-
 
     if (strcmp("locator6", animPoseGetGroupName(poseId, group)) == 0) {
         idx = 0;

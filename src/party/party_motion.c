@@ -12,6 +12,9 @@
 
 #include "party.h"
 #include "mario/mario.h"
+#include <math.h>
+
+static BOOL partyChkMarioFollowY(MarioWork* mario);
 PartyEntry* partyGetPtr(s32 index);
 s32 marioGetPartyId(void);
 s32 marioGetExtraPartyId(void);
@@ -19,7 +22,6 @@ f32 revise360(f32 angle);
 f32 distABf(f32 x1, f32 y1, f32 x2, f32 y2);
 void partyChgMot(PartyEntry* party, s32 mot);
 void partyPaperOff(PartyEntry* party);
-void partyChgPoseId(PartyEntry* party, s32 pose);
 void partyChgMotSlitFloor(PartyEntry* party);
 void sincosf(f32* ret_sin, f32* ret_cos, f32 degree);
 
@@ -86,12 +88,10 @@ void psndSFX_pos(s32 id, Vec* pos);
 void psndSFX_vol(s32 id, u8 vol);
 void psndSFX_pit(s32 id, s16 pit);
 s32 psndSFXChk(s32 id);
-s32 psndSFXOnEx_3D(const char* name, Vec* pos, u8 a, u8 b, u16 c, u16 d);
 s32 psndSFXOn_(const char* name);
 void psndBGMScope(s32 a, s32 b);
 void psndBGM_rate(s32 a, u16 b);
 BOOL psndBGMOn_f_d(s32 a, s32 b, s32 c, s32 d, s32 e);
-BOOL psndBGMOff(s32 a);
 void psndBGMOn_f(s32 a, s32 b, s32 c, s32 d);
 
 USER_FUNC(evt_snd_bgmon) {
@@ -155,7 +155,7 @@ USER_FUNC(evt_snd_sfxon) {
     if (!out) {
         psndSFXOn(name);
     } else {
-        evtSetValue(event, out, ((s32 (*)(const char*))psndSFXOn)(name));
+        evtSetValue(event, out, psndSFXOn(name));
     }
     return EVT_RETURN_DONE;
 }
@@ -167,7 +167,7 @@ USER_FUNC(evt_snd_sfxon__) {
     if (!out) {
         psndSFXOn(name);
     } else {
-        evtSetValue(event, out, ((s32 (*)(const char*))psndSFXOn)(name));
+        evtSetValue(event, out, psndSFXOn(name));
     }
     return EVT_RETURN_DONE;
 }
@@ -867,8 +867,8 @@ void partyFlyAdjustY(PartyEntry* party) {
 #endif
 
 typedef struct PartyFootmark {
-    u8 unk0;
-    u8 unk1[3];
+    u8 flags;   // 1: jump here, 4: slit floor
+    u8 pad[3];
     Vec pos;
 } PartyFootmark;
 
@@ -1148,7 +1148,7 @@ found:
                 }
             }
         }
-        if ((party->flags & 2) && (fm->unk0 & 1)) {
+        if ((party->flags & 2) && (fm->flags & 1)) {
             md = toMovedir(party->displayDirectionTarget);
             partyGetReadId(id, &rx, &ry, &rz);
             L_getTargetPos(id, &tp);
@@ -1176,7 +1176,7 @@ found:
             partyChgMot(party, 2);
             break;
         }
-        if ((party->flags & 2) && (fm->unk0 & 4)) {
+        if ((party->flags & 2) && (fm->flags & 4)) {
             if (distABf(px, pz, t.x, t.z) <= 5.0f) {
                 ((void (*)(PartyEntry*))partyChgMotSlitFloor)(party);
             }
@@ -1185,7 +1185,7 @@ found:
     }
     if (party->moveSpeed) {
         partyChgWalkPose(party, party->moveSpeed);
-    } else if (!(fm->unk0 & 4)) {
+    } else if (!(fm->flags & 4)) {
         partyChgMot(party, 0);
     }
     party->targetDir = dir;
@@ -3019,9 +3019,6 @@ BOOL party_roll(PartyEntry* party) {
     return ret;
 }
 
-static inline s32 pm_fpclassifyf(f32 x) { switch (*(s32*)&x & 0x7F800000) { case 0x7F800000: if (*(s32*)&x & 0x007FFFFF) { return 1; } else { return 2; } break; case 0: if (*(s32*)&x & 0x007FFFFF) { return 5; } else { return 3; } break; default: return 4; } }
-static inline f32 pm_sqrtf(f32 x) { if (x > 0.0f) { f64 guess = __frsqrte(x); guess = 0.5 * guess * (3.0 - guess * guess * x); guess = 0.5 * guess * (3.0 - guess * guess * x); guess = 0.5 * guess * (3.0 - guess * guess * x); return x * guess; } else if (x < 0.0) { return *(f32*)__float_nan; } else if (pm_fpclassifyf(x) == 1) { return *(f32*)__float_nan; } return x; }
-
 static f32 partyStayDist(PartyEntry* party) {
     f32 d;
     if (party->moveKind == 0) {
@@ -3072,7 +3069,7 @@ s32 getFrontFloor(PartyEntry* party, Vec* out, f32 dir) {
         q.targetPos.y = party->position.y + party->height;
         q.targetDistance = 100.0f;
         if (hitCheckVecFilter(&q, NULL)) {
-            if (pm_sqrtf(q.hitNormal.x * q.hitNormal.x + q.hitNormal.z * q.hitNormal.z) < 45.0f) {
+            if (sqrtf(q.hitNormal.x * q.hitNormal.x + q.hitNormal.z * q.hitNormal.z) < 45.0f) {
                 y = q.hitPos.y;
                 goto found;
             }

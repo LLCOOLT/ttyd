@@ -5,8 +5,6 @@
 #include "mri.h"
 #include "data_tables.h"
 
-#pragma force_active on
-
 USER_FUNC(evt_bero_get_info);
 USER_FUNC(evt_bero_overwrite);
 USER_FUNC(evt_cam3d_evt_off);
@@ -73,70 +71,18 @@ USER_FUNC(evt_sub_intpl_msec_init);
 USER_FUNC(N_evt_party_cloud_lock_animations_on_off);
 #endif
 
-f32 fd_mri_09_negone_one_374[2] __attribute__((aligned(8)));
-f32 fd_mri_09_neg_one_382;
-f32 fd_mri_09___local_PI_383;
-f32 fd_mri_09___local_3PIO2_385;
-f32 fd_mri_09_one_negone_373[2] __attribute__((aligned(8)));
-f32 fd_mri_09___local_PIO2_384;
-f32 fd_mri_09_one_381;
-f32 fd_mri_09_negone_one_360[2] __attribute__((aligned(8)));
-f32 fd_mri_09_neg_one_365;
-f32 fd_mri_09___local_PI_366;
-f32 fd_mri_09___local_3PIO2_368;
-f32 fd_mri_09_one_negone_359[2] __attribute__((aligned(8)));
-f32 fd_mri_09___local_PIO2_367;
-f32 fd_mri_09_one_364;
 BeroEntry bero_bluejail[1];
 static BeroEntry bero_entry_data[5];
-EvtWord wall_roll_sub[96];
-#ifdef VERSION_G8ME01
-EvtWord wall_roll[272];
-#else
-EvtWord wall_roll[264];
-#endif
-static EvtWord breakyuka_init[17];
-static EvtWord breakyuka_main[9];
+extern EvtWord wall_roll_sub[];
+extern EvtWord wall_roll[];
 static KusaAccess ueki_access_data[6];
-EvtWord slot00_event[52];
-EvtWord slot01_event[52];
-EvtWord slot02_event[52];
-EvtWord slot03_event[52];
-EvtWord slot_event[66];
-EvtWord get_blue_jail_key[143];
-#ifdef VERSION_G8ME01
-EvtWord mri_09_init_evt[230];
-#else
-EvtWord mri_09_init_evt[228];
-#endif
-
-f32 fd_mri_09_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
-
-f32 fd_mri_09_neg_one_382 = -1.0f;
-
-f32 fd_mri_09___local_PI_383 = 3.1415927f;
-
-f32 fd_mri_09___local_3PIO2_385 = 4.712389f;
-
-f32 fd_mri_09_one_negone_373[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
-
-f32 fd_mri_09___local_PIO2_384 = 1.5707964f;
-
-f32 fd_mri_09_one_381 = 1.0f;
-
-f32 fd_mri_09_negone_one_360[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
-
-f32 fd_mri_09_neg_one_365 = -1.0f;
-
-f32 fd_mri_09___local_PI_366 = 3.1415927f;
-
-f32 fd_mri_09___local_3PIO2_368 = 4.712389f;
-
-f32 fd_mri_09_one_negone_359[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
-
-f32 fd_mri_09___local_PIO2_367 = 1.5707964f;
-
-f32 fd_mri_09_one_364 = 1.0f;
+extern EvtWord slot00_event[];
+extern EvtWord slot01_event[];
+extern EvtWord slot02_event[];
+extern EvtWord slot03_event[];
+extern EvtWord slot_event[];
+extern EvtWord get_blue_jail_key[];
+extern EvtWord mri_09_init_evt[];
 
 BeroEntry bero_bluejail[] = {
     {
@@ -578,7 +524,7 @@ EVT_BEGIN(mri_09_init_evt)
     CALL(evt_item_entry, STRING("item100"), 256, -250, -234, 75, 16, GSWF(2853), 0)
     CALL(evt_mobj_powerupblk, STRING("pblk1"), 0, -174, -125, 0, GSWF(5543), 0)
     SPAWN_EVENT(PTR(breakyuka_init))
-    CALL(evt_mobj_breaking_floor, STRING("mobj_bf00\0\0"), 0, 0, 75, 1, PTR(breakyuka_main), GSWF(2851))
+    CALL(evt_mobj_breaking_floor, STRING("mobj_bf00"), 0, 0, 75, 1, PTR(breakyuka_main), GSWF(2851))
     RETURN
 EVT_END()
 

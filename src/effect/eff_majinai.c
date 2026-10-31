@@ -77,9 +77,17 @@ void effMajinaiMain(EffectEntry* effect) {
             map->entries[0].flags |= 8;
             if (!gp->inBattle) {
                 mario = marioGetPtr();
+#ifdef VERSION_G8MP01
+                for (i = 0; i < 3; i++) {
+                    if (mario->paperAnimGroupId[i] != -1) {
+                        animPoseSetMaterialFlagOn(mario->paperAnimGroupId[i], 0x800);
+                    }
+                }
+#else
                 for (i = 0; i < 5; i++) {
                     animPoseSetMaterialFlagOn(mario->paperAnimGroupId[i], 0x800);
                 }
+#endif
             }
             else {
                 unit = BattleGetMarioPtr(_battleWorkPointer);
@@ -107,9 +115,17 @@ void effMajinaiMain(EffectEntry* effect) {
             map->entries[0].flags |= 8;
             if (!gp->inBattle) {
                 mario = marioGetPtr();
+#ifdef VERSION_G8MP01
+                for (i = 0; i < 3; i++) {
+                    if (mario->paperAnimGroupId[i] != -1) {
+                        animPoseSetMaterialFlagOff(mario->paperAnimGroupId[i], 0x800);
+                    }
+                }
+#else
                 for (i = 0; i < 5; i++) {
                     animPoseSetMaterialFlagOff(mario->paperAnimGroupId[i], 0x800);
                 }
+#endif
             }
             else {
                 unit = BattleGetMarioPtr(_battleWorkPointer);

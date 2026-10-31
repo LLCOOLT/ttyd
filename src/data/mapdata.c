@@ -464,18 +464,13 @@ AreaData area_dig = { "dig", "ダイジェスト", NULL, NULL, { &dig_00, NULL }
 
 AreaData area_end = { "end", "エンディング", NULL, NULL, { &end_00, NULL } };
 
-WorldData world_data = { "MarioSt", "マリオの世界\0\0\0", { &area_kwb, &area_bti, &area_stg, &area_aaa, &area_gor, &area_tik,
+WorldData world_data = { "MarioSt", "マリオの世界", { &area_kwb, &area_bti, &area_stg, &area_aaa, &area_gor, &area_tik,
                                                       &area_gon, &area_hei, &area_nok, &area_win, &area_mri, &area_tou,
                                                       &area_usu, &area_gra, &area_jin, &area_muj, &area_dou, &area_pik,
                                                       &area_rsh, &area_hom, &area_eki, &area_bom, &area_moo, &area_aji,
                                                       &area_las, &area_kpa, &area_jon, &area_yuu, &area_qiz, &area_sys,
                                                       &area_dmo, &area_dig, &area_end } };
 
-#ifdef VERSION_G8ME01
-#pragma force_active on
-__declspec(section ".data") u32 gap_mapdata_data[5] = {0, 0, 0, 0, 0};
-#pragma force_active reset
-#endif
 
 /*
 00032a68 00014c 80038048  4 mapDataPtr 	mapdata.o

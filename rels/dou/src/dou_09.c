@@ -5,8 +5,6 @@
 #include "dou.h"
 #include "driver/hitdrv.h"
 
-#pragma force_active on
-
 USER_FUNC(evt_bero_get_info);
 USER_FUNC(evt_hit_bind_mapobj);
 USER_FUNC(evt_hit_bind_update);
@@ -41,75 +39,9 @@ USER_FUNC(evt_snd_set_rev_mode);
 USER_FUNC(evt_snd_sfxon_3d);
 USER_FUNC(evt_sub_random);
 
-f32 fd_dou_09_negone_one_374[2] __attribute__((aligned(8)));
-f32 fd_dou_09_neg_one_382;
-f32 fd_dou_09___local_PI_383;
-f32 fd_dou_09___local_3PIO2_385;
-f32 fd_dou_09_one_negone_373[2] __attribute__((aligned(8)));
-f32 fd_dou_09___local_PIO2_384;
-f32 fd_dou_09_one_381;
-f32 fd_dou_09_negone_one_360[2] __attribute__((aligned(8)));
-f32 fd_dou_09_neg_one_365;
-f32 fd_dou_09___local_PI_366;
-f32 fd_dou_09___local_3PIO2_368;
-f32 fd_dou_09_one_negone_359[2] __attribute__((aligned(8)));
-f32 fd_dou_09___local_PIO2_367;
-f32 fd_dou_09_one_364;
 static BeroEntry bero_entry_data[5];
-static EvtWord dou_puka_event_init0[8];
-static EvtWord dou_puka_event_0[24];
-static EvtWord dou_puka_event_rev_0[10];
-static EvtWord dou_puka_event_main0[21];
-static EvtWord dou_puka_event_sub0[45];
-static EvtWord dou_puka_event_init1[8];
-static EvtWord dou_puka_event_1[24];
-static EvtWord dou_puka_event_rev_1[10];
-static EvtWord dou_puka_event_main1[21];
-static EvtWord dou_puka_event_sub1[45];
-static EvtWord dou_puka_event_init2[8];
-static EvtWord dou_puka_event_2[24];
-static EvtWord dou_puka_event_rev_2[10];
-static EvtWord dou_puka_event_main2[21];
-static EvtWord dou_puka_event_sub2[45];
-static EvtWord dou_puka_event_init3[8];
-static EvtWord dou_puka_event_3[24];
-static EvtWord dou_puka_event_rev_3[10];
-static EvtWord dou_puka_event_main3[21];
-static EvtWord dou_puka_event_sub3[45];
 static HitDamageReturn hitDmgRetPoints[5];
-static EvtWord evt_ride_taru[15];
-static EvtWord evt_ride_ship[15];
-static EvtWord bombwall_bomb[138];
-static EvtWord bombwall_init[40];
-EvtWord dou_09_init_evt[211];
-
-f32 fd_dou_09_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
-
-f32 fd_dou_09_neg_one_382 = -1.0f;
-
-f32 fd_dou_09___local_PI_383 = 3.1415927f;
-
-f32 fd_dou_09___local_3PIO2_385 = 4.712389f;
-
-f32 fd_dou_09_one_negone_373[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
-
-f32 fd_dou_09___local_PIO2_384 = 1.5707964f;
-
-f32 fd_dou_09_one_381 = 1.0f;
-
-f32 fd_dou_09_negone_one_360[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
-
-f32 fd_dou_09_neg_one_365 = -1.0f;
-
-f32 fd_dou_09___local_PI_366 = 3.1415927f;
-
-f32 fd_dou_09___local_3PIO2_368 = 4.712389f;
-
-f32 fd_dou_09_one_negone_359[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
-
-f32 fd_dou_09___local_PIO2_367 = 1.5707964f;
-
-f32 fd_dou_09_one_364 = 1.0f;
+extern EvtWord dou_09_init_evt[];
 
 static BeroEntry bero_entry_data[] = {
     {
@@ -560,7 +492,7 @@ EVT_BEGIN(dou_09_init_evt)
     CALL(evt_run_case_evt, 0, 1, STRING("a09_fune_ata1"), 0, PTR(dou_puka_event_3), 0)
     CALL(evt_run_case_evt, 1, 1, STRING("a09_fune_ata1"), 0, PTR(dou_puka_event_rev_3), 0)
     CALL(evt_mobj_powerupblk, STRING("pblk1"), 500, 140, -100, 0, GSWF(5557), 0)
-    CALL(evt_mobj_brick, STRING("hblk1\0\0"), 500, 50, -100, 0, 13, 0, GSWF(2994))
+    CALL(evt_mobj_brick, STRING("hblk1"), 500, 50, -100, 0, 13, 0, GSWF(2994))
     SPAWN_EVENT(PTR(bombwall_init))
     RETURN
 EVT_END()

@@ -395,7 +395,13 @@ void mot_slit_post(void) {
 			marioPaperOff();
 			mapResetPaperAmbColor();
 			m->dispFlags &= ~4;
+#ifdef VERSION_G8MP01
+			if (!(m->flags & 0x20)) {
+				marioAdjustMoveDir();
+			}
+#else
 			marioAdjustMoveDir();
+#endif
 			allPartyForceSlitOff();
 		}
 	} else if (m->currMotionId != 10) {
@@ -602,6 +608,11 @@ void mot_slit(void) {
 		psndSFXOn_3D((char*)0x177, &m->position);
 		break;
 	case 2:
+#ifdef VERSION_G8MP01
+		if (m->flags & 0x20) {
+			break;
+		}
+#endif
 #ifdef VERSION_G8ME01
 		if (!m->controlStickSensitivity) {
 			m->baseSpeed = 0.0f;
@@ -634,7 +645,13 @@ void mot_slit(void) {
 			}
 			m->directionView = toMovedirSimple(m->displayDirection);
 		}
+#ifdef VERSION_G8MP01
+		if (!(m->flags & 0x20)) {
+			SPEEDCHK(m)
+		}
+#else
 		SPEEDCHK(m)
+#endif
 		m->displayDirection = 270.0f;
 		m->displayDirectionTarget = m->displayDirection;
 		if (!m->controlStickSensitivity) {
@@ -952,6 +969,11 @@ void mot_slit(void) {
 		}
 		psndSFXOn_3D((char*)0x178, &m->position);
 	case 0x65:
+#ifdef VERSION_G8MP01
+		if (m->flags & 0x20) {
+			break;
+		}
+#endif
 #ifdef VERSION_G8ME01
 		if (!m->controlStickSensitivity) {
 			m->baseSpeed = 0.0f;
@@ -972,7 +994,16 @@ void mot_slit(void) {
 		m->slitState = 0x66;
 		break;
 	case 0x66:
-#ifdef VERSION_G8ME01
+#if defined(VERSION_G8MP01)
+		if (!(m->flags & 0x20)) {
+			if (!m->controlStickSensitivity) {
+				m->baseSpeed = 0.0f;
+				marioChgPose("M_S_1");
+			} else {
+				SPEEDCHK_IF(m, 1)
+			}
+		}
+#elif defined(VERSION_G8ME01)
 		if (!m->controlStickSensitivity) {
 			m->baseSpeed = 0.0f;
 			marioChgPose("M_S_1");
@@ -989,7 +1020,13 @@ void mot_slit(void) {
 		marioPaperOff();
 		mapResetPaperAmbColor();
 		m->dispFlags &= ~4;
+#ifdef VERSION_G8MP01
+		if (!(m->flags & 0x20)) {
+			marioAdjustMoveDir();
+		}
+#else
 		marioAdjustMoveDir();
+#endif
 #ifndef VERSION_G8ME01
 		allPartySlitOff();
 #endif

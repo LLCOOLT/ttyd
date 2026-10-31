@@ -79,6 +79,84 @@ BOOL R_bReset; // before DvdCheckTreadOn: .sbss is emitted in reverse
 BOOL DvdCheckTreadOn;
 
 //.data
+#ifdef VERSION_G8MP01
+// PAL: the plain modes are 50Hz PAL interlaced, the _prog / Prog ones EURGB60 interlaced
+GXRenderModeObj sRMObjHReso = {
+	VI_TVMODE_PAL_INT, //viTVmode
+	0x260, //fbWidth
+	0x1C0, //efbHeight
+	0x212, //xfbHeight
+	0x1B, //viXOrigin
+	0x16, //viYOrigin
+	0x29A, //viWidth
+	0x212, //viHeight
+	VI_XFBMODE_DF, //xFBmode
+	0, //field_rendering
+	0, //aa
+	6, 6, 6, 6, 6, 6, //pix 0
+	6, 6, 6, 6, 6, 6, //pix 1
+	6, 6, 6, 6, 6, 6, //pix 2
+	6, 6, 6, 6, 6, 6, //pix 3
+	8, 8, 10, 12, 10, 8, 8, //vfilter
+};
+
+GXRenderModeObj sRMObjHReso_prog = {
+	VI_TVMODE_EURGB60_INT, //viTVmode
+	0x260, //fbWidth
+	0x1C0, //efbHeight
+	0x1C0, //xfbHeight
+	0x1B, //viXOrigin
+	0x10, //viYOrigin
+	0x29A, //viWidth
+	0x1C0, //viHeight
+	VI_XFBMODE_DF, //xFBmode
+	0, //field_rendering
+	0, //aa
+	6, 6, 6, 6, 6, 6, //pix 0
+	6, 6, 6, 6, 6, 6, //pix 1
+	6, 6, 6, 6, 6, 6, //pix 2
+	6, 6, 6, 6, 6, 6, //pix 3
+	8, 8, 10, 12, 10, 8, 8, //vfilter
+};
+
+GXRenderModeObj GXNtsc480IntDfMarioSt = {
+	VI_TVMODE_PAL_INT, //viTVmode
+	0x260, //fbWidth
+	0x1E0, //efbHeight
+	0x238, //xfbHeight
+	0x1E, //viXOrigin
+	0x6, //viYOrigin
+	0x294, //viWidth
+	0x238, //viHeight
+	VI_XFBMODE_DF, //xFBmode
+	0, //field_rendering
+	0, //aa
+	6, 6, 6, 6, 6, 6, //pix 0
+	6, 6, 6, 6, 6, 6, //pix 1
+	6, 6, 6, 6, 6, 6, //pix 2
+	6, 6, 6, 6, 6, 6, //pix 3
+	8, 8, 10, 12, 10, 8, 8, //vfilter
+};
+
+GXRenderModeObj GXNtsc480ProgMarioSt = {
+	VI_TVMODE_EURGB60_INT, //viTVmode
+	0x260, //fbWidth
+	0x1E0, //efbHeight
+	0x1E0, //xfbHeight
+	0x1E, //viXOrigin
+	0x0, //viYOrigin
+	0x294, //viWidth
+	0x1E0, //viHeight
+	VI_XFBMODE_DF, //xFBmode
+	0, //field_rendering
+	0, //aa
+	6, 6, 6, 6, 6, 6, //pix 0
+	6, 6, 6, 6, 6, 6, //pix 1
+	6, 6, 6, 6, 6, 6, //pix 2
+	6, 6, 6, 6, 6, 6, //pix 3
+	8, 8, 10, 12, 10, 8, 8, //vfilter
+};
+#else
 GXRenderModeObj sRMObjHReso = {
 	VI_TVMODE_NTSC_INT, //viTVmode
 	0x260, //fbWidth
@@ -154,6 +232,7 @@ GXRenderModeObj GXNtsc480ProgMarioSt = {
 	6, 6, 6, 6, 6, 6, //pix 3
 	8, 8, 10, 12, 10, 8, 8, //vfilter
 };
+#endif
 
 //local prototypes
 void viPostCallback(u32 retraceCount);
@@ -208,7 +287,40 @@ void marioStInit(void) {
 	gp->areaFadeOutDuration = 300;
 	gp->areaFadeInType = FADE_OUT_BLACK;
 	gp->areaFadeInDuration = 300;
-#ifdef VERSION_G8ME01
+#ifdef VERSION_G8MP01
+	if (VIGetTvFormat() == VI_NTSC)
+		gp->framerate = 60;
+	else if (VIGetTvFormat() == VI_EURGB60)
+		gp->framerate = 60;
+	else
+		gp->framerate = 50;
+	if ((OSGetFontEncode() == OS_FONT_ENCODE_SJIS) && !(gp->flags & 0x1000)) {
+		gp->language = 0;
+	} else {
+		// game language: 1 English, 2 German, 3 French, 4 Spanish, 5 Italian
+		gp->language = 1;
+		switch (OSGetLanguage()) {
+		case OS_LANG_ENGLISH:
+			gp->language = 1;
+			break;
+		case OS_LANG_GERMAN:
+			gp->language = 2;
+			break;
+		case OS_LANG_FRENCH:
+			gp->language = 3;
+			break;
+		case OS_LANG_SPANISH:
+			gp->language = 4;
+			break;
+		case OS_LANG_ITALIAN:
+			gp->language = 5;
+			break;
+		case OS_LANG_DUTCH:
+			gp->language = 1;
+			break;
+		}
+	}
+#elif defined(VERSION_G8ME01)
 	if (VIGetTvFormat() == 0)
 		gp->framerate = 60;
 	else

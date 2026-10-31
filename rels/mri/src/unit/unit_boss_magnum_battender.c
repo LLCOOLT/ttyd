@@ -2,7 +2,6 @@
 #include "battle/battle_unit.h"
 #include "evt/evt_cmd.h"
 
-#pragma force_active on
 #include "manager/evtmgr_cmd.h"
 #include "battle/battle.h"
 #include "battle/battle_unit.h"
@@ -20,14 +19,15 @@
 #include "evt/evt_eff.h"
 #include "party/party_motion.h"
 #include "battle/battle_database_common.h"
+#include "battle/battle_sub.h"
 
 static EffectEntry* eff_charge;
-EffectEntry* effHokoriN64Entry(s32 type, s32 arg1, f32 x, f32 y, f32 z);
+EffectEntry* effHokoriN64Entry(s32 type, s32 lifetime, f32 x, f32 y, f32 z);
 typedef struct ArmWork { Vec prevPos; Vec pos; f32 rot; f32 targetRot; EffectEntry* eff; } ArmWork;
 static ArmWork* work[2];
 EffectEntry* effBattenEntry(s32 type, s32 time, f32 x, f32 y, f32 z, f32 scale);
 double atan(double x);
-typedef struct BattenEffWork { s32 field_0x0; Vec pos; u8 field_0x10[0x28 - 0x10]; Mtx mtx; } BattenEffWork;
+typedef struct BattenEffWork { s32 type; Vec pos; u8 drawState[0x28 - 0x10]; Mtx mtx; } BattenEffWork; /* type/drawState mirror EffBattenWork */
 
 static USER_FUNC(arm_check);
 static USER_FUNC(arm_end);
@@ -77,20 +77,6 @@ static USER_FUNC(eff_dead_delete);
 USER_FUNC(eff_hokori);
 static USER_FUNC(arm_init2);
 
-f32 fd_boss_magnum_battender_negone_one_374[2] __attribute__((aligned(8)));
-f32 fd_boss_magnum_battender_neg_one_382;
-f32 fd_boss_magnum_battender___local_PI_383;
-f32 fd_boss_magnum_battender___local_3PIO2_385;
-f32 fd_boss_magnum_battender_one_negone_373[2] __attribute__((aligned(8)));
-f32 fd_boss_magnum_battender___local_PIO2_384;
-f32 fd_boss_magnum_battender_one_381;
-f32 fd_boss_magnum_battender_negone_one_360[2] __attribute__((aligned(8)));
-f32 fd_boss_magnum_battender_neg_one_365;
-f32 fd_boss_magnum_battender___local_PI_366;
-f32 fd_boss_magnum_battender___local_3PIO2_368;
-f32 fd_boss_magnum_battender_one_negone_359[2] __attribute__((aligned(8)));
-f32 fd_boss_magnum_battender___local_PIO2_367;
-f32 fd_boss_magnum_battender_one_364;
 BattleUnitKind unit_boss_magnum_battender;
 static BattleUnitDefense defence;
 static BattleUnitDefenseAttr defence_attr;
@@ -108,7 +94,7 @@ static EvtWord damage_event[111];
 static EvtWord dead_event[234];
 static EvtWord entry_event[78];
 static EvtWord attack_event[150];
-EvtWord stamp_attack_event[352];
+extern EvtWord stamp_attack_event[];
 static EvtWord shake_attack_event[324];
 static EvtWord arm_bunri_event[199];
 static EvtWord arm_return_event[151];
@@ -127,34 +113,6 @@ static EvtWord arm_event_end[35];
 static EvtWord damage_event_r[30];
 static EvtWord attack_event_r[368];
 static EvtWord wait_event_r[18];
-
-f32 fd_boss_magnum_battender_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
-
-f32 fd_boss_magnum_battender_neg_one_382 = -1.0f;
-
-f32 fd_boss_magnum_battender___local_PI_383 = 3.1415927f;
-
-f32 fd_boss_magnum_battender___local_3PIO2_385 = 4.712389f;
-
-f32 fd_boss_magnum_battender_one_negone_373[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
-
-f32 fd_boss_magnum_battender___local_PIO2_384 = 1.5707964f;
-
-f32 fd_boss_magnum_battender_one_381 = 1.0f;
-
-f32 fd_boss_magnum_battender_negone_one_360[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
-
-f32 fd_boss_magnum_battender_neg_one_365 = -1.0f;
-
-f32 fd_boss_magnum_battender___local_PI_366 = 3.1415927f;
-
-f32 fd_boss_magnum_battender___local_3PIO2_368 = 4.712389f;
-
-f32 fd_boss_magnum_battender_one_negone_359[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
-
-f32 fd_boss_magnum_battender___local_PIO2_367 = 1.5707964f;
-
-f32 fd_boss_magnum_battender_one_364 = 1.0f;
 
 BattleUnitKind unit_boss_magnum_battender = {
     34,

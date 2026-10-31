@@ -2,7 +2,6 @@
 #include "battle/battle_unit.h"
 #include "evt/evt_cmd.h"
 
-#pragma force_active on
 #include "mario/mario.h"
 #include "system.h"
 #include "driver/effdrv.h"
@@ -15,7 +14,6 @@
 #include "data/mapdata.h"
 #include "muj.h"
 
-s32 psndSFXOnEx_3D(const char* name, Vec* position, s32 vol, s32 pan, s32 pitch, s32 flags);
 typedef void (*voidfunctionptr)(void);
 extern voidfunctionptr _ctors[];
 extern voidfunctionptr _dtors[];
@@ -39,59 +37,11 @@ void _unresolved(void);
 void _epilog(void);
 void _prolog(void);
 
-f32 fd_muj_negone_one_374[2] __attribute__((aligned(8)));
-f32 fd_muj_neg_one_382;
-f32 fd_muj___local_PI_383;
-f32 fd_muj___local_3PIO2_385;
-f32 fd_muj_one_negone_373[2] __attribute__((aligned(8)));
-f32 fd_muj___local_PIO2_384;
-f32 fd_muj_one_381;
-f32 fd_muj_negone_one_360[2] __attribute__((aligned(8)));
-f32 fd_muj_neg_one_365;
-f32 fd_muj___local_PI_366;
-f32 fd_muj___local_3PIO2_368;
-f32 fd_muj_one_negone_359[2] __attribute__((aligned(8)));
-f32 fd_muj___local_PIO2_367;
-f32 fd_muj_one_364;
-f64 fd_muj__three_localstatic4_sqrtf;
-f64 fd_muj__half_localstatic3_sqrtf;
 f32 muj_ship_puka_data[16];
-EvtWord muj_ship_puka[21];
-EvtWord korutesu_apper[234];
-EvtWord korutesu_vanish[227];
-EvtWord muj_mario_pos_osreport[4];
-
-f32 fd_muj_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
-
-f32 fd_muj_neg_one_382 = -1.0f;
-
-f32 fd_muj___local_PI_383 = 3.1415927f;
-
-f32 fd_muj___local_3PIO2_385 = 4.712389f;
-
-f32 fd_muj_one_negone_373[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
-
-f32 fd_muj___local_PIO2_384 = 1.5707964f;
-
-f32 fd_muj_one_381 = 1.0f;
-
-f32 fd_muj_negone_one_360[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
-
-f32 fd_muj_neg_one_365 = -1.0f;
-
-f32 fd_muj___local_PI_366 = 3.1415927f;
-
-f32 fd_muj___local_3PIO2_368 = 4.712389f;
-
-f32 fd_muj_one_negone_359[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
-
-f32 fd_muj___local_PIO2_367 = 1.5707964f;
-
-f32 fd_muj_one_364 = 1.0f;
-
-f64 fd_muj__three_localstatic4_sqrtf = 3.0;
-
-f64 fd_muj__half_localstatic3_sqrtf = 0.5;
+extern EvtWord muj_ship_puka[];
+extern EvtWord korutesu_apper[];
+extern EvtWord korutesu_vanish[];
+extern EvtWord muj_mario_pos_osreport[];
 
 f32 muj_ship_puka_data[] = {
     -0.0f, -0.5f, -1.0f, -1.5f, -2.0f, -2.2f, -2.5f, -2.7f,

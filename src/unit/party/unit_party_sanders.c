@@ -88,20 +88,11 @@ USER_FUNC(evt_snd_sfxon_3d);
 USER_FUNC(_make_counterset_weapon);
 static void __makeTechMenuFunc(BattleCommand* command, s32* count);
 
-__declspec(section ".data") f32 unit_party_sanders_negone_one_a[2];
-__declspec(section ".data") f32 sanders_negone_one_374[2];
-__declspec(section ".data") f32 unit_party_sanders_one_negone_a[2];
-__declspec(section ".data") f32 sanders_one_negone_373[2];
-__declspec(section ".data") f32 unit_party_sanders_negone_one_b[2];
-__declspec(section ".data") f32 sanders_negone_one_360[2];
-__declspec(section ".data") f32 unit_party_sanders_one_negone_b[2];
-__declspec(section ".data") f32 sanders_one_negone_359[2];
 PoseTableEntry pose_table_sanders_stay[25];
 PoseTableEntry pose_table_counter_sanders[20];
 static BattleDataEntry data_table[9];
 BattleUnitKindPart unitpartsdata_Party_Sanders[1];
 BattleUnitKind unitdata_Party_Sanders;
-static EvtWord battle_entry_event[59];
 static EvtWord init_event[63];
 static EvtWord damage_event[16];
 static EvtWord wait_event[26];
@@ -110,27 +101,15 @@ BattleWeapon partyWeapon_SandersNormalAttack;
 BattleWeapon partyWeapon_SandersTimeBombSet;
 BattleWeapon partyWeapon_SandersCounterSet;
 BattleWeapon partyWeapon_SandersSuperBombAttack;
-EvtWord partySandersAttack_FirstAttack[321];
-EvtWord partySandersAttack_NormalAttack[970];
-#ifdef VERSION_G8ME01
-EvtWord partySandersAttack_SuperBombAttack[1118];
-#else
-EvtWord partySandersAttack_SuperBombAttack[1116];
-#endif
-#ifdef VERSION_G8ME01
-EvtWord partySandersAttack_CounterSet[242];
-#else
-EvtWord partySandersAttack_CounterSet[201];
-#endif
-#ifdef VERSION_G8ME01
-EvtWord partySandersAttack_TimeBombSet[331];
-#else
-EvtWord partySandersAttack_TimeBombSet[290];
-#endif
-EvtWord _shot_bomb_event[155];
-EvtWord sanders_appeal_event[121];
+extern EvtWord partySandersAttack_FirstAttack[];
+extern EvtWord partySandersAttack_NormalAttack[];
+extern EvtWord partySandersAttack_SuperBombAttack[];
+extern EvtWord partySandersAttack_CounterSet[];
+extern EvtWord partySandersAttack_TimeBombSet[];
+extern EvtWord _shot_bomb_event[];
+extern EvtWord sanders_appeal_event[];
 static EvtWord attack_audience_event[284];
-EvtWord sanders_battle_end_event[14];
+extern EvtWord sanders_battle_end_event[];
 static BattleUnitDefense defence;
 static BattleUnitDefenseAttr defence_attr;
 static StatusVulnerability regist;
@@ -138,37 +117,13 @@ static EvtWord attack_event[2];
 BattleUnitSetup entry_bomzou;
 static EvtWord party_win_reaction[9];
 
-__declspec(section ".data") f32 unit_party_sanders_negone_one_a[] = {
-    -1.0f, 1.0f,
-};
 
-__declspec(section ".data") f32 sanders_negone_one_374[] = {
-    -1.0f, 1.0f,
-};
 
-__declspec(section ".data") f32 unit_party_sanders_one_negone_a[] = {
-    1.0f, -1.0f,
-};
 
-__declspec(section ".data") f32 sanders_one_negone_373[] = {
-    1.0f, -1.0f,
-};
 
-__declspec(section ".data") f32 unit_party_sanders_negone_one_b[] = {
-    -1.0f, 1.0f,
-};
 
-__declspec(section ".data") f32 sanders_negone_one_360[] = {
-    -1.0f, 1.0f,
-};
 
-__declspec(section ".data") f32 unit_party_sanders_one_negone_b[] = {
-    1.0f, -1.0f,
-};
 
-__declspec(section ".data") f32 sanders_one_negone_359[] = {
-    1.0f, -1.0f,
-};
 
 PoseTableEntry pose_table_sanders_stay[] = {
     {9, "D_4"},

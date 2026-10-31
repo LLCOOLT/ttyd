@@ -1,9 +1,7 @@
 #pragma defer_codegen on
-#pragma auto_inline on
 #include "battle/battle_unit.h"
 #include "evt/evt_cmd.h"
 
-#pragma force_active on
 #include "string.h"
 #include "dolphin/os.h"
 #include "mario/mariost.h"
@@ -21,9 +19,8 @@
 
 typedef struct MoamoaPoseDef { char model[16]; char anim[8]; s16 loop; f32 speed; s32 start; s32 count; } MoamoaPoseDef;
 typedef struct Moamoa { u16 flags; s16 state; s16 timer; Vec pos; f32 angle; s16 pose; u64 startTime; } Moamoa;
-typedef struct MoamoaWork { s32 field_0x0; s32 count; Moamoa* moa; s32 numDefs; MoamoaPoseDef defs[32]; } MoamoaWork;
+typedef struct MoamoaWork { s32 flags; s32 count; Moamoa* moa; s32 numDefs; MoamoaPoseDef defs[32]; } MoamoaWork;
 typedef struct MoamoaData { const char* model; const char* anim; f32 speed; } MoamoaData;
-static s32 wp_pad;
 static MoamoaWork* wp;
 int rand(void);
 static f32 randf(f32 min, f32 max);
@@ -91,71 +88,24 @@ static void moamoa_pose_change(Moamoa* moa, const char* model, const char* anim)
 static void moamoa_pose_main(void);
 static void moamoa_pose_init(void);
 
-f32 fd_rsh_00_negone_one_374[2] __attribute__((aligned(8)));
-f32 fd_rsh_00_neg_one_382;
-f32 fd_rsh_00___local_PI_383;
-f32 fd_rsh_00___local_3PIO2_385;
-f32 fd_rsh_00_one_negone_373[2] __attribute__((aligned(8)));
-f32 fd_rsh_00___local_PIO2_384;
-f32 fd_rsh_00_one_381;
-f32 fd_rsh_00_negone_one_360[2] __attribute__((aligned(8)));
-f32 fd_rsh_00_neg_one_365;
-f32 fd_rsh_00___local_PI_366;
-f32 fd_rsh_00___local_3PIO2_368;
-f32 fd_rsh_00_one_negone_359[2] __attribute__((aligned(8)));
-f32 fd_rsh_00___local_PIO2_367;
-f32 fd_rsh_00_one_364;
 ExtTexInfo moamoa_data[81];
-static EvtWord evt_moamoa[324];
-EvtWord evt_rsh_moamoa_on_window[46];
+extern EvtWord evt_rsh_moamoa_on_window[];
 static BeroEntry bero_data_a[2];
 static BeroEntry bero_data_b[2];
 static BeroEntry bero_data_c[2];
-EvtWord evt_handle[107];
-EvtWord regu_unten[210];
-static EvtWord init_unten[17];
-static EvtWord talk_unten[236];
+extern EvtWord evt_handle[];
+extern EvtWord regu_unten[];
 static NpcSetupInfo npc_data[2];
 static const char* access_tbl[5];
-static EvtWord evt_access[14];
-static EvtWord evt_access_entry[23];
-EvtWord rsh_00_init_evt[194];
-EvtWord rsh_00_a_init_evt[51];
-EvtWord rsh_00_b_init_evt[11];
+extern EvtWord rsh_00_init_evt[];
+extern EvtWord rsh_00_a_init_evt[];
+extern EvtWord rsh_00_b_init_evt[];
 static const char* window_tbl[5];
-EvtWord rsh_00_c_init_evt[16];
-EvtWord rsh_00_init_evt_nidome[164];
-EvtWord rsh_00_a_init_evt_nidome[11];
-EvtWord rsh_00_b_init_evt_nidome[11];
-EvtWord rsh_00_c_init_evt_nidome[16];
-
-f32 fd_rsh_00_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
-
-f32 fd_rsh_00_neg_one_382 = -1.0f;
-
-f32 fd_rsh_00___local_PI_383 = 3.1415927f;
-
-f32 fd_rsh_00___local_3PIO2_385 = 4.712389f;
-
-f32 fd_rsh_00_one_negone_373[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
-
-f32 fd_rsh_00___local_PIO2_384 = 1.5707964f;
-
-f32 fd_rsh_00_one_381 = 1.0f;
-
-f32 fd_rsh_00_negone_one_360[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
-
-f32 fd_rsh_00_neg_one_365 = -1.0f;
-
-f32 fd_rsh_00___local_PI_366 = 3.1415927f;
-
-f32 fd_rsh_00___local_3PIO2_368 = 4.712389f;
-
-f32 fd_rsh_00_one_negone_359[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
-
-f32 fd_rsh_00___local_PIO2_367 = 1.5707964f;
-
-f32 fd_rsh_00_one_364 = 1.0f;
+extern EvtWord rsh_00_c_init_evt[];
+extern EvtWord rsh_00_init_evt_nidome[];
+extern EvtWord rsh_00_a_init_evt_nidome[];
+extern EvtWord rsh_00_b_init_evt_nidome[];
+extern EvtWord rsh_00_c_init_evt_nidome[];
 
 ExtTexInfo moamoa_data[] = {
     {"c_n_moa_a", "S_1", 0.0f},
@@ -268,7 +218,7 @@ static void moamoa_pose_init(void) {
         wp->defs[wp->numDefs].count = i - start + 1;
         wp->defs[wp->numDefs].speed = data->speed;
         wp->defs[wp->numDefs].loop = 1;
-        if (!strncmp(anim, "J\0\0", 1)) {
+        if (!strncmp(anim, "J", 1)) {
             wp->defs[wp->numDefs].loop = 0;
         }
         i++;
@@ -1120,6 +1070,5 @@ EVT_BEGIN(rsh_00_c_init_evt_nidome)
     CALL_CHILD(PTR(evt_rsh_window))
     RETURN
 EVT_END()
-
 
 int rand(void);

@@ -3,7 +3,6 @@
 #include "eff/eff_starstone.h"
 #include "evt/evt_cmd.h"
 
-#pragma force_active on
 #include "driver/effdrv.h"
 #include "mario/mario.h"
 #include "manager/evtmgr_cmd.h"
@@ -13,6 +12,7 @@
 #include "evt/evt_bero.h"
 #include "evt/evt_memcard.h"
 #include "evt/evt_sub.h"
+#include "mario/mario_cam.h"
 
 EffectEntry* effStarStoneEntry(s32 type, f32 x, f32 y, f32 z, f32 scale);
 static inline f32 hoshi_sin(f32 x) { f32 a = 0.00761f; f32 b = 0.16605f; f32 c = 1.0f; f32 y; f32 x2; if (x <= 3.1415927f) { if (x <= 1.5707964f) { x2 = x * x; a = a * x2 - b; a = a * x2 + c; a = a * x; } else { y = 1.5707964f - (x - 1.5707964f); x2 = y * y; a = a * x2 - b; a = a * x2 + c; a = a * y; } } else if (x < 4.712389f) { y = x - 3.1415927f; x2 = y * y; a = a * x2 - b; a = a * x2 + c; a = a * y; a = -a; } else { y = 1.5707964f - (x - 4.712389f); x2 = y * y; a = a * x2 - b; a = a * x2 + c; a = a * y; a = -a; } return a; }
@@ -109,85 +109,30 @@ USER_FUNC(hoshi_jump);
 USER_FUNC(hoshi_r);
 USER_FUNC(kpa_chg_pose);
 USER_FUNC(reset_stone_cam);
-#ifdef VERSION_G8ME01
-#endif
 static USER_FUNC(set_starstone_pos);
 static USER_FUNC(starstone_entry);
 static USER_FUNC(starstone_fall);
 static USER_FUNC(stone_bg);
 static USER_FUNC(npc_set_pos);
 
-f32 fd_pik_02_negone_one_374[2] __attribute__((aligned(8)));
-f32 fd_pik_02_neg_one_382;
-f32 fd_pik_02___local_PI_383;
-f32 fd_pik_02___local_3PIO2_385;
-f32 fd_pik_02_one_negone_373[2] __attribute__((aligned(8)));
-f32 fd_pik_02___local_PIO2_384;
-f32 fd_pik_02_one_381;
-f32 fd_pik_02_negone_one_360[2] __attribute__((aligned(8)));
-f32 fd_pik_02_neg_one_365;
-f32 fd_pik_02___local_PI_366;
-f32 fd_pik_02___local_3PIO2_368;
-f32 fd_pik_02_one_negone_359[2] __attribute__((aligned(8)));
-f32 fd_pik_02___local_PIO2_367;
-f32 fd_pik_02_one_364;
-EvtWord haikei_on[24];
-EvtWord haikei_off[28];
-EvtWord evt_return_sub[99];
-EvtWord evt_return[13];
-EvtWord evt_go[7];
-static EvtWord s_door_open[22];
-static EvtWord s_door_close[22];
+extern EvtWord haikei_on[];
+extern EvtWord haikei_off[];
+extern EvtWord evt_return_sub[];
+extern EvtWord evt_return[];
+extern EvtWord evt_go[];
 static BeroEntry bero_data[5];
-EvtWord out_room[12];
+extern EvtWord out_room[];
 BeroEntry s_bero_peach[1];
-static EvtWord init_powan[30];
-static EvtWord talk_powan[53];
-EvtWord init_majo[17];
-EvtWord init_mari[17];
-EvtWord init_ramp[17];
-EvtWord patakuri_init[7];
-static EvtWord baba_init[7];
+extern EvtWord init_majo[];
+extern EvtWord init_mari[];
+extern EvtWord init_ramp[];
+extern EvtWord patakuri_init[];
 static NpcSetupInfo npc_data[7];
-EvtWord evt_garnet[562];
-static EvtWord evt_sw[89];
-EvtWord evt_kaiga[14];
-static EvtWord evt_daiza[27];
-EvtWord pik_02_koopa_evt[1256];
-EvtWord nise_starstone_init[18];
-#ifdef VERSION_G8ME01
-EvtWord pik_02_init_evt[172];
-#else
-EvtWord pik_02_init_evt[166];
-#endif
-
-f32 fd_pik_02_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
-
-f32 fd_pik_02_neg_one_382 = -1.0f;
-
-f32 fd_pik_02___local_PI_383 = 3.1415927f;
-
-f32 fd_pik_02___local_3PIO2_385 = 4.712389f;
-
-f32 fd_pik_02_one_negone_373[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
-
-f32 fd_pik_02___local_PIO2_384 = 1.5707964f;
-
-f32 fd_pik_02_one_381 = 1.0f;
-
-f32 fd_pik_02_negone_one_360[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
-
-f32 fd_pik_02_neg_one_365 = -1.0f;
-
-f32 fd_pik_02___local_PI_366 = 3.1415927f;
-
-f32 fd_pik_02___local_3PIO2_368 = 4.712389f;
-
-f32 fd_pik_02_one_negone_359[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
-
-f32 fd_pik_02___local_PIO2_367 = 1.5707964f;
-
-f32 fd_pik_02_one_364 = 1.0f;
+extern EvtWord evt_garnet[];
+extern EvtWord evt_kaiga[];
+extern EvtWord pik_02_koopa_evt[];
+extern EvtWord nise_starstone_init[];
+extern EvtWord pik_02_init_evt[];
 
 EVT_BEGIN(haikei_on)
     CALL(evt_hitobj_onoff, STRING("a_E_yuka"), 1, 1)
@@ -544,7 +489,7 @@ USER_FUNC(hoshi_r) {
 #pragma opt_lifetimes off
 USER_FUNC(hoshi_jump) {
     f32* pos = (f32*)((EffectEntry*)event->lwData[10])->userdata + 2;
-    NpcEntry* npc = npcNameToPtr("\203}\203W\203\207\203\212\203\223");
+    NpcEntry* npc = npcNameToPtr("マジョリン");
     f32 vy;
     f32 speed;
     f32 t;

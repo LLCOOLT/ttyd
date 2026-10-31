@@ -5,8 +5,6 @@
 #include "mri.h"
 #include "data_tables.h"
 
-#pragma force_active on
-
 USER_FUNC(evt_bero_get_info);
 USER_FUNC(evt_bero_overwrite);
 USER_FUNC(evt_item_delete_check);
@@ -19,53 +17,10 @@ USER_FUNC(evt_puni_set_yuka);
 USER_FUNC(evt_snd_bgmon);
 USER_FUNC(evt_snd_envon);
 
-f32 fd_mri_20_negone_one_374[2] __attribute__((aligned(8)));
-f32 fd_mri_20_neg_one_382;
-f32 fd_mri_20___local_PI_383;
-f32 fd_mri_20___local_3PIO2_385;
-f32 fd_mri_20_one_negone_373[2] __attribute__((aligned(8)));
-f32 fd_mri_20___local_PIO2_384;
-f32 fd_mri_20_one_381;
-f32 fd_mri_20_negone_one_360[2] __attribute__((aligned(8)));
-f32 fd_mri_20_neg_one_365;
-f32 fd_mri_20___local_PI_366;
-f32 fd_mri_20___local_3PIO2_368;
-f32 fd_mri_20_one_negone_359[2] __attribute__((aligned(8)));
-f32 fd_mri_20___local_PIO2_367;
-f32 fd_mri_20_one_364;
 BeroEntry bero_black_shadow[1];
 static BeroEntry bero_entry_data[5];
-static EvtWord evt_ueki_08[20];
 static KusaAccess ueki_access_data[7];
-EvtWord mri_20_init_evt[123];
-
-f32 fd_mri_20_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
-
-f32 fd_mri_20_neg_one_382 = -1.0f;
-
-f32 fd_mri_20___local_PI_383 = 3.1415927f;
-
-f32 fd_mri_20___local_3PIO2_385 = 4.712389f;
-
-f32 fd_mri_20_one_negone_373[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
-
-f32 fd_mri_20___local_PIO2_384 = 1.5707964f;
-
-f32 fd_mri_20_one_381 = 1.0f;
-
-f32 fd_mri_20_negone_one_360[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
-
-f32 fd_mri_20_neg_one_365 = -1.0f;
-
-f32 fd_mri_20___local_PI_366 = 3.1415927f;
-
-f32 fd_mri_20___local_3PIO2_368 = 4.712389f;
-
-f32 fd_mri_20_one_negone_359[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
-
-f32 fd_mri_20___local_PIO2_367 = 1.5707964f;
-
-f32 fd_mri_20_one_364 = 1.0f;
+extern EvtWord mri_20_init_evt[];
 
 BeroEntry bero_black_shadow[] = {
     {
@@ -206,7 +161,7 @@ EVT_BEGIN(mri_20_init_evt)
     CALL(evt_map_playanim, STRING("mizu_01"), 1, 0)
     CALL(evt_map_playanim, STRING("mizu_02"), 1, 0)
     CALL(evt_map_playanim, STRING("awa_01"), 1, 0)
-    CALL(evt_map_playanim, STRING("awa_02\0"), 1, 0)
+    CALL(evt_map_playanim, STRING("awa_02"), 1, 0)
     IF_INT_EQUAL(GSW(0), 90)
         SET_VALUE(LW(0), STRING("dokan1"))
         CALL_CHILD(PTR(bero_case_switch_off))

@@ -4,8 +4,6 @@
 #include "rsh.h"
 #include "evt/evt_npc.h"
 
-#pragma force_active on
-
 USER_FUNC(evt_bero_get_info);
 USER_FUNC(evt_map_playanim);
 USER_FUNC(evt_mario_key_onoff);
@@ -20,62 +18,16 @@ USER_FUNC(evt_snd_envoff);
 USER_FUNC(evt_snd_envon);
 USER_FUNC(evt_sub_get_mapname);
 
-f32 fd_rsh_07_negone_one_374[2] __attribute__((aligned(8)));
-f32 fd_rsh_07_neg_one_382;
-f32 fd_rsh_07___local_PI_383;
-f32 fd_rsh_07___local_3PIO2_385;
-f32 fd_rsh_07_one_negone_373[2] __attribute__((aligned(8)));
-f32 fd_rsh_07___local_PIO2_384;
-f32 fd_rsh_07_one_381;
-f32 fd_rsh_07_negone_one_360[2] __attribute__((aligned(8)));
-f32 fd_rsh_07_neg_one_365;
-f32 fd_rsh_07___local_PI_366;
-f32 fd_rsh_07___local_3PIO2_368;
-f32 fd_rsh_07_one_negone_359[2] __attribute__((aligned(8)));
-f32 fd_rsh_07___local_PIO2_367;
-f32 fd_rsh_07_one_364;
 static BeroEntry bero_data_a[2];
 static BeroEntry bero_data_b[2];
 static BeroEntry bero_data_c[2];
-static EvtWord init_unten[6];
-static EvtWord talk_unten[19];
 static NpcSetupInfo npc_data[2];
 static const char* access_tbl[5];
-static EvtWord evt_access[14];
-static EvtWord evt_access_entry[23];
-EvtWord rsh_07_init_evt[113];
-EvtWord rsh_07_a_init_evt[11];
-EvtWord rsh_07_b_init_evt[11];
+extern EvtWord rsh_07_init_evt[];
+extern EvtWord rsh_07_a_init_evt[];
+extern EvtWord rsh_07_b_init_evt[];
 static const char* window_tbl[5];
-EvtWord rsh_07_c_init_evt[16];
-
-f32 fd_rsh_07_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
-
-f32 fd_rsh_07_neg_one_382 = -1.0f;
-
-f32 fd_rsh_07___local_PI_383 = 3.1415927f;
-
-f32 fd_rsh_07___local_3PIO2_385 = 4.712389f;
-
-f32 fd_rsh_07_one_negone_373[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
-
-f32 fd_rsh_07___local_PIO2_384 = 1.5707964f;
-
-f32 fd_rsh_07_one_381 = 1.0f;
-
-f32 fd_rsh_07_negone_one_360[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
-
-f32 fd_rsh_07_neg_one_365 = -1.0f;
-
-f32 fd_rsh_07___local_PI_366 = 3.1415927f;
-
-f32 fd_rsh_07___local_3PIO2_368 = 4.712389f;
-
-f32 fd_rsh_07_one_negone_359[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
-
-f32 fd_rsh_07___local_PIO2_367 = 1.5707964f;
-
-f32 fd_rsh_07_one_364 = 1.0f;
+extern EvtWord rsh_07_c_init_evt[];
 
 static BeroEntry bero_data_a[] = {
     {
@@ -261,7 +213,7 @@ static const char* window_tbl[] = {
     "mado_uturi_1",
     "mado_uturi_2",
     "mado_uturi_3",
-    "mado_uturi_4\0\0\0",
+    "mado_uturi_4",
     NULL,
 };
 

@@ -47,7 +47,7 @@ One row per commit window, at most 3 per day. Figures come from an objdiff-cli r
 
 ## Code-quality cleanup (since 2026-10-23)
 
-The cleanup keeps both builds byte-identical; every change is gated on JP (32 files OK) and US (30 files OK). These figures are measured on the main branch:
+The cleanup keeps both builds byte-identical; every change is gated on JP (32 files OK) and US (30 files OK). These figures are measured on the cleanup branch (2026-10-25):
 
 | What | Start | Now |
 | --- | --- | --- |
@@ -57,10 +57,18 @@ The cleanup keeps both builds byte-identical; every change is gated on JP (32 fi
 | Offset-hiding macros (`#define X(p) *(T*)((u8*)p + N)`), including the US layout-shift macros | 157 | 1 (a listed fake) |
 | Array-index casts, type puns, hard-coded strides and per-file views of shared structs | 1,075 | 0 (54 look-alikes such as pixel math and byte-stream reads checked and kept) |
 | Placeholder struct fields (`unk*`, `field_*`) get names | 789 | 0 |
-| `__declspec(section ...)` data placements | 26,648 | 434 (all needed or faithful to the original) |
+| `__declspec(section ...)` data placements | 26,648 | 54 (all needed or faithful to the original) |
 | Decompiler-generated local names (`var_r31`, `temp_r3`) | 483 | 0 |
 | Inline asm in game code | 31 | 4, the original's own GQR/MSR writes and word copy, behind named helpers in `hwaccess.h` |
 | Script words: arrays, `args` views and script pointers typed as `EvtWord` | ~11,000 declarations | done |
 | Pointers stored in integers (`(s32)"name"` table fields, pointer values in `s32` slots) | 2,598 casts | 60, at SDK interfaces that take `u32` addresses or in listed fakes |
+| Escaped Shift-JIS strings (`\x82\xA0...`) written as readable text | 684 lines | 10 (bytes that are not valid text) |
+| `force_active` keep-alive markers | 788 | 27 |
+| Constants named after their address (`lbl_8030...`, `float_80...`) | 7,423 | 349 |
+| Gap and padding filler objects | 148 | 15 |
+| Script arrays declared with a hard-coded size | 7,990 | 2,245 (sized where a forward declaration needs it) |
+| `#pragma` lines other than `once` | 1,692 | 708 |
+| `TODO` comments | 168 | 79 |
+| Behaviour-identical fakes ([FAKES.md](FAKES.md) rows / `FAKE` comments) | 214 / 427 | 120 / 225 |
 
 Placements that stay are needed or kept on purpose: SDK startup sections, padding fillers, and small main-executable data that the original source most likely placed by hand too. Behaviour-identical fakes stay as well, and each is listed in [FAKES.md](FAKES.md).

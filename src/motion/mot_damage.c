@@ -25,7 +25,6 @@ void nokonoko_use_cancel(void);
 void bomhei_use_cancel2(void);
 void mario_simple_kemuri(void);
 void marioSetFallPara(void);
-void marioMakeJumpPara(void);
 
 
 static EVT_BEGIN(quake_evt)
@@ -312,7 +311,7 @@ void mot_damage(void) {
         if (mario->characterId == 0) {
             pouchAddHP(-1);
         }
-        if (((s32(*)(void))pouchGetHP)() <= 0) {
+        if (pouchGetHP() <= 0) {
             mario->currSubMotionId = 33;
             marioUpdateCamPos();
             break;
@@ -469,7 +468,7 @@ void mot_damageToge(void) {
             break;
         }
         pouchAddHP(-1);
-        if (((s32(*)(void))pouchGetHP)() <= 0) {
+        if (pouchGetHP() <= 0) {
             mario->currSubMotionId = 33;
             marioUpdateCamPos();
             break;

@@ -1,7 +1,6 @@
 #include "battle/battle_unit.h"
 #include "evt/evt_cmd.h"
 
-#pragma force_active on
 #include "battle/battle.h"
 #include "battle/battle_sub.h"
 #include "battle/battle_event_default.h"
@@ -11,6 +10,7 @@
 #include "battle/battle_weapon_power.h"
 #include "evt/evt_sub.h"
 #include "battle/battle_database_common.h"
+#include "manager/evtmgr_cmd.h"
 
 f32 intplGetValue(f32 start, f32 end, s32 mode, s32 currStep, s32 steps);
 
@@ -34,27 +34,12 @@ static USER_FUNC(shadow_scale_return);
 static USER_FUNC(shadow_scale_small);
 static USER_FUNC(pakkun_ceil_exist);
 
-f32 fd_monochrome_pakkun_negone_one_374[2] __attribute__((aligned(8)));
-f32 fd_monochrome_pakkun_neg_one_382;
-f32 fd_monochrome_pakkun___local_PI_383;
-f32 fd_monochrome_pakkun___local_3PIO2_385;
-f32 fd_monochrome_pakkun_one_negone_373[2] __attribute__((aligned(8)));
-f32 fd_monochrome_pakkun___local_PIO2_384;
-f32 fd_monochrome_pakkun_one_381;
-f32 fd_monochrome_pakkun_negone_one_360[2] __attribute__((aligned(8)));
-f32 fd_monochrome_pakkun_neg_one_365;
-f32 fd_monochrome_pakkun___local_PI_366;
-f32 fd_monochrome_pakkun___local_3PIO2_368;
-f32 fd_monochrome_pakkun_one_negone_359[2] __attribute__((aligned(8)));
-f32 fd_monochrome_pakkun___local_PIO2_367;
-f32 fd_monochrome_pakkun_one_364;
 BattleUnitKind unit_monochrome_pakkun;
 static BattleUnitDefense defence;
 static BattleUnitDefenseAttr defence_attr;
 static StatusVulnerability regist;
 static BattleUnitKindPart parts[1];
 static BattleWeapon weapon_pakkun_flower_attack;
-static EvtWord attack_event[41];
 static PoseTableEntry pose_table[18];
 static PoseTableEntry pose_table_ceil[18];
 static BattleDataEntry data_table[15];
@@ -62,38 +47,9 @@ static EvtWord init_event[31];
 static EvtWord dmg_avoid_counter_thorn_head_event[71];
 static EvtWord damage_event[10];
 static EvtWord counter_damage_event[30];
-static EvtWord ceil_fall_ready_event[131];
 static EvtWord return_event[256];
 static EvtWord normal_attack_event[311];
 static EvtWord wait_event[6];
-
-f32 fd_monochrome_pakkun_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
-
-f32 fd_monochrome_pakkun_neg_one_382 = -1.0f;
-
-f32 fd_monochrome_pakkun___local_PI_383 = 3.1415927f;
-
-f32 fd_monochrome_pakkun___local_3PIO2_385 = 4.712389f;
-
-f32 fd_monochrome_pakkun_one_negone_373[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
-
-f32 fd_monochrome_pakkun___local_PIO2_384 = 1.5707964f;
-
-f32 fd_monochrome_pakkun_one_381 = 1.0f;
-
-f32 fd_monochrome_pakkun_negone_one_360[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
-
-f32 fd_monochrome_pakkun_neg_one_365 = -1.0f;
-
-f32 fd_monochrome_pakkun___local_PI_366 = 3.1415927f;
-
-f32 fd_monochrome_pakkun___local_3PIO2_368 = 4.712389f;
-
-f32 fd_monochrome_pakkun_one_negone_359[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
-
-f32 fd_monochrome_pakkun___local_PIO2_367 = 1.5707964f;
-
-f32 fd_monochrome_pakkun_one_364 = 1.0f;
 
 BattleUnitKind unit_monochrome_pakkun = {
     25,

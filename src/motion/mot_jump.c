@@ -23,7 +23,6 @@ void kpa_jumpNpc(void);
 void kpaChgPose(const char* a, const char* b);
 void clear_hitobj_ride(void);
 void marioSetJumpPara(void);
-void marioMakeJumpPara(void);
 void marioSetPeakYpos(void);
 void marioClearJumpPara(void);
 void marioChgMot2(MarioMotion);
@@ -42,7 +41,7 @@ f32 marioJumpSwData[] = {2.5f, -0.1f, 0.02f, -0.01f, -0.08f, -0.4f, 0.0f, -0.002
 
 static inline void chgPoseB(MarioWork* mario) {
 	if (!(mario->flags & 0x2000) && mario->characterId == 0) {
-		marioChgPose("M_J_1B\x00");
+		marioChgPose("M_J_1B");
 	}
 }
 static inline void chgPoseC(MarioWork* mario) {

@@ -51,7 +51,7 @@ typedef struct WinMarioState {
 } WinMarioState;
 
 typedef struct WinPartyState {
-    s32 field_0x19C;            // 0x19C
+    s32 switchRequested;        // 0x19C, A pressed: switch to the selected partner
     s32 poseIds[7];             // 0x1A0
     s32 partyIds[7];            // 0x1BC
     s32 dtIdx;                  // 0x1D8
@@ -60,7 +60,7 @@ typedef struct WinPartyState {
     f32 angle;                  // 0x1E4
     f32 angleTarget;            // 0x1E8
     u8 pad_1EC[0x1FC - 0x1EC];  // 0x1EC
-    s32 field_0x1FC;            // 0x1FC
+    s32 openCursor;             // 0x1FC, cursor when the menu opened
     s32 mode;                   // 0x200
     s32 wazaCount;              // 0x204
     s32 wazaCursor;             // 0x208

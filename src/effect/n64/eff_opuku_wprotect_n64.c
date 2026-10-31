@@ -38,8 +38,8 @@ typedef struct EffOpukuWprotectN64Work {
     s32 alpha;    // 0x24
     s32 alpha2;   // 0x28
     f32 scale;    // 0x2C
-    f32 unk30;    // 0x30
-    f32 unk34;    // 0x34
+    f32 wobble;   // 0x30, recomputed each frame; never read
+    f32 scroll;   // 0x34, wraps at 128
     f32 a[4];     // 0x38
     f32 b[4];     // 0x48
     f32 c[4];     // 0x58
@@ -56,7 +56,7 @@ EffectEntry* effOpukuWprotectN64Entry(s32 type, s32 lifetime, f32 x, f32 y, f32 
     EffOpukuWprotectN64Work* work;
 
     effect = effEntry();
-    effect->type = "OpukuWprotectN64\0\0\0";
+    effect->type = "OpukuWprotectN64";
     effect->count = 1;
     work = __memAlloc(HEAP_EFFECT, sizeof(EffOpukuWprotectN64Work));
     effect->userdata = work;
@@ -77,8 +77,8 @@ EffectEntry* effOpukuWprotectN64Entry(s32 type, s32 lifetime, f32 x, f32 y, f32 
     work->colorR = 47;
     work->colorG = 127;
     work->colorB = 255;
-    work->unk30 = 0.0f;
-    work->unk34 = 0.0f;
+    work->wobble = 0.0f;
+    work->scroll = 0.0f;
     work->g[0] = -1;
     work->g[1] = -5;
     work->g[2] = -9;
@@ -150,10 +150,10 @@ void effOpukuWprotectMain(EffectEntry* effect) {
     s6 = (f32)sin(6.2831855f * (6.0f * t) / 360.0f);
     c2 = (f32)cos(6.2831855f * (2.0f * t) / 360.0f);
     c1 = (f32)cos(a1);
-    work->unk30 = 32.0f * s6 * s1 + 256.0f + 32.0f * c2 + 32.0f * c1;
-    work->unk34 += 0.2f;
-    if (work->unk34 >= 128.0f) {
-        work->unk34 = 0.0f;
+    work->wobble = 32.0f * s6 * s1 + 256.0f + 32.0f * c2 + 32.0f * c1;
+    work->scroll += 0.2f;
+    if (work->scroll >= 128.0f) {
+        work->scroll = 0.0f;
     }
     for (i = 0; i < 4; i++) {
         work->g[i]++;

@@ -3,7 +3,6 @@
 #include "evt/evt_cmd.h"
 #include "manager/evtmgr_cmd.h"
 
-#pragma force_active on
 #include "mario/mario.h"
 #include "driver/animdrv.h"
 #include "pmario_sound.h"
@@ -174,169 +173,101 @@ USER_FUNC(urouro_init_func);
 USER_FUNC(urouro_main_func);
 static void majin_callback(s32 type);
 
-f32 fd_usu_01_negone_one_374[2] __attribute__((aligned(8)));
-f32 fd_usu_01_neg_one_382;
-f32 fd_usu_01___local_PI_383;
-f32 fd_usu_01___local_3PIO2_385;
-f32 fd_usu_01_one_negone_373[2] __attribute__((aligned(8)));
-f32 fd_usu_01___local_PIO2_384;
-f32 fd_usu_01_one_381;
-f32 fd_usu_01_negone_one_360[2] __attribute__((aligned(8)));
-f32 fd_usu_01_neg_one_365;
-f32 fd_usu_01___local_PI_366;
-f32 fd_usu_01___local_3PIO2_368;
-f32 fd_usu_01_one_negone_359[2] __attribute__((aligned(8)));
-f32 fd_usu_01___local_PIO2_367;
-f32 fd_usu_01_one_364;
-EvtWord villagerF_init[7];
-EvtWord villagerF_talk[52];
-EvtWord villagerG_init[7];
-EvtWord villagerG_talk[52];
-EvtWord villagerH_init[7];
-EvtWord villagerH_talk[44];
-EvtWord villagerI_init[19];
-EvtWord villagerI_pig_init[19];
-EvtWord villagerI_talk[57];
-EvtWord villagerJ_init[19];
-EvtWord villagerJ_pig_init[19];
-EvtWord villagerJ_talk[57];
-EvtWord shop_man_init[36];
-EvtWord shop_man_talk[28];
-EvtWord shop_woman_init[7];
-EvtWord shop_woman_talk[163];
-static EvtWord kizayarou_init[38];
-EvtWord kizayarou_pig_init[14];
-static EvtWord kizayarou_talk[33];
-EvtWord childABC_talk_01[28];
-EvtWord childABC_talk_02[28];
-EvtWord childABC_talk_03[28];
-EvtWord childABC_talk_04[28];
-EvtWord aunt_init[22];
-EvtWord aunt_pig_init[29];
-EvtWord iri_20_out_house[407];
-EvtWord iri_20_aunt_to_house[149];
-EvtWord aunt_talk[687];
-EvtWord childA_init[7];
-EvtWord childA_talk[31];
-EvtWord childB_init[7];
-EvtWord childB_talk[31];
-EvtWord childC_init[7];
-EvtWord childC_talk[31];
-EvtWord gatekeeper_init[38];
-EvtWord gatekeeper_pig_init[33];
-EvtWord gatekeeper_talk[145];
-EvtWord crow_f_init[8];
-EvtWord crow_g_init[8];
-EvtWord crow_h_init[8];
-EvtWord crow_i_init[8];
-EvtWord crow_j_init[8];
-static EvtWord musume_talk[84];
-EvtWord musume_a_init[40];
-static EvtWord musume_a_entry[15];
-EvtWord musume_a_pig_entry[15];
-EvtWord musume_b_init[40];
-static EvtWord musume_b_entry[15];
-EvtWord musume_b_pig_entry[15];
-EvtWord musume_c_init[40];
-static EvtWord musume_c_entry[15];
-EvtWord musume_c_pig_entry[15];
-static EvtWord urouro_move[24];
-EvtWord urouro_move_semai[24];
+extern EvtWord villagerF_init[];
+extern EvtWord villagerF_talk[];
+extern EvtWord villagerG_init[];
+extern EvtWord villagerG_talk[];
+extern EvtWord villagerH_init[];
+extern EvtWord villagerH_talk[];
+extern EvtWord villagerI_init[];
+extern EvtWord villagerI_pig_init[];
+extern EvtWord villagerI_talk[];
+extern EvtWord villagerJ_init[];
+extern EvtWord villagerJ_pig_init[];
+extern EvtWord villagerJ_talk[];
+extern EvtWord shop_man_init[];
+extern EvtWord shop_man_talk[];
+extern EvtWord shop_woman_init[];
+extern EvtWord shop_woman_talk[];
+extern EvtWord kizayarou_pig_init[];
+extern EvtWord childABC_talk_01[];
+extern EvtWord childABC_talk_02[];
+extern EvtWord childABC_talk_03[];
+extern EvtWord childABC_talk_04[];
+extern EvtWord aunt_init[];
+extern EvtWord aunt_pig_init[];
+extern EvtWord iri_20_out_house[];
+extern EvtWord iri_20_aunt_to_house[];
+extern EvtWord aunt_talk[];
+extern EvtWord childA_init[];
+extern EvtWord childA_talk[];
+extern EvtWord childB_init[];
+extern EvtWord childB_talk[];
+extern EvtWord childC_init[];
+extern EvtWord childC_talk[];
+extern EvtWord gatekeeper_init[];
+extern EvtWord gatekeeper_pig_init[];
+extern EvtWord gatekeeper_talk[];
+extern EvtWord crow_f_init[];
+extern EvtWord crow_g_init[];
+extern EvtWord crow_h_init[];
+extern EvtWord crow_i_init[];
+extern EvtWord crow_j_init[];
+extern EvtWord musume_a_init[];
+extern EvtWord musume_a_pig_entry[];
+extern EvtWord musume_b_init[];
+extern EvtWord musume_b_pig_entry[];
+extern EvtWord musume_c_init[];
+extern EvtWord musume_c_pig_entry[];
+extern EvtWord urouro_move_semai[];
 static NpcSetupInfo npcEnt[24];
-EvtWord village_chief_change_pig_event[166];
-EvtWord evt_mon_open[112];
-static EvtWord cam_up[34];
-static EvtWord cam_down[8];
-EvtWord usu01_check_vivian[36];
-EvtWord usu01_crowFG_talk_event[VERSION_PICK(355, 394)];
-EvtWord usu01_crowHI_talk_event[VERSION_PICK(250, 289)];
-EvtWord usu01_crowJ_talk_event[VERSION_PICK(226, 265)];
+extern EvtWord village_chief_change_pig_event[];
+extern EvtWord evt_mon_open[];
+extern EvtWord usu01_check_vivian[];
+extern EvtWord usu01_crowFG_talk_event[];
+extern EvtWord usu01_crowHI_talk_event[];
+extern EvtWord usu01_crowJ_talk_event[];
 const char* minka_npc[6];
 const char* minka_item[2];
 const char* shop_npc[6];
 const char* shop_mobj[4];
 const char* shop_item[5];
-static EvtWord evt_door_1_1[12];
-static EvtWord evt_door_1_2[12];
-static EvtWord evt_wall_1[28];
-static EvtWord door_1_open[12];
-static EvtWord door_1_close[14];
 static DoorParam door_1;
-EvtWord evt_door_2_1_1[15];
-EvtWord evt_door_2_1_2[2];
-EvtWord evt_wall_2_1[28];
-EvtWord loop_msg[84];
-EvtWord mise_kiza_msg[32];
-EvtWord mawari_house_delay[46];
-EvtWord door_2_1_open[23];
+extern EvtWord evt_door_2_1_1[];
+extern EvtWord evt_door_2_1_2[];
+extern EvtWord evt_wall_2_1[];
+extern EvtWord loop_msg[];
+extern EvtWord mise_kiza_msg[];
+extern EvtWord mawari_house_delay[];
+extern EvtWord door_2_1_open[];
 DoorParam door_2_1;
-EvtWord evt_ie2_door2_1[244];
-EvtWord evt_ie2_door2_2[226];
-static EvtWord evt_door_3_1[12];
-static EvtWord evt_door_3_2[12];
-static EvtWord evt_wall_3[30];
+extern EvtWord evt_ie2_door2_1[];
+extern EvtWord evt_ie2_door2_2[];
 const char* door_3_item[2];
-static EvtWord door_3_open[12];
-static EvtWord door_3_close[14];
 static DoorParam door_3;
 static BeroEntry bero_entry_data[3];
-EvtWord usu01_gusun[80];
-EvtWord evt_monban_buta_main[34];
-EvtWord evt_monban_buta[18];
-EvtWord evt_monban_buta2[17];
-EvtWord evt_monban_look[119];
+extern EvtWord usu01_gusun[];
+extern EvtWord evt_monban_buta_main[];
+extern EvtWord evt_monban_buta[];
+extern EvtWord evt_monban_buta2[];
+extern EvtWord evt_monban_look[];
 static s32 lock_tbl[2];
-static EvtWord lock_item_check[41];
-EvtWord unlock[13];
+extern EvtWord unlock[];
 static ShopObj obj_list[6];
 static ShopItem goods_list[6];
 static ShopDb trade_list[12];
 static ShopperData35 shopper_data;
-EvtWord shopper_talk1[11];
-EvtWord shopper_talk2[11];
-typedef struct BoobooName { const char* name; u8 field_0x4; u8 field_0x5; u8 pad_0x6[2]; } BoobooName; /* field_0x4/0x5 never read */
+extern EvtWord shopper_talk1[];
+extern EvtWord shopper_talk2[];
+typedef struct BoobooName { const char* name; u8 villagerNo; u8 isVillager; u8 pad_0x6[2]; } BoobooName; /* villagerNo/isVillager never read */
 static BoobooName booboo_name[8];
-EvtWord evt_roll_get[2];
+extern EvtWord evt_roll_get[];
 static s32 key_tbl[2];
-static EvtWord evt_majin[330];
-static EvtWord evt_majin2[237];
-EvtWord tree_onoff[57];
-static EvtWord evt_ki_1[12];
-static EvtWord evt_ki_2[20];
-static EvtWord evt_ki_3[20];
+extern EvtWord tree_onoff[];
 static TreeAccess tree_tbl[5];
-EvtWord usu_01_tree_init[7];
+extern EvtWord usu_01_tree_init[];
 static EvtWord mobj_box00[34];
-EvtWord usu_01_init_evt[350];
-
-
-f32 fd_usu_01_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
-
-f32 fd_usu_01_neg_one_382 = -1.0f;
-
-f32 fd_usu_01___local_PI_383 = 3.1415927f;
-
-f32 fd_usu_01___local_3PIO2_385 = 4.712389f;
-
-f32 fd_usu_01_one_negone_373[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
-
-f32 fd_usu_01___local_PIO2_384 = 1.5707964f;
-
-f32 fd_usu_01_one_381 = 1.0f;
-
-f32 fd_usu_01_negone_one_360[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
-
-f32 fd_usu_01_neg_one_365 = -1.0f;
-
-f32 fd_usu_01___local_PI_366 = 3.1415927f;
-
-f32 fd_usu_01___local_3PIO2_368 = 4.712389f;
-
-f32 fd_usu_01_one_negone_359[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
-
-f32 fd_usu_01___local_PIO2_367 = 1.5707964f;
-
-f32 fd_usu_01_one_364 = 1.0f;
+extern EvtWord usu_01_init_evt[];
 
 EVT_BEGIN(villagerF_init)
     CALL(evt_npc_flag_onoff, 1, STRING("村人Ｆ"), 1536)
@@ -2626,7 +2557,7 @@ USER_FUNC(sleep_voice) {
         loops = animPoseGetLoopTimes(mario->paperAnimGroupId[marioAnimeId()]);
         if (loops != event->userdata[0]) {
             event->userdata[0] = loops;
-            evtSetValue(event, GW(10), psndSFXOn_3D("SFX_VOICE_MARIO_SLEEP1\0", &mario->position));
+            evtSetValue(event, GW(10), psndSFXOn_3D("SFX_VOICE_MARIO_SLEEP1", &mario->position));
         }
     }
     return EVT_RETURN_BLOCK;
@@ -2672,8 +2603,8 @@ USER_FUNC(check_tabemono) {
     s32 id = evtGetValue(event, args[0]);
     BOOL food = FALSE;
 
-    // FAKE: the u16 view of the u16 field is a no-op; the plain field read schedules the table load differently
-    if (*(u16*)&itemDataTable[id].usable_locations & 4) {
+    ItemData* item = &itemDataTable[id];
+    if (item->usable_locations & 4) {
         food = TRUE;
     }
     evtSetValue(event, args[1], food);
@@ -2712,9 +2643,9 @@ USER_FUNC(shop_item_disp_on) {
 }
 
 USER_FUNC(ie2_npc_disp_off) {
-    const char* show[] = {"\202\250\223X\202\314\211\234\202\263\202\361", "\203L\203U\226\354\230Y",
-                          "\203u\203^\203L\203U\226\354\230Y", "\223X\202\314\216\345\220l", NULL};
-    const char* hide[] = {"\203y\203\211\226\202\220l", NULL};
+    const char* show[] = {"お店の奥さん", "キザ野郎",
+                          "ブタキザ野郎", "店の主人", NULL};
+    const char* hide[] = {"ペラ魔人", NULL};
     s32 i;
 
     for (i = 0; show[i] != NULL; i++) {
@@ -2727,9 +2658,9 @@ USER_FUNC(ie2_npc_disp_off) {
 }
 
 USER_FUNC(ie2_npc_disp_on) {
-    const char* hide[] = {"\202\250\223X\202\314\211\234\202\263\202\361", "\203L\203U\226\354\230Y",
-                          "\203u\203^\203L\203U\226\354\230Y", "\223X\202\314\216\345\220l", NULL};
-    const char* show[] = {"\203y\203\211\226\202\220l", NULL};
+    const char* hide[] = {"お店の奥さん", "キザ野郎",
+                          "ブタキザ野郎", "店の主人", NULL};
+    const char* show[] = {"ペラ魔人", NULL};
     s32 i;
 
     for (i = 0; hide[i] != NULL; i++) {

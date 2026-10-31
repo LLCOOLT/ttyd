@@ -236,8 +236,8 @@ USER_FUNC(evt_eff) {
 		case 13:
 			entry = effBreathFireEntry(int2, int9, int10, int11, float3, float4, float5, float6, float7, float8);
 			((EffBreathFireN64Work*)entry->userdata)->scale = float12;
-			((EffBreathFireN64Work*)entry->userdata)->unk30 = float12;
-			((EffBreathFireN64Work*)entry->userdata)->unk34 = float13;
+			((EffBreathFireN64Work*)entry->userdata)->initialScale = float12;
+			((EffBreathFireN64Work*)entry->userdata)->targetScale = float13;
 			break;
 		case 4:
 			entry = effHitEntry(int2, int7, float3, float4, float5, float6);
@@ -385,15 +385,13 @@ USER_FUNC(evt_eff) {
 	return EVT_RETURN_DONE;
 }
 
-#pragma push
-#pragma optimization_level 2
 s32 evt_eff64(EventEntry *event, BOOL isFirstCall)
 {
   EvtWord *args;
   s32 *pi;
   s32 *pr;
   s32 *pf;
-  s32 new_var;
+  s32 int2Copy;
   const char *effName;
   const char *effSet;
   s32 int2;
@@ -604,7 +602,7 @@ s32 evt_eff64(EventEntry *event, BOOL isFirstCall)
       effect = effCoolLeafN64Entry(int2, float3, float4, float5);
       break;
 
-    new_var = int2;
+    int2Copy = int2;
     case 35:
       effect = effBushN64Entry(int2, float3, float4, float5);
       break;
@@ -889,7 +887,6 @@ s32 evt_eff64(EventEntry *event, BOOL isFirstCall)
   return 2;
 }
 
-#pragma pop
 
 USER_FUNC(evt_eff_softdelete) {
 	effSoftDelete(effNameToPtr((const char*)evtGetValue(event, *event->args)));

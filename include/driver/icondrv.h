@@ -65,11 +65,19 @@ void iconDelete(const char* name);
 void iconChange(const char* name, s16 iconId);
 void iconDispGxAlpha(Vec* position, s16 flags, u16 iconId, u8 alpha, f32 scale);
 void iconDispGx(Vec* position, s16 flags, u16 iconId, f32 scale);
-void iconDispGx2(Mtx mtx, s16 flags, s16 iconId);
-void iconDispGxCol(Mtx pos, s16 flags, s32 iconId, GXColor color);
+void iconDispGx2(Mtx mtx, s16 flags, u16 iconId);
+void iconDispGxCol(Mtx pos, s16 flags, u16 iconId, GXColor color);
+#ifdef VERSION_G8ME01
+void iconGetTexObj(GXTexObj* texObj, s32 iconId);
+#else
 void iconGetTexObj(GXTexObj* texObj, s16 iconId);
+#endif
 void iconGetWidthHeight(u16* width, u16* height, s16 iconId);
+#ifdef VERSION_G8ME01
+void iconGetWidthHight(u16* width, u16* height, s32 iconId);
+#else
 void iconGetWidthHight(u16* width, u16* height, s16 iconId);
+#endif
 IconEntry* iconNameToPtr(const char* name);
 void iconSetPos(const char* name, f32 x, f32 y, f32 z);
 void iconFlagOn(const char* name, s16 flags);

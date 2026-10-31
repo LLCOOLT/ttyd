@@ -1,7 +1,6 @@
 #include "battle/battle_unit.h"
 #include "evt/evt_cmd.h"
 
-#pragma force_active on
 #include "driver/npcdrv.h"
 #include "manager/evtmgr.h"
 #include "manager/evtmgr_cmd.h"
@@ -181,25 +180,7 @@ void _unresolved(void);
 void _epilog(void);
 void _prolog(void);
 
-f32 fd_jon_negone_one_374[2] __attribute__((aligned(8)));
-f32 fd_jon_neg_one_382;
-f32 fd_jon___local_PI_383;
-f32 fd_jon___local_3PIO2_385;
-f32 fd_jon_one_negone_373[2] __attribute__((aligned(8)));
-f32 fd_jon___local_PIO2_384;
-f32 fd_jon_one_381;
-f32 fd_jon_negone_one_360[2] __attribute__((aligned(8)));
-f32 fd_jon_neg_one_365;
-f32 fd_jon___local_PI_366;
-f32 fd_jon___local_3PIO2_368;
-f32 fd_jon_one_negone_359[2] __attribute__((aligned(8)));
-f32 fd_jon___local_PIO2_367;
-f32 fd_jon_one_364;
-#ifdef VERSION_G8ME01
-EvtWord jon_init_evt[400];
-#else
-EvtWord jon_init_evt[391];
-#endif
+extern EvtWord jon_init_evt[];
 u8 enemy_100[100];
 NpcSetupInfo npcEnt_kuriboo[2];
 NpcSetupInfo npcEnt_patakuri[2];
@@ -227,93 +208,56 @@ NpcSetupInfo npcEnt_basabasa2[2];
 NpcSetupInfo npcEnt_togedaruma[2];
 NpcSetupInfo npcEnt_pansy[2];
 NpcSetupInfo npcEnt_zonbaba[2];
-EvtWord enemy_setup[1055];
+extern EvtWord enemy_setup[];
 s32 treasure_tbl[10];
-EvtWord evt_open_box[46];
-static EvtWord move_event[55];
-EvtWord get_map_name[111];
-EvtWord talk_idouya[141];
+extern EvtWord evt_open_box[];
+extern EvtWord get_map_name[];
+extern EvtWord talk_idouya[];
 NpcSetupInfo npcEnt_idouya[2];
-EvtWord idouya_setup[38];
-#ifdef VERSION_G8ME01
-EvtWord talk_gyousyou[219];
-#else
-EvtWord talk_gyousyou[207];
-#endif
+extern EvtWord idouya_setup[];
+extern EvtWord talk_gyousyou[];
 NpcSetupInfo npcEnt_gyousyou[2];
-EvtWord gyousyou_setup[47];
-EvtWord shikake_setup[117];
-EvtWord dokan_open[74];
-EvtWord dokan_open2[70];
+extern EvtWord gyousyou_setup[];
+extern EvtWord shikake_setup[];
+extern EvtWord dokan_open[];
+extern EvtWord dokan_open2[];
 static EvtWord evt_kanban[25];
-static EvtWord evt_kanban2[20];
-EvtWord floor_inc[10];
-EvtWord floor_clear[8];
+extern EvtWord floor_inc[];
+extern EvtWord floor_clear[];
 BeroEntry bero_boss[3];
-EvtWord setup_boss[9];
+extern EvtWord setup_boss[];
 BeroEntry bero_return[4];
 BeroEntry bero_return2[2];
 BeroEntry bero_return3[2];
-EvtWord setup_return[190];
+extern EvtWord setup_return[];
 BeroEntry bero_prev_return[3];
 BeroEntry bero_prev_return2[2];
 BeroEntry bero_prev_return3[2];
 BeroEntry bero_prev_return4[2];
-EvtWord setup_prev_return[69];
+extern EvtWord setup_prev_return[];
 BeroEntry bero_normal[3];
 BeroEntry bero_normal2[2];
 BeroEntry bero_normal3[2];
-EvtWord setup_normal[53];
-EvtWord iri_12_dokan_in_sub[202];
-EvtWord iri_12_dokan_in[16];
-EvtWord iri_12_makkino_return_dokan[193];
-EvtWord iri_12_makkino_return[31];
-EvtWord iri_12_makkino_return_b100[42];
-EvtWord iri_12_makkino_return_zonbaba[44];
-EvtWord iri_12_makkino_move_dokan_side[94];
-EvtWord iri_12_enemy_dead_event[18];
-EvtWord iri_12_makkino_urouro[25];
-EvtWord iri_12_makkino_buruburu[44];
-EvtWord iri_12_makkino_okiru[33];
+extern EvtWord setup_normal[];
+extern EvtWord iri_12_dokan_in_sub[];
+extern EvtWord iri_12_dokan_in[];
+extern EvtWord iri_12_makkino_return_dokan[];
+extern EvtWord iri_12_makkino_return[];
+extern EvtWord iri_12_makkino_return_b100[];
+extern EvtWord iri_12_makkino_return_zonbaba[];
+extern EvtWord iri_12_makkino_move_dokan_side[];
+extern EvtWord iri_12_enemy_dead_event[];
+extern EvtWord iri_12_makkino_urouro[];
+extern EvtWord iri_12_makkino_buruburu[];
+extern EvtWord iri_12_makkino_okiru[];
 static EvtWord iri_12_makkino_talk[55];
-EvtWord iri_12_makkino_fall[79];
-EvtWord iri_12_makkino_fall_return[71];
-EvtWord iri_12_init_fall[38];
+extern EvtWord iri_12_makkino_fall[];
+extern EvtWord iri_12_makkino_fall_return[];
+extern EvtWord iri_12_init_fall[];
 static EvtWord iri_12_init[65];
-EvtWord evt_iri_30_touch_rakugaki[14];
-EvtWord evt_iri_30_bomb_rakugaki[154];
-static EvtWord gonbaba_standup_shake[23];
-static EvtWord gonbaba_fog_change[87];
-static EvtWord gonbaba_down_shake[83];
-EvtWord zonbaba_first_event[677];
-
-f32 fd_jon_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
-
-f32 fd_jon_neg_one_382 = -1.0f;
-
-f32 fd_jon___local_PI_383 = 3.1415927f;
-
-f32 fd_jon___local_3PIO2_385 = 4.712389f;
-
-f32 fd_jon_one_negone_373[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
-
-f32 fd_jon___local_PIO2_384 = 1.5707964f;
-
-f32 fd_jon_one_381 = 1.0f;
-
-f32 fd_jon_negone_one_360[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
-
-f32 fd_jon_neg_one_365 = -1.0f;
-
-f32 fd_jon___local_PI_366 = 3.1415927f;
-
-f32 fd_jon___local_3PIO2_368 = 4.712389f;
-
-f32 fd_jon_one_negone_359[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
-
-f32 fd_jon___local_PIO2_367 = 1.5707964f;
-
-f32 fd_jon_one_364 = 1.0f;
+extern EvtWord evt_iri_30_touch_rakugaki[];
+extern EvtWord evt_iri_30_bomb_rakugaki[];
+extern EvtWord zonbaba_first_event[];
 
 EVT_BEGIN(jon_init_evt)
     CALL(evt_sub_get_system_flag, LW(0))
@@ -2982,7 +2926,7 @@ EVT_END()
 
 static USER_FUNC(gonbaba_wait_landon) {
     // 敵
-    return npcNameToPtr("\223G")->groundHit ? EVT_RETURN_DONE : EVT_RETURN_BLOCK;
+    return npcNameToPtr("敵")->groundHit ? EVT_RETURN_DONE : EVT_RETURN_BLOCK;
 }
 
 void iri_12_msgcb(s32 type, void* param) {
@@ -2995,7 +2939,7 @@ void iri_12_msgcb(s32 type, void* param) {
 
 USER_FUNC(wait_landon) {
     // マッキノ
-    NpcEntry* npc = npcNameToPtr("\203}\203b\203L\203m");
+    NpcEntry* npc = npcNameToPtr("マッキノ");
 
     if (!(npc->flags & 0x10) || npc->groundHit != NULL) {
         return EVT_RETURN_DONE;
@@ -3006,12 +2950,12 @@ USER_FUNC(wait_landon) {
 USER_FUNC(iri_12_makkino_set_y) {
     f32 y = evtGetFloat(event, event->args[0]);
 
-    npcNameToPtr("\203}\203b\203L\203m")->position.y = y;
+    npcNameToPtr("マッキノ")->position.y = y;
     return EVT_RETURN_DONE;
 }
 
 USER_FUNC(iri_12_paper_init) {
-    NpcEntry* npc = npcNameToPtr("\203}\203b\203L\203m");
+    NpcEntry* npc = npcNameToPtr("マッキノ");
 
     animPosePaperPeraOff(npc->poseId);
     animPoseSetMaterialLightFlagOff(npc->poseId, 1);
@@ -3020,7 +2964,7 @@ USER_FUNC(iri_12_paper_init) {
 
 USER_FUNC(shikakeFlag) {
     s32 type = evtGetValue(event, event->args[0]);
-    NpcEntry* npc = npcNameToPtr("\223G");
+    NpcEntry* npc = npcNameToPtr("敵");
 
     switch (type) {
         case 0:
@@ -3061,7 +3005,7 @@ USER_FUNC(setup_npc_ex_para) {
 }
 
 USER_FUNC(yattukeFlag) {
-    npcNameToPtr("\223G")->battleInfo.battleFlags |= 0x10000000;
+    npcNameToPtr("敵")->battleInfo.battleFlags |= 0x10000000;
     return EVT_RETURN_DONE;
 }
 
@@ -3082,7 +3026,7 @@ USER_FUNC(enemy_info) {
     }
     if (!found) {
         // クリボー
-        name = "\203N\203\212\203{\201[";
+        name = "クリボー";
         tribe = npcGetTribe(name);
     } else {
         name = tribe->nameJp;
@@ -3230,6 +3174,3 @@ void _prolog(void) {
     relSetBtlAddr("jon", btlsetup_jon_tbl, btl_jon_setup_no_tbl);
 }
 
-
-#pragma force_active on
-#pragma force_active reset

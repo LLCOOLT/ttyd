@@ -56,7 +56,7 @@ struct HitEntry {
     struct HitEntry* parent;        // 0xD4
     struct HitEntry* child;         // 0xD8
     struct HitEntry* sibling;       // 0xDC
-    struct HitEntry* siblingActive; // 0xE0, TODO: next or sibling
+    struct HitEntry* nextActive;    // 0xE0, next entry in the hitActiveListTop list
 };
 
 void hitInit(void);
@@ -78,3 +78,5 @@ s32 hitGetAttr(HitEntry* hit);
 void hitGrpDamageReturnSet(const char* name, HitDamageReturn* damage);
 Vec* hitGetDamageReturnPos(HitEntry* hit);
 void hitBindMapObj(const char* hitName, const char* mapobjName);
+
+void hitDelete(const char* name);

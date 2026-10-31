@@ -1,8 +1,6 @@
-#pragma dollar_identifiers on
 #include "battle/battle_unit.h"
 #include "evt/evt_cmd.h"
 
-#pragma force_active on
 #include "battle/battle.h"
 #include "battle/battle_unit.h"
 #include "dolphin/mtx.h"
@@ -18,6 +16,7 @@
 #include "battle/battle_database_common.h"
 #include "data_tables.h"
 #include "driver/extdrv.h"
+#include "manager/evtmgr_cmd.h"
 
 typedef struct Chorogun { u8 flags; u8 state; u8 pad_2[2]; Vec vel; f32 speed; Vec pos; s32 timer; Vec target; } Chorogun;
 Chorogun* chorogun;
@@ -69,22 +68,6 @@ void chorogun_ext_init(void);
 BattleUnit* chorogun_get_ptr(void);
 extern EvtWord escape_chorogun_event[];
 
-f32 negone_one$374[2] __attribute__((aligned(8)));
-f32 neg_one$382;
-f32 __local_PI$383;
-f32 __local_3PIO2$385;
-u32 gap_04_0000FF9C_data[1];
-f32 one_negone$373[2] __attribute__((aligned(8)));
-f32 __local_PIO2$384;
-f32 one$381;
-f32 negone_one$360[2] __attribute__((aligned(8)));
-f32 neg_one$365;
-f32 __local_PI$366;
-f32 __local_3PIO2$368;
-u32 gap_04_0000FFC4_data[1];
-f32 one_negone$359[2] __attribute__((aligned(8)));
-f32 __local_PIO2$367;
-f32 one$364;
 BattleUnitKind unit_chorobon_gundan;
 typedef struct { BattleUnitDefense v; u8 pad[3]; } DefencePad;
 typedef struct { BattleUnitDefenseAttr v; u8 pad[3]; } DefenceAttrPad;
@@ -96,13 +79,13 @@ static PoseTableEntry pose_table[15];
 static BattleDataEntry data_table[2];
 static BattleUnitKindPart parts[1];
 BattleWeapon weapon_chorobon_gundan_attack;
-EvtWord chorogun_dead_reward[73];
+extern EvtWord chorogun_dead_reward[];
 static EvtWord init_event[26];
 static EvtWord damage_event[59];
 static EvtWord attack_event[217];
 static EvtWord wait_event[6];
 ExtTexInfo chorogun_ext_entry_data[21];
-EvtWord chorogun_entry[19];
+extern EvtWord chorogun_entry[];
 
 BattleUnit* chorogun_get_ptr(void) {
     s32 i;
@@ -117,38 +100,6 @@ BattleUnit* chorogun_get_ptr(void) {
     }
     return NULL;
 }
-
-f32 negone_one$374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
-
-f32 neg_one$382 = -1.0f;
-
-f32 __local_PI$383 = 3.1415927f;
-
-f32 __local_3PIO2$385 = 4.712389f;
-
-u32 gap_04_0000FF9C_data[1] = {0};
-
-f32 one_negone$373[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
-
-f32 __local_PIO2$384 = 1.5707964f;
-
-f32 one$381 = 1.0f;
-
-f32 negone_one$360[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
-
-f32 neg_one$365 = -1.0f;
-
-f32 __local_PI$366 = 3.1415927f;
-
-f32 __local_3PIO2$368 = 4.712389f;
-
-u32 gap_04_0000FFC4_data[1] = {0};
-
-f32 one_negone$359[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
-
-f32 __local_PIO2$367 = 1.5707964f;
-
-f32 one$364 = 1.0f;
 
 BattleUnitKind unit_chorobon_gundan = {
     21,
@@ -940,7 +891,3 @@ USER_FUNC(chorogun_escape_all) {
     return 2;
 }
 
-
-#pragma force_active on
-u32 gap_04_00010994_data[1] = {0};
-#pragma force_active reset

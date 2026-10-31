@@ -3,8 +3,6 @@
 #include "evt/evt_bero.h"
 #include "evt/evt_npc.h"
 
-#pragma force_active on
-
 USER_FUNC(evt_bero_exec_wait);
 USER_FUNC(evt_bero_get_info);
 USER_FUNC(evt_bero_overwrite);
@@ -52,63 +50,18 @@ USER_FUNC(evt_snd_envon);
 USER_FUNC(evt_snd_set_rev_mode);
 USER_FUNC(evt_snd_sfxon_3d);
 
-f32 fd_tik_03_negone_one_374[2] __attribute__((aligned(8)));
-f32 fd_tik_03_neg_one_382;
-f32 fd_tik_03___local_PI_383;
-f32 fd_tik_03___local_3PIO2_385;
-f32 fd_tik_03_one_negone_373[2] __attribute__((aligned(8)));
-f32 fd_tik_03___local_PIO2_384;
-f32 fd_tik_03_one_381;
-f32 fd_tik_03_negone_one_360[2] __attribute__((aligned(8)));
-f32 fd_tik_03_neg_one_365;
-f32 fd_tik_03___local_PI_366;
-f32 fd_tik_03___local_3PIO2_368;
-f32 fd_tik_03_one_negone_359[2] __attribute__((aligned(8)));
-f32 fd_tik_03___local_PIO2_367;
-f32 fd_tik_03_one_364;
-EvtWord bero_05_custom_in[30];
-EvtWord bero_05_custom_out[12];
+extern EvtWord bero_05_custom_in[];
+extern EvtWord bero_05_custom_out[];
 static BeroEntry bero_entry_data[3];
 static BeroEntry bero_entry_data2[2];
-static EvtWord guide_init[48];
-static EvtWord guide_talk[11];
 static NpcSetupInfo npcEnt[2];
-static EvtWord puni_walk_se[20];
-EvtWord puni_soguu_3[584];
-EvtWord anm_para_snd[72];
-EvtWord anm_rapa_snd[72];
-EvtWord puni_switch[133];
-EvtWord puni_nakama[93];
-EvtWord tik03_switch_evt[70];
-EvtWord tik_03_init_evt[116];
-
-f32 fd_tik_03_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
-
-f32 fd_tik_03_neg_one_382 = -1.0f;
-
-f32 fd_tik_03___local_PI_383 = 3.1415927f;
-
-f32 fd_tik_03___local_3PIO2_385 = 4.712389f;
-
-f32 fd_tik_03_one_negone_373[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
-
-f32 fd_tik_03___local_PIO2_384 = 1.5707964f;
-
-f32 fd_tik_03_one_381 = 1.0f;
-
-f32 fd_tik_03_negone_one_360[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
-
-f32 fd_tik_03_neg_one_365 = -1.0f;
-
-f32 fd_tik_03___local_PI_366 = 3.1415927f;
-
-f32 fd_tik_03___local_3PIO2_368 = 4.712389f;
-
-f32 fd_tik_03_one_negone_359[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
-
-f32 fd_tik_03___local_PIO2_367 = 1.5707964f;
-
-f32 fd_tik_03_one_364 = 1.0f;
+extern EvtWord puni_soguu_3[];
+extern EvtWord anm_para_snd[];
+extern EvtWord anm_rapa_snd[];
+extern EvtWord puni_switch[];
+extern EvtWord puni_nakama[];
+extern EvtWord tik03_switch_evt[];
+extern EvtWord tik_03_init_evt[];
 
 EVT_BEGIN(bero_05_custom_in)
     IF_INT_GREATER_OR_EQUAL(GSW(0), 112)
@@ -562,7 +515,7 @@ EVT_BEGIN(tik_03_init_evt)
         SPAWN_EVENT(PTR(puni_nakama))
     END_IF
     CALL(evt_item_entry, STRING("item_00"), 276, -450, -50, -50, 16, GSWF(1356), 0)
-    CALL(evt_mobj_kururing_floor, STRING("kururin1"), 325, -50, 0, STRING("kakoi\0\0"), 125, GSWF(5590))
+    CALL(evt_mobj_kururing_floor, STRING("kururin1"), 325, -50, 0, STRING("kakoi"), 125, GSWF(5590))
     IF_INT_LESS(GSW(0), 71)
         SET_VALUE(LW(0), STRING("dokan"))
         CALL_CHILD(PTR(bero_case_switch_off))

@@ -9,7 +9,7 @@
 #include "system.h"
 #include <dolphin/gx.h>
 #include <dolphin/pad.h>
-// #include <math.h>
+#include <math.h>
 #include <stdlib.h>
 // #include <string.h>
 #include <demo/DEMOPad.h>
@@ -19,70 +19,10 @@
 #include "eff/eff_magic1_n64.h"
 #include "libc_decls.h"
 
-#pragma pool_data on
 
 #define HALF_PI 1.570796f
 #define PI 3.141592653589793f
 #define TWO_PI 6.283185307179586f
-
-#ifdef __MWERKS__
-#define fabs(x) __fabs(x)
-#define fabsf(x) __fabsf(x)
-#else
-double fabs(double x);
-float fabsf(float x);
-#endif
-
-int __float_nan[];
-#define NAN (*(f32*)__float_nan)
-
-#define FP_NAN 1
-#define FP_INFINITE 2
-#define FP_ZERO 3
-#define FP_NORMAL 4
-#define FP_SUBNORMAL 5
-
-static inline s32 __fpclassifyf(f32 x) {
-    switch (*(s32*)&x & 0x7F800000) {
-        case 0x7F800000:
-            if (*(s32*)&x & 0x007FFFFF) {
-                return FP_NAN;
-            } else {
-                return FP_INFINITE;
-            }
-            break;
-        case 0:
-            if (*(s32*)&x & 0x007FFFFF) {
-                return FP_SUBNORMAL;
-            } else {
-                return FP_ZERO;
-            }
-            break;
-        default:
-            return FP_NORMAL;
-    }
-}
-
-#define fpclassify(x) __fpclassifyf(x)
-#define isnan(x) (fpclassify(x) == FP_NAN)
-
-static inline f32 sqrtf(f32 x) {
-    const f64 _half = .5;
-    const f64 _three = 3.0;
-
-    if (x > 0.0f) {
-        f64 guess = __frsqrte(x);
-        guess = _half * guess * (_three - guess * guess * x);
-        guess = _half * guess * (_three - guess * guess * x);
-        guess = _half * guess * (_three - guess * guess * x);
-        return x * guess;
-    } else if (x < 0.0) {
-        return NAN;
-    } else if (isnan(x)) {
-        return NAN;
-    }
-    return x;
-}
 
 //.data
 static f32 angleABTBL[] = { 1.0f,       1.273187f,  1.27303f,   1.272768f,  1.272402f,  1.271932f,  1.271358f,
@@ -106,14 +46,34 @@ static f32 angleABTBL[] = { 1.0f,       1.273187f,  1.27303f,   1.272768f,  1.27
 const char* build_date_ptr = R_build_date;
 const char* build_time_ptr = R_build_time;
 
+#ifndef VERSION_G8MP01
 const char* systemStrippedPool0(void) {
-    return "assertion \"%s\" failed.\n \"%s\"\n\0\0";
+    return "assertion \"%s\" failed.\n \"%s\"\n";
 }
+#endif
 
 
 const char* getMarioStDvdRoot(void) {
-    return ".\0\0";
+    return ".";
 }
+
+#ifdef VERSION_G8MP01
+// PAL keeps the assertion helpers that JP and US strip
+BOOL __assert(const char* filename, s32 line, const char* assertion) {
+    OSPanic(filename, line, assertion);
+    return TRUE;
+}
+
+BOOL __assert2(const char* filename, s32 line, const char* assertion, const char* message, ...) {
+    char buf[1024];
+    va_list args;
+
+    va_start(args, message);
+    vsprintf(buf, message, args);
+    OSPanic(filename, line, "assertion \"%s\" failed.\n \"%s\"\n", assertion, buf);
+    return TRUE;
+}
+#endif
 
 f32 reviseAngle(f32 angle) {
     f32 result, temp;
@@ -833,31 +793,43 @@ f32 sysMsec2FrameFloat(f32 msec) {
 #endif
 }
 
-void mtxGetRotationElement(Mtx arg0, Mtx arg1, s8 arg2, s8 arg3) {
+#ifdef VERSION_G8MP01
+// PAL keeps the file:line debug print that JP and US strip
+void sysDebugReport(const char* filename, s32 line, const char* format, ...) {
+    char buf[2048];
+    va_list args;
+
+    va_start(args, format);
+    vsprintf(buf, format, args);
+    OSReport("[%8s:% 4d] %s", filename, line, buf);
+}
+#endif
+
+void mtxGetRotationElement(Mtx src, Mtx dst, s8 firstAxis, s8 secondAxis) {
     Vec vecX, vecY, vecZ;
-    switch (arg2) {
+    switch (firstAxis) {
         case 'x':
         case 'X':
-            vecX.x = arg0[0][0];
-            vecX.y = arg0[1][0];
-            vecX.z = arg0[2][0];
+            vecX.x = src[0][0];
+            vecX.y = src[1][0];
+            vecX.z = src[2][0];
             PSVECNormalize(&vecX, &vecX);
 
-            switch (arg3) {
+            switch (secondAxis) {
                 case 'z':
                 case 'Z':
-                    vecZ.x = arg0[0][2];
-                    vecZ.y = arg0[1][2];
-                    vecZ.z = arg0[2][2];
+                    vecZ.x = src[0][2];
+                    vecZ.y = src[1][2];
+                    vecZ.z = src[2][2];
                     PSVECNormalize(&vecZ, &vecZ);
                     PSVECCrossProduct(&vecZ, &vecX, &vecY);
                     PSVECCrossProduct(&vecX, &vecY, &vecZ);
                     break;
 
                 default:
-                    vecY.x = arg0[0][1];
-                    vecY.y = arg0[1][1];
-                    vecY.z = arg0[2][1];
+                    vecY.x = src[0][1];
+                    vecY.y = src[1][1];
+                    vecY.z = src[2][1];
                     PSVECNormalize(&vecY, &vecY);
                     PSVECCrossProduct(&vecX, &vecY, &vecZ);
                     PSVECCrossProduct(&vecZ, &vecX, &vecY);
@@ -867,26 +839,26 @@ void mtxGetRotationElement(Mtx arg0, Mtx arg1, s8 arg2, s8 arg3) {
 
         case 'y':
         case 'Y':
-            vecY.x = arg0[0][1];
-            vecY.y = arg0[1][1];
-            vecY.z = arg0[2][1];
+            vecY.x = src[0][1];
+            vecY.y = src[1][1];
+            vecY.z = src[2][1];
             PSVECNormalize(&vecY, &vecY);
 
-            switch (arg3) {
+            switch (secondAxis) {
                 case 'x':
                 case 'X':
-                    vecX.x = arg0[0][0];
-                    vecX.y = arg0[1][0];
-                    vecX.z = arg0[2][0];
+                    vecX.x = src[0][0];
+                    vecX.y = src[1][0];
+                    vecX.z = src[2][0];
                     PSVECNormalize(&vecX, &vecX);
                     PSVECCrossProduct(&vecX, &vecY, &vecZ);
                     PSVECCrossProduct(&vecY, &vecZ, &vecX);
                     break;
 
                 default:
-                    vecZ.x = arg0[0][2];
-                    vecZ.y = arg0[1][2];
-                    vecZ.z = arg0[2][2];
+                    vecZ.x = src[0][2];
+                    vecZ.y = src[1][2];
+                    vecZ.z = src[2][2];
                     PSVECNormalize(&vecZ, &vecZ);
                     PSVECCrossProduct(&vecY, &vecZ, &vecX);
                     PSVECCrossProduct(&vecX, &vecY, &vecZ);
@@ -895,26 +867,26 @@ void mtxGetRotationElement(Mtx arg0, Mtx arg1, s8 arg2, s8 arg3) {
             break;
 
         default:
-            vecZ.x = arg0[0][2];
-            vecZ.y = arg0[1][2];
-            vecZ.z = arg0[2][2];
+            vecZ.x = src[0][2];
+            vecZ.y = src[1][2];
+            vecZ.z = src[2][2];
             PSVECNormalize(&vecZ, &vecZ);
 
-            switch (arg3) {
+            switch (secondAxis) {
                 case 'y':
                 case 'Y':
-                    vecY.x = arg0[0][1];
-                    vecY.y = arg0[1][1];
-                    vecY.z = arg0[2][1];
+                    vecY.x = src[0][1];
+                    vecY.y = src[1][1];
+                    vecY.z = src[2][1];
                     PSVECNormalize(&vecY, &vecY);
                     PSVECCrossProduct(&vecY, &vecZ, &vecX);
                     PSVECCrossProduct(&vecZ, &vecX, &vecY);
                     break;
 
                 default:
-                    vecX.x = arg0[0][0];
-                    vecX.y = arg0[1][0];
-                    vecX.z = arg0[2][0];
+                    vecX.x = src[0][0];
+                    vecX.y = src[1][0];
+                    vecX.z = src[2][0];
                     PSVECNormalize(&vecX, &vecX);
                     PSVECCrossProduct(&vecZ, &vecX, &vecY);
                     PSVECCrossProduct(&vecY, &vecZ, &vecX);
@@ -923,18 +895,18 @@ void mtxGetRotationElement(Mtx arg0, Mtx arg1, s8 arg2, s8 arg3) {
             break;
     }
 
-    arg1[0][0] = vecX.x;
-    arg1[1][0] = vecX.y;
-    arg1[2][0] = vecX.z;
-    arg1[0][1] = vecY.x;
-    arg1[1][1] = vecY.y;
-    arg1[2][1] = vecY.z;
-    arg1[0][2] = vecZ.x;
-    arg1[1][2] = vecZ.y;
-    arg1[2][2] = vecZ.z;
-    arg1[0][3] = 0.0f;
-    arg1[1][3] = 0.0f;
-    arg1[2][3] = 0.0f;
+    dst[0][0] = vecX.x;
+    dst[1][0] = vecX.y;
+    dst[2][0] = vecX.z;
+    dst[0][1] = vecY.x;
+    dst[1][1] = vecY.y;
+    dst[2][1] = vecY.z;
+    dst[0][2] = vecZ.x;
+    dst[1][2] = vecZ.y;
+    dst[2][2] = vecZ.z;
+    dst[0][3] = 0.0f;
+    dst[1][3] = 0.0f;
+    dst[2][3] = 0.0f;
 }
 
 s32 LZ77Decode(u8* inputBuffer, u8* outputBuffer) {
@@ -1069,4 +1041,3 @@ void systemStrippedPool1(const char** str, f32* f, f64* d, f32 x) {
 }
 #endif
 
-#pragma pool_data off

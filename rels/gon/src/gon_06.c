@@ -1,7 +1,6 @@
 #include "battle/battle_unit.h"
 #include "evt/evt_cmd.h"
 
-#pragma force_active on
 #include "driver/mobjdrv.h"
 #include "driver/animdrv.h"
 #include "evt/evt_bero.h"
@@ -90,59 +89,11 @@ USER_FUNC(lect_cam_load);
 USER_FUNC(lect_cam_save);
 static void majin_callback(s32 type);
 
-f32 fd_gon_06_negone_one_374[2] __attribute__((aligned(8)));
-f32 fd_gon_06_neg_one_382;
-f32 fd_gon_06___local_PI_383;
-f32 fd_gon_06___local_3PIO2_385;
-f32 fd_gon_06_one_negone_373[2] __attribute__((aligned(8)));
-f32 fd_gon_06___local_PIO2_384;
-f32 fd_gon_06_one_381;
-f32 fd_gon_06_negone_one_360[2] __attribute__((aligned(8)));
-f32 fd_gon_06_neg_one_365;
-f32 fd_gon_06___local_PI_366;
-f32 fd_gon_06___local_3PIO2_368;
-f32 fd_gon_06_one_negone_359[2] __attribute__((aligned(8)));
-f32 fd_gon_06___local_PIO2_367;
-f32 fd_gon_06_one_364;
-static EvtWord door01_close[12];
-static EvtWord door01_open[12];
-static EvtWord door02_close[12];
-static EvtWord door02_open[12];
 static BeroEntry bero_entry_data[3];
-EvtWord evt_ori_open[130];
-EvtWord tsuritenjo_event[143];
+extern EvtWord evt_ori_open[];
+extern EvtWord tsuritenjo_event[];
 static s32 key_tbl[2];
-static EvtWord evt_majin[409];
-static EvtWord evt_majin2[241];
-EvtWord gon_06_init_evt[340];
-
-f32 fd_gon_06_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
-
-f32 fd_gon_06_neg_one_382 = -1.0f;
-
-f32 fd_gon_06___local_PI_383 = 3.1415927f;
-
-f32 fd_gon_06___local_3PIO2_385 = 4.712389f;
-
-f32 fd_gon_06_one_negone_373[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
-
-f32 fd_gon_06___local_PIO2_384 = 1.5707964f;
-
-f32 fd_gon_06_one_381 = 1.0f;
-
-f32 fd_gon_06_negone_one_360[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
-
-f32 fd_gon_06_neg_one_365 = -1.0f;
-
-f32 fd_gon_06___local_PI_366 = 3.1415927f;
-
-f32 fd_gon_06___local_3PIO2_368 = 4.712389f;
-
-f32 fd_gon_06_one_negone_359[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
-
-f32 fd_gon_06___local_PIO2_367 = 1.5707964f;
-
-f32 fd_gon_06_one_364 = 1.0f;
+extern EvtWord gon_06_init_evt[];
 
 static EVT_BEGIN(door01_close)
     MULTIPLY_FLOAT(LW(0), FLOAT(0.44433594f))
@@ -578,7 +529,7 @@ EVT_BEGIN(gon_06_init_evt)
     CALL(evt_sub_rumble_onoff, 1, 0)
     WAIT_FRAMES(1)
     CALL(evt_npc_change_fbat_mode, 1)
-    CALL(evt_map_playanim, STRING("hokori\0"), 1, 0)
+    CALL(evt_map_playanim, STRING("hokori"), 1, 0)
     IF_INT_GREATER_OR_EQUAL(GSW(0), 45)
         SET_VALUE(GSWF(1493), 1)
     END_IF

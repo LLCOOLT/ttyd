@@ -19,7 +19,7 @@
 #ifdef VERSION_G8ME01
 #include "mario/mariost.h"
 #endif
-
+#include <math.h>
 
 HitEntry* partySearchGround(PartyEntry* party, f32 range, f32 depth);
 HitEntry* partyChkFrontStep(PartyEntry* party, f32 range, f32* outY, f32* outDist, f32* outAng);
@@ -91,12 +91,7 @@ BOOL chkfilterNokotaro(HitCheckQuery* query, HitEntry* entry) {
     return TRUE;
 }
 
-static inline s32 party_fpclassifyf(f32 x) { switch (*(s32*)&x & 0x7F800000) { case 0x7F800000: if (*(s32*)&x & 0x007FFFFF) { return 1; } else { return 2; } break; case 0: if (*(s32*)&x & 0x007FFFFF) { return 5; } else { return 3; } break; default: return 4; } }
-static inline f32 party_sqrtf(f32 x) { if (x > 0.0f) { f64 guess = __frsqrte(x); guess = 0.5 * guess * (3.0 - guess * guess * x); guess = 0.5 * guess * (3.0 - guess * guess * x); guess = 0.5 * guess * (3.0 - guess * guess * x); return x * guess; } else if (x < 0.0) { return *(f32*)__float_nan; } else if (party_fpclassifyf(x) == 1) { return *(f32*)__float_nan; } return x; }
-
-#pragma fp_contract off
 static inline f32 party_sumsq(f32 x, f32 z) { return x * x + z * z; }
-#pragma fp_contract reset
 
 static inline HitEntry* partyHitCheckInl(PartyEntry* party, Vec* pos, Vec* dir, Vec* outPos, Vec* outNrm, f32* dist) {
     HitCheckQuery query;
@@ -152,11 +147,11 @@ HitEntry* partyHitCheck(PartyEntry* party, Vec* pos, Vec* dir, Vec* outPos, Vec*
 }
 
 static inline f32 partyNrmTo(Vec* n) {
-    return angleABf(0.0f, 0.0f, party_sqrtf(n->x * n->x + n->z * n->z), -n->y);
+    return angleABf(0.0f, 0.0f, sqrtf(n->x * n->x + n->z * n->z), -n->y);
 }
 
 f32 partyNrmToAngle(Vec n) {
-    return angleABf(0.0f, 0.0f, party_sqrtf(n.x * n.x + n.z * n.z), -n.y);
+    return angleABf(0.0f, 0.0f, sqrtf(n.x * n.x + n.z * n.z), -n.y);
 }
 
 void partyChkGnd(PartyEntry* party) {
@@ -727,9 +722,9 @@ void partySearchHead(PartyEntry *party, Vec *pos, f32 *dist, f32 angle)
   f32 nz0;
   f32 ny0;
   f32 nx0;
-  float new_var;
+  float probeHeight;
   // FAKE: t.y read into a reused local right after each t store, so the load numbers below the 10.0f
-  // (the add is written new_var + ty, as in the target operand order)
+  // (the add is written probeHeight + ty, as in the target operand order)
   f32 ty;
   f32 hz0;
   f32 hy0;
@@ -777,9 +772,9 @@ void partySearchHead(PartyEntry *party, Vec *pos, f32 *dist, f32 angle)
     if ((t.z && t.z) && t.z)
     {
     }
-    // FAKE: new_var reloaded with the same 10.0f (permuter idiom)
-    new_var = 10.0f;
-    hit = hitCheckFilter((void *) 0, &hx0, &hy0, &hz0, &d0, &nx0, &ny0, &nz0, t.x, new_var + ty, t.z, zero, one, zero);
+    // FAKE: probeHeight reloaded with the same 10.0f (permuter idiom)
+    probeHeight = 10.0f;
+    hit = hitCheckFilter((void *) 0, &hx0, &hy0, &hz0, &d0, &nx0, &ny0, &nz0, t.x, probeHeight + ty, t.z, zero, one, zero);
     if (hit && (best >= d0))
     {
       best = d0;
@@ -795,9 +790,9 @@ void partySearchHead(PartyEntry *party, Vec *pos, f32 *dist, f32 angle)
     // FAKE: empty barrier (no code) steers scheduling of the 10.0f + t.y argument
     if ((t.z && t.z) && t.z) { }
     d1 = best;
-    // FAKE: new_var reloaded with the same 10.0f (permuter idiom)
-    new_var = 10.0f;
-    hit = hitCheckFilter((void *) 0, &hx1, &hy1, &hz1, &d1, &nx1, &ny1, &nz1, t.x, new_var + ty, t.z, zero, one, zero);
+    // FAKE: probeHeight reloaded with the same 10.0f (permuter idiom)
+    probeHeight = 10.0f;
+    hit = hitCheckFilter((void *) 0, &hx1, &hy1, &hz1, &d1, &nx1, &ny1, &nz1, t.x, probeHeight + ty, t.z, zero, one, zero);
     if (hit && (best >= d1))
     {
       best = d1;
@@ -812,9 +807,9 @@ void partySearchHead(PartyEntry *party, Vec *pos, f32 *dist, f32 angle)
       // FAKE: empty barrier (no code) steers scheduling of the 10.0f + t.y argument
       if ((t.z && t.z) && t.z) { }
       d2 = best;
-      // FAKE: new_var reloaded with the same 10.0f (permuter idiom)
-      new_var = 10.0f;
-      hit = hitCheckFilter((void *) 0, &hx2, &hy2, &hz2, &d2, &nx2, &ny2, &nz2, t.x, new_var + ty, t.z, zero, one, zero);
+      // FAKE: probeHeight reloaded with the same 10.0f (permuter idiom)
+      probeHeight = 10.0f;
+      hit = hitCheckFilter((void *) 0, &hx2, &hy2, &hz2, &d2, &nx2, &ny2, &nz2, t.x, probeHeight + ty, t.z, zero, one, zero);
       if (hit && (best >= d2))
       {
         best = d2;
@@ -829,9 +824,9 @@ void partySearchHead(PartyEntry *party, Vec *pos, f32 *dist, f32 angle)
         // FAKE: empty barrier (no code) steers scheduling of the 10.0f + t.y argument
         if ((t.z && t.z) && t.z) { }
         d3 = best;
-        // FAKE: new_var reloaded with the same 10.0f (permuter idiom)
-        new_var = 10.0f;
-        hit = hitCheckFilter((void *) 0, &hx3, &hy3, &hz3, &d3, &nx3, &ny3, &nz3, t.x, new_var + ty, t.z, zero, one, zero);
+        // FAKE: probeHeight reloaded with the same 10.0f (permuter idiom)
+        probeHeight = 10.0f;
+        hit = hitCheckFilter((void *) 0, &hx3, &hy3, &hz3, &d3, &nx3, &ny3, &nz3, t.x, probeHeight + ty, t.z, zero, one, zero);
         if (hit && (best >= d3))
         {
           best = d3;
@@ -865,7 +860,6 @@ void partyHitStrippedPool(f32* f, s32 i) {
 }
 
 #ifdef VERSION_G8ME01
-extern void marioChkWallAround(Vec* pos, s32 a1, f32 a2, f32 angle, f32 radius, f32 height);
 
 /* FAKE: inline add keeps the original fadds operand order (pos.y, 10.0f) */
 static inline f32 party_addf(f32 a, f32 b) { return a + b; }

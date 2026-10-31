@@ -2,7 +2,6 @@
 #include "battle/battle_unit.h"
 #include "evt/evt_cmd.h"
 
-#pragma force_active on
 #include "driver/npcdrv.h"
 #include "driver/animdrv.h"
 #include "memory.h"
@@ -16,8 +15,7 @@
 #include "driver/hitdrv.h"
 #include "data_tables.h"
 #include "mario/mario_pouch.h"
-#ifdef VERSION_G8ME01
-#endif
+#include "manager/evtmgr_cmd.h"
 
 typedef struct PosterWork { u32 flags; s32 group; s32 shape; } PosterWork;
 PosterWork* poster;
@@ -112,38 +110,19 @@ USER_FUNC(urouro_main_func);
 void nok_stg2_013_cb(s32 type, void** work);
 void draw_poster(void* userdata, s32 group);
 
-f32 fd_nok_00_negone_one_374[2] __attribute__((aligned(8)));
-f32 fd_nok_00_neg_one_382;
-f32 fd_nok_00___local_PI_383;
-f32 fd_nok_00___local_3PIO2_385;
-f32 fd_nok_00_one_negone_373[2] __attribute__((aligned(8)));
-f32 fd_nok_00___local_PIO2_384;
-f32 fd_nok_00_one_381;
-f32 fd_nok_00_negone_one_360[2] __attribute__((aligned(8)));
-f32 fd_nok_00_neg_one_365;
-f32 fd_nok_00___local_PI_366;
-f32 fd_nok_00___local_3PIO2_368;
-f32 fd_nok_00_one_negone_359[2] __attribute__((aligned(8)));
-f32 fd_nok_00___local_PIO2_367;
-f32 fd_nok_00_one_364;
-EvtWord nokonoko_A_init[27];
-EvtWord nokonoko_A_regl[2];
-EvtWord nokonoko_A_talk[55];
-EvtWord nokonoko_B_init[12];
-EvtWord nokonoko_B_regl[19];
-EvtWord nokonoko_B_talk[44];
-EvtWord nokonoko_B_damage[18];
-EvtWord nokonoko_C_regl[19];
-EvtWord nokonoko_C_talk[44];
-EvtWord nokonoko_D_talk[52];
+extern EvtWord nokonoko_A_init[];
+extern EvtWord nokonoko_A_regl[];
+extern EvtWord nokonoko_A_talk[];
+extern EvtWord nokonoko_B_init[];
+extern EvtWord nokonoko_B_regl[];
+extern EvtWord nokonoko_B_talk[];
+extern EvtWord nokonoko_B_damage[];
+extern EvtWord nokonoko_C_regl[];
+extern EvtWord nokonoko_C_talk[];
+extern EvtWord nokonoko_D_talk[];
 s32 iri_15_item_tbl1[2];
 s32 iri_15_item_tbl2[2];
-EvtWord nokonoko_F_talk[318];
-static EvtWord init_white[24];
-static EvtWord talk_white[36];
-static EvtWord kizayarou_regl[19];
-static EvtWord kizayarou_talk[92];
-static EvtWord kizayarou_init[38];
+extern EvtWord nokonoko_F_talk[];
 static NpcSetupInfo npcEnt[10];
 static BeroEntry bero_entry_data[3];
 static const char* yado_npc[2];
@@ -159,11 +138,11 @@ static ShopItem goods_list[6];
 static ShopDb trade_list[13];
 static ShopperData35 shopper_data;
 static KinopioData kino_dt;
-EvtWord first_time_camera[195];
+extern EvtWord first_time_camera[];
 static HitDamageReturn hitDmgRetPoints[10];
-EvtWord nok_00_koopa_npc_entry[35];
-EvtWord nok_00_koopa_evt[1250];
-EvtWord nok_00_init_evt[205];
+extern EvtWord nok_00_koopa_npc_entry[];
+extern EvtWord nok_00_koopa_evt[];
+extern EvtWord nok_00_init_evt[];
 
 void nok_stg2_013_cb(s32 type, void** work) {
     s32* msg = *work;
@@ -181,34 +160,6 @@ USER_FUNC(pposter_nok_on) {
     poster->flags |= 1;
     return EVT_RETURN_DONE;
 }
-
-f32 fd_nok_00_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
-
-f32 fd_nok_00_neg_one_382 = -1.0f;
-
-f32 fd_nok_00___local_PI_383 = 3.1415927f;
-
-f32 fd_nok_00___local_3PIO2_385 = 4.712389f;
-
-f32 fd_nok_00_one_negone_373[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
-
-f32 fd_nok_00___local_PIO2_384 = 1.5707964f;
-
-f32 fd_nok_00_one_381 = 1.0f;
-
-f32 fd_nok_00_negone_one_360[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
-
-f32 fd_nok_00_neg_one_365 = -1.0f;
-
-f32 fd_nok_00___local_PI_366 = 3.1415927f;
-
-f32 fd_nok_00___local_3PIO2_368 = 4.712389f;
-
-f32 fd_nok_00_one_negone_359[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
-
-f32 fd_nok_00___local_PIO2_367 = 1.5707964f;
-
-f32 fd_nok_00_one_364 = 1.0f;
 
 EVT_BEGIN(nokonoko_A_init)
     CALL(evt_npc_flag_onoff, 1, STRING("me"), 1536)
@@ -1508,7 +1459,7 @@ USER_FUNC(pposter_init) {
     poster->shape = animPoseGetShapeIdx(npcNameToPtr("poster")->poseId, "pPlaneShape2");
     // ノコノコA
     npc = npcNameToPtr("\x83\x6D\x83\x52\x83\x6D\x83\x52\x41");
-    poster->group = animPoseGetGroupIdx(npc->poseId, "locator7\0\0\0");
+    poster->group = animPoseGetGroupIdx(npc->poseId, "locator7");
     animPoseSetDispCallBack(npc->poseId, draw_poster, NULL);
     return EVT_RETURN_DONE;
 }

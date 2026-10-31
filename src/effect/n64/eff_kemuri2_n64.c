@@ -13,7 +13,7 @@ typedef struct EffKemuri2N64Work {
     u8 pad_6[2];    // 0x6
     Vec position;   // 0x8
     u8 pad_14[0x44 - 0x14];
-    f32 field_44;   // 0x44
+    f32 speed;      // 0x44, sideways speed along (dirX, dirZ)
     f32 velY;       // 0x48
     f32 accelY;     // 0x4C
     f32 dirX;       // 0x50
@@ -23,8 +23,8 @@ typedef struct EffKemuri2N64Work {
     s32 frame;      // 0x60
 } EffKemuri2N64Work;
 
-static s8 anim_data_0[] = {0, 1, 2, 2, 3, 3, 4, 4, 5, 5, 5, 6, 6, 6, -1, 0};
-static s8 anim_data_1[] = {0, 1, 2, 2, 3, 3, 4, 4, 5, 5, 6, 6, 6, 7, 7, 7, -1, 0, 0, 0};
+static s8 anim_data_0[] = {0, 1, 2, 2, 3, 3, 4, 4, 5, 5, 5, 6, 6, 6, -1};
+static s8 anim_data_1[] = {0, 1, 2, 2, 3, 3, 4, 4, 5, 5, 6, 6, 6, 7, 7, 7, -1};
 static s8* anim_data_table[] = {anim_data_0, anim_data_1};
 
 void effKemuri2Main(EffectEntry* effect);
@@ -35,7 +35,7 @@ EffectEntry* effKemuri2N64Entry(s32 type, f32 x, f32 y, f32 z, f32 dirX, f32 dir
     EffKemuri2N64Work* work;
 
     effect = effEntry();
-    effect->type = "Kemuri2N64\0";
+    effect->type = "Kemuri2N64";
     effect->count = 1;
     work = __memAlloc(HEAP_EFFECT, sizeof(EffKemuri2N64Work));
     effect->userdata = work;
@@ -49,7 +49,7 @@ EffectEntry* effKemuri2N64Entry(s32 type, f32 x, f32 y, f32 z, f32 dirX, f32 dir
     work->position.x = x;
     work->position.y = y;
     work->position.z = z;
-    work->field_44 = 0.33333334f;
+    work->speed = 0.33333334f;
     work->velY = 1.75f;
     work->accelY = -0.16f;
     return effect;
@@ -70,8 +70,8 @@ void effKemuri2Main(EffectEntry* effect) {
         return;
     }
     for (i = 0; i < effect->count; i++, work++) {
-        work->position.x += work->field_44 * work->dirX;
-        work->position.z += work->field_44 * work->dirZ;
+        work->position.x += work->speed * work->dirX;
+        work->position.z += work->speed * work->dirZ;
         work->velY += work->accelY;
         work->position.y += work->velY;
     }

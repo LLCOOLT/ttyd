@@ -1,7 +1,6 @@
 #include "battle/battle_unit.h"
 #include "evt/evt_cmd.h"
 
-#pragma force_active on
 #include "party.h"
 #include "manager/evtmgr_cmd.h"
 #include "driver/mobjdrv.h"
@@ -42,62 +41,14 @@ USER_FUNC(evt_sub_intpl_init);
 USER_FUNC(set_mobj_y_position);
 static USER_FUNC(set_party_y_pos);
 
-f32 fd_las_21_negone_one_374[2] __attribute__((aligned(8)));
-f32 fd_las_21_neg_one_382;
-f32 fd_las_21___local_PI_383;
-f32 fd_las_21___local_3PIO2_385;
-f32 fd_las_21_one_negone_373[2] __attribute__((aligned(8)));
-f32 fd_las_21___local_PIO2_384;
-f32 fd_las_21_one_381;
-f32 fd_las_21_negone_one_360[2] __attribute__((aligned(8)));
-f32 fd_las_21_neg_one_365;
-f32 fd_las_21___local_PI_366;
-f32 fd_las_21___local_3PIO2_368;
-f32 fd_las_21_one_negone_359[2] __attribute__((aligned(8)));
-f32 fd_las_21___local_PIO2_367;
-f32 fd_las_21_one_364;
-static EvtWord w_door_close[22];
-static EvtWord w_door_open[22];
-static EvtWord e1_door_close[22];
-static EvtWord e1_door_open[22];
-static EvtWord e2_door_close[22];
-static EvtWord e2_door_open[22];
 static BeroEntry bero_entry_data[5];
 static BeroEntry w_bero_mapchg[1];
-EvtWord floatblk_stop_se[47];
-EvtWord floatblk_shake[27];
-EvtWord floatblk_evt[336];
-EvtWord floatblk21_1_evt[62];
-EvtWord floatblk21_2_evt[62];
-EvtWord las_21_init_evt[211];
-
-f32 fd_las_21_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
-
-f32 fd_las_21_neg_one_382 = -1.0f;
-
-f32 fd_las_21___local_PI_383 = 3.1415927f;
-
-f32 fd_las_21___local_3PIO2_385 = 4.712389f;
-
-f32 fd_las_21_one_negone_373[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
-
-f32 fd_las_21___local_PIO2_384 = 1.5707964f;
-
-f32 fd_las_21_one_381 = 1.0f;
-
-f32 fd_las_21_negone_one_360[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
-
-f32 fd_las_21_neg_one_365 = -1.0f;
-
-f32 fd_las_21___local_PI_366 = 3.1415927f;
-
-f32 fd_las_21___local_3PIO2_368 = 4.712389f;
-
-f32 fd_las_21_one_negone_359[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
-
-f32 fd_las_21___local_PIO2_367 = 1.5707964f;
-
-f32 fd_las_21_one_364 = 1.0f;
+extern EvtWord floatblk_stop_se[];
+extern EvtWord floatblk_shake[];
+extern EvtWord floatblk_evt[];
+extern EvtWord floatblk21_1_evt[];
+extern EvtWord floatblk21_2_evt[];
+extern EvtWord las_21_init_evt[];
 
 static EVT_BEGIN(w_door_close)
     MULTIPLY_FLOAT(LW(0), FLOAT(-0.38867188f))
@@ -506,8 +457,8 @@ EVT_BEGIN(las_21_init_evt)
         CALL(evt_mobj_switch_float_blk, STRING("21switch1"), 175, -480, -67, STRING("21blk1"), 1, PTR(floatblk21_1_evt), 0)
         CALL(evt_mobj_switch_float_blk, STRING("21switch2"), 300, -30, 15, STRING("21blk2"), 3, PTR(floatblk21_2_evt), 0)
     END_IF
-    CALL(evt_mobj_jumpstand_blue, 0, STRING("jump\0\0\0"), 700, -650, -580, 75, 0, 0)
-    CALL(evt_mobj_flag_onoff, 0, STRING("jump\0\0\0"), 64)
+    CALL(evt_mobj_jumpstand_blue, 0, STRING("jump"), 700, -650, -580, 75, 0, 0)
+    CALL(evt_mobj_flag_onoff, 0, STRING("jump"), 64)
     RETURN
 EVT_END()
 

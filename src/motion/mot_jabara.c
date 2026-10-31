@@ -12,6 +12,8 @@
 #include "pmario_sound.h"
 #include "system.h"
 #include <string.h>
+#include "driver/animdrv.h"
+#include "mario/mario_hit.h"
 
 BOOL marioGetRub(s32 mask, s32* a, s32* b, s32* c);
 void allPartyRideOff(void);
@@ -24,7 +26,7 @@ typedef struct MotJabaraWork {
 	u32 flags;          // 0x00: 1 = swing input taken (swingMain); 0x10000 / 0x20000 / 0x40000 = one-shot charge-level sounds played
 	f32 swingAccel;     // 0x04: added to the swing angle while the push timer runs (2.4 start, 0.1 walk)
 	f32 swingDecel;     // 0x08: added once the push timer hits 0 (-0.4 start, -0.1 walk)
-	f32 field_0xC;      // 0x0C: cleared at sub-motion 0x32
+	f32 swingDrift;     // 0x0C: cleared at sub-motion 0x32, never read
 	f32 swingRotStep;   // 0x10: 0.18, swing tilt step
 	s32 wobbleCount;    // 0x14: wobble direction changes, picks SFX 0x189..0x18B
 	f32 wobbleDir;      // 0x18: +-0.6, last wobble direction
@@ -167,9 +169,11 @@ BOOL marioChkJabara(void) {
 	}
 }
 
-static inline void jabaraHitPos(HitEntry* hit, Vec* v) {
+static inline f32 jabaraHitPosZ(HitEntry* hit) {
+	Vec v;
 	marioGetPtr();
-	hitObjGetPos(hitGetName(hit), v);
+	hitObjGetPos(hitGetName(hit), &v);
+	return v.z;
 }
 
 static inline void jabaraLand(f32 y_, void* h_) {
@@ -206,10 +210,8 @@ static inline void jabaraLand(f32 y_, void* h_) {
 void mario_land_kemuri(void);
 void mot_slit_post(void);
 void L_allPartyRideOn(void);
-f32 marioChkOverheadJabara(s32* a, s32* b);
 void marioChkOverhead(void);
 void* marioSearchHead(Vec* p, f32* h, f32 r);
-void* marioSearchHead_jabara(Vec* p, f32* a, f32* b, f32 r);
 HitEntry* marioChkLandon2(f32* out, f32 y, f32 z);
 void marioChgSmallJumpMotion(void);
 void swingMain(void);
@@ -225,16 +227,14 @@ void mot_jabara(void) {
 	MarioWork* mario = marioGetPtr();
 	Vec v74;
 	Vec v68;
-	Vec v5c;
-	Vec v50;
 	s32 rubCount;
 	s32 rubDir;
 	s32 rubMag;
 	s32 overheadHit;
 	f32 hitY;
-	s32 overheadDist;
+	f32 overheadDist;
 	f32 headDist;
-	f32 headHit;
+	s32 headHit;
 	f32 headRange;
 	f32 rr;
 	if (mario->trigFlags & 1) {
@@ -410,8 +410,7 @@ void mot_jabara(void) {
 			mario->multiTimer = 10;
 			mario->mot.jabara.floorY = (s32)(hitY + mario->wPlayerCollisionBox.y);
 			{
-				jabaraHitPos(mario->hitobjHead, &v50);
-				mario->position.z = (s32)((100.0f * v50.z + 0.5f) / 100.0f);
+				mario->position.z = (s32)((100.0f * jabaraHitPosZ(mario->hitobjHead) + 0.5f) / 100.0f);
 				mario->position.y = (f32)mario->mot.jabara.floorY - mario->wPlayerCollisionBox.y - 3.5f;
 				mario->rotOfs.y = 9.0f + mario->wPlayerCollisionBox.y;
 			}
@@ -495,7 +494,7 @@ void mot_jabara(void) {
 		marioPaperLightOff();
 		mario->currSubMotionId = 0x32;
 		mario->mot.jabara.animFrame = 0;
-		marioGetPtr()->motJabara->field_0xC = 0.0f;
+		marioGetPtr()->motJabara->swingDrift = 0.0f;
 	case 0x32: {
 		BOOL changed;
 		f32 f28;
@@ -684,10 +683,7 @@ void mot_jabara(void) {
 						}
 					}
 				}
-				{
-					v5c = mario->position;
-					marioUpdateCamCollision(&v5c);
-				}
+				marioUpdateCamCollision(mario->position);
 			}
 		}
 		break;

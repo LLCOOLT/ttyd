@@ -2,7 +2,6 @@
 #include "eff/n64/eff_guruguru_n64.h"
 #include "evt/evt_cmd.h"
 
-#pragma force_active on
 #include "driver/npcdrv.h"
 #include "driver/effdrv.h"
 #include "eff/eff_syuryou.h"
@@ -123,37 +122,15 @@ static USER_FUNC(make_name);
 USER_FUNC(syuryo_baria);
 USER_FUNC(syuryo_baria_recalc_pos);
 
-f32 fd_las_28_negone_one_374[2] __attribute__((aligned(8)));
-f32 fd_las_28_neg_one_382;
-f32 fd_las_28___local_PI_383;
-f32 fd_las_28___local_3PIO2_385;
-f32 fd_las_28_one_negone_373[2] __attribute__((aligned(8)));
-f32 fd_las_28___local_PIO2_384;
-f32 fd_las_28_one_381;
-f32 fd_las_28_negone_one_360[2] __attribute__((aligned(8)));
-f32 fd_las_28_neg_one_365;
-f32 fd_las_28___local_PI_366;
-f32 fd_las_28___local_3PIO2_368;
-f32 fd_las_28_one_negone_359[2] __attribute__((aligned(8)));
-f32 fd_las_28___local_PIO2_367;
-f32 fd_las_28_one_364;
-static EvtWord w_door_close[22];
-static EvtWord w_door_open[22];
 static BeroEntry bero_entry_data[3];
-static EvtWord syuryo_init[30];
-EvtWord koopa_init[7];
-EvtWord koopa_talk[8];
-static EvtWord baba_init[7];
-static EvtWord baba_talk[8];
+extern EvtWord koopa_init[];
+extern EvtWord koopa_talk[];
 static NpcSetupInfo npcEnt[5];
-static EvtWord first_evt[170];
-EvtWord syuryo_thunder[419];
-EvtWord syuryo_evt[1254];
-EvtWord gareki_fall[45];
-EvtWord koopa_evt[1671];
-static EvtWord shuryolight_init[18];
-static EvtWord shan_init[46];
-EvtWord las_28_init_evt[238];
+extern EvtWord syuryo_thunder[];
+extern EvtWord syuryo_evt[];
+extern EvtWord gareki_fall[];
+extern EvtWord koopa_evt[];
+extern EvtWord las_28_init_evt[];
 
 USER_FUNC(syuryo_baria) {
     // ピーチ単
@@ -164,34 +141,6 @@ USER_FUNC(syuryo_baria) {
     effSetName(eff, "baria");
     return EVT_RETURN_DONE;
 }
-
-f32 fd_las_28_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
-
-f32 fd_las_28_neg_one_382 = -1.0f;
-
-f32 fd_las_28___local_PI_383 = 3.1415927f;
-
-f32 fd_las_28___local_3PIO2_385 = 4.712389f;
-
-f32 fd_las_28_one_negone_373[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
-
-f32 fd_las_28___local_PIO2_384 = 1.5707964f;
-
-f32 fd_las_28_one_381 = 1.0f;
-
-f32 fd_las_28_negone_one_360[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
-
-f32 fd_las_28_neg_one_365 = -1.0f;
-
-f32 fd_las_28___local_PI_366 = 3.1415927f;
-
-f32 fd_las_28___local_3PIO2_368 = 4.712389f;
-
-f32 fd_las_28_one_negone_359[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
-
-f32 fd_las_28___local_PIO2_367 = 1.5707964f;
-
-f32 fd_las_28_one_364 = 1.0f;
 
 static EVT_BEGIN(w_door_close)
     MULTIPLY_FLOAT(LW(0), FLOAT(-0.38867188f))
@@ -836,7 +785,7 @@ EVT_BEGIN(syuryo_evt)
     RETURN
 EVT_END()
 
-EffectEntry* effGuruguruN64Entry(s32 type, s32 arg1, f32 x, f32 y, f32 z, f32 arg5);
+EffectEntry* effGuruguruN64Entry(s32 type, s32 num, f32 x, f32 y, f32 z, f32 radius);
 
 static USER_FUNC(eff_guruguru) {
     EvtWord* args = event->args;

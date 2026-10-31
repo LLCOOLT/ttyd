@@ -2,7 +2,6 @@
 #include "evt/evt_cmd.h"
 #include "manager/evtmgr_cmd.h"
 
-#pragma force_active on
 #include "driver/msgdrv.h"
 #include "mario/mario.h"
 #include "evt/evt_bero.h"
@@ -110,124 +109,49 @@ USER_FUNC(get_password);
 static USER_FUNC(peach_evt_toumei);
 static USER_FUNC(peach_set_pose);
 
-f32 fd_aji_01_negone_one_374[2] __attribute__((aligned(8)));
-f32 fd_aji_01_neg_one_382;
-f32 fd_aji_01___local_PI_383;
-f32 fd_aji_01___local_3PIO2_385;
-f32 fd_aji_01_one_negone_373[2] __attribute__((aligned(8)));
-f32 fd_aji_01___local_PIO2_384;
-f32 fd_aji_01_one_381;
-f32 fd_aji_01_negone_one_360[2] __attribute__((aligned(8)));
-f32 fd_aji_01_neg_one_365;
-f32 fd_aji_01___local_PI_366;
-f32 fd_aji_01___local_3PIO2_368;
-f32 fd_aji_01_one_negone_359[2] __attribute__((aligned(8)));
-f32 fd_aji_01___local_PIO2_367;
-f32 fd_aji_01_one_364;
-static EvtWord w1_door_open[22];
-static EvtWord w1_door_close[22];
-static EvtWord e1_door_open[22];
-static EvtWord e1_door_close[22];
-static EvtWord w2_door_open[22];
-static EvtWord w2_door_close[22];
-static EvtWord e2_door_open[22];
-static EvtWord e2_door_close[22];
-static EvtWord n1_door_open[22];
-static EvtWord n1_door_close[22];
-static EvtWord n2_door_open[22];
-static EvtWord n2_door_close[22];
-EvtWord n3_door_open[22];
-EvtWord n3_door_close[22];
-EvtWord n4_door_open[22];
-EvtWord n4_door_close[22];
-EvtWord w3_door_open[22];
-EvtWord w3_door_close[22];
-static EvtWord e3_door_open[22];
-static EvtWord e3_door_close[22];
-EvtWord w4_door_open[22];
-EvtWord w4_door_close[22];
-EvtWord e4_door_open[22];
-EvtWord e4_door_close[22];
-EvtWord w5_door_open[22];
-EvtWord w5_door_close[22];
-EvtWord e5_door_open[22];
-EvtWord e5_door_close[22];
+extern EvtWord n3_door_open[];
+extern EvtWord n3_door_close[];
+extern EvtWord n4_door_open[];
+extern EvtWord n4_door_close[];
+extern EvtWord w3_door_open[];
+extern EvtWord w3_door_close[];
+extern EvtWord w4_door_open[];
+extern EvtWord w4_door_close[];
+extern EvtWord e4_door_open[];
+extern EvtWord e4_door_close[];
+extern EvtWord w5_door_open[];
+extern EvtWord w5_door_close[];
+extern EvtWord e5_door_open[];
+extern EvtWord e5_door_close[];
 static BeroEntry bero_entry_data[15];
 BeroEntry e_bero_5_peach[2];
 s32 elv_key1[2];
-EvtWord elv_unlock1[131];
+extern EvtWord elv_unlock1[];
 s32 elv_key2[2];
-EvtWord elv_unlock2[131];
-EvtWord ele1_door_open[139];
-EvtWord ele1_door_close[139];
-#ifdef VERSION_G8ME01
-EvtWord ele_1[607];
-#else
-EvtWord ele_1[595];
-#endif
-EvtWord ele2_door_open[139];
-EvtWord ele2_door_close[139];
-#ifdef VERSION_G8ME01
-EvtWord ele_2[634];
-#else
-EvtWord ele_2[622];
-#endif
-static EvtWord evt_elv_init[271];
-EvtWord key_lock[14];
-EvtWord last_key_lock[36];
-EvtWord last_elv_lock[36];
-EvtWord evt_key_init[242];
-EvtWord evt_aikotoba[188];
-static EvtWord peach_evt_stg1[32];
-static EvtWord peach_evt_stg1_1[41];
-EvtWord peach_evt_stg1_2[106];
-static EvtWord peach_evt_stg3_1[64];
-static EvtWord peach_evt_stg3[25];
-static EvtWord peach_evt_stg5[51];
-static EvtWord peach_evt_stg5_1[46];
-static EvtWord peach_evt_door_stop[14];
-EvtWord peach_evt_ele_2[505];
-EvtWord peach_evt_ele_init[177];
-EvtWord peach_evt_key_init[178];
-EvtWord peach_evt_init[365];
-static EvtWord teshita1_init[42];
-EvtWord teshita1_talk[14];
-static EvtWord teshita2_init[51];
-EvtWord teshita2_talk[14];
-EvtWord teshita2_regl[35];
-static EvtWord teshita3_init[46];
-EvtWord teshita3_talk[14];
-EvtWord teshita3_regl[35];
+extern EvtWord elv_unlock2[];
+extern EvtWord ele1_door_open[];
+extern EvtWord ele1_door_close[];
+extern EvtWord ele_1[];
+extern EvtWord ele2_door_open[];
+extern EvtWord ele2_door_close[];
+extern EvtWord ele_2[];
+extern EvtWord key_lock[];
+extern EvtWord last_key_lock[];
+extern EvtWord last_elv_lock[];
+extern EvtWord evt_key_init[];
+extern EvtWord evt_aikotoba[];
+extern EvtWord peach_evt_stg1_2[];
+extern EvtWord peach_evt_ele_2[];
+extern EvtWord peach_evt_ele_init[];
+extern EvtWord peach_evt_key_init[];
+extern EvtWord peach_evt_init[];
+extern EvtWord teshita1_talk[];
+extern EvtWord teshita2_talk[];
+extern EvtWord teshita2_regl[];
+extern EvtWord teshita3_talk[];
+extern EvtWord teshita3_regl[];
 static NpcSetupInfo npcEnt[4];
-EvtWord aji_01_init_evt[171];
-
-f32 fd_aji_01_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
-
-f32 fd_aji_01_neg_one_382 = -1.0f;
-
-f32 fd_aji_01___local_PI_383 = 3.1415927f;
-
-f32 fd_aji_01___local_3PIO2_385 = 4.712389f;
-
-f32 fd_aji_01_one_negone_373[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
-
-f32 fd_aji_01___local_PIO2_384 = 1.5707964f;
-
-f32 fd_aji_01_one_381 = 1.0f;
-
-f32 fd_aji_01_negone_one_360[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
-
-f32 fd_aji_01_neg_one_365 = -1.0f;
-
-f32 fd_aji_01___local_PI_366 = 3.1415927f;
-
-f32 fd_aji_01___local_3PIO2_368 = 4.712389f;
-
-f32 fd_aji_01_one_negone_359[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
-
-f32 fd_aji_01___local_PIO2_367 = 1.5707964f;
-
-f32 fd_aji_01_one_364 = 1.0f;
+extern EvtWord aji_01_init_evt[];
 
 static EVT_BEGIN(w1_door_open)
     MULTIPLY_FLOAT(LW(0), FLOAT(0.25f))
@@ -2333,7 +2257,7 @@ EVT_END()
 USER_FUNC(get_password) {
     EvtWord* args = event->args;
 
-    evtSetValue(event, args[0], (EvtWord)msgSearch("stg7_aji_password\0\0"));
+    evtSetValue(event, args[0], (EvtWord)msgSearch("stg7_aji_password"));
     return EVT_RETURN_DONE;
 }
 

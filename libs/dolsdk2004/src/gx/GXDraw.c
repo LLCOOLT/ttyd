@@ -1,12 +1,9 @@
-#define MATH_NO_SQRTF 1
 #include <math.h>
-float sqrtf(float x);
 
 #include <dolphin/gx.h>
 #include <dolphin/os.h>
 
 #include "__gx.h"
-static void gxdraw_pool_order(f32* o, f64* d) { o[0] = 0.0f; o[1] = 1.0f; o[2] = 3.1415927f; o[3] = -1.0f; d[0] = 4503601774854144.0; d[1] = 4503599627370496.0; o[4] = 6.2831855f; o[5] = 0.57735026f; }
 
 static GXVtxDescList vcd[27];
 static GXVtxAttrFmtList vat[27];
@@ -26,7 +23,6 @@ static void RestoreVertState(void) {
     GXSetVtxAttrFmtv(GX_VTXFMT3, vat);
 }
 
-#ifdef GXDRAW_UNUSED_FUNCS // FAKE: dead-stripped in the original binary; excluded to keep .sdata2 layout
 static void vsub(f32 p1[3], f32 p2[3], f32 u[3]) {
     u32 i;
 
@@ -102,8 +98,6 @@ static void SubDivTriangle(u8 depth, u8 i, f32 (*data)[3], u8 (*ndx)[3]) {
     Subdivide(depth, x0, x1, x2);
 }
 
-#endif
-#ifdef GXDRAW_UNUSED_FUNCS // FAKE: dead-stripped in the original binary; excluded to keep .sdata2 layout
 void GXDrawCylinder(u8 numEdges) {
     s32 i;
     f32 top;
@@ -199,7 +193,6 @@ void GXDrawTorus(f32 rc, u8 numc, u8 numt) {
     RestoreVertState();
 }
 
-#endif
 void GXDrawSphere(u8 numMajor, u8 numMinor) {
     GXAttrType ttype;
     f32 radius = 1.0f;
@@ -326,7 +319,6 @@ void GXDrawCube(void) {
     RestoreVertState();
 }
 
-#ifdef GXDRAW_UNUSED_FUNCS // FAKE: dead-stripped in the original binary; excluded to keep .sdata2 layout
 static u32 polygons[12][5] = {
     {  0, 12, 10, 11, 16 },
     {  1, 17,  8,  9, 13 },
@@ -557,5 +549,3 @@ u32 GXGenNormalTable(u8 depth, f32* table) {
 
     return nrm_cnt;
 }
-
-#endif

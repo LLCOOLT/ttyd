@@ -3,7 +3,6 @@
 #include "battle/battle_unit.h"
 #include "evt/evt_cmd.h"
 
-#pragma force_active on
 #include "driver/camdrv.h"
 #include "dolphin/os.h"
 #include "driver/npcdrv.h"
@@ -69,32 +68,14 @@ USER_FUNC(time_shift);
 USER_FUNC(evt_snd_bgmon_f_d);
 static USER_FUNC(npc_set_pos);
 
-f32 fd_tou_00_negone_one_374[2] __attribute__((aligned(8)));
-f32 fd_tou_00_neg_one_382;
-f32 fd_tou_00___local_PI_383;
-f32 fd_tou_00___local_3PIO2_385;
-f32 fd_tou_00_one_negone_373[2] __attribute__((aligned(8)));
-f32 fd_tou_00___local_PIO2_384;
-f32 fd_tou_00_one_381;
-f32 fd_tou_00_negone_one_360[2] __attribute__((aligned(8)));
-f32 fd_tou_00_neg_one_365;
-f32 fd_tou_00___local_PI_366;
-f32 fd_tou_00___local_3PIO2_368;
-f32 fd_tou_00_one_negone_359[2] __attribute__((aligned(8)));
-f32 fd_tou_00___local_PIO2_367;
-f32 fd_tou_00_one_364;
-static EvtWord evt_tou_balloon[85];
-static EvtWord evt_light[66];
-static EvtWord evt_wing[125];
-EvtWord evt_to_tou[293];
-EvtWord evt_pos_keep[39];
-EvtWord evt_to_gor[247];
+extern EvtWord evt_to_tou[];
+extern EvtWord evt_pos_keep[];
+extern EvtWord evt_to_gor[];
 const char* kemuri_name[5];
-EvtWord tou_00_koopa_evt[678];
-static EvtWord hkoopa_init[7];
+extern EvtWord tou_00_koopa_evt[];
 static NpcSetupInfo npcEnt[2];
-EvtWord evt_skip[43];
-EvtWord tou_00_init_evt[76];
+extern EvtWord evt_skip[];
+extern EvtWord tou_00_init_evt[];
 
 USER_FUNC(time_shift) {
     CameraEntry* cam = camGetPtr(CAMERA_3D);
@@ -103,34 +84,6 @@ USER_FUNC(time_shift) {
     event->savedTime += OSMillisecondsToTicks((OSTime)-3500);
     return EVT_RETURN_DONE;
 }
-
-f32 fd_tou_00_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
-
-f32 fd_tou_00_neg_one_382 = -1.0f;
-
-f32 fd_tou_00___local_PI_383 = 3.1415927f;
-
-f32 fd_tou_00___local_3PIO2_385 = 4.712389f;
-
-f32 fd_tou_00_one_negone_373[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
-
-f32 fd_tou_00___local_PIO2_384 = 1.5707964f;
-
-f32 fd_tou_00_one_381 = 1.0f;
-
-f32 fd_tou_00_negone_one_360[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
-
-f32 fd_tou_00_neg_one_365 = -1.0f;
-
-f32 fd_tou_00___local_PI_366 = 3.1415927f;
-
-f32 fd_tou_00___local_3PIO2_368 = 4.712389f;
-
-f32 fd_tou_00_one_negone_359[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
-
-f32 fd_tou_00___local_PIO2_367 = 1.5707964f;
-
-f32 fd_tou_00_one_364 = 1.0f;
 
 static EVT_BEGIN(evt_tou_balloon)
     CALL(evt_mapobj_get_position, STRING("tou_enkei"), LW(13), LW(14), LW(15))
@@ -775,7 +728,7 @@ EVT_BEGIN(tou_00_init_evt)
     SPAWN_EVENT(PTR(evt_light))
     SET_VALUE(LW(0), STRING("coloer_light_2"))
     SPAWN_EVENT(PTR(evt_light))
-    SET_VALUE(LW(0), STRING("coloer_light_3\0"))
+    SET_VALUE(LW(0), STRING("coloer_light_3"))
     SPAWN_EVENT(PTR(evt_light))
     SPAWN_EVENT(PTR(evt_wing))
     CALL(evt_bero_get_entername, LW(0))

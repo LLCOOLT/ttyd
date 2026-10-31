@@ -2,7 +2,6 @@
 #include "battle/battle_unit.h"
 #include "evt/evt_cmd.h"
 
-#pragma force_active on
 #include "battle/battle.h"
 #include "battle/battle_unit.h"
 #include "battle/battle_stage_object.h"
@@ -19,13 +18,14 @@
 #include "battle/battle_database_common.h"
 #include "data_tables.h"
 #include "driver/extdrv.h"
+#include "manager/evtmgr_cmd.h"
 
-typedef struct ZakoGun { s8 field_0x0; s8 state; s32 timer; s32 timerMax; Vec pos; Vec home; s32 poseBase; s32 poseNum; s32 poseDiv; s32 poseCount; Vec start; Vec target; Vec vel; Vec ofs; Vec rot; } ZakoGun;
+typedef struct ZakoGun { s8 flags; s8 state; s32 timer; s32 timerMax; Vec pos; Vec home; s32 poseBase; s32 poseNum; s32 poseDiv; s32 poseCount; Vec start; Vec target; Vec vel; Vec ofs; Vec rot; } ZakoGun;
 typedef struct ZakoGunWork { s32 flag; s32 targetId;
 #ifdef VERSION_G8ME01
     u8 us_pad08[0xC]; // US: 12 more bytes here
 #endif
-    s32 state; s32 timer; Vec pos; u8 field_0x1c[0x34 - 0x1c]; f32 radius; f32 angle; f32 speed; u8 field_0x40[0x48 - 0x40]; Vec start; Vec end; s32 timer2; s32 steps; s32 count; s32 sfx; ZakoGun* zako; } ZakoGunWork;
+    s32 state; s32 timer; Vec pos; u8 pad_1C[0x34 - 0x1c]; f32 radius; f32 angle; f32 speed; u8 pad_40[0x48 - 0x40]; Vec start; Vec end; s32 timer2; s32 steps; s32 count; s32 sfx; ZakoGun* zako; } ZakoGunWork;
 extern ZakoGun* zakogun;
 extern ZakoGunWork* work;
 void zakogun_ext_main1(void);
@@ -86,20 +86,6 @@ void zakogun_ext_init(void);
 BattleUnit* zakogun_get_ptr(void);
 void zakogun_set_pose(ZakoGun* zako, s32 base, s32 num, s32 div);
 
-f32 fd_boss_gundan_zako_group1_negone_one_374[2] __attribute__((aligned(8)));
-f32 fd_boss_gundan_zako_group1_neg_one_382;
-f32 fd_boss_gundan_zako_group1___local_PI_383;
-f32 fd_boss_gundan_zako_group1___local_3PIO2_385;
-f32 fd_boss_gundan_zako_group1_one_negone_373[2] __attribute__((aligned(8)));
-f32 fd_boss_gundan_zako_group1___local_PIO2_384;
-f32 fd_boss_gundan_zako_group1_one_381;
-f32 fd_boss_gundan_zako_group1_negone_one_360[2] __attribute__((aligned(8)));
-f32 fd_boss_gundan_zako_group1_neg_one_365;
-f32 fd_boss_gundan_zako_group1___local_PI_366;
-f32 fd_boss_gundan_zako_group1___local_3PIO2_368;
-f32 fd_boss_gundan_zako_group1_one_negone_359[2] __attribute__((aligned(8)));
-f32 fd_boss_gundan_zako_group1___local_PIO2_367;
-f32 fd_boss_gundan_zako_group1_one_364;
 BattleUnitKind unit_boss_gundan_zako_group1;
 static BattleUnitDefense defence;
 static BattleUnitDefenseAttr defence_attr;
@@ -110,13 +96,13 @@ static BattleUnitKindPart parts[1];
 BattleWeapon weapon_gundan_zako_group1_attack;
 static EvtWord init_event[44];
 static EvtWord damage_event[134];
-EvtWord damage_event_kaiten_hammer[30];
+extern EvtWord damage_event_kaiten_hammer[];
 static EvtWord dead_event[138];
 static EvtWord attack_event[85];
 static EvtWord hit_check_event[95];
 static EvtWord wait_event[6];
 ExtTexInfo zakogun_ext_entry_data[49];
-EvtWord zakogun_entry[19];
+extern EvtWord zakogun_entry[];
 
 USER_FUNC(zakogun_set_target_id) {
     work->targetId = evtGetValue(event, event->args[0]);
@@ -191,34 +177,6 @@ BattleUnit* zakogun_get_ptr(void) {
     }
     return NULL;
 }
-
-f32 fd_boss_gundan_zako_group1_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
-
-f32 fd_boss_gundan_zako_group1_neg_one_382 = -1.0f;
-
-f32 fd_boss_gundan_zako_group1___local_PI_383 = 3.1415927f;
-
-f32 fd_boss_gundan_zako_group1___local_3PIO2_385 = 4.712389f;
-
-f32 fd_boss_gundan_zako_group1_one_negone_373[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
-
-f32 fd_boss_gundan_zako_group1___local_PIO2_384 = 1.5707964f;
-
-f32 fd_boss_gundan_zako_group1_one_381 = 1.0f;
-
-f32 fd_boss_gundan_zako_group1_negone_one_360[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
-
-f32 fd_boss_gundan_zako_group1_neg_one_365 = -1.0f;
-
-f32 fd_boss_gundan_zako_group1___local_PI_366 = 3.1415927f;
-
-f32 fd_boss_gundan_zako_group1___local_3PIO2_368 = 4.712389f;
-
-f32 fd_boss_gundan_zako_group1_one_negone_359[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
-
-f32 fd_boss_gundan_zako_group1___local_PIO2_367 = 1.5707964f;
-
-f32 fd_boss_gundan_zako_group1_one_364 = 1.0f;
 
 BattleUnitKind unit_boss_gundan_zako_group1 = {
     100,
@@ -686,7 +644,7 @@ void zakogun_ext_init123_common(ExtdrvPose* pose, s32 i) {
     (*pose->mtx)[1][3] = -1000.0f;
     (*pose->mtx)[2][3] = 0.0f;
     pose->dir = 90.0f;
-    zakogun[i].field_0x0 = 0;
+    zakogun[i].flags = 0;
     zakogun[i].state = 0;
     zakogun[i].timer = 0;
     zakogun[i].pos = (Vec){0.0f, -1000.0f, 0.0f};

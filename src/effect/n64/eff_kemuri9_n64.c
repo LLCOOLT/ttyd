@@ -31,8 +31,6 @@ typedef struct EffKemuri9N64Work {
 void effKemuri9Main(EffectEntry* effect);
 void effKemuri9Disp(CameraId cameraId, EffectEntry* effect);
 
-#pragma opt_propagation off
-#pragma opt_lifetimes off
 EffectEntry* effKemuri9N64Entry(s32 type, s32 count, s32 life, f32 x, f32 y, f32 z, f32 radiusEnd, f32 angle) {
     EffectEntry* effect;
     EffKemuri9N64Work* work;
@@ -44,7 +42,7 @@ EffectEntry* effKemuri9N64Entry(s32 type, s32 count, s32 life, f32 x, f32 y, f32
     f32 ang;
 
     effect = effEntry();
-    effect->type = "Kemuri9N64\0";
+    effect->type = "Kemuri9N64";
     effect->count = count + 1;
     work = __memAlloc(HEAP_EFFECT, (count + 1) * sizeof(EffKemuri9N64Work));
     effect->userdata = work;
@@ -80,8 +78,6 @@ EffectEntry* effKemuri9N64Entry(s32 type, s32 count, s32 life, f32 x, f32 y, f32
     return effect;
 }
 
-#pragma opt_propagation reset
-#pragma opt_lifetimes reset
 void effKemuri9Main(EffectEntry* effect) {
     EffKemuri9N64Work* work = effect->userdata;
     s32 i;

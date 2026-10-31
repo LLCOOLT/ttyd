@@ -1,7 +1,6 @@
 #include "battle/battle_unit.h"
 #include "evt/evt_cmd.h"
 
-#pragma force_active on
 #include "party.h"
 #include "manager/evtmgr_cmd.h"
 #include "driver/npcdrv.h"
@@ -116,70 +115,22 @@ static void senkaron_ext_dispent(void);
 static void senkaron_ext_disp(CameraId camera, void* param);
 static void senkaron_ext_shadow_disp(CameraId camera, void* param);
 
-f32 fd_gon_03_negone_one_374[2] __attribute__((aligned(8)));
-f32 fd_gon_03_neg_one_382;
-f32 fd_gon_03___local_PI_383;
-f32 fd_gon_03___local_3PIO2_385;
-f32 fd_gon_03_one_negone_373[2] __attribute__((aligned(8)));
-f32 fd_gon_03___local_PIO2_384;
-f32 fd_gon_03_one_381;
-f32 fd_gon_03_negone_one_360[2] __attribute__((aligned(8)));
-f32 fd_gon_03_neg_one_365;
-f32 fd_gon_03___local_PI_366;
-f32 fd_gon_03___local_3PIO2_368;
-f32 fd_gon_03_one_negone_359[2] __attribute__((aligned(8)));
-f32 fd_gon_03___local_PIO2_367;
-f32 fd_gon_03_one_364;
 static NpcSetupInfo npcEnt[4];
-static EvtWord door01_close[12];
-static EvtWord door01_open[12];
-static EvtWord door02_close[12];
-static EvtWord door02_open[12];
 static BeroEntry bero_entry_data[3];
 const char* nokotaro_pose[2];
-EvtWord tegami_event[305];
-static EvtWord senkaron_event[579];
-static EvtWord key_get[5];
-EvtWord gon_03_init_evt[256];
-EvtWord richard_init_event[29];
-EvtWord richard_regl_event[2];
-EvtWord richard_talk_event[53];
-EvtWord leaderkaron_init_event[44];
-EvtWord leaderkaron_talk_event[40];
+extern EvtWord tegami_event[];
+extern EvtWord gon_03_init_evt[];
+extern EvtWord richard_init_event[];
+extern EvtWord richard_regl_event[];
+extern EvtWord richard_talk_event[];
+extern EvtWord leaderkaron_init_event[];
+extern EvtWord leaderkaron_talk_event[];
 static ExtTexInfo senkaron_ext_entry_data[26];
-EvtWord senkarondummy_init_event[8];
-EvtWord senkarondummy_regl_event[2];
-EvtWord senkarondummy_talk_event[2];
-EvtWord senkaron_entry_event[9];
-EvtWord senkaron_escape_event[4];
-
-f32 fd_gon_03_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
-
-f32 fd_gon_03_neg_one_382 = -1.0f;
-
-f32 fd_gon_03___local_PI_383 = 3.1415927f;
-
-f32 fd_gon_03___local_3PIO2_385 = 4.712389f;
-
-f32 fd_gon_03_one_negone_373[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
-
-f32 fd_gon_03___local_PIO2_384 = 1.5707964f;
-
-f32 fd_gon_03_one_381 = 1.0f;
-
-f32 fd_gon_03_negone_one_360[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
-
-f32 fd_gon_03_neg_one_365 = -1.0f;
-
-f32 fd_gon_03___local_PI_366 = 3.1415927f;
-
-f32 fd_gon_03___local_3PIO2_368 = 4.712389f;
-
-f32 fd_gon_03_one_negone_359[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
-
-f32 fd_gon_03___local_PIO2_367 = 1.5707964f;
-
-f32 fd_gon_03_one_364 = 1.0f;
+extern EvtWord senkarondummy_init_event[];
+extern EvtWord senkarondummy_regl_event[];
+extern EvtWord senkarondummy_talk_event[];
+extern EvtWord senkaron_entry_event[];
+extern EvtWord senkaron_escape_event[];
 
 static NpcSetupInfo npcEnt[] = {
     {
@@ -225,7 +176,6 @@ static EVT_BEGIN(door01_close)
 EVT_END()
 
 int rand(void);
-
 
 static EVT_BEGIN(door01_open)
     MULTIPLY_FLOAT(LW(0), FLOAT(-0.44433594f))
@@ -795,7 +745,7 @@ USER_FUNC(leader_touch_check) {
     if (marioStGetSystemLevel() != 0U) {
         off = TRUE;
     }
-    if (npc != NULL && strcmp(npc->description, "\203\212\201[\203_\201[") == 0 && !off) {
+    if (npc != NULL && strcmp(npc->description, "リーダー") == 0 && !off) {
         evtSetValue(event, LW(0), 1);
     } else {
         evtSetValue(event, LW(0), 0);

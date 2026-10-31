@@ -46,14 +46,6 @@ USER_FUNC(btlevtcmd_RecoverFp);
 USER_FUNC(btlevtcmd_RecoverHp);
 USER_FUNC(evt_eff);
 
-__declspec(section ".data") f32 battle_break_slot_negone_one_a[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
-__declspec(section ".data") f32 fd_battle_break_slot_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
-__declspec(section ".data") f32 battle_break_slot_one_negone_a[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
-__declspec(section ".data") f32 fd_battle_break_slot_one_negone_373[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
-__declspec(section ".data") f32 battle_break_slot_negone_one_b[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
-__declspec(section ".data") f32 fd_battle_break_slot_negone_one_360[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
-__declspec(section ".data") f32 battle_break_slot_one_negone_b[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
-__declspec(section ".data") f32 fd_battle_break_slot_one_negone_359[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
 
 EVT_BEGIN(kinoko_effect)
     CALL(btlevtcmd_GetUnitId, -3, LW(3))
@@ -205,12 +197,12 @@ EVT_END()
 
 #ifdef VERSION_G8ME01
 // US battle textures are 0x16 higher
-u16 tex_id_list_small[6] = {0x41, 0x43, 0x45, 0x44, 0x42, 0};
-u16 tex_id_list_big[6] = {0x46, 0x48, 0x4A, 0x49, 0x47, 0};
+u16 tex_id_list_small[5] = {0x41, 0x43, 0x45, 0x44, 0x42};
+u16 tex_id_list_big[5] = {0x46, 0x48, 0x4A, 0x49, 0x47};
 #define BBS_ICON_OFS 8
 #else
-u16 tex_id_list_small[6] = {0x2B, 0x2D, 0x2F, 0x2E, 0x2C, 0};
-u16 tex_id_list_big[6] = {0x30, 0x32, 0x34, 0x33, 0x31, 0};
+u16 tex_id_list_small[5] = {0x2B, 0x2D, 0x2F, 0x2E, 0x2C};
+u16 tex_id_list_big[5] = {0x30, 0x32, 0x34, 0x33, 0x31};
 #define BBS_ICON_OFS 0
 #endif
 
@@ -298,7 +290,6 @@ void BattleAudienceSoundCheer(s32 a, s32 b);
 void BattleAudienceSoundBooing(void);
 double sin(double);
 
-#define SFX_ON ((s32 (*)(const char*))psndSFXOn)
 
 void BattleBreakSlot_Main(void) {
 	static f32 updown;
@@ -312,9 +303,27 @@ void BattleBreakSlot_Main(void) {
 	BreakSlotReel* rr;
 	s32 count;
 	s32 item;
+#ifdef VERSION_G8MP01
+	BOOL isBreakFrame;
+#endif
 	s32 k;
 	s32 i;
 	f32 y;
+
+#ifdef VERSION_G8MP01
+	// PAL: phase 6 plays a language-dependent number of break hits (count) every i frames;
+	// count and i are reused for this (separate live ranges, as in the original)
+	switch (gp->language) {
+		case 4: // Italian: one more break hit
+			count = 7;
+			i = 20;
+			break;
+		default:
+			count = 6;
+			i = 20;
+			break;
+	}
+#endif
 
 	switch (slot->phase) {
 		case 0:
@@ -371,7 +380,7 @@ void BattleBreakSlot_Main(void) {
 						reel->state = 7;
 					}
 				}
-				slot->startSfxId = SFX_ON("SFX_BTL_SLOT_START1");
+				slot->startSfxId = psndSFXOn("SFX_BTL_SLOT_START1");
 			}
 			break;
 		case 3:
@@ -411,7 +420,7 @@ void BattleBreakSlot_Main(void) {
 				}
 				if (count >= 2) {
 					slot->phase = 5;
-					SFX_ON("SFX_BTL_SLOT_SUCCESS1");
+					psndSFXOn("SFX_BTL_SLOT_SUCCESS1");
 					reel = BattleBreakSlotReelGetPtr(0);
 					for (i = 3; i != 0; i--, reel++) {
 						reel->state = 11;
@@ -419,7 +428,7 @@ void BattleBreakSlot_Main(void) {
 					}
 				} else {
 					slot->phase = 7;
-					SFX_ON("SFX_BTL_SYS_BREAK_FAILRE1");
+					psndSFXOn("SFX_BTL_SYS_BREAK_FAILRE1");
 					reel = BattleBreakSlotReelGetPtr(0);
 					for (i = 3; i != 0; i--, reel++) {
 						reel->state = 12;
@@ -451,15 +460,32 @@ void BattleBreakSlot_Main(void) {
 					BattleAudienceSoundBooing();
 				}
 			}
-			if (slot->phaseTimer == 20 || slot->phaseTimer == 40 || slot->phaseTimer == 60 || slot->phaseTimer == 80 ||
-			    slot->phaseTimer == 100 || slot->phaseTimer == 120) {
-				SFX_ON("SFX_BTL_SYS_BREAK1");
+#ifdef VERSION_G8MP01
+			isBreakFrame = FALSE;
+			for (item = 1; item <= count; item++) {
+				if (slot->phaseTimer == item * i) {
+					isBreakFrame = TRUE;
+					break;
+				}
+			}
+			if (isBreakFrame) {
+				psndSFXOn("SFX_BTL_SYS_BREAK1");
 				btl_camera_shake_h(0, 5.0f, 0.0f, 10, 0);
 			}
-			if (slot->phaseTimer == 120) {
+			count *= i; // now the frame of the last hit
+#define BREAK_END(n) (count + (n))
+#else
+			if (slot->phaseTimer == 20 || slot->phaseTimer == 40 || slot->phaseTimer == 60 || slot->phaseTimer == 80 ||
+			    slot->phaseTimer == 100 || slot->phaseTimer == 120) {
+				psndSFXOn("SFX_BTL_SYS_BREAK1");
+				btl_camera_shake_h(0, 5.0f, 0.0f, 10, 0);
+			}
+#define BREAK_END(n) (120 + (n))
+#endif
+			if (slot->phaseTimer == BREAK_END(0)) {
 				BattleAudienceSoundCheer(240, 240);
 			}
-			if (slot->phaseTimer == 130) {
+			if (slot->phaseTimer == BREAK_END(10)) {
 				switch (BattleBreakSlotReelGetPtr(0)->item) {
 					case 0:
 						evtEntry(kinoko_effect, 0, 0x20);
@@ -474,7 +500,7 @@ void BattleBreakSlot_Main(void) {
 					case 2:
 						evtEntry(star_effect, 0, 0x20);
 						pouchSetAP(pouchGetMaxAP());
-						SFX_ON("SFX_HP_RECOVER_BIG1");
+						psndSFXOn("SFX_HP_RECOVER_BIG1");
 						slot->breakTurn = 4;
 						slot->spMultiplier = 2.0f;
 						break;
@@ -486,11 +512,11 @@ void BattleBreakSlot_Main(void) {
 						break;
 					case 4:
 						evtEntry(doku_kinoko_effect, 0, 0x20);
-						((void (*)(s32))pouchSetAP)(((s32 (*)(void))pouchGetAP)() / 2);
+						((void (*)(s32))pouchSetAP)(pouchGetAP() / 2);
 						break;
 				}
 			}
-			if (slot->phaseTimer == 140) {
+			if (slot->phaseTimer == BREAK_END(20)) {
 				switch (BattleBreakSlotReelGetPtr(0)->item) {
 					case 0:
 					case 1:
@@ -505,7 +531,7 @@ void BattleBreakSlot_Main(void) {
 					btl_camera_set_mode(0, 0);
 				}
 			}
-			if (slot->phaseTimer == 180) {
+			if (slot->phaseTimer == BREAK_END(60)) {
 				updown = 0.0f;
 				switch (BattleBreakSlotReelGetPtr(0)->item) {
 					case 0:
@@ -524,10 +550,10 @@ void BattleBreakSlot_Main(void) {
 					updown = 0.0f;
 				}
 			}
-			if (slot->phaseTimer == 209 && updown != 0.0f) {
+			if (slot->phaseTimer == BREAK_END(89) && updown != 0.0f) {
 				BattleAudienceSoundRun(0);
 			}
-			if (slot->phaseTimer == 210) {
+			if (slot->phaseTimer == BREAK_END(90)) {
 				if (!((u32)_battleWorkPointer->cameraWork.flags & 2)) {
 					btl_camera_shake_h(0, 2.0f, 2.0f, 1000, 0);
 				}
@@ -544,11 +570,11 @@ void BattleBreakSlot_Main(void) {
 					BattleAudienceSoundStop(13);
 				}
 			}
-			if (slot->phaseTimer == 220 && k == 200) {
+			if (slot->phaseTimer == BREAK_END(100) && k == 200) {
 				btl_camera_set_mode(0, 0);
 				btl_camera_noshake(0);
 			}
-			if (slot->phaseTimer == 270) {
+			if (slot->phaseTimer == BREAK_END(150)) {
 				BattleAudienceAddTargetNum(0.0f, updown);
 				slot->phase = 8;
 				slot->flags &= ~4;
@@ -578,6 +604,7 @@ void BattleBreakSlot_Main(void) {
 			}
 			slot->phaseTimer++;
 			break;
+#undef BREAK_END
 		case 7:
 			count = 0;
 			reel = BattleBreakSlotReelGetPtr(0);

@@ -7,8 +7,6 @@
 #include "data_tables.h"
 #include "mario/mario_pouch.h"
 
-#pragma force_active on
-
 USER_FUNC(evt_bero_get_info);
 USER_FUNC(evt_cam3d_evt_off);
 USER_FUNC(evt_cam3d_evt_set);
@@ -41,62 +39,18 @@ USER_FUNC(evt_snd_envon);
 USER_FUNC(evt_snd_sfxoff);
 USER_FUNC(evt_snd_sfxon_3d);
 
-f32 fd_mri_07_negone_one_374[2] __attribute__((aligned(8)));
-f32 fd_mri_07_neg_one_382;
-f32 fd_mri_07___local_PI_383;
-f32 fd_mri_07___local_3PIO2_385;
-f32 fd_mri_07_one_negone_373[2] __attribute__((aligned(8)));
-f32 fd_mri_07___local_PIO2_384;
-f32 fd_mri_07_one_381;
-f32 fd_mri_07_negone_one_360[2] __attribute__((aligned(8)));
-f32 fd_mri_07_neg_one_365;
-f32 fd_mri_07___local_PI_366;
-f32 fd_mri_07___local_3PIO2_368;
-f32 fd_mri_07_one_negone_359[2] __attribute__((aligned(8)));
-f32 fd_mri_07___local_PIO2_367;
-f32 fd_mri_07_one_364;
 static ShopObj obj_list[6];
 static ShopItem goods_list[6];
 static ShopDb trade_list[12];
 static ShopperData35 shopper_data;
-EvtWord chibitoge_nakama[287];
-static EvtWord chibitoge_init[29];
-static EvtWord chibitoge_talk[4];
-EvtWord punishop_init[12];
-EvtWord punishop_talk[2];
-EvtWord puniinfo_init[12];
-EvtWord puniinfo_talk[118];
+extern EvtWord chibitoge_nakama[];
+extern EvtWord punishop_init[];
+extern EvtWord punishop_talk[];
+extern EvtWord puniinfo_init[];
+extern EvtWord puniinfo_talk[];
 static NpcSetupInfo npcEnt[4];
 static BeroEntry bero_entry_data[2];
-EvtWord mri_07_init_evt[108];
-
-f32 fd_mri_07_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
-
-f32 fd_mri_07_neg_one_382 = -1.0f;
-
-f32 fd_mri_07___local_PI_383 = 3.1415927f;
-
-f32 fd_mri_07___local_3PIO2_385 = 4.712389f;
-
-f32 fd_mri_07_one_negone_373[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
-
-f32 fd_mri_07___local_PIO2_384 = 1.5707964f;
-
-f32 fd_mri_07_one_381 = 1.0f;
-
-f32 fd_mri_07_negone_one_360[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
-
-f32 fd_mri_07_neg_one_365 = -1.0f;
-
-f32 fd_mri_07___local_PI_366 = 3.1415927f;
-
-f32 fd_mri_07___local_3PIO2_368 = 4.712389f;
-
-f32 fd_mri_07_one_negone_359[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
-
-f32 fd_mri_07___local_PIO2_367 = 1.5707964f;
-
-f32 fd_mri_07_one_364 = 1.0f;
+extern EvtWord mri_07_init_evt[];
 
 static ShopObj obj_list[] = {
     {"S_item_01", "A_item_01"},
@@ -363,7 +317,7 @@ EVT_BEGIN(mri_07_init_evt)
         CALL(evt_snd_bgmon, 512, STRING("BGM_STG2_MRI1"))
         CALL(evt_snd_envon, 272, STRING("ENV_STG2_MRI1"))
     END_SWITCH
-    CALL(evt_mobj_recovery_blk, STRING("mobj_recover\0\0\0"), 8, 290, 82, 120, 0, 0)
+    CALL(evt_mobj_recovery_blk, STRING("mobj_recover"), 8, 290, 82, 120, 0, 0)
     CALL(evt_npc_setup, PTR(npcEnt))
     CALL(evt_shop_setup, PTR(obj_list), PTR(goods_list), PTR(&shopper_data), PTR(trade_list))
     RETURN

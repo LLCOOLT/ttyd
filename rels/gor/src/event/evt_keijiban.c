@@ -2,14 +2,13 @@
 #include "evt/evt_cmd.h"
 #include "manager/evtmgr_cmd.h"
 
-#pragma force_active on
 #include "driver/msgdrv.h"
 #include "evt/evt_johoya.h"
 #include "stdio.h"
 #include "string.h"
 #include "memory.h"
 
-typedef struct KeijibanEntry { s16 unk0; s16 evtNo; s16 index; } KeijibanEntry;
+typedef struct KeijibanEntry { s16 flags; s16 evtNo; s16 index; } KeijibanEntry; /* flags: never accessed */
 typedef struct KeijibanData { KeijibanEntry* entries; s32 count; const char* prefix; char* label; s32 current; s32 maxEvtNo; } KeijibanData;
 #define KJDT (_kjdt)
 
@@ -19,20 +18,6 @@ USER_FUNC(keijiban_joho_check);
 USER_FUNC(keijiban_data_free);
 USER_FUNC(keijiban_data_alloc);
 
-f32 fd_evt_keijiban_negone_one_374[2] __attribute__((aligned(8)));
-f32 fd_evt_keijiban_neg_one_382;
-f32 fd_evt_keijiban___local_PI_383;
-f32 fd_evt_keijiban___local_3PIO2_385;
-f32 fd_evt_keijiban_one_negone_373[2] __attribute__((aligned(8)));
-f32 fd_evt_keijiban___local_PIO2_384;
-f32 fd_evt_keijiban_one_381;
-f32 fd_evt_keijiban_negone_one_360[2] __attribute__((aligned(8)));
-f32 fd_evt_keijiban_neg_one_365;
-f32 fd_evt_keijiban___local_PI_366;
-f32 fd_evt_keijiban___local_3PIO2_368;
-f32 fd_evt_keijiban_one_negone_359[2] __attribute__((aligned(8)));
-f32 fd_evt_keijiban___local_PIO2_367;
-f32 fd_evt_keijiban_one_364;
 KeijibanData _kjdt[1];
 
 s32 keijiban_data_make(const char* prefix, BOOL fill) {
@@ -172,34 +157,6 @@ USER_FUNC(keijiban_data_alloc) {
     keijiban_data_make(KJDT->prefix, TRUE);
     return EVT_RETURN_DONE;
 }
-
-f32 fd_evt_keijiban_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
-
-f32 fd_evt_keijiban_neg_one_382 = -1.0f;
-
-f32 fd_evt_keijiban___local_PI_383 = 3.1415927f;
-
-f32 fd_evt_keijiban___local_3PIO2_385 = 4.712389f;
-
-f32 fd_evt_keijiban_one_negone_373[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
-
-f32 fd_evt_keijiban___local_PIO2_384 = 1.5707964f;
-
-f32 fd_evt_keijiban_one_381 = 1.0f;
-
-f32 fd_evt_keijiban_negone_one_360[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
-
-f32 fd_evt_keijiban_neg_one_365 = -1.0f;
-
-f32 fd_evt_keijiban___local_PI_366 = 3.1415927f;
-
-f32 fd_evt_keijiban___local_3PIO2_368 = 4.712389f;
-
-f32 fd_evt_keijiban_one_negone_359[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
-
-f32 fd_evt_keijiban___local_PIO2_367 = 1.5707964f;
-
-f32 fd_evt_keijiban_one_364 = 1.0f;
 
 KeijibanData _kjdt[] = {
     {0},

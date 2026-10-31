@@ -19,14 +19,14 @@ void BattleAcGaugeSeDelete(void);
 typedef struct RepeatDisp {
     s32 frame;        // 0x0
     s32 frame2;       // 0x4
-    u8 field_0x8[4];  // 0x8
+    u8 pad_08[4];     // 0x8, no named access
     GXColor color;    // 0xC
     s8 delta[4];      // 0x10
-    f32 unk14;        // 0x14
-    f32 unk18;        // 0x18
-    f32 unk1C;        // 0x1C
+    f32 iconX;        // 0x14
+    f32 iconY;        // 0x18
+    f32 reserved_1C;  // 0x1C, never read
     s32 timer;        // 0x20
-    u8 field_0x24[4]; // 0x24
+    u8 pad_24[4];     // 0x24, iconStep in BattleACDispParams, not used here
     f32 gauge;        // 0x28
 } RepeatDisp;
 
@@ -42,12 +42,12 @@ typedef struct RepeatWork {
     u16 count;        // 0x20
     u16 timer;        // 0x22
     s16 power;        // 0x24
-    s16 field_0x26;   // 0x26
+    s16 graceInit;    // 0x26, initial grace frames (params[1]), never read
     s16 grace;        // 0x28
     u8 iconParam;     // 0x2A
     s8 done;          // 0x2B
     u8 resetFlag;     // 0x2C
-    u8 field_0x2D[3]; // 0x2D
+    u8 pad_2D[3];     // 0x2D
     s32 endTimer;     // 0x30
 } RepeatWork;
 
@@ -57,7 +57,7 @@ typedef struct RepeatWork {
 static void actionCommandDisp(f32 x, f32 y);
 void battleAcDelete_Repeatedly(BattleWork* work);
 
-#define PadNow(m) (((s32(*)(s32))BattlePadCheckNow)(m))
+#define PadNow(m) (BattlePadCheckNow(m))
 
 static s32 _power_table[] = {55, 50, 45, 40, 35, 30, 25};
 
@@ -105,7 +105,7 @@ static void _init_param(BattleWork* work) {
             r->btn0 = r->btn1 = r->btn2 = 0x100;
             break;
     }
-    r->field_0x26 = r->grace = work->actionCommands.params[1];
+    r->graceInit = r->grace = work->actionCommands.params[1];
     r->pos = work->actionCommands.params[2];
     r->vel = work->actionCommands.params[3] / 10.0f;
     if (r->vel) {
@@ -140,8 +140,8 @@ s32 battleAcMain_Repeatedly(BattleWork* work) {
     switch (work->actionCommands.mAcState) {
         case 0:
             memset(d, 0, sizeof(RepeatDisp));
-            d->unk14 = -300.0f;
-            d->unk18 = 0.0f;
+            d->iconX = -300.0f;
+            d->iconY = 0.0f;
             d->timer = 20;
             d->color = (GXColor){255, 255, 255, 255};
             d->delta[0] = 0;
@@ -466,6 +466,3 @@ static void actionCommandDisp(f32 x, f32 y) {
     d->frame2++;
 }
 
-#pragma force_active on
-u32 gap_07_804117CC_sdata[5] = {0};
-#pragma force_active reset

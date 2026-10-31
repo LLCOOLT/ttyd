@@ -1,7 +1,6 @@
 #include "battle/battle_unit.h"
 #include "evt/evt_cmd.h"
 
-#pragma force_active on
 #include "manager/evtmgr_cmd.h"
 #include "driver/npcdrv.h"
 #include "mario/mario.h"
@@ -29,7 +28,7 @@
 #include "mario/mario_pouch.h"
 
 int rand(void);
-typedef struct Teresa { Vec vel; f32 angle; Vec ofs; f32 field_0x1C; f32 field_0x20; Vec from; Vec to; s32 wait; u8 alpha; u8 seq; } Teresa;
+typedef struct Teresa { Vec vel; f32 angle; Vec ofs; f32 bobPhase; f32 angleSpeed; Vec from; Vec to; s32 wait; u8 alpha; u8 seq; } Teresa;
 static Teresa* pTeresa;
 Vec g_vecRotCenter;
 s32 g_bMove;
@@ -153,64 +152,39 @@ f32 computeAngle(ExtdrvPose* pose, MarioWork* mp);
 static f32 randf(f32 min, f32 max);
 s32 randn(s32 min, s32 max);
 
-f32 fd_jin_00_negone_one_374[2] __attribute__((aligned(8)));
-f32 fd_jin_00_neg_one_382;
-f32 fd_jin_00___local_PI_383;
-f32 fd_jin_00___local_3PIO2_385;
-f32 fd_jin_00_one_negone_373[2] __attribute__((aligned(8)));
-f32 fd_jin_00___local_PIO2_384;
-f32 fd_jin_00_one_381;
-f32 fd_jin_00_negone_one_360[2] __attribute__((aligned(8)));
-f32 fd_jin_00_neg_one_365;
-f32 fd_jin_00___local_PI_366;
-f32 fd_jin_00___local_3PIO2_368;
-f32 fd_jin_00_one_negone_359[2] __attribute__((aligned(8)));
-f32 fd_jin_00___local_PIO2_367;
-f32 fd_jin_00_one_364;
-static EvtWord w_open[22];
-static EvtWord w_close[22];
-EvtWord n3_open[12];
-EvtWord n3_close[12];
-static EvtWord s_open[12];
-static EvtWord s_close[12];
-static EvtWord n2_open[12];
-static EvtWord n2_close[12];
-EvtWord e3_open[12];
-EvtWord e3_close[12];
-EvtWord e1_open[12];
-EvtWord e1_close[12];
-EvtWord e2_open[12];
-EvtWord e2_close[12];
-EvtWord jin_00_dai[16];
-EvtWord jin_00_dai_in_sub[83];
-EvtWord jin_00_dai_in[9];
-static EvtWord check_roll[16];
-EvtWord teresa_n_fadein[48];
-EvtWord teresa_n_fadeout[35];
-EvtWord door_teresa_n[90];
-EvtWord teresa_s_fadein[48];
-EvtWord teresa_s_fadeout[35];
-EvtWord door_teresa_s[90];
+extern EvtWord n3_open[];
+extern EvtWord n3_close[];
+extern EvtWord e3_open[];
+extern EvtWord e3_close[];
+extern EvtWord e1_open[];
+extern EvtWord e1_close[];
+extern EvtWord e2_open[];
+extern EvtWord e2_close[];
+extern EvtWord jin_00_dai[];
+extern EvtWord jin_00_dai_in_sub[];
+extern EvtWord jin_00_dai_in[];
+extern EvtWord teresa_n_fadein[];
+extern EvtWord teresa_n_fadeout[];
+extern EvtWord door_teresa_n[];
+extern EvtWord teresa_s_fadein[];
+extern EvtWord teresa_s_fadeout[];
+extern EvtWord door_teresa_s[];
 BeroEntry bero_stg4majo3nin[1];
 static BeroEntry bero_entry_data[10];
-EvtWord first_jin00[69];
-static EvtWord push_evt[297];
-EvtWord nopush_evt[5];
-static EvtWord evt_key[5];
+extern EvtWord first_jin00[];
+extern EvtWord nopush_evt[];
 static s32 lock_tbl[2];
-static EvtWord lock_item_check[23];
-static EvtWord evt_unlock[10];
-EvtWord tyuou_teresa_kusukusu[42];
-EvtWord tyuou_teresa_look_mario[14];
-EvtWord tyuou_teresa_init[35];
-EvtWord tyuou_teresa_talk[391];
-EvtWord oku_teresa_init[21];
-EvtWord temae_teresa_init[21];
-EvtWord atomic_teresa_init[2];
+extern EvtWord tyuou_teresa_kusukusu[];
+extern EvtWord tyuou_teresa_look_mario[];
+extern EvtWord tyuou_teresa_init[];
+extern EvtWord tyuou_teresa_talk[];
+extern EvtWord oku_teresa_init[];
+extern EvtWord temae_teresa_init[];
+extern EvtWord atomic_teresa_init[];
 static NpcSetupInfo npcEnt[12];
 static ExtTexInfo senteresa_ext_entry_data[47];
-EvtWord senteresa_evt[1248];
-EvtWord jin_00_init_evt[221];
+extern EvtWord senteresa_evt[];
+extern EvtWord jin_00_init_evt[];
 
 USER_FUNC(get_npc_color) {
     EvtWord* args = event->args;
@@ -318,7 +292,7 @@ static void senteresa_ext_init(void) {
         pTeresa[i].wait = (i % 100 + 1) * 3;
         pTeresa[i].alpha = 0;
         pTeresa[i].seq = 0;
-        pTeresa[i].field_0x20 = randf(0.0f, 0.1f);
+        pTeresa[i].angleSpeed = randf(0.0f, 0.1f);
         pTeresa[i].ofs.x = randf(-300.0f, 300.0f);
         pTeresa[i].ofs.y = 0.0f;
         pTeresa[i].ofs.z = randf(-235.0f, 235.0f);
@@ -341,34 +315,6 @@ static void senteresa_ext_init(void) {
     g_vecRotCenter.y = 0.0f;
     g_vecRotCenter.z = mp->position.z;
 }
-
-f32 fd_jin_00_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
-
-f32 fd_jin_00_neg_one_382 = -1.0f;
-
-f32 fd_jin_00___local_PI_383 = 3.1415927f;
-
-f32 fd_jin_00___local_3PIO2_385 = 4.712389f;
-
-f32 fd_jin_00_one_negone_373[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
-
-f32 fd_jin_00___local_PIO2_384 = 1.5707964f;
-
-f32 fd_jin_00_one_381 = 1.0f;
-
-f32 fd_jin_00_negone_one_360[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
-
-f32 fd_jin_00_neg_one_365 = -1.0f;
-
-f32 fd_jin_00___local_PI_366 = 3.1415927f;
-
-f32 fd_jin_00___local_3PIO2_368 = 4.712389f;
-
-f32 fd_jin_00_one_negone_359[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
-
-f32 fd_jin_00___local_PIO2_367 = 1.5707964f;
-
-f32 fd_jin_00_one_364 = 1.0f;
 
 static EVT_BEGIN(w_open)
     MULTIPLY_FLOAT(LW(0), FLOAT(0.38867188f))
@@ -1386,10 +1332,10 @@ static void senteresa_ext_main(void) {
                 (*pose->mtx)[0][3] = g_vecRotCenter.x + v.x;
                 (*pose->mtx)[2][3] = g_vecRotCenter.z + v.z;
                 v.y = (*pose->mtx)[1][3];
-                (*pose->mtx)[1][3] = 0.4f * sinf(1.2f * pTeresa[i].field_0x1C) + v.y;
-                pTeresa[i].field_0x1C += 0.08f;
-                if (pTeresa[i].field_0x1C > 3.1415927f) {
-                    pTeresa[i].field_0x1C -= 3.1415927f;
+                (*pose->mtx)[1][3] = 0.4f * sinf(1.2f * pTeresa[i].bobPhase) + v.y;
+                pTeresa[i].bobPhase += 0.08f;
+                if (pTeresa[i].bobPhase > 3.1415927f) {
+                    pTeresa[i].bobPhase -= 3.1415927f;
                 }
                 angle = computeAngle(pose, mp);
                 pTeresa[i].alpha += 3;
@@ -1426,10 +1372,10 @@ static void senteresa_ext_main(void) {
                 (*pose->mtx)[0][3] = g_vecRotCenter.x + v.x;
                 (*pose->mtx)[2][3] = g_vecRotCenter.z + v.z;
                 v.y = (*pose->mtx)[1][3];
-                (*pose->mtx)[1][3] = 0.4f * sinf(1.2f * pTeresa[i].field_0x1C) + v.y;
-                pTeresa[i].field_0x1C += 0.08f;
-                if (pTeresa[i].field_0x1C > 3.1415927f) {
-                    pTeresa[i].field_0x1C -= 3.1415927f;
+                (*pose->mtx)[1][3] = 0.4f * sinf(1.2f * pTeresa[i].bobPhase) + v.y;
+                pTeresa[i].bobPhase += 0.08f;
+                if (pTeresa[i].bobPhase > 3.1415927f) {
+                    pTeresa[i].bobPhase -= 3.1415927f;
                 }
                 angle = computeAngle(pose, mp);
                 computeAlpha(&pTeresa[i], mp, angle);
@@ -1449,8 +1395,8 @@ static void senteresa_ext_main(void) {
                 (*pose->mtx)[0][3] = g_vecRotCenter.x + v.x;
                 (*pose->mtx)[2][3] = g_vecRotCenter.z + v.z;
                 v.y = (*pose->mtx)[1][3];
-                (*pose->mtx)[1][3] = 0.4f * sinf(1.2f * pTeresa[i].field_0x1C) + v.y;
-                pTeresa[i].field_0x1C += 0.08f;
+                (*pose->mtx)[1][3] = 0.4f * sinf(1.2f * pTeresa[i].bobPhase) + v.y;
+                pTeresa[i].bobPhase += 0.08f;
                 pTeresa[i].wait--;
                 if (pTeresa[i].wait == 0) {
                     pose->flags &= ~2;
@@ -1465,15 +1411,15 @@ static void senteresa_ext_main(void) {
                 (*pose->mtx)[0][3] = g_vecRotCenter.x + v.x;
                 (*pose->mtx)[1][3] = v.y;
                 (*pose->mtx)[2][3] = g_vecRotCenter.z + v.z;
-                pTeresa[i].field_0x1C += 0.08f;
-                if (pTeresa[i].field_0x1C > 3.1415927f) {
-                    pTeresa[i].field_0x1C -= 3.1415927f;
+                pTeresa[i].bobPhase += 0.08f;
+                if (pTeresa[i].bobPhase > 3.1415927f) {
+                    pTeresa[i].bobPhase -= 3.1415927f;
                 }
-                pTeresa[i].field_0x20 += 0.01f;
-                if (pTeresa[i].field_0x20 > 1.2f) {
-                    pTeresa[i].field_0x20 = 1.2f;
+                pTeresa[i].angleSpeed += 0.01f;
+                if (pTeresa[i].angleSpeed > 1.2f) {
+                    pTeresa[i].angleSpeed = 1.2f;
                 }
-                pTeresa[i].angle += pTeresa[i].field_0x20;
+                pTeresa[i].angle += pTeresa[i].angleSpeed;
                 if (pTeresa[i].angle > 360.0f) {
                     pTeresa[i].angle -= 360.0f;
                 }
@@ -1490,7 +1436,7 @@ static void senteresa_ext_main(void) {
                 if (!party && g_nNumHuttobasu[0] < 20) {
                     pTeresa[i].wait--;
                     if (pTeresa[i].wait == 0) {
-                        pTeresa[i].field_0x1C = 0.0f;
+                        pTeresa[i].bobPhase = 0.0f;
                         pTeresa[i].seq++;
                     }
                 }
@@ -1505,11 +1451,11 @@ static void senteresa_ext_main(void) {
                 PSVECScale(&d, &d, 1.8f);
                 PSVECAdd(&v, &d, &v);
                 (*pose->mtx)[0][3] = v.x;
-                (*pose->mtx)[1][3] = 0.4f * sinf(1.2f * pTeresa[i].field_0x1C) + v.y;
+                (*pose->mtx)[1][3] = 0.4f * sinf(1.2f * pTeresa[i].bobPhase) + v.y;
                 (*pose->mtx)[2][3] = v.z;
-                pTeresa[i].field_0x1C += 0.08f;
-                if (pTeresa[i].field_0x1C > 3.1415927f) {
-                    pTeresa[i].field_0x1C -= 3.1415927f;
+                pTeresa[i].bobPhase += 0.08f;
+                if (pTeresa[i].bobPhase > 3.1415927f) {
+                    pTeresa[i].bobPhase -= 3.1415927f;
                 }
                 if (!party) {
                     PSVECSubtract(&v, &mp->position, &v);
@@ -1569,11 +1515,11 @@ static void senteresa_ext_main(void) {
                 computePos(&pTeresa[i], &v);
                 v.y = (*pose->mtx)[1][3];
                 (*pose->mtx)[0][3] = g_vecRotCenter.x + v.x;
-                (*pose->mtx)[1][3] = 0.4f * sinf(1.2f * pTeresa[i].field_0x1C) + v.y;
+                (*pose->mtx)[1][3] = 0.4f * sinf(1.2f * pTeresa[i].bobPhase) + v.y;
                 (*pose->mtx)[2][3] = g_vecRotCenter.z + v.z;
-                pTeresa[i].field_0x1C += 0.08f;
-                if (pTeresa[i].field_0x1C > 3.1415927f) {
-                    pTeresa[i].field_0x1C -= 3.1415927f;
+                pTeresa[i].bobPhase += 0.08f;
+                if (pTeresa[i].bobPhase > 3.1415927f) {
+                    pTeresa[i].bobPhase -= 3.1415927f;
                 }
                 pTeresa[i].angle += 1.2f;
                 if (pTeresa[i].angle > 360.0f) {
@@ -1604,11 +1550,11 @@ static void senteresa_ext_main(void) {
                 computePos(&pTeresa[i], &v);
                 v.y = (*pose->mtx)[1][3];
                 (*pose->mtx)[0][3] = g_vecRotCenter.x + v.x;
-                (*pose->mtx)[1][3] = 0.4f * sinf(1.2f * pTeresa[i].field_0x1C) + v.y;
+                (*pose->mtx)[1][3] = 0.4f * sinf(1.2f * pTeresa[i].bobPhase) + v.y;
                 (*pose->mtx)[2][3] = g_vecRotCenter.z + v.z;
-                pTeresa[i].field_0x1C += 0.08f;
-                if (pTeresa[i].field_0x1C > 3.1415927f) {
-                    pTeresa[i].field_0x1C -= 3.1415927f;
+                pTeresa[i].bobPhase += 0.08f;
+                if (pTeresa[i].bobPhase > 3.1415927f) {
+                    pTeresa[i].bobPhase -= 3.1415927f;
                 }
                 pTeresa[i].angle += 1.2f;
                 if (pTeresa[i].angle > 360.0f) {
@@ -1623,7 +1569,7 @@ static void senteresa_ext_main(void) {
                     pTeresa[i].from.x = (*pose->mtx)[0][3];
                     pTeresa[i].from.y = (*pose->mtx)[1][3];
                     pTeresa[i].from.z = (*pose->mtx)[2][3];
-                    pTeresa[i].field_0x1C = 0.0f;
+                    pTeresa[i].bobPhase = 0.0f;
                     pTeresa[i].seq++;
                 }
                 break;
@@ -1631,7 +1577,7 @@ static void senteresa_ext_main(void) {
                 f32 t;
 
                 pose->texId = (gp->retraceCount + i * i) % 10 + 16;
-                t = pTeresa[i].field_0x1C;
+                t = pTeresa[i].bobPhase;
                 if (t >= 1.0f) {
                     pTeresa[i].seq = 22;
                     {
@@ -1647,9 +1593,9 @@ static void senteresa_ext_main(void) {
                     v.y = (1.0f - t) * pTeresa[i].from.y + t * pTeresa[i].to.y;
                     v.z = (1.0f - t) * pTeresa[i].from.z + t * pTeresa[i].to.z;
                     (*pose->mtx)[0][3] = v.x;
-                    (*pose->mtx)[1][3] = 20.0f * (f32)sin(6.28f * pTeresa[i].field_0x1C) + v.y;
+                    (*pose->mtx)[1][3] = 20.0f * (f32)sin(6.28f * pTeresa[i].bobPhase) + v.y;
                     (*pose->mtx)[2][3] = v.z;
-                    pTeresa[i].field_0x1C += 0.01f;
+                    pTeresa[i].bobPhase += 0.01f;
                 }
                 break;
             }
@@ -1776,7 +1722,7 @@ USER_FUNC(senteresa_tikaduku_stop) {
 
 USER_FUNC(senteresa_syugo) {
     ExtdrvPose* pose = extGetPosePtr();
-    NpcEntry* npc = npcNameToPtr("\222\206\211\233\203e\203\214\203T");
+    NpcEntry* npc = npcNameToPtr("中央テレサ");
     s32 n = extGetPoseNum();
     s32 i;
     f32 a;
@@ -1792,7 +1738,7 @@ USER_FUNC(senteresa_syugo) {
         pTeresa[i].to.x = r * cosf(a) + npc->position.x;
         pTeresa[i].to.y = r * sinf(a) + npc->position.y;
         pTeresa[i].to.z = npc->position.z;
-        pTeresa[i].field_0x1C = 0.0f;
+        pTeresa[i].bobPhase = 0.0f;
         pTeresa[i].wait = (i & 15) + rand() % 10 * 30 + 1;
         pTeresa[i].alpha = 255;
         pTeresa[i].seq = 20;
@@ -1818,7 +1764,7 @@ USER_FUNC(senteresa_dispoff) {
 
 USER_FUNC(senteresa_huttobu) {
     ExtdrvPose* pose = extGetPosePtr();
-    NpcEntry* npc = npcNameToPtr("\203A\203g\203~\203b\203N\203e\203\214\203T");
+    NpcEntry* npc = npcNameToPtr("アトミックテレサ");
     s32 n = extGetPoseNum();
     s32 i;
     f32 scale;

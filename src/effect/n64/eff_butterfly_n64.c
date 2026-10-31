@@ -10,57 +10,7 @@
 #include <stdlib.h>
 #include "eff/eff_magic1_n64.h"
 #include "libc_decls.h"
-
-
-#define NAN (*(f32*)__float_nan)
-
-#define FP_NAN 1
-#define FP_INFINITE 2
-#define FP_ZERO 3
-#define FP_NORMAL 4
-#define FP_SUBNORMAL 5
-
-static inline s32 __fpclassifyf(f32 x) {
-    switch (*(s32*)&x & 0x7F800000) {
-        case 0x7F800000:
-            if (*(s32*)&x & 0x007FFFFF) {
-                return FP_NAN;
-            } else {
-                return FP_INFINITE;
-            }
-            break;
-        case 0:
-            if (*(s32*)&x & 0x007FFFFF) {
-                return FP_SUBNORMAL;
-            } else {
-                return FP_ZERO;
-            }
-            break;
-        default:
-            return FP_NORMAL;
-    }
-}
-
-#define fpclassify(x) __fpclassifyf(x)
-#define isnan(x) (fpclassify(x) == FP_NAN)
-
-static inline f32 sqrtf(f32 x) {
-    const f64 _half = .5;
-    const f64 _three = 3.0;
-
-    if (x > 0.0f) {
-        f64 guess = __frsqrte(x);
-        guess = _half * guess * (_three - guess * guess * x);
-        guess = _half * guess * (_three - guess * guess * x);
-        guess = _half * guess * (_three - guess * guess * x);
-        return x * guess;
-    } else if (x < 0.0) {
-        return NAN;
-    } else if (isnan(x)) {
-        return NAN;
-    }
-    return x;
-}
+#include <math.h>
 
 typedef struct EffButterflyN64Work {
     s32 type;       // 0x0
@@ -77,7 +27,7 @@ typedef struct EffButterflyN64Work {
     Vec velocity;   // 0x3C
 } EffButterflyN64Work;
 
-static s8 y_data[32] = {-1, -2, -3, -4, -5, -6, -7, -8, -9, -10, -11, -12, -13, -14, -15, -16, -17, -18, -19, -17, -15, -13, -11, -9, -7, -5, -3, -1, 0, 0, 0, 0};
+static s8 y_data[30] = {-1, -2, -3, -4, -5, -6, -7, -8, -9, -10, -11, -12, -13, -14, -15, -16, -17, -18, -19, -17, -15, -13, -11, -9, -7, -5, -3, -1, 0, 0};
 
 void effButterflyMain(EffectEntry* effect);
 void effButterflyDisp(CameraId cameraId, EffectEntry* effect);
@@ -269,7 +219,7 @@ EffectEntry* effButterflyN64Entry(s32 type, f32 x, f32 y, f32 z) {
     EffButterflyN64Work* work;
 
     effect = effEntry();
-    effect->type = "ButterflyN64\0\0\0";
+    effect->type = "ButterflyN64";
     effect->count = 1;
     work = __memAlloc(HEAP_EFFECT, sizeof(EffButterflyN64Work));
     effect->userdata = work;

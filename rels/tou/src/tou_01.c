@@ -3,7 +3,6 @@
 #include "battle/battle_unit.h"
 #include "evt/evt_cmd.h"
 
-#pragma force_active on
 #include "mario/mario.h"
 #include "mario/mario_party.h"
 #include "party.h"
@@ -194,129 +193,78 @@ static USER_FUNC(yami_view);
 void make_shadow_disp(CameraId camera, void* param);
 extern s32 envSetYami[];
 
-f32 fd_tou_01_negone_one_374[2] __attribute__((aligned(8)));
-f32 fd_tou_01_neg_one_382;
-f32 fd_tou_01___local_PI_383;
-f32 fd_tou_01___local_3PIO2_385;
-f32 fd_tou_01_one_negone_373[2] __attribute__((aligned(8)));
-f32 fd_tou_01___local_PIO2_384;
-f32 fd_tou_01_one_381;
-f32 fd_tou_01_negone_one_360[2] __attribute__((aligned(8)));
-f32 fd_tou_01_neg_one_365;
-f32 fd_tou_01___local_PI_366;
-f32 fd_tou_01___local_3PIO2_368;
-f32 fd_tou_01_one_negone_359[2] __attribute__((aligned(8)));
-f32 fd_tou_01___local_PIO2_367;
-f32 fd_tou_01_one_364;
-static EvtWord n_door_open[60];
-static EvtWord n_door_close[58];
 static BeroEntry bero_data[2];
-static EvtWord evt_door[15];
-static EvtWord evt_door2[12];
-static EvtWord evt_wall[22];
-EvtWord evt_door_1_open[12];
-EvtWord evt_door_1_close[14];
+extern EvtWord evt_door_1_open[];
+extern EvtWord evt_door_1_close[];
 static const char* mise_npc[2];
 static DoorParam door_1;
-static EvtWord evt_door_2[12];
-static EvtWord evt_door2_2[12];
-EvtWord evt_sakaba_1[26];
-EvtWord evt_sakaba_2[26];
-EvtWord evt_sakaba_3[26];
-EvtWord evt_sakaba_4[29];
-#ifdef VERSION_G8ME01
-EvtWord evt_wall2[38];
-#else
-EvtWord evt_wall2[19];
-#endif
+extern EvtWord evt_sakaba_1[];
+extern EvtWord evt_sakaba_2[];
+extern EvtWord evt_sakaba_3[];
+extern EvtWord evt_sakaba_4[];
+extern EvtWord evt_wall2[];
 const char* sakaba_npc[7];
 const char* sakaba_item[2];
-EvtWord evt_door_2_open[12];
-EvtWord evt_door_2_close[14];
+extern EvtWord evt_door_2_open[];
+extern EvtWord evt_door_2_close[];
 static DoorParam door_2;
-static EvtWord evt_kanban[51];
-static EvtWord evt_kanban2[175];
 static ShopObj obj_list[6];
 static ShopItem goods_list[6];
 static ShopDb trade_list[13];
 static ShopperData35 shopper_data;
-EvtWord evt_hotdog[86];
-EvtWord evt_ship_shadow[91];
-EvtWord init_hikuu[12];
-EvtWord talk_hikuu[84];
-EvtWord init_sakaba[8];
-EvtWord talk_sakaba[369];
-EvtWord init_mise[12];
-EvtWord talk_mise[2];
-EvtWord init_hot[13];
-EvtWord talk_hot[21];
-static EvtWord init_papa[20];
-static EvtWord talk_papa[78];
-static EvtWord init_mama[20];
-static EvtWord talk_mama[78];
-static EvtWord init_konari[20];
-static EvtWord talk_konari[78];
-static EvtWord talk_musume[132];
-EvtWord init_musume_1[14];
-EvtWord talk_musume_1[4];
-EvtWord init_musume_2[14];
-EvtWord talk_musume_2[4];
-EvtWord init_musume_3[14];
-EvtWord talk_musume_3[4];
-EvtWord init_kino_1[13];
-EvtWord reg_kino_1[31];
-EvtWord talk_kino_1[112];
-EvtWord init_kino_2[8];
-EvtWord talk_kino_2[112];
-EvtWord init_roten_1[8];
-EvtWord talk_roten_1[112];
-EvtWord init_roten_2[8];
-EvtWord talk_roten_2[112];
-EvtWord init_jugem_1[8];
-EvtWord talk_jugem_1[112];
-EvtWord init_jugem_2[12];
-EvtWord talk_jugem_2[112];
-EvtWord init_bijyo[40];
-EvtWord talk_bijyo[112];
-static EvtWord init_kiza[21];
-static EvtWord talk_kiza[60];
-static EvtWord init_sarary[12];
-EvtWord select_number[44];
-static EvtWord talk_sarary[479];
+extern EvtWord evt_hotdog[];
+extern EvtWord evt_ship_shadow[];
+extern EvtWord init_hikuu[];
+extern EvtWord talk_hikuu[];
+extern EvtWord init_sakaba[];
+extern EvtWord talk_sakaba[];
+extern EvtWord init_mise[];
+extern EvtWord talk_mise[];
+extern EvtWord init_hot[];
+extern EvtWord talk_hot[];
+extern EvtWord init_musume_1[];
+extern EvtWord talk_musume_1[];
+extern EvtWord init_musume_2[];
+extern EvtWord talk_musume_2[];
+extern EvtWord init_musume_3[];
+extern EvtWord talk_musume_3[];
+extern EvtWord init_kino_1[];
+extern EvtWord reg_kino_1[];
+extern EvtWord talk_kino_1[];
+extern EvtWord init_kino_2[];
+extern EvtWord talk_kino_2[];
+extern EvtWord init_roten_1[];
+extern EvtWord talk_roten_1[];
+extern EvtWord init_roten_2[];
+extern EvtWord talk_roten_2[];
+extern EvtWord init_jugem_1[];
+extern EvtWord talk_jugem_1[];
+extern EvtWord init_jugem_2[];
+extern EvtWord talk_jugem_2[];
+extern EvtWord init_bijyo[];
+extern EvtWord talk_bijyo[];
+extern EvtWord select_number[];
 static NpcSetupInfo npcEnt[20];
-EvtWord evt_uron[195];
-EvtWord evt_tamago_sleep[56];
-EvtWord dummy[2];
-EvtWord hot_move_evt[66];
-EvtWord hot_move_evt2[24];
-EvtWord evt_oyaji_move[60];
-static EvtWord evt_tamago_scale[89];
-static EvtWord evt_tamago_scale2[83];
+extern EvtWord evt_uron[];
+extern EvtWord evt_tamago_sleep[];
+extern EvtWord dummy[];
+extern EvtWord hot_move_evt[];
+extern EvtWord hot_move_evt2[];
+extern EvtWord evt_oyaji_move[];
 s32 yoshi_data[30];
-EvtWord evt_tamago_move[306];
-EvtWord evt_tamago[100];
-EvtWord talk_tamago[321];
-EvtWord evt_gondora_updown[143];
-EvtWord evt_gondora_mon[62];
-EvtWord evt_gondora[169];
-EvtWord evt_gondora2[200];
-EvtWord evt_search_light[82];
-EvtWord evt_dummy_sw[178];
-EvtWord evt_peach_after[92];
-static EvtWord sekai_yami_npc_init[84];
-static EvtWord sekai_yami_npc[65];
-static EvtWord sekai_yami_evt[215];
-static EvtWord minnnanokoe_npc_entry[175];
-static EvtWord minnnanokoe_evt[446];
-EvtWord evt_telbox[124];
-EvtWord evt_mail[175];
-static EvtWord evt_key[7];
-static EvtWord mobj_box00[36];
-#ifdef VERSION_G8ME01
-EvtWord tou_01_init_evt[1641];
-#else
-EvtWord tou_01_init_evt[627];
-#endif
+extern EvtWord evt_tamago_move[];
+extern EvtWord evt_tamago[];
+extern EvtWord talk_tamago[];
+extern EvtWord evt_gondora_updown[];
+extern EvtWord evt_gondora_mon[];
+extern EvtWord evt_gondora[];
+extern EvtWord evt_gondora2[];
+extern EvtWord evt_search_light[];
+extern EvtWord evt_dummy_sw[];
+extern EvtWord evt_peach_after[];
+extern EvtWord evt_telbox[];
+extern EvtWord evt_mail[];
+extern EvtWord tou_01_init_evt[];
 
 static USER_FUNC(proj_off) {
     animPoseSetMaterialFlagOff(marioGetPtr()->paperAnimGroupId[0], 0x400);
@@ -330,34 +278,6 @@ static USER_FUNC(proj_off) {
     }
     return EVT_RETURN_DONE;
 }
-
-f32 fd_tou_01_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
-
-f32 fd_tou_01_neg_one_382 = -1.0f;
-
-f32 fd_tou_01___local_PI_383 = 3.1415927f;
-
-f32 fd_tou_01___local_3PIO2_385 = 4.712389f;
-
-f32 fd_tou_01_one_negone_373[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
-
-f32 fd_tou_01___local_PIO2_384 = 1.5707964f;
-
-f32 fd_tou_01_one_381 = 1.0f;
-
-f32 fd_tou_01_negone_one_360[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
-
-f32 fd_tou_01_neg_one_365 = -1.0f;
-
-f32 fd_tou_01___local_PI_366 = 3.1415927f;
-
-f32 fd_tou_01___local_3PIO2_368 = 4.712389f;
-
-f32 fd_tou_01_one_negone_359[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
-
-f32 fd_tou_01___local_PIO2_367 = 1.5707964f;
-
-f32 fd_tou_01_one_364 = 1.0f;
 
 static EVT_BEGIN(n_door_open)
     IF_FLOAT_EQUAL(LW(0), FLOAT(0.0f))
@@ -798,7 +718,7 @@ static USER_FUNC(proj_on) {
     if (partyGetPtr(marioGetExtraPartyId()) != NULL) {
         animPoseSetMaterialFlagOn(partyGetPtr(marioGetExtraPartyId())->paperAnimGroup, 0x400);
     }
-    animPoseSetMaterialFlagOn(npcNameToPtr("\224\362\213\363\221D")->poseId, 0x400);
+    animPoseSetMaterialFlagOn(npcNameToPtr("飛空船")->poseId, 0x400);
     return EVT_RETURN_DONE;
 }
 
@@ -2082,7 +2002,6 @@ static NpcSetupInfo npcEnt[] = {
     {0},
 };
 
-
 EVT_BEGIN(evt_uron)
     CALL(evt_mario_key_onoff, 0)
     CALL(evt_mario_normalize)
@@ -2148,7 +2067,7 @@ EVT_END()
 
 USER_FUNC(eff_sleep_on) {
     EffectEntry* eff = effNameToPtr("eff_sleep");
-    NpcEntry* npc = npcNameToPtr_NoAssert("\202\275\202\334\202\262");
+    NpcEntry* npc = npcNameToPtr_NoAssert("たまご");
 
     if (eff == NULL) {
         effSetName(effSleepEntry(0, 0, npc->position.x, 16.0f + npc->position.y, npc->position.z, 1.0f, 65.0f),
@@ -3512,6 +3431,7 @@ EVT_BEGIN(tou_01_init_evt)
         CALL(evt_mapobj_flag_onoff, 1, 0, STRING("I_gai_1"), 16384)
         CALL(evt_mapobj_flag_onoff, 1, 0, STRING("I_gai_2"), 16384)
     END_SWITCH
+#ifndef VERSION_G8MP01 // PAL sets the language signs once (above)
     CALL(evt_mapobj_flag_onoff, 1, 1, STRING("J_hot"), 16384)
     CALL(evt_mapobj_flag_onoff, 1, 1, STRING("E_hot"), 16384)
     CALL(evt_mapobj_flag_onoff, 1, 1, STRING("D_hot"), 16384)
@@ -3591,6 +3511,7 @@ EVT_BEGIN(tou_01_init_evt)
         CALL(evt_mapobj_flag_onoff, 1, 0, STRING("J_maku5"), 16384)
         CALL(evt_mapobj_flag_onoff, 1, 0, STRING("I_kan_1"), 16384)
     END_SWITCH
+#endif
     BEGIN_INLINE_EVENT
         CALL(tou_01_kanban_moji_flag_sync)
     END_INLINE_EVENT

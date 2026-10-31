@@ -2,7 +2,6 @@
 #include "battle/battle_unit.h"
 #include "evt/evt_cmd.h"
 
-#pragma force_active on
 #include "driver/camdrv.h"
 #include "driver/msgdrv.h"
 #include "mario/mariost.h"
@@ -96,64 +95,16 @@ USER_FUNC(evt_win_nameent_wait);
 static USER_FUNC(zoom);
 void msg_callback(s32 type, void* param);
 
-f32 fd_gra_00_negone_one_374[2] __attribute__((aligned(8)));
-f32 fd_gra_00_neg_one_382;
-f32 fd_gra_00___local_PI_383;
-f32 fd_gra_00___local_3PIO2_385;
-f32 fd_gra_00_one_negone_373[2] __attribute__((aligned(8)));
-f32 fd_gra_00___local_PIO2_384;
-f32 fd_gra_00_one_381;
-f32 fd_gra_00_negone_one_360[2] __attribute__((aligned(8)));
-f32 fd_gra_00_neg_one_365;
-f32 fd_gra_00___local_PI_366;
-f32 fd_gra_00___local_3PIO2_368;
-f32 fd_gra_00_one_negone_359[2] __attribute__((aligned(8)));
-f32 fd_gra_00___local_PIO2_367;
-f32 fd_gra_00_one_364;
-f64 fd_gra_00__three_localstatic4_sqrtf;
-f64 fd_gra_00__half_localstatic3_sqrtf;
-EvtWord evt_yabure_on[56];
-EvtWord evt_yabure_off[5];
-EvtWord evt_nameent[109];
-EvtWord name_seikai[682];
-EvtWord evt_machibuse[VERSION_PICK(666, 694)];
+extern EvtWord evt_yabure_on[];
+extern EvtWord evt_yabure_off[];
+extern EvtWord evt_nameent[];
+extern EvtWord name_seikai[];
+extern EvtWord evt_machibuse[];
 static BeroEntry bero_entry_data[3];
 static NpcSetupInfo npcEnt[2];
 static TreeAccess tree_tbl[2];
-EvtWord evt_majin_key[5];
-EvtWord gra_00_init_evt[74];
-
-f32 fd_gra_00_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
-
-f32 fd_gra_00_neg_one_382 = -1.0f;
-
-f32 fd_gra_00___local_PI_383 = 3.1415927f;
-
-f32 fd_gra_00___local_3PIO2_385 = 4.712389f;
-
-f32 fd_gra_00_one_negone_373[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
-
-f32 fd_gra_00___local_PIO2_384 = 1.5707964f;
-
-f32 fd_gra_00_one_381 = 1.0f;
-
-f32 fd_gra_00_negone_one_360[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
-
-f32 fd_gra_00_neg_one_365 = -1.0f;
-
-f32 fd_gra_00___local_PI_366 = 3.1415927f;
-
-f32 fd_gra_00___local_3PIO2_368 = 4.712389f;
-
-f32 fd_gra_00_one_negone_359[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
-
-f32 fd_gra_00___local_PIO2_367 = 1.5707964f;
-
-f32 fd_gra_00_one_364 = 1.0f;
-
-f64 fd_gra_00__three_localstatic4_sqrtf = 3.0;
-
-f64 fd_gra_00__half_localstatic3_sqrtf = 0.5;
+extern EvtWord evt_majin_key[];
+extern EvtWord gra_00_init_evt[];
 
 EVT_BEGIN(evt_yabure_on)
     CALL(evt_paper_entry, STRING("OFF_d_yabu_small"))

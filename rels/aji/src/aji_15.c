@@ -1,7 +1,6 @@
 #include "battle/battle_unit.h"
 #include "evt/evt_cmd.h"
 
-#pragma force_active on
 #include "mario/mario.h"
 #include "manager/evtmgr_cmd.h"
 #include "evt/evt_bero.h"
@@ -46,55 +45,11 @@ USER_FUNC(evt_sub_random);
 USER_FUNC(peach_chk_aftershower);
 USER_FUNC(peach_set_pos);
 
-f32 fd_aji_15_negone_one_374[2] __attribute__((aligned(8)));
-f32 fd_aji_15_neg_one_382;
-f32 fd_aji_15___local_PI_383;
-f32 fd_aji_15___local_3PIO2_385;
-f32 fd_aji_15_one_negone_373[2] __attribute__((aligned(8)));
-f32 fd_aji_15___local_PIO2_384;
-f32 fd_aji_15_one_381;
-f32 fd_aji_15_negone_one_360[2] __attribute__((aligned(8)));
-f32 fd_aji_15_neg_one_365;
-f32 fd_aji_15___local_PI_366;
-f32 fd_aji_15___local_3PIO2_368;
-f32 fd_aji_15_one_negone_359[2] __attribute__((aligned(8)));
-f32 fd_aji_15___local_PIO2_367;
-f32 fd_aji_15_one_364;
-static EvtWord e_door_close[22];
-static EvtWord e_door_open[22];
 static BeroEntry bero_entry_data[2];
-EvtWord peach_evt_yuge[43];
-EvtWord peach_evt_syawa_main[798];
-EvtWord peach_evt_syawa_init[63];
-EvtWord aji_15_init_evt[58];
-
-f32 fd_aji_15_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
-
-f32 fd_aji_15_neg_one_382 = -1.0f;
-
-f32 fd_aji_15___local_PI_383 = 3.1415927f;
-
-f32 fd_aji_15___local_3PIO2_385 = 4.712389f;
-
-f32 fd_aji_15_one_negone_373[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
-
-f32 fd_aji_15___local_PIO2_384 = 1.5707964f;
-
-f32 fd_aji_15_one_381 = 1.0f;
-
-f32 fd_aji_15_negone_one_360[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
-
-f32 fd_aji_15_neg_one_365 = -1.0f;
-
-f32 fd_aji_15___local_PI_366 = 3.1415927f;
-
-f32 fd_aji_15___local_3PIO2_368 = 4.712389f;
-
-f32 fd_aji_15_one_negone_359[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
-
-f32 fd_aji_15___local_PIO2_367 = 1.5707964f;
-
-f32 fd_aji_15_one_364 = 1.0f;
+extern EvtWord peach_evt_yuge[];
+extern EvtWord peach_evt_syawa_main[];
+extern EvtWord peach_evt_syawa_init[];
+extern EvtWord aji_15_init_evt[];
 
 static EVT_BEGIN(e_door_close)
     MULTIPLY_FLOAT(LW(0), FLOAT(-0.22167969f))
@@ -432,10 +387,10 @@ EVT_BEGIN(aji_15_init_evt)
     IF_INT_EQUAL(LW(0), 1)
         CALL(evt_mario_set_mode, 1)
         CALL(evt_npc_check_delete, STRING("軍団ザコエリート"))
-        CALL(evt_snd_bgmon, 512, STRING("BGM_EVT_PEACH1\0"))
+        CALL(evt_snd_bgmon, 512, STRING("BGM_EVT_PEACH1"))
         CALL(evt_snd_envoff, 512)
         ELSE
-        CALL(evt_snd_bgmon, 512, STRING("BGM_EVT_PEACH1\0"))
+        CALL(evt_snd_bgmon, 512, STRING("BGM_EVT_PEACH1"))
         CALL(evt_snd_envoff, 512)
     END_IF
     CALL(evt_snd_set_rev_mode, 1)

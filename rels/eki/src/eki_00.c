@@ -2,7 +2,6 @@
 #include "battle/battle_unit.h"
 #include "evt/evt_cmd.h"
 
-#pragma force_active on
 #include "manager/evtmgr.h"
 #include "driver/mapdrv.h"
 #include "string.h"
@@ -30,14 +29,10 @@
 #include "driver/extdrv.h"
 #undef EXT_LIT
 #define EXT_LIT(sym, val) (val)
-// target .bss/.sbss pad (uninitialised objects are emitted in reverse order, so this sits last)
-#pragma force_active on
-u32 gap_05_00000004_bss[1];
-#pragma force_active reset
 
 typedef struct MoamoaPoseDef { char model[16]; char anim[8]; s16 loop; f32 speed; s32 start; s32 count; } MoamoaPoseDef;
-typedef struct Moamoa { u16 flags; s16 state; s16 timer; u8 field_0x6[2]; Vec target; f32 vy; s16 jumpTimer; u8 field_0x1a[2]; f32 speed; f32 gravity; s16 next; u8 field_0x26[2]; f32 lastX; f32 lastZ; Vec field_0x30; s16 pose; u8 field_0x3e[2]; OSTime startTime; s16 group; s16 order; u8 kind; u8 field_0x4d[3]; } Moamoa;
-typedef struct MoamoaWork { u16 flags; u8 field_0x2[2]; s32 count; Moamoa* moa; MapObject* mobj; f32 mobjY; Vec target[3]; s16 hitCount; s16 field_0x3a[2]; s16 field_0x3e; s16 field_0x40; s16 idleFrames; void* escapeEvt; s32 animPoseId; s32 numDefs; MoamoaPoseDef defs[32]; f32 angle; f32 dist; s32 bounceCount; f32 breathDir; f32 breathDist; Vec breathPos; s16 chainNum[128]; s16 chainIdx[128][2]; } MoamoaWork;
+typedef struct Moamoa { u16 flags; s16 state; s16 timer; u8 pad_6[2]; Vec target; f32 vy; s16 jumpTimer; u8 pad_1a[2]; f32 speed; f32 gravity; s16 next; u8 pad_26[2]; f32 lastX; f32 lastZ; Vec jitter; s16 pose; u8 pad_3e[2]; OSTime startTime; s16 group; s16 order; u8 kind; u8 pad_4d[3]; } Moamoa;
+typedef struct MoamoaWork { u16 flags; u8 pad_2[2]; s32 count; Moamoa* moa; MapObject* mobj; f32 mobjY; Vec target[3]; s16 hitCount; s16 targetHits[2]; s16 thirdTargetHits; s16 hammerFrames; s16 idleFrames; void* escapeEvt; s32 animPoseId; s32 numDefs; MoamoaPoseDef defs[32]; f32 angle; f32 dist; s32 bounceCount; f32 breathDir; f32 breathDist; Vec breathPos; s16 chainNum[128]; s16 chainIdx[128][2]; } MoamoaWork; /* thirdTargetHits is targetHits[2], reached by i % 3 */
 typedef struct MoamoaData { const char* model; const char* anim; f32 speed; } MoamoaData;
 static MoamoaWork* wp;
 int rand(void);
@@ -53,14 +48,10 @@ extern const char* g_moamoa_chain_tbl[][2];
 static void ext_moamoa_main(void);
 static void ext_moamoa_main(void);
 #pragma inline_max_total_size(100000)
-#pragma opt_propagation off
-#pragma opt_lifetimes off
 static inline f32 moa_sin(f32 x) { f32 a = 0.00761f; f32 b = 0.16605f; f32 c = 1.0f; f32 y; f32 x2; if (x <= 3.1415927f) { if (x <= 1.5707964f) { x2 = x * x; a = a * x2 - b; a = a * x2 + c; a = a * x; } else { y = 1.5707964f - (x - 1.5707964f); x2 = y * y; a = a * x2 - b; a = a * x2 + c; a = a * y; } } else if (x < 4.712389f) { y = x - 3.1415927f; x2 = y * y; a = a * x2 - b; a = a * x2 + c; a = a * y; a = -a; } else { y = 1.5707964f - (x - 4.712389f); x2 = y * y; a = a * x2 - b; a = a * x2 + c; a = a * y; a = -a; } return a; }
 static inline f32 moa_cos(f32 x) { f32 a = 0.03705f; f32 b = 0.4967f; f32 c = 1.0f; f32 y; f32 x2; if (x <= 3.1415927f) { if (x <= 1.5707964f) { x2 = x * x; a = a * x2 - b; a = a * x2 + c; } else { y = 1.5707964f - (x - 1.5707964f); x2 = y * y; a = a * x2 - b; a = a * x2 + c; a = -a; } } else if (x < 4.712389f) { y = x - 3.1415927f; x2 = y * y; a = a * x2 - b; a = a * x2 + c; a = -a; } else { y = 1.5707964f - (x - 4.712389f); x2 = y * y; a = a * x2 - b; a = a * x2 + c; } return a; }
 static inline f32 moa_sinx(f32 x) { f32 a = 0.00761f; f32 b = 0.16605f; f32 c = 1.0f; f32 x2; if (x <= 3.1415927f) { if (x <= 1.5707964f) { x2 = x * x; a = a * x2 - b; a = a * x2 + c; a = a * x; } else { x = 1.5707964f - (x - 1.5707964f); x2 = x * x; a = a * x2 - b; a = a * x2 + c; a = a * x; } } else if (x < 4.712389f) { x = x - 3.1415927f; x2 = x * x; a = a * x2 - b; a = a * x2 + c; a = a * x; a = -a; } else { x = 1.5707964f - (x - 4.712389f); x2 = x * x; a = a * x2 - b; a = a * x2 + c; a = a * x; a = -a; } return a; }
 static inline f32 moa_cosx(f32 x) { f32 a = 0.03705f; f32 b = 0.4967f; f32 c = 1.0f; f32 x2; if (x <= 3.1415927f) { if (x <= 1.5707964f) { x2 = x * x; a = a * x2 - b; a = a * x2 + c; } else { x = 1.5707964f - (x - 1.5707964f); x2 = x * x; a = a * x2 - b; a = a * x2 + c; a = -a; } } else if (x < 4.712389f) { x = x - 3.1415927f; x2 = x * x; a = a * x2 - b; a = a * x2 + c; a = -a; } else { x = 1.5707964f - (x - 4.712389f); x2 = x * x; a = a * x2 - b; a = a * x2 + c; } return a; }
-#pragma opt_propagation reset
-#pragma opt_lifetimes reset
 s32 nokonokoGetStatus(PartyEntry* party);
 f32 cloudGetBreathDist(void);
 double sin(double x);
@@ -203,70 +194,18 @@ s32 evt_win_item_select(EventEntry* event, BOOL isFirstCall);
 s32 img_set_color(EventEntry* event, BOOL isFirstCall);
 s32 img_set_color(EventEntry* event, BOOL isFirstCall);
 
-f32 fd_eki_00_negone_one_374[2] __attribute__((aligned(8)));
-f32 fd_eki_00_neg_one_382;
-f32 fd_eki_00___local_PI_383;
-f32 fd_eki_00___local_3PIO2_385;
-f32 fd_eki_00_one_negone_373[2] __attribute__((aligned(8)));
-f32 fd_eki_00___local_PIO2_384;
-f32 fd_eki_00_one_381;
-f32 fd_eki_00_negone_one_360[2] __attribute__((aligned(8)));
-f32 fd_eki_00_neg_one_365;
-f32 fd_eki_00___local_PI_366;
-f32 fd_eki_00___local_3PIO2_368;
-f32 fd_eki_00_one_negone_359[2] __attribute__((aligned(8)));
-f32 fd_eki_00___local_PIO2_367;
-f32 fd_eki_00_one_364;
 static ExtTexInfo ext_moamoa_data[47];
-static EvtWord e_door_close[12];
-static EvtWord e_door_open[12];
-static EvtWord s_door_close[22];
-static EvtWord s_door_open[22];
 static BeroEntry bero_data[3];
-EvtWord evt_bridge[14];
-EvtWord evt_bridge2[118];
-static EvtWord evt_origami[198];
-static EvtWord evt_moamoa_init[29];
-static EvtWord evt_meet_moamoa[215];
+extern EvtWord evt_bridge[];
+extern EvtWord evt_bridge2[];
 static EvtWord evt_moamoa_escape[47];
-EvtWord evt_elv_rumble[60];
-static EvtWord evt_elv_init[49];
-EvtWord evt_elv_down[554];
-EvtWord evt_elv_up[456];
+extern EvtWord evt_elv_rumble[];
+extern EvtWord evt_elv_down[];
+extern EvtWord evt_elv_up[];
 static s32 item_tbl[2];
-EvtWord evt_elv[61];
-EvtWord evt_elv_nomsg[14];
-static EvtWord evt_head[42];
-static EvtWord evt_kanban[14];
-EvtWord eki_00_init_evt[99];
-
-f32 fd_eki_00_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
-
-f32 fd_eki_00_neg_one_382 = -1.0f;
-
-f32 fd_eki_00___local_PI_383 = 3.1415927f;
-
-f32 fd_eki_00___local_3PIO2_385 = 4.712389f;
-
-f32 fd_eki_00_one_negone_373[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
-
-f32 fd_eki_00___local_PIO2_384 = 1.5707964f;
-
-f32 fd_eki_00_one_381 = 1.0f;
-
-f32 fd_eki_00_negone_one_360[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
-
-f32 fd_eki_00_neg_one_365 = -1.0f;
-
-f32 fd_eki_00___local_PI_366 = 3.1415927f;
-
-f32 fd_eki_00___local_3PIO2_368 = 4.712389f;
-
-f32 fd_eki_00_one_negone_359[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
-
-f32 fd_eki_00___local_PIO2_367 = 1.5707964f;
-
-f32 fd_eki_00_one_364 = 1.0f;
+extern EvtWord evt_elv[];
+extern EvtWord evt_elv_nomsg[];
+extern EvtWord eki_00_init_evt[];
 
 static ExtTexInfo ext_moamoa_data[] = {
     {((char*)"c_n_moa_a"), ((char*)"S_1"), 0.0f},
@@ -351,8 +290,7 @@ static void moamoa_pose_init(void) {
         wp->defs[wp->numDefs].count = i - start + 1;
         wp->defs[wp->numDefs].speed = data->speed;
         wp->defs[wp->numDefs].loop = 1;
-        // FAKE: "J" padded to the target's 4-byte .rodata string (strncmp reads 1 byte)
-        if (!strncmp(anim, (char*)"J\0\0", 1)) {
+        if (!strncmp(anim, "J", 1)) {
             wp->defs[wp->numDefs].loop = 0;
         }
         i++;
@@ -566,7 +504,7 @@ static s32 evt_moamoa_target_off(EventEntry* event, BOOL isFirstCall) {
     s32 i = evtGetValue(event, event->args[0]);
 
     wp->target[i] = wp->target[1 - i];
-    wp->field_0x3a[i] = 100;
+    wp->targetHits[i] = 100;
     if (i == 0) {
         wp->flags |= 0x1000;
     } else {
@@ -731,7 +669,7 @@ static s32 moamoa_hit_check(ExtdrvPose* pose, Moamoa* moa) {
     if (!(mario->flags & 0x30000)) {
         wp->bounceCount = 0;
     }
-    if (mario->currMotionId == 0x12 && wp->field_0x40 > 10) {
+    if (mario->currMotionId == 0x12 && wp->hammerFrames > 10) {
         f32 r2; f32 t; cam = camGetPtr(CAMERA_3D);
         t = cam->viewYaw; r2 = 6.2831855f * reviseAngle((f32)(mario->displayDirection - 90.0f) + t) / 360.0f;
         angle = 35.0f * moa_sin(r2) + mario->position.x;
@@ -836,11 +774,11 @@ static void ext_moamoa_main(void)
   hit = 0;
   if (mario->currMotionId == 0x12)
   {
-    wp->field_0x40++;
+    wp->hammerFrames++;
   }
   else
   {
-    wp->field_0x40 = 0;
+    wp->hammerFrames = 0;
   }
   if (mario->currMotionId == 0)
   {
@@ -958,10 +896,7 @@ static void ext_moamoa_main(void)
     }
     if ((((wp->flags & 1) && (!(moa->flags & 0x444))) && (i == (gp->retraceCount % wp->count))) && (irand(1000) < 200))
     {
-      // FAKE: named Vec + static zero template instead of a compound literal (no @ temp copy; same values)
-      Vec tmp;
-      static const Vec z0 = {0.0f, 0.0f, 0.0f};
-      tmp = z0;
+      Vec tmp = {0.0f, 0.0f, 0.0f};
       tmp.x = (*pose->mtx)[0][3]; tmp.y = (*pose->mtx)[1][3]; tmp.z = (*pose->mtx)[2][3];
       sp = tmp;
       psndSFXOn_3D(SFX_NAME_WORD("SFX_STG6_MOAMOA_VOICE1"), &sp); // FAKE: integer cast hoists the literal as an @ temp
@@ -1202,10 +1137,7 @@ static void ext_moamoa_main(void)
       }
         if (!sndFlag)
       {
-        // FAKE: named Vec + static zero template instead of &(Vec){...} (drops one coalesced copy; same values)
-        Vec pos;
-        static const Vec z = {0.0f, 0.0f, 0.0f};
-        pos = z;
+        Vec pos = {0.0f, 0.0f, 0.0f};
         pos.x = (*pose->mtx)[0][3]; pos.y = (*pose->mtx)[1][3]; pos.z = (*pose->mtx)[2][3];
         psndSFXOn_3D((const char *) 0x6c3, &pos);
         sndFlag = 1;
@@ -2065,10 +1997,4 @@ EVT_BEGIN(eki_00_init_evt)
 EVT_END()
 
 // target pad words (G5: section sizes must match or later DOL addresses shift)
-#pragma force_active on
-#pragma force_active reset
-
-
-
-
 

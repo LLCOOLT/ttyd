@@ -29,7 +29,7 @@ typedef struct SignalTimingWork {
     s32 okStart;    // 0x1C
     s32 okEnd;      // 0x20
     s32 pressed;    // 0x24
-    s32 unk28;      // 0x28
+    s32 nextEnd;    // 0x28, last frame of the next step
     s32 difficulty; // 0x2C
     s32 okFlag;     // 0x30
     u32 button;     // 0x34
@@ -99,7 +99,7 @@ s32 battleAcMain_SignalTiming(BattleWork *work)
   sfxPi = "SFX_AC_PI1";
   sfxPone = "SFX_AC_PONE1";
   sfxOk = "SFX_AC_COMMAND_OK1";
-  sfxNg2 = sfxNg = "SFX_AC_COMMAND_NG1\0";
+  sfxNg2 = sfxNg = "SFX_AC_COMMAND_NG1";
   do
   {
     loop = 0;
@@ -198,7 +198,7 @@ s32 battleAcMain_SignalTiming(BattleWork *work)
         ac->mAcState = 1000;
 
       case 1000:
-        w->unk28 = ((w->next + 1) * ST_STEP(work)) - 1;
+        w->nextEnd = ((w->next + 1) * ST_STEP(work)) - 1;
         w->next++;
         if (w->next < (ST_LEAD(work) + 1))
       {

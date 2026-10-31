@@ -2,7 +2,6 @@
 #include "eff/eff_starstone.h"
 #include "evt/evt_cmd.h"
 
-#pragma force_active on
 #include "manager/evtmgr_cmd.h"
 #include "dolphin/mtx.h"
 #include "driver/npcdrv.h"
@@ -123,53 +122,23 @@ static USER_FUNC(yami_view);
 void iri_08_msg(s32 type, void** work);
 extern s32 envSetYami[];
 
-f32 fd_nok_01_negone_one_374[2] __attribute__((aligned(8)));
-f32 fd_nok_01_neg_one_382;
-f32 fd_nok_01___local_PI_383;
-f32 fd_nok_01___local_3PIO2_385;
-f32 fd_nok_01_one_negone_373[2] __attribute__((aligned(8)));
-f32 fd_nok_01___local_PIO2_384;
-f32 fd_nok_01_one_381;
-f32 fd_nok_01_negone_one_360[2] __attribute__((aligned(8)));
-f32 fd_nok_01_neg_one_365;
-f32 fd_nok_01___local_PI_366;
-f32 fd_nok_01___local_3PIO2_368;
-f32 fd_nok_01_one_negone_359[2] __attribute__((aligned(8)));
-f32 fd_nok_01___local_PIO2_367;
-f32 fd_nok_01_one_364;
-EvtWord nokonoko_G_regl[19];
-EvtWord nokonoko_G_talk[44];
-EvtWord nokonoko_H_regl[19];
-EvtWord nokonoko_H_talk[52];
-EvtWord nokonoko_I_regl[19];
-EvtWord nokonoko_I_talk[44];
-EvtWord open_gate[221];
-EvtWord monban_init[14];
-EvtWord monban_talk[56];
-static EvtWord nokotarou_init[26];
-static EvtWord nokotarou_talk[36];
-EvtWord nokopapa_init[19];
-EvtWord nokopapa_talk[72];
-EvtWord nokonoko_K_talk[69];
-#ifdef VERSION_G8ME01
-EvtWord boss_noko_open_gate[184];
-#else
-EvtWord boss_noko_open_gate[181];
-#endif
+extern EvtWord nokonoko_G_regl[];
+extern EvtWord nokonoko_G_talk[];
+extern EvtWord nokonoko_H_regl[];
+extern EvtWord nokonoko_H_talk[];
+extern EvtWord nokonoko_I_regl[];
+extern EvtWord nokonoko_I_talk[];
+extern EvtWord open_gate[];
+extern EvtWord monban_init[];
+extern EvtWord monban_talk[];
+extern EvtWord nokopapa_init[];
+extern EvtWord nokopapa_talk[];
+extern EvtWord nokonoko_K_talk[];
+extern EvtWord boss_noko_open_gate[];
 static s32 iri_17_item_tbl[2];
-EvtWord boss_noko_talk[352];
-EvtWord nokorin_init[30];
-#ifdef VERSION_G8ME01
-EvtWord nokorin_talk[281];
-#else
-EvtWord nokorin_talk[267];
-#endif
-static EvtWord odoriko_1_talk[44];
-static EvtWord odoriko_1_init[33];
-static EvtWord odoriko_2_talk[44];
-static EvtWord odoriko_2_init[33];
-static EvtWord odoriko_3_talk[44];
-static EvtWord odoriko_3_init[33];
+extern EvtWord boss_noko_talk[];
+extern EvtWord nokorin_init[];
+extern EvtWord nokorin_talk[];
 static NpcSetupInfo npcEnt[10];
 static BeroEntry bero_entry_data[4];
 const char* son_npc[2];
@@ -185,21 +154,11 @@ static const char* ie_npc[2];
 static const char* ie_map[2];
 static HouseParam ie_data;
 static HitDamageReturn hitDmgRetPoints[13];
-EvtWord nokotarou_tabidachi[328];
-EvtWord nokotarou_tabidachi_init[89];
-static EvtWord sekai_yami_npc[59];
-static EvtWord sekai_yami_evt[234];
-static EvtWord minnnanokoe_evt[416];
-static EvtWord evt_switch_init[17];
-EvtWord e3_talk[12];
-static EvtWord epilogue_npc_entry[31];
-static EvtWord epilogue_evt_sub[194];
-static EvtWord epilogue_evt[148];
-static EvtWord evt_kusa_4[25];
-static EvtWord evt_kusa_5[25];
-static EvtWord evt_kusa_6[25];
+extern EvtWord nokotarou_tabidachi[];
+extern EvtWord nokotarou_tabidachi_init[];
+extern EvtWord e3_talk[];
 static KusaAccess kusa_data[4];
-EvtWord nok_01_init_evt[337];
+extern EvtWord nok_01_init_evt[];
 
 void iri_08_msg(s32 type, void** work) {
     u16* msg = *work;
@@ -208,34 +167,6 @@ void iri_08_msg(s32 type, void** work) {
         evtSetValue(NULL, GF(0), 0);
     }
 }
-
-f32 fd_nok_01_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
-
-f32 fd_nok_01_neg_one_382 = -1.0f;
-
-f32 fd_nok_01___local_PI_383 = 3.1415927f;
-
-f32 fd_nok_01___local_3PIO2_385 = 4.712389f;
-
-f32 fd_nok_01_one_negone_373[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
-
-f32 fd_nok_01___local_PIO2_384 = 1.5707964f;
-
-f32 fd_nok_01_one_381 = 1.0f;
-
-f32 fd_nok_01_negone_one_360[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
-
-f32 fd_nok_01_neg_one_365 = -1.0f;
-
-f32 fd_nok_01___local_PI_366 = 3.1415927f;
-
-f32 fd_nok_01___local_3PIO2_368 = 4.712389f;
-
-f32 fd_nok_01_one_negone_359[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
-
-f32 fd_nok_01___local_PIO2_367 = 1.5707964f;
-
-f32 fd_nok_01_one_364 = 1.0f;
 
 EVT_BEGIN(nokonoko_G_regl)
     CALL(evt_npc_get_position, STRING("me"), LW(0), LW(1), LW(2))
@@ -736,7 +667,7 @@ EVT_BEGIN(nokorin_talk)
         CALL(evt_msg_print, 0, STRING("stg1_nok_78"), 0, 0)
     END_IF
     CASE_DEFAULT
-#ifdef VERSION_G8ME01
+#if defined(VERSION_G8ME01) && !defined(VERSION_G8MP01) // PAL has the JP line
     CALL(evt_mario_get_party, LW(0))
     IF_INT_EQUAL(LW(0), 2)
         CALL(evt_msg_print, 0, STRING("stg1_nok_77"), 0, 0)

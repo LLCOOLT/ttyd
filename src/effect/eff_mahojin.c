@@ -14,7 +14,6 @@ void effMahojinMain(EffectEntry* effect);
 void effMahojinDisp(CameraId cameraId, EffectEntry* effect);
 
 
-s32 gap_08_80418B4C_sbss;
 s32 mahojin_rate;
 
 static const char* name_tbl[] = {
@@ -32,20 +31,13 @@ Vec pos_tbl[7] = {
     { -11.1931f, 0.0f, -9.0435f },
 };
 
-#pragma force_active on
-#ifdef VERSION_G8ME01
-__declspec(section ".data") u32 gap_05_803B1718_data[2] = {0, 0};
-#else
-__declspec(section ".data") u32 gap_05_803AE248_data[6] = {0, 0, 0, 0, 0, 0};
-#endif
-#pragma force_active reset
 
 
 static void callback(MapTevCallbackInfo* info) {
     s32 tevStage = info->tevStage;
     s32 texCoord = info->texCoord;
     s32 texMap = info->texMap;
-    s32 field_0x18 = info->indStage;
+    s32 indStage = info->indStage;
 
     GXSetTevColor(GX_TEVREG0, (GXColor){ 0xE8, 0x00, 0xE8, mahojin_rate });
     GXSetTevOrder(tevStage, GX_TEXCOORD_NULL, GX_TEXMAP_NULL, GX_COLOR_NULL);
@@ -56,7 +48,7 @@ static void callback(MapTevCallbackInfo* info) {
     GXSetTevSwapMode(tevStage, GX_TEV_SWAP0, GX_TEV_SWAP0);
     info->tevStage = tevStage + 1;
     info->texMap = texMap;
-    info->indStage = field_0x18;
+    info->indStage = indStage;
     info->texCoord = texCoord;
 }
 
@@ -82,7 +74,7 @@ EffectEntry* effMahojinEntry(s32 type, f32 x, f32 y, f32 z) {
     p->position.y = y;
     p->position.z = z;
     p->timer = 1000;
-    p->field_0x14 = 0;
+    p->counter = 0;
     p->poseId[0] = -1;
     p->poseId[1] = -1;
     p->alpha = 255;
@@ -96,7 +88,7 @@ EffectEntry* effMahojinEntry(s32 type, f32 x, f32 y, f32 z) {
     p->position.y = y;
     p->position.z = z;
     p->timer = 1000;
-    p->field_0x14 = 0;
+    p->counter = 0;
     p->poseId[0] = -1;
     p->poseId[1] = -1;
     p->alpha = 255;
@@ -275,7 +267,7 @@ void effMahojinDisp(CameraId cameraId, EffectEntry* effect) {
     s32 idx[16];
     f32* zp;
     MapWork* map;
-    s32* new_var; // FAKE: alias of idx forces z/idx base register order
+    s32* idxList; // FAKE: alias of idx forces z/idx base register order
     s32 i;
     s32 j;
     s32 k;
@@ -311,7 +303,7 @@ void effMahojinDisp(CameraId cameraId, EffectEntry* effect) {
             z[n] = d;
             idx[n++] = i;
         }
-        new_var = idx; // FAKE
+        idxList = idx; // FAKE
         for (i = 0; i < effect->count - 1; i++) {
             for (j = i + 1; j < effect->count; j++) {
                 if (zp[i] > z[j]) {
@@ -327,7 +319,7 @@ void effMahojinDisp(CameraId cameraId, EffectEntry* effect) {
         map->entries[0].flags &= ~1;
         PSMTXTrans(mtx, work->position.x, work->position.y, work->position.z);
         for (k = 0; k < effect->count; k++) {
-            EffMahojinWork* p = &work[new_var[k]];
+            EffMahojinWork* p = &work[idxList[k]];
             if (pass == 1 && p->arg != NULL) {
                 p->func(cameraId, p->arg);
             }

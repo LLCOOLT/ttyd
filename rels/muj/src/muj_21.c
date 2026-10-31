@@ -2,7 +2,6 @@
 #include "eff/eff_funemizu.h"
 #include "evt/evt_cmd.h"
 
-#pragma force_active on
 #include "driver/effdrv.h"
 #include "mario/mariost.h"
 #include "muj.h"
@@ -47,53 +46,10 @@ USER_FUNC(evt_sub_intpl_msec_get_value);
 USER_FUNC(evt_sub_intpl_msec_init);
 static USER_FUNC(fune_eff);
 
-f32 fd_muj_21_negone_one_374[2] __attribute__((aligned(8)));
-f32 fd_muj_21_neg_one_382;
-f32 fd_muj_21___local_PI_383;
-f32 fd_muj_21___local_3PIO2_385;
-f32 fd_muj_21_one_negone_373[2] __attribute__((aligned(8)));
-f32 fd_muj_21___local_PIO2_384;
-f32 fd_muj_21_one_381;
-f32 fd_muj_21_negone_one_360[2] __attribute__((aligned(8)));
-f32 fd_muj_21_neg_one_365;
-f32 fd_muj_21___local_PI_366;
-f32 fd_muj_21___local_3PIO2_368;
-f32 fd_muj_21_one_negone_359[2] __attribute__((aligned(8)));
-f32 fd_muj_21___local_PIO2_367;
-f32 fd_muj_21_one_364;
-EvtWord peach_init[12];
+extern EvtWord peach_init[];
 static NpcSetupInfo npcEnt[2];
-EvtWord fune_yure[42];
-static EvtWord epilogue_evt[344];
-EvtWord muj_21_init_evt[58];
-
-f32 fd_muj_21_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
-
-f32 fd_muj_21_neg_one_382 = -1.0f;
-
-f32 fd_muj_21___local_PI_383 = 3.1415927f;
-
-f32 fd_muj_21___local_3PIO2_385 = 4.712389f;
-
-f32 fd_muj_21_one_negone_373[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
-
-f32 fd_muj_21___local_PIO2_384 = 1.5707964f;
-
-f32 fd_muj_21_one_381 = 1.0f;
-
-f32 fd_muj_21_negone_one_360[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
-
-f32 fd_muj_21_neg_one_365 = -1.0f;
-
-f32 fd_muj_21___local_PI_366 = 3.1415927f;
-
-f32 fd_muj_21___local_3PIO2_368 = 4.712389f;
-
-f32 fd_muj_21_one_negone_359[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
-
-f32 fd_muj_21___local_PIO2_367 = 1.5707964f;
-
-f32 fd_muj_21_one_364 = 1.0f;
+extern EvtWord fune_yure[];
+extern EvtWord muj_21_init_evt[];
 
 EVT_BEGIN(peach_init)
     CALL(evt_npc_set_position, STRING("me"), 62, 28, 44)
@@ -245,7 +201,7 @@ EVT_BEGIN(muj_21_init_evt)
     RETURN
 EVT_END()
 
-EffectEntry* effFunemizuEntry(s32 type, f32 x, f32 y, f32 z, f32 arg4, f32 arg5);
+EffectEntry* effFunemizuEntry(s32 type, f32 x, f32 y, f32 z, f32 size, f32 yaw);
 EffectEntry* effWaterDamageN64Entry(s32 type, s32 count, f32 x, f32 y, f32 z, f32 scale);
 void mapObjGetPos(const char* name, Vec* pos);
 

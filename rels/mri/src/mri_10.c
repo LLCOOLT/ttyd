@@ -3,8 +3,6 @@
 #include "evt/evt_bero.h"
 #include "mri.h"
 
-#pragma force_active on
-
 USER_FUNC(evt_bero_get_info);
 USER_FUNC(evt_item_entry);
 USER_FUNC(evt_item_get_important_item);
@@ -25,51 +23,8 @@ USER_FUNC(evt_snd_envoff);
 USER_FUNC(evt_snd_envon);
 USER_FUNC(lect_juyoitem_rel_set);
 
-f32 fd_mri_10_negone_one_374[2] __attribute__((aligned(8)));
-f32 fd_mri_10_neg_one_382;
-f32 fd_mri_10___local_PI_383;
-f32 fd_mri_10___local_3PIO2_385;
-f32 fd_mri_10_one_negone_373[2] __attribute__((aligned(8)));
-f32 fd_mri_10___local_PIO2_384;
-f32 fd_mri_10_one_381;
-f32 fd_mri_10_negone_one_360[2] __attribute__((aligned(8)));
-f32 fd_mri_10_neg_one_365;
-f32 fd_mri_10___local_PI_366;
-f32 fd_mri_10___local_3PIO2_368;
-f32 fd_mri_10_one_negone_359[2] __attribute__((aligned(8)));
-f32 fd_mri_10___local_PIO2_367;
-f32 fd_mri_10_one_364;
 static BeroEntry bero_entry_data[2];
-static EvtWord item_evt[68];
-EvtWord mri_10_init_evt[100];
-
-f32 fd_mri_10_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
-
-f32 fd_mri_10_neg_one_382 = -1.0f;
-
-f32 fd_mri_10___local_PI_383 = 3.1415927f;
-
-f32 fd_mri_10___local_3PIO2_385 = 4.712389f;
-
-f32 fd_mri_10_one_negone_373[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
-
-f32 fd_mri_10___local_PIO2_384 = 1.5707964f;
-
-f32 fd_mri_10_one_381 = 1.0f;
-
-f32 fd_mri_10_negone_one_360[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
-
-f32 fd_mri_10_neg_one_365 = -1.0f;
-
-f32 fd_mri_10___local_PI_366 = 3.1415927f;
-
-f32 fd_mri_10___local_3PIO2_368 = 4.712389f;
-
-f32 fd_mri_10_one_negone_359[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
-
-f32 fd_mri_10___local_PIO2_367 = 1.5707964f;
-
-f32 fd_mri_10_one_364 = 1.0f;
+extern EvtWord mri_10_init_evt[];
 
 static BeroEntry bero_entry_data[] = {
     {
@@ -138,7 +93,7 @@ EVT_BEGIN(mri_10_init_evt)
     CALL(evt_map_playanim, STRING("mizu_01"), 1, 0)
     CALL(evt_map_playanim, STRING("mizu_02"), 1, 0)
     CALL(evt_map_playanim, STRING("awa_01"), 1, 0)
-    CALL(evt_map_playanim, STRING("awa_02\0"), 1, 0)
+    CALL(evt_map_playanim, STRING("awa_02"), 1, 0)
     CALL(evt_mobj_itembox, STRING("mobj_box00"), 0, 0, 25, 1, 0, PTR(item_evt), GSWF(2854))
     RETURN
 EVT_END()

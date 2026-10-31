@@ -282,7 +282,7 @@ USER_FUNC(snd_on) {
 }
 
 USER_FUNC(N_cameraman_on) {
-	NpcEntry* npc = npcNameToPtr("\217h\211\256\202\314\203J\203\201\203\211\203}\203\223");
+	NpcEntry* npc = npcNameToPtr("宿屋のカメラマン");
 	animPoseSetMaterialFlagOn(npc->poseId, 0x1800);
 	return 2;
 }
@@ -489,34 +489,34 @@ EVT_END()
 EVT_BEGIN(evt_50)
     CALL(get_npcname, 4264967306)
     CALL(evt_npc_get_position, 4264967306, 4264967309, 4264967310, 4264967311)
-    CALL(evt_npc_entry, STRING("\217h\211\256\202\314\203J\203\201\203\211\203}\203\223"), STRING("c_jugem_c"))
-    CALL(evt_npc_set_tribe, STRING("\217h\211\256\202\314\203J\203\201\203\211\203}\203\223"), STRING("\203J\203\201\203\211\203}\203\223"))
+    CALL(evt_npc_entry, STRING("宿屋のカメラマン"), STRING("c_jugem_c"))
+    CALL(evt_npc_set_tribe, STRING("宿屋のカメラマン"), STRING("カメラマン"))
     CALL(N_cameraman_on)
-    CALL(evt_npc_flag_onoff, 1, STRING("\217h\211\256\202\314\203J\203\201\203\211\203}\203\223"), 32768)
+    CALL(evt_npc_flag_onoff, 1, STRING("宿屋のカメラマン"), 32768)
     CALL(evt_sub_get_mapname, 4264967296)
     IF_STR_EQUAL(4264967296, STRING("bom_02"))
-        CALL(evt_npc_set_position, STRING("\217h\211\256\202\314\203J\203\201\203\211\203}\203\223"), 4294966931, 30, 4294967126)
+        CALL(evt_npc_set_position, STRING("宿屋のカメラマン"), 4294966931, 30, 4294967126)
     END_IF
     IF_STR_EQUAL(4264967296, STRING("gor_01"))
-        CALL(evt_npc_set_position, STRING("\217h\211\256\202\314\203J\203\201\203\211\203}\203\223"), 168, 154, 4294967067)
+        CALL(evt_npc_set_position, STRING("宿屋のカメラマン"), 168, 154, 4294967067)
     END_IF
     IF_STR_EQUAL(4264967296, STRING("muj_01"))
-        CALL(evt_npc_set_position, STRING("\217h\211\256\202\314\203J\203\201\203\211\203}\203\223"), 270, 20, 4294967151)
+        CALL(evt_npc_set_position, STRING("宿屋のカメラマン"), 270, 20, 4294967151)
     END_IF
     IF_STR_EQUAL(4264967296, STRING("nok_00"))
-        CALL(evt_npc_set_position, STRING("\217h\211\256\202\314\203J\203\201\203\211\203}\203\223"), 4294966911, 25, 4294967151)
+        CALL(evt_npc_set_position, STRING("宿屋のカメラマン"), 4294966911, 25, 4294967151)
     END_IF
     IF_STR_EQUAL(4264967296, STRING("pik_04"))
-        CALL(evt_npc_set_position, STRING("\217h\211\256\202\314\203J\203\201\203\211\203}\203\223"), 310, 1329, 4294967196)
+        CALL(evt_npc_set_position, STRING("宿屋のカメラマン"), 310, 1329, 4294967196)
         CALL(evt_npc_set_position, 4264967306, 310, 1329, 4294967231)
     END_IF
     IF_STR_EQUAL(4264967296, STRING("usu_00"))
-        CALL(evt_npc_set_position, STRING("\217h\211\256\202\314\203J\203\201\203\211\203}\203\223"), 268, 0, 4294967086)
+        CALL(evt_npc_set_position, STRING("宿屋のカメラマン"), 268, 0, 4294967086)
     END_IF
-    CALL(evt_set_dir_to_target, STRING("\217h\211\256\202\314\203J\203\201\203\211\203}\203\223"), STRING("mario"))
+    CALL(evt_set_dir_to_target, STRING("宿屋のカメラマン"), STRING("mario"))
     CALL(evt_set_dir_to_target, 4264967306, STRING("mario"))
-    CALL(evt_mario_set_dir_npc, STRING("\217h\211\256\202\314\203J\203\201\203\211\203}\203\223"))
-    CALL(evt_party_set_dir_npc, 0, STRING("\217h\211\256\202\314\203J\203\201\203\211\203}\203\223"))
+    CALL(evt_mario_set_dir_npc, STRING("宿屋のカメラマン"))
+    CALL(evt_party_set_dir_npc, 0, STRING("宿屋のカメラマン"))
     CALL(msg_no, 9, 4264967296)
     CALL(evt_msg_print, 0, 4264967296, 0, 4264967306)
     CALL(get_bed, 4264967296, 4264967297, 4264967298)
@@ -545,8 +545,8 @@ EVT_BEGIN(evt_50)
     CALL(evt_mario_set_dir_npc, 4264967306)
     CALL(msg_no, 11, 4264967296)
     CALL(evt_msg_print, 0, 4264967296, 0, 4264967306)
-    CALL(evt_mario_set_dir_npc, STRING("\217h\211\256\202\314\203J\203\201\203\211\203}\203\223"))
-    CALL(evt_party_set_dir_npc, 0, STRING("\217h\211\256\202\314\203J\203\201\203\211\203}\203\223"))
+    CALL(evt_mario_set_dir_npc, STRING("宿屋のカメラマン"))
+    CALL(evt_party_set_dir_npc, 0, STRING("宿屋のカメラマン"))
     WAIT_MS(300)
     CALL(evt_snd_sfxon, STRING("SFX_EVT_50_HOTEL_SHUTTER1"), 0)
     CALL(evt_fade_entry, 8, 150, 255, 255, 255)
@@ -566,7 +566,7 @@ EVT_BEGIN(evt_50)
     CALL(evt_msg_print, 0, 4264967296, 0, 4264967306)
     CALL(evt_fade_entry, 10, 1000, 0, 0, 0)
     CALL(evt_fade_end_wait)
-    CALL(evt_npc_check_delete, STRING("\217h\211\256\202\314\203J\203\201\203\211\203}\203\223"))
+    CALL(evt_npc_check_delete, STRING("宿屋のカメラマン"))
     CALL(evt_npc_set_position, 4264967306, 4264967309, 4264967310, 4264967311)
     CALL(evt_set_dir_to_target, 4264967306, STRING("mario"))
     CALL(evt_fade_entry, 9, 1000, 0, 0, 0)

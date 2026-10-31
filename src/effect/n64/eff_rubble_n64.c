@@ -22,7 +22,7 @@ typedef struct EffRubbleN64Work {
     f32 rotVelZ;  // 0x34
     f32 rotVelY;  // 0x38
     f32 scale;    // 0x3C
-    s32 unk40;    // 0x40
+    s32 counter;  // 0x40, only cleared at entry
     s32 alpha;    // 0x44
     s32 lifetime; // 0x48
     s32 frame;    // 0x4C
@@ -30,7 +30,7 @@ typedef struct EffRubbleN64Work {
 
 EffectEntry* effHokoriN64Entry(s32 type, s32 lifetime, f32 x, f32 y, f32 z);
 
-struct { effN64Vtx v[58]; u8 pad[4]; } stg_hahen_v = { { // FAKE: padded to the original symbol size (trailing zero bytes, never read)
+effN64Vtx stg_hahen_v[58] = {
     {3, 3, -3, 0, 0, 50, 50, 50, 255},
     {-3, -3, -3, -579, 0, 50, 50, 50, 255},
     {-3, 3, 3, -290, -502, 50, 50, 50, 255},
@@ -89,7 +89,7 @@ struct { effN64Vtx v[58]; u8 pad[4]; } stg_hahen_v = { { // FAKE: padded to the 
     {-3, 0, -5, -52, -138, 50, 50, 50, 255},
     {0, 0, -6, 0, 0, 120, 120, 120, 255},
     {-1, -3, -1, -282, 0, 140, 140, 140, 255},
-}, {0} };
+};
 
 void effRubbleMain(EffectEntry* effect);
 void effRubbleDisp(CameraId cameraId, EffectEntry* effect);
@@ -99,7 +99,7 @@ EffectEntry* effRubbleN64Entry(s32 type, s32 lifetime, f32 x, f32 y, f32 z, f32 
     EffRubbleN64Work* work;
 
     effect = effEntry();
-    effect->type = "RubbleN64\0\0";
+    effect->type = "RubbleN64";
     effect->count = 1;
     work = __memAlloc(HEAP_EFFECT, sizeof(EffRubbleN64Work));
     effect->userdata = work;
@@ -123,7 +123,7 @@ EffectEntry* effRubbleN64Entry(s32 type, s32 lifetime, f32 x, f32 y, f32 z, f32 
     work->rotVelZ = -20.0f;
     work->alpha = 255;
     work->scale = 2.0f * scale;
-    work->unk40 = 0;
+    work->counter = 0;
     return effect;
 }
 
@@ -199,7 +199,7 @@ void effRubbleDisp(CameraId cameraId, EffectEntry* effect) {
     switch (work->type) {
         case 0:
         case 3:
-            effSetVtxDescN64(&stg_hahen_v.v[28]);
+            effSetVtxDescN64(&stg_hahen_v[28]);
             GXBegin(GX_TRIANGLES, GX_VTXFMT0, 30);
             tri2(0, 1, 2, 0, 3, 4, 5, 0);
             tri2(6, 7, 8, 0, 9, 10, 11, 0);
@@ -209,7 +209,7 @@ void effRubbleDisp(CameraId cameraId, EffectEntry* effect) {
             break;
         case 1:
         case 4:
-            effSetVtxDescN64(&stg_hahen_v.v[23]);
+            effSetVtxDescN64(&stg_hahen_v[23]);
             GXBegin(GX_TRIANGLES, GX_VTXFMT0, 18);
             tri2(0, 1, 2, 0, 1, 3, 2, 0);
             tri2(1, 0, 4, 0, 1, 4, 3, 0);
@@ -217,7 +217,7 @@ void effRubbleDisp(CameraId cameraId, EffectEntry* effect) {
             break;
         case 2:
         case 5:
-            effSetVtxDescN64(stg_hahen_v.v);
+            effSetVtxDescN64(stg_hahen_v);
             GXBegin(GX_TRIANGLES, GX_VTXFMT0, 30);
             tri2(0, 1, 2, 0, 2, 3, 4, 0);
             tri2(5, 6, 7, 0, 5, 7, 8, 0);

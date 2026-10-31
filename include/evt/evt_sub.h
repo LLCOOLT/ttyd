@@ -37,7 +37,11 @@ extern EvtWord mail_evt_bom_01[65];
 extern EvtWord mail_evt_gor_01[61];
 extern EvtWord mail_evt_gor_01_2[93];
 extern EvtWord mail_evt_gor_02[87];
+#ifdef VERSION_G8MP01
+extern EvtWord mail_evt_gor_02_2[68];
+#else
 extern EvtWord mail_evt_gor_02_2[61];
+#endif
 extern EvtWord mail_evt_gor_03[87];
 extern EvtWord mail_evt_gor_04[97];
 extern EvtWord mail_evt_hom_00[61];

@@ -7,8 +7,8 @@
 #include "manager/evtmgr_cmd.h"
 #include <dolphin/mtx.h>
 #include <string.h>
+#include "pmario_sound.h"
 
-extern void psndSFXOn(s32 id);
 extern USER_FUNC(evt_mario_set_prev_party_pos);
 extern USER_FUNC(evt_mario_set_enable_key);
 extern USER_FUNC(evt_bero_mapchange);
@@ -27,7 +27,6 @@ USER_FUNC(yuuminigame_window_end);
 PiantaParlorWork yuugijouwork;
 
 //.sbss
-s32 gap_08_80418B5C_sbss;
 PiantaParlorWork* yuwp;
 s32 yuu_window_evt;
 
@@ -347,7 +346,7 @@ void monteCountDisp(void) {
 			y = yuwp->tokens - yuwp->dispTokens;
 			yuwp->dispTick = 0;
 			if (monte_snd_flag == 0 && y != 0) {
-				psndSFXOn(0x8CA);
+				psndSFXOn(SFX_NAME_WORD(0x8CA));
 				monte_snd_flag = 8;
 			}
 			if (y != 0) {

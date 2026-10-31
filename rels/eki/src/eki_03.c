@@ -1,8 +1,6 @@
-#pragma dollar_identifiers on
 #include "battle/battle_unit.h"
 #include "evt/evt_cmd.h"
 
-#pragma force_active on
 #include "memory.h"
 #include "mario/mariost.h"
 #include "driver/mapdrv.h"
@@ -12,9 +10,6 @@
 #include "evt/evt_bero.h"
 
 double sin(double x);
-#pragma force_active on
-u32 gap_05_0000000C_bss;
-#pragma force_active reset
 static smartEntry* ind_lp;
 void envGlareFilter(s32 on, s16 x0, s16 y0, s16 x1, s16 y1);
 void envGlareFilterZ(f32 z);
@@ -39,81 +34,15 @@ USER_FUNC(evt_mobj_blk);
 static USER_FUNC(test_glare);
 static void sun_tev(MapTevCallbackInfo* info);
 
-f32 negone_one$374[2] __attribute__((aligned(8)));
-f32 neg_one$382;
-f32 __local_PI$383;
-f32 __local_3PIO2$385;
-u32 gap_04_0000301C_data[1];
-f32 one_negone$373[2] __attribute__((aligned(8)));
-f32 __local_PIO2$384;
-f32 one$381;
-f32 negone_one$360[2] __attribute__((aligned(8)));
-f32 neg_one$365;
-f32 __local_PI$366;
-f32 __local_3PIO2$368;
-u32 gap_04_00003044_data[1];
-f32 one_negone$359[2] __attribute__((aligned(8)));
-f32 __local_PIO2$367;
-f32 one$364;
-static EvtWord w1_close[12];
-static EvtWord w1_open[12];
-static EvtWord w2_close[12];
-static EvtWord w2_open[12];
 static BeroEntry bero_data[3];
-EvtWord evt_poster[10];
-static EvtWord evt_chk[74];
-static EvtWord evt_poster_1[7];
-static EvtWord evt_poster_2[7];
-static EvtWord evt_poster_3[7];
-static EvtWord evt_poster_4[7];
-static EvtWord evt_poster_5[7];
-static EvtWord evt_poster_6[7];
-static EvtWord evt_poster_7[7];
-static EvtWord evt_poster_8[7];
-static EvtWord evt_poster_9[7];
-EvtWord evt_poster_10[12];
-EvtWord evt_poster_11[27];
-EvtWord evt_poster_12[22];
-EvtWord evt_poster_13[7];
-EvtWord evt_poster_14[7];
-EvtWord evt_poster_15[7];
-#ifdef VERSION_G8ME01
-EvtWord eki_03_init_evt[470];
-#else
-EvtWord eki_03_init_evt[471];
-#endif
-
-f32 negone_one$374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
-
-f32 neg_one$382 = -1.0f;
-
-f32 __local_PI$383 = 3.1415927f;
-
-f32 __local_3PIO2$385 = 4.712389f;
-
-u32 gap_04_0000301C_data[1] = {0};
-
-f32 one_negone$373[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
-
-f32 __local_PIO2$384 = 1.5707964f;
-
-f32 one$381 = 1.0f;
-
-f32 negone_one$360[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
-
-f32 neg_one$365 = -1.0f;
-
-f32 __local_PI$366 = 3.1415927f;
-
-f32 __local_3PIO2$368 = 4.712389f;
-
-u32 gap_04_00003044_data[1] = {0};
-
-f32 one_negone$359[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
-
-f32 __local_PIO2$367 = 1.5707964f;
-
-f32 one$364 = 1.0f;
+extern EvtWord evt_poster[];
+extern EvtWord evt_poster_10[];
+extern EvtWord evt_poster_11[];
+extern EvtWord evt_poster_12[];
+extern EvtWord evt_poster_13[];
+extern EvtWord evt_poster_14[];
+extern EvtWord evt_poster_15[];
+extern EvtWord eki_03_init_evt[];
 
 static EVT_BEGIN(w1_close)
     MULTIPLY_FLOAT(LW(0), FLOAT(0.44433594f))
@@ -529,7 +458,3 @@ static USER_FUNC(test_glare) {
     return EVT_RETURN_BLOCK;
 }
 
-
-#ifndef VERSION_G8ME01
-u32 gap_04_00003CBC_data[1] = {0};
-#endif

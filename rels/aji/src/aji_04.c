@@ -2,7 +2,6 @@
 #include "battle/battle_unit.h"
 #include "evt/evt_cmd.h"
 
-#pragma force_active on
 #include "manager/evtmgr.h"
 #include "driver/msgdrv.h"
 #include "pmario_sound.h"
@@ -78,73 +77,21 @@ USER_FUNC(evt_npc_set_stay_anim);
 static void callback(s32 type, void** work);
 void kuti_callback(s32 type, void** work);
 
-f32 fd_aji_04_negone_one_374[2] __attribute__((aligned(8)));
-f32 fd_aji_04_neg_one_382;
-f32 fd_aji_04___local_PI_383;
-f32 fd_aji_04___local_3PIO2_385;
-f32 fd_aji_04_one_negone_373[2] __attribute__((aligned(8)));
-f32 fd_aji_04___local_PIO2_384;
-f32 fd_aji_04_one_381;
-f32 fd_aji_04_negone_one_360[2] __attribute__((aligned(8)));
-f32 fd_aji_04_neg_one_365;
-f32 fd_aji_04___local_PI_366;
-f32 fd_aji_04___local_3PIO2_368;
-f32 fd_aji_04_one_negone_359[2] __attribute__((aligned(8)));
-f32 fd_aji_04___local_PIO2_367;
-f32 fd_aji_04_one_364;
-static EvtWord w_door_close[22];
-static EvtWord w_door_open[22];
 static BeroEntry bero_entry_data[2];
-EvtWord sekizou_kaiten[81];
-EvtWord sekizou_kaiten2[56];
-EvtWord sekizou_talk[2];
-EvtWord evt_item[5];
-static EvtWord evt_down_snd[116];
-static EvtWord evt_up_snd_[12];
-static EvtWord evt_up_snd__[76];
-EvtWord offscreen_to_kuizu[127];
-static EvtWord offscreen_to_normal[121];
+extern EvtWord sekizou_kaiten[];
+extern EvtWord sekizou_kaiten2[];
+extern EvtWord sekizou_talk[];
+extern EvtWord evt_item[];
+extern EvtWord offscreen_to_kuizu[];
 QuizEntry kuizu_data[7];
-EvtWord UNK_0x00022a90[46];
-EvtWord quiz_ok[19];
-EvtWord quiz_ng[21];
-EvtWord UNK_0x00022be8[21];
-EvtWord UNK_0x00022c3c[66];
-#ifdef VERSION_G8ME01
-EvtWord kuizu_sekizou[980];
-#else
-EvtWord kuizu_sekizou[920];
-#endif
-EvtWord sekizou_init[47];
-EvtWord aji_04_init_evt[55];
-
-f32 fd_aji_04_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
-
-f32 fd_aji_04_neg_one_382 = -1.0f;
-
-f32 fd_aji_04___local_PI_383 = 3.1415927f;
-
-f32 fd_aji_04___local_3PIO2_385 = 4.712389f;
-
-f32 fd_aji_04_one_negone_373[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
-
-f32 fd_aji_04___local_PIO2_384 = 1.5707964f;
-
-f32 fd_aji_04_one_381 = 1.0f;
-
-f32 fd_aji_04_negone_one_360[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
-
-f32 fd_aji_04_neg_one_365 = -1.0f;
-
-f32 fd_aji_04___local_PI_366 = 3.1415927f;
-
-f32 fd_aji_04___local_3PIO2_368 = 4.712389f;
-
-f32 fd_aji_04_one_negone_359[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
-
-f32 fd_aji_04___local_PIO2_367 = 1.5707964f;
-
-f32 fd_aji_04_one_364 = 1.0f;
+extern EvtWord UNK_0x00022a90[];
+extern EvtWord quiz_ok[];
+extern EvtWord quiz_ng[];
+extern EvtWord UNK_0x00022be8[];
+extern EvtWord UNK_0x00022c3c[];
+extern EvtWord kuizu_sekizou[];
+extern EvtWord sekizou_init[];
+extern EvtWord aji_04_init_evt[];
 
 static EVT_BEGIN(w_door_close)
     MULTIPLY_FLOAT(LW(0), FLOAT(0.25f))
@@ -780,8 +727,6 @@ EVT_BEGIN(sekizou_init)
     RETURN
 EVT_END()
 
-void psndBGMOff(u32 flags);
-
 static void callback(s32 type, void** work) {
     EventEntry* evt = ((MsgWinData*)*work)->event;
 
@@ -792,14 +737,14 @@ static void callback(s32 type, void** work) {
                 psndSFXOn("SFX_STG7_QUIZ_START1");
             } else if (evt->lwData[5] == 4) {
                 psndBGMOff(0x400);
-                psndBGMOn(1, "BGM_EVT_QUIZ2\0\0\0\0\0\0");
+                psndBGMOn(1, "BGM_EVT_QUIZ2");
             }
         }
     } else if (type == 3) {
         evt->lwData[5]++;
         if (evt->lwData[5] == 1) {
             psndBGMOff(0x400);
-            psndBGMOn(1, "BGM_EVT_QUIZ2\0\0\0\0\0\0");
+            psndBGMOn(1, "BGM_EVT_QUIZ2");
         }
     }
     evt = ((MsgWinData*)*work)->event;

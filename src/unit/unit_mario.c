@@ -59,24 +59,19 @@ static StatusVulnerability regist;
 PoseTableEntry pose_table_object[3];
 BattleUnitKindPart unitpartsdata_Mario[3];
 BattleUnitKind unitdata_Mario;
-static EvtWord battle_entry_event[73];
-EvtWord mario_ride_btl_entry_event[120];
+extern EvtWord mario_ride_btl_entry_event[];
 static EvtWord init_event[75];
-#ifdef VERSION_G8ME01
-EvtWord mario_dead_event[67];
-#else
-EvtWord mario_dead_event[57];
-#endif
-EvtWord mario_emergency_revival_event[130];
-EvtWord mario_appeal_event[30];
+extern EvtWord mario_dead_event[];
+extern EvtWord mario_emergency_revival_event[];
+extern EvtWord mario_appeal_event[];
 static EvtWord attack_audience_event[15];
-EvtWord btlataudevtMarioJump[237];
-EvtWord btlataudevtMarioHammer[356];
+extern EvtWord btlataudevtMarioJump[];
+extern EvtWord btlataudevtMarioHammer[];
 static PoseSoundTiming pose_sound_timing_table[2];
 static EvtWord damage_event[10];
 static EvtWord attack_event[2];
 static EvtWord wait_event[6];
-EvtWord mario_win_reaction[9];
+extern EvtWord mario_win_reaction[];
 
 PoseTableEntry pose_table_mario_stay[] = {
     {4, "M_S_3"},
@@ -319,7 +314,7 @@ static void callback(MapTevCallbackInfo* info) {
     s32 tevStage = info->tevStage;
     s32 texCoord = info->texCoord;
     s32 texMap = info->texMap;
-    s32 field_0x18 = info->indStage;
+    s32 indStage = info->indStage;
 
     GXSetTevColor(GX_TEVREG0, color);
     GXSetTevOrder(tevStage, GX_TEXCOORD_NULL, GX_TEXMAP_NULL, GX_COLOR_NULL);
@@ -330,7 +325,7 @@ static void callback(MapTevCallbackInfo* info) {
     GXSetTevSwapMode(tevStage, GX_TEV_SWAP0, GX_TEV_SWAP0);
     info->tevStage = tevStage + 1;
     info->texMap = texMap;
-    info->indStage = field_0x18;
+    info->indStage = indStage;
     info->texCoord = texCoord;
 }
 

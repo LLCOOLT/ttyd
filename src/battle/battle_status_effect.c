@@ -15,7 +15,7 @@
 #define ST_CHG_MSG(i) ((StChgMsg*)_battleWorkPointer->announce.stChg.msg + (i)) /* cast keeps the 0x18D88 displacement folded into each access */
 
 BOOL BattleStatusChangeAnnouceMain_Unit(BattleUnit* unit);
-void BattleStatusChangeMsgSetAnnouce(BattleUnit* unit, s32 index, s32 arg2);
+void BattleStatusChangeMsgSetAnnouce(BattleUnit* unit, s32 index, s32 changed);
 void BattleStatusChangeInfoWorkInit(BattleUnit* unit);
 void _st_chg_msg_disp(void);
 
@@ -27,30 +27,30 @@ typedef struct StChgMsgData {
 } StChgMsgData;
 
 StChgMsgData _st_chg_msg_data[] = {
-	{ 4, "\202\307\202\255", "msg_st_chg_poison", "msg_st_chg_poison" },
-	{ 16, "\203`\203\203\201[\203W", "msg_st_chg_charge", "msg_st_chg_charge3" },
-	{ 1, "\202\313\202\336\202\350", "msg_st_chg_sleep", "msg_st_chg_sleep" },
-	{ 2, "\203X\203g\203b\203v", "msg_st_chg_stan", "msg_st_chg_stan" },
-	{ 3, "\203O\203\213\203O\203\213", "msg_st_chg_guruguru", "msg_st_chg_guruguru" },
-	{ 5, "\202\261\202\361\202\347\202\361", "msg_st_chg_confusion", "msg_st_chg_confusion" },
-	{ 6, "\203r\203\212\203r\203\212", "msg_st_chg_biribiri", "msg_st_chg_biribiri" },
-	{ 7, "\203\210\203P\203\210\203P", "msg_st_chg_dodge", "msg_st_chg_dodge" },
-	{ 8, "\202\320\202\276\202\351\202\334", "msg_st_chg_fire", "msg_st_chg_fire" },
-	{ 9, "\202\261\202\250\202\350\202\303\202\257", "msg_st_chg_freeze", "msg_st_chg_freeze" },
-	{ 10, "\203f\203J\203f\203J", "msg_st_chg_big", "msg_st_chg_big" },
-	{ 11, "\203~\203j\203~\203j", "msg_st_chg_small", "msg_st_chg_small" },
-	{ 12, "\202\302\202\346\202\302\202\346", "msg_st_chg_tuyotuyo", "msg_st_chg_tuyotuyo" },
-	{ 13, "\202\346\202\355\202\346\202\355", "msg_st_chg_yowayowa", "msg_st_chg_yowayowa" },
-	{ 14, "\203J\203`\203J\203`", "msg_st_chg_hard", "msg_st_chg_hard" },
-	{ 15, "\203t\203j\203\203\203t\203j\203\203", "msg_st_chg_soft", "msg_st_chg_soft" },
-	{ 0, "\203A\203\214\203\213\203M\201[", "msg_st_chg_allergy", "msg_st_chg_allergy" },
-	{ 18, "\202\306\202\244\202\337\202\242", "msg_st_chg_trans", "msg_st_chg_trans" },
-	{ 19, "\202\315\202\342\202\242", "msg_st_chg_quick", "msg_st_chg_quick" },
-	{ 20, "\202\314\202\353\202\242", "msg_st_chg_slow", "msg_st_chg_slow" },
-	{ 21, "\202\265\202\251\202\246\202\265", "msg_st_chg_counter", "msg_st_chg_counter" },
-	{ 22, "\203{\203\200\203J\203E\203\223\203^\201[", "msg_st_chg_bombcounter", "msg_st_chg_bombcounter" },
-	{ 23, "\202\266\202\355\202\266\202\355\202g\202o", "msg_st_chg_reg_hp", "msg_st_chg_reg_hp" },
-	{ 24, "\202\266\202\355\202\266\202\355\202e\202o", "msg_st_chg_reg_fp", "msg_st_chg_reg_fp" },
+	{ 4, "どく", "msg_st_chg_poison", "msg_st_chg_poison" },
+	{ 16, "チャージ", "msg_st_chg_charge", "msg_st_chg_charge3" },
+	{ 1, "ねむり", "msg_st_chg_sleep", "msg_st_chg_sleep" },
+	{ 2, "ストップ", "msg_st_chg_stan", "msg_st_chg_stan" },
+	{ 3, "グルグル", "msg_st_chg_guruguru", "msg_st_chg_guruguru" },
+	{ 5, "こんらん", "msg_st_chg_confusion", "msg_st_chg_confusion" },
+	{ 6, "ビリビリ", "msg_st_chg_biribiri", "msg_st_chg_biribiri" },
+	{ 7, "ヨケヨケ", "msg_st_chg_dodge", "msg_st_chg_dodge" },
+	{ 8, "ひだるま", "msg_st_chg_fire", "msg_st_chg_fire" },
+	{ 9, "こおりづけ", "msg_st_chg_freeze", "msg_st_chg_freeze" },
+	{ 10, "デカデカ", "msg_st_chg_big", "msg_st_chg_big" },
+	{ 11, "ミニミニ", "msg_st_chg_small", "msg_st_chg_small" },
+	{ 12, "つよつよ", "msg_st_chg_tuyotuyo", "msg_st_chg_tuyotuyo" },
+	{ 13, "よわよわ", "msg_st_chg_yowayowa", "msg_st_chg_yowayowa" },
+	{ 14, "カチカチ", "msg_st_chg_hard", "msg_st_chg_hard" },
+	{ 15, "フニャフニャ", "msg_st_chg_soft", "msg_st_chg_soft" },
+	{ 0, "アレルギー", "msg_st_chg_allergy", "msg_st_chg_allergy" },
+	{ 18, "とうめい", "msg_st_chg_trans", "msg_st_chg_trans" },
+	{ 19, "はやい", "msg_st_chg_quick", "msg_st_chg_quick" },
+	{ 20, "のろい", "msg_st_chg_slow", "msg_st_chg_slow" },
+	{ 21, "しかえし", "msg_st_chg_counter", "msg_st_chg_counter" },
+	{ 22, "ボムカウンター", "msg_st_chg_bombcounter", "msg_st_chg_bombcounter" },
+	{ 23, "じわじわＨＰ", "msg_st_chg_reg_hp", "msg_st_chg_reg_hp" },
+	{ 24, "じわじわＦＰ", "msg_st_chg_reg_fp", "msg_st_chg_reg_fp" },
 	{ -1, "", "", "" },
 };
 
@@ -82,7 +82,7 @@ s8 _st_pri_data[] = {
 	STATUS_HOLD_FAST,
 	STATUS_HP_REGEN,
 	STATUS_FP_REGEN,
-	-1, 0, 0, 0
+	-1,
 };
 
 //local prototypes
@@ -291,7 +291,7 @@ void BSE_Kagegakure(BattleUnit* unit) {
 	}
 	if (on) {
 		if (unit->kageIcon == NULL) {
-			sprintf(name, "_biK_%02x\0\0", *(s32*)unit);
+			sprintf(name, "_biK_%02x", *(s32*)unit);
 #ifdef VERSION_G8ME01
 			iconEntry(name, 0xA1);
 #else
@@ -413,22 +413,23 @@ s32 _get_pri(s8 type) {
 }
 
 #pragma optimize_for_size on
-void BattleStatusChangeInfoSetAnnouce(BattleUnit* unit, s32 type, s32 arg2, s32 arg3) {
+void BattleStatusChangeInfoSetAnnouce(BattleUnit* unit, s32 type, s32 strength, s32 changed) {
 	StChgInfo* e = &unit->statusChangeInfo[0];
 	StChgInfo tmp, swap;
 	s8 pri = _get_pri(type);
 	s32 i, j, n;
-	s32 z;
 	u8 u, t;
 
 	for (i = 0; i < 6; i++) {
-		n = _get_pri((s8)(u8)e[i].type); // FAKE: no-op (s8)(u8) round trip on the s8 type (lbz, extsb at the call), as in the target
+		s32 cur = e[i].type;
+
+		n = _get_pri(cur);
 		if (pri >= (s8)n) break;
 	}
 	if (i >= 6) return;
 	tmp.type = type;
-	tmp.strength = arg2;
-	tmp.changed = arg3;
+	tmp.strength = strength;
+	tmp.changed = changed;
 	if (type == e[i].type) {
 		e[i] = tmp;
 	}
@@ -464,7 +465,6 @@ Ld:;
 }
 
 #pragma optimize_for_size reset
-#pragma dont_inline on
 #pragma optimize_for_size on
 BOOL BattleStatusChangeAnnouceMain(BattleWork* wp) {
 	s32 i;
@@ -485,7 +485,6 @@ BOOL BattleStatusChangeAnnouceMain_Unit(BattleUnit* unit) {
 	return FALSE;
 }
 #pragma optimize_for_size reset
-#pragma dont_inline reset
 
 #pragma optimize_for_size on
 void BattleStatusChangeMsgWorkInit(void) {
@@ -499,14 +498,14 @@ void BattleStatusChangeMsgWorkInit(void) {
 }
 #pragma optimize_for_size reset
 
-void BattleStatusChangeMsgSetAnnouce(BattleUnit* unit, s32 index, s32 arg2) {
+void BattleStatusChangeMsgSetAnnouce(BattleUnit* unit, s32 index, s32 changed) {
 	StChgMsg* msg = ST_CHG_MSG(index);
 	s32 id;
 
 	msg->unitId = unit->unitId;
 	msg->type = index;
 	msg->timer = 0;
-	msg->changed = arg2;
+	msg->changed = changed;
 	id = unit->currentKind;
 	if (id == 0xDE) {
 		msg->flags |= 1;
@@ -519,7 +518,6 @@ void BattleStatusChangeMsgSetAnnouce(BattleUnit* unit, s32 index, s32 arg2) {
 	}
 }
 
-#pragma dont_inline on
 #pragma optimize_for_size on
 void BattleStatusChangeMsgAdjust(BattleWork* wp) {
 	s32 t;
@@ -615,7 +613,6 @@ BOOL BattleStatusChangeMsgMain(BattleWork* wp) {
 	return ret;
 }
 
-#pragma dont_inline reset
 
 
 typedef void (*WakuColByRefFunc)(u16, GXColor*, f32, f32, f32, f32, f32);
@@ -634,8 +631,3 @@ void _st_chg_msg_disp(void) {
 	FontDrawMessage(x, (s32)y + (lines - 1) * 29, (const char*)st->text);
 }
 
-#pragma force_active on
-#pragma explicit_zero_data on
-__declspec(section ".sdata") u32 gap_07_8041270C_sdata = 0;
-#pragma explicit_zero_data reset
-#pragma force_active reset

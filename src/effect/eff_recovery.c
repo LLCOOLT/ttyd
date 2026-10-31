@@ -186,7 +186,6 @@ s16 recovery_effFace_pPlane2_q007_0[] = {
     768, -768, 0, 512, 512,
     768, 768, 0, 512, 0,
     -768, 768, 0, 0, 0,
-    0, // pad
 };
 s16* recovery_effFaceDt_pPlane2_q007 = recovery_effFace_pPlane2_q007_0;
 MayaPoly recovery_effAnimRST[] = {
@@ -204,8 +203,6 @@ void effRecoveryDisp2(CameraId cameraId, EffectEntry* effect);
 void effRecoveryDisp3(CameraId cameraId, EffectEntry* effect);
 void effRecoveryDisp4(CameraId cameraId, EffectEntry* effect);
 
-#pragma opt_propagation off
-#pragma opt_lifetimes off
 EffectEntry* effRecoveryEntry(s32 type, s32 amount, f32 x, f32 y, f32 z) {
     EffectEntry* effect;
     RecoveryWork* work;
@@ -230,7 +227,7 @@ EffectEntry* effRecoveryEntry(s32 type, s32 amount, f32 x, f32 y, f32 z) {
         amount = 11;
         break;
     }
-    effect->type = "Recovery\0\0\0";
+    effect->type = "Recovery";
     effect->count = amount + 1;
     size = effect->count * sizeof(RecoveryWork);
     work = __memAlloc(HEAP_EFFECT, size);
@@ -340,8 +337,6 @@ EffectEntry* effRecoveryEntry(s32 type, s32 amount, f32 x, f32 y, f32 z) {
     }
     return effect;
 }
-#pragma opt_propagation reset
-#pragma opt_lifetimes reset
 
 void effRecoveryMain(EffectEntry* effect) {
     RecoveryWork* work = effect->userdata;

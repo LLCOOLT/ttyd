@@ -270,6 +270,9 @@ USER_FUNC(btlevtcmd_SacBgsetMove);
 USER_FUNC(btlevtcmd_SamplingEnemy);
 USER_FUNC(btlevtcmd_SetDiveSound);
 USER_FUNC(btlevtcmd_SetEventCeilFall);
+#ifdef VERSION_G8MP01
+USER_FUNC(btlevtcmd_SetEventHit);
+#endif
 USER_FUNC(btlevtcmd_SetFallAccel);
 USER_FUNC(btlevtcmd_SetJumpSpeed);
 USER_FUNC(btlevtcmd_SetMoveSoundDataWork);

@@ -16,28 +16,28 @@
 #include "icon_ids.h"
 #include "libc_decls.h"
 #define EXT_LIT(sym, val) (val)
-const char R_no_messages_JP[] = "<col ff0000ff>\203\201\203b\203Z\201[\203W\202\252\202\240\202\350\202\334\202\271\202\361</col>\n<key>\000\000\000";
+const char R_no_messages_JP[] = "<col ff0000ff>\203\201\203b\203Z\201[\203W\202\252\202\240\202\350\202\334\202\271\202\361</col>\n<key>";
 #ifdef VERSION_G8ME01
-const char R_no_messages_US[48] = "<col ff0000ff>No messages.[English]<col>\012<key>\000";
-const char R_no_messages_DE[48] = "<col ff0000ff>No messages.[German]<col>\012<key>\000\000";
-const char R_no_messages_FR[48] = "<col ff0000ff>No messages.[French]<col>\012<key>\000\000";
-const char R_no_messages_ES[48] = "<col ff0000ff>No messages.[Spanish]<col>\012<key>\000";
-const char R_no_messages_IT[48] = "<col ff0000ff>No messages.[Italian]<col>\012<key>\000";
-const char R_no_messages_DU[48] = "<col ff0000ff>No messages.[Dutch]<col>\012<key>\000\000\000";
+const char R_no_messages_US[] = "<col ff0000ff>No messages.[English]<col>\012<key>";
+const char R_no_messages_DE[] = "<col ff0000ff>No messages.[German]<col>\012<key>";
+const char R_no_messages_FR[] = "<col ff0000ff>No messages.[French]<col>\012<key>";
+const char R_no_messages_ES[] = "<col ff0000ff>No messages.[Spanish]<col>\012<key>";
+const char R_no_messages_IT[] = "<col ff0000ff>No messages.[Italian]<col>\012<key>";
+const char R_no_messages_DU[] = "<col ff0000ff>No messages.[Dutch]<col>\012<key>";
 #else
-const char R_no_messages_US[] = "<col ff0000ff>No messages.<col>\n<key>\000\000";
+const char R_no_messages_US[] = "<col ff0000ff>No messages.<col>\n<key>";
 #endif
-const char str_802C4E4C[12] = "\123\124\111\103\113\137\114\105\106\124\000";
-const char str_802C4E58[12] = "\102\125\124\124\117\116\137\114\000\000\000";
-const char str_802C4E64[12] = "\102\125\124\124\117\116\137\122\000\000\000";
-const char str_802C4E70[12] = "\120\101\104\137\130\137\117\116\000\000\000";
-const char str_802C4E7C[12] = "\120\101\104\137\131\137\117\116\000\000\000";
-const char str_802C4E88[12] = "\120\101\104\137\132\137\117\106\106\000\000";
-const char str_802C4E94[12] = "\120\101\104\137\123\124\137\117\106\106\000";
-const char str_802C4EA0[12] = "\142\154\141\143\153\137\153\145\171\000\000";
-const char str_802C4EAC[12] = "\101\116\115\137\120\101\104\137\101\000\000";
+const char str_802C4E4C[12] = "\123\124\111\103\113\137\114\105\106\124";
+const char str_802C4E58[12] = "\102\125\124\124\117\116\137\114";
+const char str_802C4E64[12] = "\102\125\124\124\117\116\137\122";
+const char str_802C4E70[12] = "\120\101\104\137\130\137\117\116";
+const char str_802C4E7C[12] = "\120\101\104\137\131\137\117\116";
+const char str_802C4E88[12] = "\120\101\104\137\132\137\117\106\106";
+const char str_802C4E94[12] = "\120\101\104\137\123\124\137\117\106\106";
+const char str_802C4EA0[12] = "\142\154\141\143\153\137\153\145\171";
+const char str_802C4EAC[12] = "\101\116\115\137\120\101\104\137\101";
 const char str_802C4EB8[16] = "\101\116\115\137\123\124\111\103\113\137\122\111\107\110\124";
-const char str_802C4EC8[16] = "\101\116\115\137\120\101\104\137\123\124\101\122\124\000\000";
+const char str_802C4EC8[16] = "\101\116\115\137\120\101\104\137\123\124\101\122\124";
 const char str_802C4ED8[8] = "\120\115\137\131\137\061\102";
 const char str_802C4EE0[8] = "\120\115\137\131\137\062\102";
 const char str_802C4EE8[8] = "\120\115\137\106\137\061\102";
@@ -48,7 +48,6 @@ const char str_802C4F00[8] = "\120\115\137\103\137\062\102";
 #ifdef VERSION_G8ME01
 #endif
 // target .bss/.sbss pad (uninitialised objects are emitted in reverse order, so this sits last)
-#pragma force_active on
 
 #define WIN_STATE(w) (*(u16*)(w)->state)
 
@@ -113,7 +112,7 @@ s32 msgWindowOpen_SE_Data[] = {
 MessageWork msgWork;
 BOOL msgSEflag; //msgSEInit and related functions are unused
 void* msgSortDvdData; //TODO: re-type
-__declspec(section ".sdata") u16 g5_active_s772;
+u16 g5_active_s772;
 
 //.sdata
 MessageWork* msgw = &msgWork;
@@ -123,7 +122,7 @@ const char* ErrMessage[7] = {R_no_messages_JP, R_no_messages_US, R_no_messages_D
 #else
 const char* ErrMessage[2] = {R_no_messages_JP, R_no_messages_US};
 #endif
-__declspec(section ".sdata") const char* paperPoseTbl[6] = {
+const char* paperPoseTbl[6] = {
 	str_802C4ED8, str_802C4EE0, str_802C4EE8,
 	str_802C4EF0, str_802C4EF8, str_802C4F00
 };
@@ -485,7 +484,6 @@ void FontDrawScaleVec(Vec scale);
 void FontDrawCode(f32 x, f32 y, u16 code);
 void FontDrawCodeMtx(Mtx mtx, u16 code);
 
-#pragma dont_inline on
 BOOL msgDisp(smartEntry* smart, u8 alpha, f32 x, f32 y);
 BOOL msgDisp(smartEntry* smart, u8 alpha, f32 x, f32 y) {
 	s32 al;
@@ -739,7 +737,6 @@ BOOL msgDisp(smartEntry* smart, u8 alpha, f32 x, f32 y) {
 	}
 	return ret;
 }
-#pragma dont_inline reset
 
 void msgDispKeyWait_render(s32 wXluStage) {
 	AnimationWork* wp = animGetPtr();
@@ -809,6 +806,9 @@ void msgAnalize(smartEntry* smart, char* msg) {
 #ifdef VERSION_G8ME01
 	Vec scale; // US: x and y scale apart (<scaleX>)
 	u32 maxW; // US: widest line so far, becomes the window width
+#ifdef VERSION_G8MP01
+	s32 centerStart; // PAL: first character of the open <center> span
+#endif
 #else
 	f32 scale;
 #endif
@@ -859,6 +859,9 @@ void msgAnalize(smartEntry* smart, char* msg) {
 		scale = one;
 	}
 	maxW = 70;
+#ifdef VERSION_G8MP01
+	centerStart = 0;
+#endif
 #else
 	scale = EXT_LIT(float_1_8041a52c, 1.0f);
 #endif
@@ -1198,6 +1201,19 @@ void msgAnalize(smartEntry* smart, char* msg) {
 				data->charCount++;
 			} else if (strcmp(tag, "nowinse") == 0) {
 				window->flags |= 8;
+#ifdef VERSION_G8MP01
+			} else if (strcmp(tag, "center") == 0) {
+				centerStart = data->charCount;
+			} else if (strcmp(tag, "/center") == 0) {
+				s32 c = centerStart;
+				s32 shift = (420 - x) / 2;
+				MsgChar* ch = &data->entries[c];
+				for (; c < data->charCount; c++, ch++) {
+					if (ch->glyph < 0xFFF2) {
+						ch->x += shift;
+					}
+				}
+#endif
 			} else if (strcmp(tag, "icon") == 0) {
 				isHM = FALSE;
 				if ((( (s8) args [0] ) >= '0') && (((s8) args [0]) <= '9') ) {
@@ -1546,7 +1562,7 @@ s32 msgIconStr2ID(const char* str) {
 	return -1;
 }
 
-s32 msgWindow_Entry(const char* msg, s32 field_0x79FC, u16 priority) {
+s32 msgWindow_Entry(const char* msg, s32 callback, u16 priority) {
 	WindowEntry* window;
 	char* copy;
 	MsgWinData* data;
@@ -1570,7 +1586,7 @@ s32 msgWindow_Entry(const char* msg, s32 field_0x79FC, u16 priority) {
 	memset(data, 0, sizeof(MsgWinData));
 	data->window = window;
 	data->flags = 3;
-	data->callback = field_0x79FC;
+	data->callback = callback;
 	data->lastUpdateTime = gp->renderTime;
 	data->openTime = gp->renderTime;
 	data->talkSfxGroup = 0;

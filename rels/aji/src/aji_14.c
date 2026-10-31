@@ -1,7 +1,6 @@
 #include "battle/battle_unit.h"
 #include "evt/evt_cmd.h"
 
-#pragma force_active on
 #include "driver/npcdrv.h"
 #include "driver/animdrv.h"
 #include "evt/evt_bero.h"
@@ -66,56 +65,11 @@ USER_FUNC(evt_sub_intpl_msec_init);
 USER_FUNC(evt_sub_random);
 USER_FUNC(waku);
 
-f32 fd_aji_14_negone_one_374[2] __attribute__((aligned(8)));
-f32 fd_aji_14_neg_one_382;
-f32 fd_aji_14___local_PI_383;
-f32 fd_aji_14___local_3PIO2_385;
-f32 fd_aji_14_one_negone_373[2] __attribute__((aligned(8)));
-f32 fd_aji_14___local_PIO2_384;
-f32 fd_aji_14_one_381;
-f32 fd_aji_14_negone_one_360[2] __attribute__((aligned(8)));
-f32 fd_aji_14_neg_one_365;
-f32 fd_aji_14___local_PI_366;
-f32 fd_aji_14___local_3PIO2_368;
-f32 fd_aji_14_one_negone_359[2] __attribute__((aligned(8)));
-f32 fd_aji_14___local_PIO2_367;
-f32 fd_aji_14_one_364;
-static EvtWord w_door_close[22];
-static EvtWord w_door_open[22];
 static BeroEntry bero_entry_data[2];
-EvtWord evt_robot_waku[34];
-static EvtWord evt_boss[797];
-EvtWord evt_boss2[147];
+extern EvtWord evt_robot_waku[];
+extern EvtWord evt_boss2[];
 static NpcSetupInfo npcEnt[3];
-EvtWord aji_14_init_evt[71];
-
-f32 fd_aji_14_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
-
-f32 fd_aji_14_neg_one_382 = -1.0f;
-
-f32 fd_aji_14___local_PI_383 = 3.1415927f;
-
-f32 fd_aji_14___local_3PIO2_385 = 4.712389f;
-
-f32 fd_aji_14_one_negone_373[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
-
-f32 fd_aji_14___local_PIO2_384 = 1.5707964f;
-
-f32 fd_aji_14_one_381 = 1.0f;
-
-f32 fd_aji_14_negone_one_360[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
-
-f32 fd_aji_14_neg_one_365 = -1.0f;
-
-f32 fd_aji_14___local_PI_366 = 3.1415927f;
-
-f32 fd_aji_14___local_3PIO2_368 = 4.712389f;
-
-f32 fd_aji_14_one_negone_359[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
-
-f32 fd_aji_14___local_PIO2_367 = 1.5707964f;
-
-f32 fd_aji_14_one_364 = 1.0f;
+extern EvtWord aji_14_init_evt[];
 
 static EVT_BEGIN(w_door_close)
     MULTIPLY_FLOAT(LW(0), FLOAT(0.25f))

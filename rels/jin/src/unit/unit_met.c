@@ -10,8 +10,6 @@
 #include "party/party_motion.h"
 #include "battle/battle_database_common.h"
 
-#pragma force_active on
-
 USER_FUNC(btlevtcmd_AnimeChangePoseFromTable);
 USER_FUNC(btlevtcmd_AnimeSetPoseTable);
 USER_FUNC(btlevtcmd_ChangeDataTable);
@@ -42,20 +40,6 @@ USER_FUNC(btlevtcmd_SetUnitWork);
 USER_FUNC(btlevtcmd_SetWalkSound);
 USER_FUNC(btlevtcmd_StartWaitEvent);
 
-f32 fd_met_negone_one_374[2] __attribute__((aligned(8)));
-f32 fd_met_neg_one_382;
-f32 fd_met___local_PI_383;
-f32 fd_met___local_3PIO2_385;
-f32 fd_met_one_negone_373[2] __attribute__((aligned(8)));
-f32 fd_met___local_PIO2_384;
-f32 fd_met_one_381;
-f32 fd_met_negone_one_360[2] __attribute__((aligned(8)));
-f32 fd_met_neg_one_365;
-f32 fd_met___local_PI_366;
-f32 fd_met___local_3PIO2_368;
-f32 fd_met_one_negone_359[2] __attribute__((aligned(8)));
-f32 fd_met___local_PIO2_367;
-f32 fd_met_one_364;
 BattleUnitKind unit_met;
 static PoseTableEntry pose_table[18];
 static PoseTableEntry pose_table_ceil[18];
@@ -74,7 +58,6 @@ static EvtWord init_event[12];
 static EvtWord init_event2[148];
 static EvtWord damage_event[10];
 static EvtWord dmg_turn_event[71];
-static EvtWord wakeup_event[85];
 static EvtWord attack_event[546];
 static EvtWord wait_event[6];
 static EvtWord damage_event_ceil[49];
@@ -82,34 +65,6 @@ static EvtWord counter_damage_event_ceil[76];
 static EvtWord ceil_fall_ready_event[158];
 static EvtWord attack_event_ceil[467];
 static EvtWord wait_event_ceil[6];
-
-f32 fd_met_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
-
-f32 fd_met_neg_one_382 = -1.0f;
-
-f32 fd_met___local_PI_383 = 3.1415927f;
-
-f32 fd_met___local_3PIO2_385 = 4.712389f;
-
-f32 fd_met_one_negone_373[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
-
-f32 fd_met___local_PIO2_384 = 1.5707964f;
-
-f32 fd_met_one_381 = 1.0f;
-
-f32 fd_met_negone_one_360[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
-
-f32 fd_met_neg_one_365 = -1.0f;
-
-f32 fd_met___local_PI_366 = 3.1415927f;
-
-f32 fd_met___local_3PIO2_368 = 4.712389f;
-
-f32 fd_met_one_negone_359[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
-
-f32 fd_met___local_PIO2_367 = 1.5707964f;
-
-f32 fd_met_one_364 = 1.0f;
 
 BattleUnitKind unit_met = {
     72,
@@ -709,7 +664,7 @@ static EVT_BEGIN(attack_event_ceil)
     CALL(btlevtcmd_MovePosition, -2, LW(0), LW(11), LW(12), 60, -1, 1)
     CALL(btlevtcmd_AnimeChangePoseType, -2, 1, 50)
     WAIT_MS(250)
-    CALL(btlevtcmd_snd_se, -2, STRING("SFX_ENM_MET_FALL1\0\0"), -250000000, 0, -250000000)
+    CALL(btlevtcmd_snd_se, -2, STRING("SFX_ENM_MET_FALL1"), -250000000, 0, -250000000)
     CALL(btlevtcmd_SetMoveSpeed, -2, 0)
     CALL(btlevtcmd_SetJumpSpeed, -2, 0)
     CALL(btlevtcmd_SetFallAccel, -2, FLOAT(0.19921875f))

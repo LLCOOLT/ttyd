@@ -158,41 +158,41 @@ BattleWeapon marioWeapon_Suki;
 BattleWeapon* superActionTable[18];
 static EvtWord marioAttackEvent_NormalJump[VERSION_PICK(889, 963)];
 static EvtWord marioAttackEvent_KururinJump[1210];
-EvtWord marioAttackEvent_JyabaraJump[VERSION_PICK(1675, 1696)];
-EvtWord marioAttackEvent_GatsuDokaJump[VERSION_PICK(624, 638)];
-EvtWord marioAttackEvent_TatsumakiJump[VERSION_PICK(1668, 1679)];
-EvtWord marioAttackEvent_RenzokuJump[840];
-EvtWord marioAttackEvent_TugiTugiJump[VERSION_PICK(793, 775)];
-EvtWord marioAttackEvent_NormalHammer_Core[VERSION_PICK(1326, 1333)];
+extern EvtWord marioAttackEvent_JyabaraJump[];
+extern EvtWord marioAttackEvent_GatsuDokaJump[];
+extern EvtWord marioAttackEvent_TatsumakiJump[];
+extern EvtWord marioAttackEvent_RenzokuJump[];
+extern EvtWord marioAttackEvent_TugiTugiJump[];
+extern EvtWord marioAttackEvent_NormalHammer_Core[];
 static EvtWord marioAttackEvent_KaitenHammer[1060];
-EvtWord marioAttackEvent_FirstAttackKaitenHammer[19];
-EvtWord marioAttackEvent_JishinHammer[VERSION_PICK(834, 845)];
-EvtWord marioAttackEvent_UltraJishinHammer[665];
-EvtWord marioAttackEvent_HammerRotate[25];
-EvtWord marioAttackEvent_HammerNageru[VERSION_PICK(446, 457)];
-EvtWord marioAttackEvent_HammerNageru_object[VERSION_PICK(240, 247)];
-EvtWord marioAttackEvent_FireNaguri[702];
-EvtWord marioAttackEvent_FireNaguri_object[374];
-EvtWord _NormalCharge_core[103];
-EvtWord _SuperCharge_core[103];
-EvtWord marioAttackEvent_GatsunJump[7];
-EvtWord marioAttackEvent_DokanJump[7];
-EvtWord marioAttackEvent_MiniminiFumi[4];
-EvtWord marioAttackEvent_NemuraseFumi[4];
-EvtWord marioAttackEvent_FunyafunyaJump[4];
+extern EvtWord marioAttackEvent_FirstAttackKaitenHammer[];
+extern EvtWord marioAttackEvent_JishinHammer[];
+extern EvtWord marioAttackEvent_UltraJishinHammer[];
+extern EvtWord marioAttackEvent_HammerRotate[];
+extern EvtWord marioAttackEvent_HammerNageru[];
+extern EvtWord marioAttackEvent_HammerNageru_object[];
+extern EvtWord marioAttackEvent_FireNaguri[];
+extern EvtWord marioAttackEvent_FireNaguri_object[];
+extern EvtWord _NormalCharge_core[];
+extern EvtWord _SuperCharge_core[];
+extern EvtWord marioAttackEvent_GatsunJump[];
+extern EvtWord marioAttackEvent_DokanJump[];
+extern EvtWord marioAttackEvent_MiniminiFumi[];
+extern EvtWord marioAttackEvent_NemuraseFumi[];
+extern EvtWord marioAttackEvent_FunyafunyaJump[];
 static EvtWord marioAttackEvent_NormalHammer[7];
-EvtWord marioAttackEvent_GatsunHammer[7];
-EvtWord marioAttackEvent_IceNaguri[7];
-EvtWord marioAttackEvent_TsuranukiHammer[7];
-EvtWord marioAttackEvent_NormalCharge[7];
-EvtWord marioAttackEvent_NormalChargeP[7];
-EvtWord marioAttackEvent_SuperCharge[7];
-EvtWord marioAttackEvent_SuperChargeP[7];
-EvtWord marioAttackEvent_MajinaiPowerUpCheck[35];
-EvtWord marioAttackEvent_MajinaiJump[43];
-EvtWord _MajinaiPoseReset[14];
-EvtWord marioAttackEvent_MajinaiDefenceUp[29];
-EvtWord marioAttackEvent_MajinaiExpUp[27];
+extern EvtWord marioAttackEvent_GatsunHammer[];
+extern EvtWord marioAttackEvent_IceNaguri[];
+extern EvtWord marioAttackEvent_TsuranukiHammer[];
+extern EvtWord marioAttackEvent_NormalCharge[];
+extern EvtWord marioAttackEvent_NormalChargeP[];
+extern EvtWord marioAttackEvent_SuperCharge[];
+extern EvtWord marioAttackEvent_SuperChargeP[];
+extern EvtWord marioAttackEvent_MajinaiPowerUpCheck[];
+extern EvtWord marioAttackEvent_MajinaiJump[];
+extern EvtWord _MajinaiPoseReset[];
+extern EvtWord marioAttackEvent_MajinaiDefenceUp[];
+extern EvtWord marioAttackEvent_MajinaiExpUp[];
 
 #ifdef VERSION_G8ME01
 BattleWeapon marioDefaultWeapon_Jump = {
@@ -4506,9 +4506,11 @@ EVT_BEGIN(marioAttackEvent_JyabaraJump)
         CALL(btlevtcmd_GetResultPrizeLv, LW(3), 0, LW(6))
         CALL(btlevtcmd_AudienceDeclareACResult, LW(12), LW(6))
         CALL(btlevtcmd_GetDamage, LW(3), LW(0))
+#ifndef VERSION_G8MP01
         IF_INT_GREATER_OR_EQUAL(LW(0), 10)
             SET_VALUE(LW(0), 9)
         END_IF
+#endif
         CALL(evt_btl_camera_shake_h, 0, LW(0), 0, 10, 13)
         CALL(btlevtcmd_WeaponAftereffect, LW(12))
         CALL(btlevtcmd_StopAC)
@@ -10324,14 +10326,14 @@ USER_FUNC(_whirlwind_effect) {
     BattleWork* wp = _battleWorkPointer;
     EvtWord* args = event->args;
     s32 id = evtGetValue(event, args[0]);
-    s32 arg1 = evtGetValue(event, args[1]);
+    s32 life = evtGetValue(event, args[1]);
     BattleUnit* unit;
     EffectEntry* eff;
     f32 pos[3];
     id = BattleTransID(event, id);
     unit = BattleGetUnitPtr(wp, id);
     BtlUnit_GetPos(unit, &pos[0], &pos[1], &pos[2]);
-    eff = effWhirlwindN64Entry(unit->faceDirection < 0, NULL, unit->mSizeMultiplier, arg1);
+    eff = effWhirlwindN64Entry(unit->faceDirection < 0, NULL, unit->mSizeMultiplier, life);
     ((EffWhirlwindN64Work*)eff->userdata)->position.x = pos[0];
     ((EffWhirlwindN64Work*)eff->userdata)->position.y = pos[1];
     ((EffWhirlwindN64Work*)eff->userdata)->position.z = pos[2];
@@ -10428,7 +10430,7 @@ USER_FUNC(_tatsumaki_effect) {
         ud[4] = (s32) * &unit->mPosition.z;
         ud[5] = (EvtWord)effKamekiTornadeN64Entry(0, 90, ud[2], ud[3], ud[4], 3.0f);
         ud[6] = (EvtWord)effKamekiTornadeN64Entry(0, 90, ud[2], ud[3], ud[4], 3.0f);
-        ud[7] = ((s32(*)(const char*))psndSFXOn)("SFX_BTL_JUMP_TATUMAKI2\000");
+        ud[7] = psndSFXOn("SFX_BTL_JUMP_TATUMAKI2");
         v.x = ud[2];
         v.y = ud[3];
         v.z = ud[4];

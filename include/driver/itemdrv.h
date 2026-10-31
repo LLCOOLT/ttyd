@@ -9,7 +9,7 @@ typedef struct ItemEntry {
 	u16 flags; //0x0
 	u16 type; //0x2, entry type (itemEntry arg)
 	s32 itemId; //0x4
-	s32 evtId; //0x8, TODO: better name?
+	s32 collectFlag; //0x8, GSWF/LSWF flag set when collected, -1 for none
 	char name[0x10]; //0xC
 	EffectEntry* effect; //0x1C
 	EvtWord evtCode; //0x20, event script run on pickup (evtEntry)
@@ -20,7 +20,7 @@ typedef struct ItemEntry {
 	u32 flags2; //0x38
 	Vec position; //0x3C
 	f32 scale; //0x48
-	u8 alpha; //0x4C, TODO: "icon_alpha"?
+	u8 alpha; //0x4C
 	u8 pad_4D[0x50 - 0x4D]; //0x4D, never accessed
 	f32 speed; //0x50
 	s32 direction; //0x54
@@ -55,3 +55,7 @@ ItemEntry* itemNameToPtr(char*);
 
 void itemNokoForceGet(ItemEntry* entry);
 void itemPickUp(ItemEntry* entry);
+
+void itemDelete(const char* name);
+void itemFlagOn(ItemEntry* entry, u16 flags);
+void itemModeChange(ItemEntry* entry, s32 mode);

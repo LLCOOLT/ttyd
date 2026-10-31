@@ -13,27 +13,24 @@
 #include "party/party_yoshi.h"
 #include "party/party_vivian.h"
 #include "mario/mario_sbr.h"
+#include "mario/mario_hit.h"
+#include "party/party_hit.h"
 
 #define GETPARTY(args) partyGetPtr((args)[0] == 0 ? partyCtrlNo : 1)
 #define PARTY_ID(args) ((args)[0] == 0 ? partyCtrlNo : 1)
 
 extern void partyChgRunMode(PartyEntry* party, s32 mode);
 extern void partyChgPose();
-extern void partyChgPoseId();
 extern void partySetForceMove(PartyEntry* party, s32 a2, f32 a3, f32 a4);
 extern void partyMoveBesideMario();
 extern void partyMoveBehindMario();
 extern void partySetCamId();
-extern void* partySearchGround();
-extern void* partyHitCheck();
-extern void* searchUnder2();
 extern s32 nokonokoGetStatus();
 extern s32 bomheiGetStatus();
 extern void vivianUnhold(PartyEntry* party);
 extern void L_partyVivianTailStart();
 extern void L_partyVivianTailStop();
 extern void marioGetoffYoshi();
-extern void evt_set_yoshi_spd();
 extern void evt_set_yoshi_frm();
 extern s32 cloudGetStatus();
 
@@ -132,6 +129,9 @@ USER_FUNC(evt_party_force_reset_outofscreen) {
 	Vec out2;
 	Vec pos;
 	Vec pos2;
+#ifdef VERSION_G8MP01
+	Vec marioPos;
+#endif
 	f32 sx, sy, sz;
 	f32 h;
 	f32 ang;
@@ -152,6 +152,13 @@ USER_FUNC(evt_party_force_reset_outofscreen) {
 		if (marioChkInScreen((s32)sx, (s32)sy)) {
 			break;
 		}
+#ifdef VERSION_G8MP01
+		marioPos = ((MarioWork*)mw)->position;
+		marioGetScreenPos(marioPos, &sx, &sy, &sz);
+		if (!marioChkInScreen((s32)sx, (s32)sy)) {
+			break;
+		}
+#endif
 		ang = angleABf(p->position.x, p->position.z, ((MarioWork*)mw)->position.x, ((MarioWork*)mw)->position.z);
 		movePos(&p->position.x, &p->position.z, 1.0f, ang);
 		h = 100.0f;
@@ -219,8 +226,8 @@ USER_FUNC(evt_party_get_pos) {
 	return EVT_RETURN_DONE;
 }
 
-inline float inline_fn(f32 arg0, f32 arg1, f32 arg2, s32 arg3) {
-	return (arg0 - arg1) * (arg2 / (f32)arg3);
+inline float inline_fn(f32 a, f32 b, f32 c, s32 n) {
+	return (a - b) * (c / (f32)n);
 }
 
 USER_FUNC(evt_party_set_dir) {

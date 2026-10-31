@@ -1,7 +1,6 @@
 #include "battle/battle_unit.h"
 #include "evt/evt_cmd.h"
 
-#pragma force_active on
 #include "battle/battle.h"
 #include "system.h"
 #include "battle/battle_event_default.h"
@@ -9,6 +8,7 @@
 #include "battle/battle_event_subset.h"
 #include "battle/battle_weapon_power.h"
 #include "battle/battle_database_common.h"
+#include "manager/evtmgr_cmd.h"
 
 USER_FUNC(btlevtcmd_AddUnitWork);
 USER_FUNC(btlevtcmd_AnimeChangePose);
@@ -48,20 +48,6 @@ USER_FUNC(fire_bros_nagemakuri_set_target);
 void fire_bros_get_next_target(s32* unitIdx, s32* partIdx);
 void fire_bros_get_target(s32* unitIdx, s32* partIdx);
 
-f32 fd_fire_bros_negone_one_374[2] __attribute__((aligned(8)));
-f32 fd_fire_bros_neg_one_382;
-f32 fd_fire_bros___local_PI_383;
-f32 fd_fire_bros___local_3PIO2_385;
-f32 fd_fire_bros_one_negone_373[2] __attribute__((aligned(8)));
-f32 fd_fire_bros___local_PIO2_384;
-f32 fd_fire_bros_one_381;
-f32 fd_fire_bros_negone_one_360[2] __attribute__((aligned(8)));
-f32 fd_fire_bros_neg_one_365;
-f32 fd_fire_bros___local_PI_366;
-f32 fd_fire_bros___local_3PIO2_368;
-f32 fd_fire_bros_one_negone_359[2] __attribute__((aligned(8)));
-f32 fd_fire_bros___local_PIO2_367;
-f32 fd_fire_bros_one_364;
 BattleUnitKind unit_fire_bros;
 static BattleUnitDefense defence;
 static BattleUnitDefenseAttr defence_attr;
@@ -75,14 +61,11 @@ BattleWeapon weapon_fire_bros_nagemakuri_attack;
 static EvtWord init_event[21];
 static EvtWord damage_event[10];
 static EvtWord attack_event[92];
-static EvtWord damage_check_sub[167];
-static EvtWord damage_check_no_last[7];
-static EvtWord damage_check_last[113];
-EvtWord fire_move_event[605];
+extern EvtWord fire_move_event[];
 static EvtWord normal_attack_event[125];
 static EvtWord renzoku_attack_event[141];
 static EvtWord nagemakuri_attack_event[316];
-EvtWord nagemakuri_judge_last_attack_event[73];
+extern EvtWord nagemakuri_judge_last_attack_event[];
 static EvtWord wait_event[6];
 
 #pragma dont_inline on
@@ -136,34 +119,6 @@ USER_FUNC(fire_bros_nagemakuri_set_target) {
     }
     return EVT_RETURN_DONE;
 }
-
-f32 fd_fire_bros_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
-
-f32 fd_fire_bros_neg_one_382 = -1.0f;
-
-f32 fd_fire_bros___local_PI_383 = 3.1415927f;
-
-f32 fd_fire_bros___local_3PIO2_385 = 4.712389f;
-
-f32 fd_fire_bros_one_negone_373[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
-
-f32 fd_fire_bros___local_PIO2_384 = 1.5707964f;
-
-f32 fd_fire_bros_one_381 = 1.0f;
-
-f32 fd_fire_bros_negone_one_360[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
-
-f32 fd_fire_bros_neg_one_365 = -1.0f;
-
-f32 fd_fire_bros___local_PI_366 = 3.1415927f;
-
-f32 fd_fire_bros___local_3PIO2_368 = 4.712389f;
-
-f32 fd_fire_bros_one_negone_359[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
-
-f32 fd_fire_bros___local_PIO2_367 = 1.5707964f;
-
-f32 fd_fire_bros_one_364 = 1.0f;
 
 BattleUnitKind unit_fire_bros = {
     58,
@@ -787,7 +742,7 @@ static EVT_BEGIN(renzoku_attack_event)
     CALL(btlevtcmd_ChangeFaceDirection, -2, LW(15))
     CALL(btlevtcmd_SetUnitWork, -2, 1, 0)
     CALL(btlevtcmd_SetPartsWork, -2, 2, 10, 0)
-    CALL(btlevtcmd_AnimeChangePose, -2, 1, STRING("BRO_A_2A\0\0\0"))
+    CALL(btlevtcmd_AnimeChangePose, -2, 1, STRING("BRO_A_2A"))
     WAIT_FRAMES(20)
     SET_VALUE(LW(15), 2)
     SET_VALUE(LW(14), 0)
@@ -795,7 +750,7 @@ static EVT_BEGIN(renzoku_attack_event)
     SET_VALUE(LW(8), 0)
     SPAWN_EVENT(PTR(fire_move_event))
     WAIT_FRAMES(12)
-    CALL(btlevtcmd_AnimeChangePose, -2, 1, STRING("BRO_A_2A\0\0\0"))
+    CALL(btlevtcmd_AnimeChangePose, -2, 1, STRING("BRO_A_2A"))
     WAIT_FRAMES(20)
     SET_VALUE(LW(15), 3)
     SET_VALUE(LW(14), 1)
@@ -876,7 +831,7 @@ static EVT_BEGIN(nagemakuri_attack_event)
                     END_IF
                 END_LOOP
             END_IF
-            CALL(btlevtcmd_AnimeChangePose, -2, 1, STRING("BRO_A_2A\0\0\0"))
+            CALL(btlevtcmd_AnimeChangePose, -2, 1, STRING("BRO_A_2A"))
             WAIT_FRAMES(20)
             CALL(btlevtcmd_GetPartsWork, -2, LW(15), LW(10), LW(3))
             CALL(btlevtcmd_GetPartsWork, -2, LW(15), LW(11), LW(4))

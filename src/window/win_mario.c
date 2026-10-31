@@ -12,6 +12,7 @@
 #include <dolphin/gx.h>
 #include <string.h>
 #include "libc_decls.h"
+#include "win/win_mario.h"
 
 extern ItemData itemDataTable[];
 void winIconInit(void);
@@ -84,7 +85,7 @@ void winMarioInit(WindowWork* w) {
             case 0: name = "a_mario"; break;
             case 1: name = "a_mario_l"; break;
             case 2: name = "a_mario_w"; break;
-            case 3: name = "a_mario_wl\0\0\0\0\0"; break;
+            case 3: name = "a_mario_wl"; break;
         }
         w->mario.poseId = animPoseEntry(name, 0);
         animPoseSetAnim(w->mario.poseId, "M_S_1", 1);
@@ -151,7 +152,7 @@ void winMarioExit(WindowWork* w) {
     while (1) {                                                       \
         if (w->marioSel == 11 || w->marioSel == 12) {                           \
             if (w->mario.f198 != 0) break;                                  \
-        } else if (p->item == 0 || ((s32(*)(u32))pouchCheckItem)(p->item) != 0) {    \
+        } else if (p->item == 0 || pouchCheckItem(p->item) != 0) {    \
             break;                                                    \
         }                                                             \
         w->marioSel = p->links[n];                                         \
@@ -361,22 +362,22 @@ void fukidashi(WindowWork* w, u32 idx, f32 x, f32 y) {
             }
             break;
         case 7:
-            if (((s32(*)(u32))pouchCheckItem)(2)) {
+            if (pouchCheckItem(2)) {
                 fukiKey(w, itemDataTable[2].icon_id, x - 80.0f, y + 90.0f);
             }
             break;
         case 8:
-            if (((s32(*)(u32))pouchCheckItem)(4)) {
+            if (pouchCheckItem(4)) {
                 fukiKey(w, itemDataTable[4].icon_id, x - 80.0f, y + 20.0f);
             }
             break;
         case 9:
-            if (((s32(*)(u32))pouchCheckItem)(5)) {
+            if (pouchCheckItem(5)) {
                 fukiKey(w, itemDataTable[5].icon_id, x - 30.0f, y + 130.0f);
             }
             break;
         case 10:
-            if (((s32(*)(u32))pouchCheckItem)(3)) {
+            if (pouchCheckItem(3)) {
                 fukiKey(w, itemDataTable[3].icon_id, x - 30.0f, y + 60.0f);
             }
             break;
@@ -643,8 +644,7 @@ void winMarioDisp(s32 camId, void* param, s32 idx) {
             char sbuf[0x20];
 
             winFontSetWidth((Vec){y2, (f32)(130 - i * 26), 0.0f}, (Vec){1.0f, 1.0f, 1.0f}, black, 180.0f, msgSearch(superActionTable[i]->name));
-            // FAKE: the star power cost (s8 baseSpCost, never negative) is read unsigned (lbz with no extsb), as by the old u8 view of the move table
-            sprintf(sbuf, "%s", winZenkakuStr((u8)superActionTable[i]->baseSpCost));
+            sprintf(sbuf, "%s", winZenkakuStr(superActionTable[i]->baseSpCost));
             winFontSet((Vec){x2 - (f32)(FontGetMessageWidth(sbuf) / 2), (f32)(130 - i * 26), 0.0f}, (Vec){1.0f, 1.0f, 1.0f}, black, sbuf);
             winFontSet((Vec){cx6, (f32)(120 - i * 26), 0.0f}, (Vec){0.5f, 0.5f, 0.5f}, black, msgSearch("btl_cost_disp_AP"));
         }
@@ -852,8 +852,7 @@ void winMarioDisp(s32 camId, void* param, s32 idx) {
             char sbuf[0x20];
 
             winFontSetLabel((Vec){y, (f32)(130 - i * 26), 0.0f}, (Vec){1.0f, 1.0f, 1.0f}, black, superActionTable[i]->name);
-            // FAKE: the star power cost (s8 baseSpCost, never negative) is read unsigned (lbz with no extsb), as by the old u8 view of the move table
-            sprintf(sbuf, "%s", winZenkakuStr((u8)superActionTable[i]->baseSpCost));
+            sprintf(sbuf, "%s", winZenkakuStr(superActionTable[i]->baseSpCost));
             winFontSet((Vec){x - (f32)(FontGetMessageWidth(sbuf) / 2), (f32)(130 - i * 26), 0.0f}, (Vec){1.0f, 1.0f, 1.0f}, black, sbuf);
             winFontSet((Vec){cx, (f32)(120 - i * 26), 0.0f}, (Vec){0.5f, 0.5f, 0.5f}, black, "\x82\x72\x82\x6F");
         }

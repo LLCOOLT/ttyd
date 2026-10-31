@@ -7,7 +7,6 @@
 #include "battle/battle_unit.h"
 #include "evt/evt_cmd.h"
 
-#pragma force_active on
 #include "manager/evtmgr_cmd.h"
 #include "driver/effdrv.h"
 #include "stdio.h"
@@ -27,6 +26,7 @@
 #include "evt/evt_party.h"
 #include "evt/evt_sub.h"
 #include "las.h"
+#include "mario/mario_party.h"
 
 double sin(double);
 double cos(double);
@@ -181,99 +181,29 @@ void b_peach_msgcb(s32 type, void* param);
 void map_color_tev(MapTevCallbackInfo* info);
 void _hikariEntry(const char* name, s32 type, f32 scale);
 
-f32 fd_las_29_negone_one_374[2] __attribute__((aligned(8)));
-f32 fd_las_29_neg_one_382;
-f32 fd_las_29___local_PI_383;
-f32 fd_las_29___local_3PIO2_385;
-f32 fd_las_29_one_negone_373[2] __attribute__((aligned(8)));
-f32 fd_las_29___local_PIO2_384;
-f32 fd_las_29_one_381;
-f32 fd_las_29_negone_one_360[2] __attribute__((aligned(8)));
-f32 fd_las_29_neg_one_365;
-f32 fd_las_29___local_PI_366;
-f32 fd_las_29___local_3PIO2_368;
-f32 fd_las_29_one_negone_359[2] __attribute__((aligned(8)));
-f32 fd_las_29___local_PIO2_367;
-f32 fd_las_29_one_364;
-static EvtWord w_door_close[22];
-static EvtWord w_door_open[22];
 static BeroEntry bero_entry_data[2];
-static EvtWord syuryo_init[16];
-EvtWord q_kage_init[10];
+extern EvtWord q_kage_init[];
 static NpcSetupInfo npcEnt[8];
 HikariList40 hikari_data;
 HikariList27 hikari_data_2;
-EvtWord hikari_off_evt[42];
-EvtWord hikari_on_evt[63];
-EvtWord flush_on[106];
-EvtWord flush_off[106];
-EvtWord last_evt_1[1078];
-#ifdef VERSION_G8ME01
-EvtWord last_evt_2[358];
-#else
-EvtWord last_evt_2[383];
-#endif
+extern EvtWord hikari_off_evt[];
+extern EvtWord hikari_on_evt[];
+extern EvtWord flush_on[];
+extern EvtWord flush_off[];
+extern EvtWord last_evt_1[];
+extern EvtWord last_evt_2[];
 #ifndef VERSION_G8ME01
-EvtWord nise_mario_init[29];
+extern EvtWord nise_mario_init[];
 #endif
-#ifdef VERSION_G8ME01
-EvtWord last_evt_3[1349];
-#else
-EvtWord last_evt_3[1379];
-#endif
-EvtWord b_peach_fuwafuwa[39];
-#ifdef VERSION_G8ME01
-EvtWord last_evt_3_1[524];
-#else
-EvtWord last_evt_3_1[540];
-#endif
-#ifdef VERSION_G8ME01
-EvtWord koe_evt[78];
-#else
-EvtWord koe_evt[65];
-#endif
-EvtWord majo_kyorokyoro[84];
-#ifdef VERSION_G8ME01
-EvtWord last_evt_3_2[1837];
-#else
-EvtWord last_evt_3_2[1821];
-#endif
-EvtWord last_evt_4[1836];
-static EvtWord shuryolight_init[14];
-EvtWord shuryolight_delete[20];
-#ifdef VERSION_G8ME01
-EvtWord las_29_init_evt[180];
-#else
-EvtWord las_29_init_evt[182];
-#endif
-
-f32 fd_las_29_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
-
-f32 fd_las_29_neg_one_382 = -1.0f;
-
-f32 fd_las_29___local_PI_383 = 3.1415927f;
-
-f32 fd_las_29___local_3PIO2_385 = 4.712389f;
-
-f32 fd_las_29_one_negone_373[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
-
-f32 fd_las_29___local_PIO2_384 = 1.5707964f;
-
-f32 fd_las_29_one_381 = 1.0f;
-
-f32 fd_las_29_negone_one_360[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
-
-f32 fd_las_29_neg_one_365 = -1.0f;
-
-f32 fd_las_29___local_PI_366 = 3.1415927f;
-
-f32 fd_las_29___local_3PIO2_368 = 4.712389f;
-
-f32 fd_las_29_one_negone_359[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
-
-f32 fd_las_29___local_PIO2_367 = 1.5707964f;
-
-f32 fd_las_29_one_364 = 1.0f;
+extern EvtWord last_evt_3[];
+extern EvtWord b_peach_fuwafuwa[];
+extern EvtWord last_evt_3_1[];
+extern EvtWord koe_evt[];
+extern EvtWord majo_kyorokyoro[];
+extern EvtWord last_evt_3_2[];
+extern EvtWord last_evt_4[];
+extern EvtWord shuryolight_delete[];
+extern EvtWord las_29_init_evt[];
 
 static EVT_BEGIN(w_door_close)
     MULTIPLY_FLOAT(LW(0), FLOAT(0.38867188f))
@@ -563,7 +493,7 @@ USER_FUNC(rou_hikari_front_onoff) {
     func = on ? mapGrpFlagOn : mapGrpFlagOff;
     scale = on ? 0.0f : 0.5f;
     for (i = 39; i <= 62; i++) {
-        sprintf(name, "S_rou%02d\0\0", i);
+        sprintf(name, "S_rou%02d", i);
         func(name, 1);
         sprintf(name, "hi%d", i);
         eff = effNameToPtr(name);
@@ -735,11 +665,11 @@ void b_peach_msgcb(s32 type, void* param) {
     switch (type) {
         case 0:
         case 3:
-            npcSetTalkPose("\211e\202\314\217\227\211\244");
+            npcSetTalkPose("影の女王");
             break;
         case 1:
         case 2:
-            npcSetStayPose("\211e\202\314\217\227\211\244");
+            npcSetStayPose("影の女王");
             break;
     }
 }
@@ -754,7 +684,7 @@ USER_FUNC(add_vy) {
 
     base = dir ? -0.3f : 0.3f;
     step = dir ? 0.01f : -0.01f;
-    npc = npcNameToPtr("\203u\203\211\203b\203N\203s\201[\203`");
+    npc = npcNameToPtr("ブラックピーチ");
     base += step * n;
     npc->moveOffset.y += base;
     return EVT_RETURN_DONE;
@@ -924,14 +854,14 @@ USER_FUNC(slowturnoff_check) {
 }
 
 USER_FUNC(eff_b_peach_ripple) {
-    NpcEntry* npc = npcNameToPtr("\203u\203\211\203b\203N\203s\201[\203`");
+    NpcEntry* npc = npcNameToPtr("ブラックピーチ");
 
     effRippleSetRxRz(effRippleEntry(3, npc->position.x, 30.0f + npc->position.y, npc->position.z), 0.0f, 176.0f);
     return EVT_RETURN_DONE;
 }
 
 USER_FUNC(eff_b_peach_mist) {
-    NpcEntry* npc = npcNameToPtr("\203s\201[\203`\225P");
+    NpcEntry* npc = npcNameToPtr("ピーチ姫");
     f32 s;
     f32 angle;
     f32 c;

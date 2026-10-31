@@ -5,6 +5,7 @@
 #include "driver/icondrv.h"
 #include "system.h"
 #include <string.h>
+#include "pmario_sound.h"
 
 #ifdef VERSION_G8ME01
 #define AC_ICON_OFS 8
@@ -20,12 +21,11 @@ void btlDispTex4(s32 id, Vec pos, Vec scale, Vec rot, GXColor color);
 void btlGetScreenPoint(Vec* in, Vec* out);
 f32 sinfd(f32 degrees);
 f32 cosfd(f32 degrees);
-s32 psndSFXOn(const char* name);
 void psndSFXOff(s32 id);
 
 typedef struct ShotWork {
     s32 timer;        // 0x0
-    s32 field_0x4;
+    s32 timer2;       // 0x4, never used
     s32 idx;          // 0x8
     f32 minV;         // 0xC
     f32 maxV;         // 0x10
@@ -210,7 +210,7 @@ s32 battleAcMain_Shot(BattleWork* work) {
                     } else {
                         ac->mAcState = 1000;
                     }
-                } else if (!((s32 (*)(s32))BattlePadCheckNow)(0x100)) {
+                } else if (!BattlePadCheckNow(0x100)) {
                     SH_OUT(ac)[1] = (s32)(sw->maxV * sw->speed / 100.0f);
                     if ((f32)SH_OUT(ac)[1] < sw->minV) {
                         SH_OUT(ac)[1] = (s32)sw->minV;
@@ -313,7 +313,6 @@ static void _ac_disp_init(BattleWork* work) {
 }
 #pragma dont_inline reset
 
-#pragma dont_inline on
 static void actionCommandDisp(f32 x, f32 y) {
     BattleWork* work = _battleWorkPointer;
     BattleActions* ac = &work->actionCommands;
@@ -357,7 +356,6 @@ static void actionCommandDisp(f32 x, f32 y) {
         iconDispGxCol(m3, 0x10, 0x8d + AC_ICON_OFS, (GXColor){disp->color.r, disp->color.g, disp->color.b, disp->color.a});
     }
 }
-#pragma dont_inline reset
 
 #pragma dont_inline on
 static void _draw_target_mark(GXColor color, f32 x, f32 y, f32 z, f32 angle) {

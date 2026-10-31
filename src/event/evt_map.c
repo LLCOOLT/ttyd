@@ -39,7 +39,7 @@ void mapReStartAnimation(const char* name);
 void mapReStartAnimationAll(const char* name);
 void mapPauseAnimation(const char* name);
 void mapPauseAnimationAll(const char* name);
-void mapPlayAnimationLv(const char* name, s32 a, s32 b);
+void mapPlayAnimationLv(const char* name, s32 mode, s32 level);
 void mapObjSetColor(const char* name, GXColor color);
 void mapGrpSetColor(const char* name, GXColor color);
 void mapBlendOff(void);
@@ -216,7 +216,7 @@ USER_FUNC(evt_map_blend_set_flag) {
         } else {
             animPoseSetMaterialFlagOff(party->paperAnimGroup, flags);
         }
-    } else if (strcmp(name, "extparty\0\0\0") == 0) {
+    } else if (strcmp(name, "extparty") == 0) {
         PartyEntry* party = partyGetPtr(marioGetExtraPartyId());
         if (on == 1) {
             animPoseSetMaterialFlagOn(party->paperAnimGroup, flags);

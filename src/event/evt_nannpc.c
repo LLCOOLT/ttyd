@@ -46,7 +46,6 @@ USER_FUNC(evt_nannpc_set_position);
 USER_FUNC(evt_nannpc_set_subfunc);
 USER_FUNC(evt_nannpc_init);
 
-s32 gap_08_8041899C_sbss;
 NanNPCWork* nanNPCWork;
 char makestring[16];
 
@@ -378,7 +377,7 @@ USER_FUNC(evt_nannpc_init) {
         p->name[0] = 0;
         p->pose = NULL;
         p->flags = 0;
-        p->field_16 = 0;
+        p->flags2 = 0;
         p->pos = (Vec){0.0f, -1000.0f, 0.0f};
         p->target = (Vec){0.0f, -1000.0f, 0.0f};
         p->hosei = (Vec){0.0f, 0.0f, 0.0f};
@@ -453,7 +452,7 @@ s32 evt_nannpc_entry(EventEntry *event, BOOL isFirstCall)
       strcpy((char *) p->name, str);
       p->pose = &pose[i];
       p->flags = 0;
-      p->field_16 = 0;
+      p->flags2 = 0;
       p->pos = (Vec){0.0f, -1000.0f, 0.0f};
       p->target = (Vec){0.0f, -1000.0f, 0.0f};
       p->hosei = (Vec){0.0f, 0.0f, 0.0f};
@@ -698,8 +697,6 @@ USER_FUNC(evt_nannpc_set_color) {
     return 2;
 }
 
-#pragma force_active on
-#pragma explicit_zero_data on
 USER_FUNC(evt_nannpcwork_flag_onoff) {
     EvtWord* args = event->args;
     s32 onoff = evtGetValue(event, args[0]);
@@ -712,20 +709,7 @@ USER_FUNC(evt_nannpcwork_flag_onoff) {
     }
     return 2;
 }
-#pragma explicit_zero_data reset
-#pragma force_active reset
 
-#pragma force_active on
-#pragma explicit_zero_data on
-#pragma explicit_zero_data reset
-#pragma force_active reset
 
 #pragma force_active reset
 
-#ifdef VERSION_G8ME01
-#pragma force_active on
-u32 gap_07_804113E8_sdata[4] = {0}; /* US pad is 0x10 */ /* FAKE: kept (MWLD strips it in the US link) */
-#pragma force_active reset
-#else
-u32 gap_07_804113E8_sdata[6] = {0};
-#endif

@@ -1,7 +1,6 @@
 #include "battle/battle_unit.h"
 #include "evt/evt_cmd.h"
 
-#pragma force_active on
 #include "party.h"
 #include "mario/mario.h"
 #include "driver/animdrv.h"
@@ -48,6 +47,7 @@ USER_FUNC(evt_mario_wait_landon);
 USER_FUNC(evt_msg_print);
 USER_FUNC(evt_npc_set_autotalkpose);
 USER_FUNC(evt_party_cont_onoff);
+USER_FUNC(evt_party_get_pos);
 USER_FUNC(evt_party_set_pos);
 USER_FUNC(evt_peach_transform_gundan_off);
 USER_FUNC(evt_peach_transform_gundan_on);
@@ -68,75 +68,28 @@ USER_FUNC(evt_sub_intpl_msec_get_value_para);
 USER_FUNC(evt_sub_intpl_msec_init);
 static USER_FUNC(peach_set_pose);
 
-f32 fd_aji_09_negone_one_374[2] __attribute__((aligned(8)));
-f32 fd_aji_09_neg_one_382;
-f32 fd_aji_09___local_PI_383;
-f32 fd_aji_09___local_3PIO2_385;
-f32 fd_aji_09_one_negone_373[2] __attribute__((aligned(8)));
-f32 fd_aji_09___local_PIO2_384;
-f32 fd_aji_09_one_381;
-f32 fd_aji_09_negone_one_360[2] __attribute__((aligned(8)));
-f32 fd_aji_09_neg_one_365;
-f32 fd_aji_09___local_PI_366;
-f32 fd_aji_09___local_3PIO2_368;
-f32 fd_aji_09_one_negone_359[2] __attribute__((aligned(8)));
-f32 fd_aji_09___local_PIO2_367;
-f32 fd_aji_09_one_364;
-static EvtWord s_door_open[22];
-static EvtWord s_door_close[22];
 static BeroEntry bero_entry_data[2];
-EvtWord peach_evt_bero_out1[25];
+extern EvtWord peach_evt_bero_out1[];
 BeroEntry bero_data_peach1[2];
-EvtWord peach_evt_bero_out2[25];
+extern EvtWord peach_evt_bero_out2[];
 BeroEntry bero_data_peach2[2];
-EvtWord evt_kou1[115];
-EvtWord evt_kou2[155];
+extern EvtWord evt_kou1[];
+extern EvtWord evt_kou2[];
 const char* rokka_data[21];
-EvtWord evt_rokka_open[127];
-EvtWord evt_rokka_close[165];
-EvtWord evt_rokka_init[34];
-EvtWord peach_evt_fuku_g[36];
-EvtWord peach_evt_ka_open[46];
-EvtWord peach_evt_ka_close[46];
-EvtWord peach_evt_kou_in[172];
-EvtWord peach_evt_kou_out[89];
-EvtWord peach_evt_kou1_in[72];
-EvtWord peach_evt_kou1_out[43];
-EvtWord peach_evt_kou2_in[72];
-EvtWord peach_evt_kou2_out[43];
-EvtWord s_bero_out[90];
-static EvtWord peach_evt_stg3[262];
-static EvtWord evt_memo1[21];
-static EvtWord evt_memo2[14];
-EvtWord aji_09_init_evt[226];
-
-f32 fd_aji_09_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
-
-f32 fd_aji_09_neg_one_382 = -1.0f;
-
-f32 fd_aji_09___local_PI_383 = 3.1415927f;
-
-f32 fd_aji_09___local_3PIO2_385 = 4.712389f;
-
-f32 fd_aji_09_one_negone_373[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
-
-f32 fd_aji_09___local_PIO2_384 = 1.5707964f;
-
-f32 fd_aji_09_one_381 = 1.0f;
-
-f32 fd_aji_09_negone_one_360[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
-
-f32 fd_aji_09_neg_one_365 = -1.0f;
-
-f32 fd_aji_09___local_PI_366 = 3.1415927f;
-
-f32 fd_aji_09___local_3PIO2_368 = 4.712389f;
-
-f32 fd_aji_09_one_negone_359[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
-
-f32 fd_aji_09___local_PIO2_367 = 1.5707964f;
-
-f32 fd_aji_09_one_364 = 1.0f;
+extern EvtWord evt_rokka_open[];
+extern EvtWord evt_rokka_close[];
+extern EvtWord evt_rokka_init[];
+extern EvtWord peach_evt_fuku_g[];
+extern EvtWord peach_evt_ka_open[];
+extern EvtWord peach_evt_ka_close[];
+extern EvtWord peach_evt_kou_in[];
+extern EvtWord peach_evt_kou_out[];
+extern EvtWord peach_evt_kou1_in[];
+extern EvtWord peach_evt_kou1_out[];
+extern EvtWord peach_evt_kou2_in[];
+extern EvtWord peach_evt_kou2_out[];
+extern EvtWord s_bero_out[];
+extern EvtWord aji_09_init_evt[];
 
 static EVT_BEGIN(s_door_open)
     MULTIPLY_FLOAT(LW(0), FLOAT(0.16601563f))
@@ -871,6 +824,20 @@ EVT_BEGIN(aji_09_init_evt)
             CALL(evt_party_cont_onoff, 0, 1)
             CALL(evt_party_cont_onoff, 1, 1)
             CALL(evt_mario_wait_landon)
+#ifdef VERSION_G8MP01
+            LOOP(30)
+                CALL(evt_mario_get_pos, 0, LW(0), LW(1), LW(2))
+                CALL(evt_party_get_pos, 0, LW(3), LW(4), LW(5))
+                ADD(LW(1), 20)
+                IF_INT_LESS(LW(1), LW(4))
+                    SUBTRACT(LW(4), 10)
+                    CALL(evt_party_set_pos, 0, LW(3), LW(4), LW(5))
+                ELSE
+                    BREAK_LOOP
+                END_IF
+                WAIT_FRAMES(1)
+            END_LOOP
+#endif
             CALL(evt_mario_key_onoff, 1)
             CALL(evt_cam_letter_box_disable, 0)
         END_INLINE_EVENT

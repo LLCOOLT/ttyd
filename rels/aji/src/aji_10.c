@@ -1,7 +1,6 @@
 #include "battle/battle_unit.h"
 #include "evt/evt_cmd.h"
 
-#pragma force_active on
 #include "mario/mario.h"
 #include "manager/evtmgr_cmd.h"
 #include "driver/camdrv.h"
@@ -92,74 +91,17 @@ static USER_FUNC(viewport);
 void monitor_cap_tev(MapTevCallbackInfo* info);
 void monitor_cap_capture(CameraId cameraId, void* param);
 
-f32 fd_aji_10_negone_one_374[2] __attribute__((aligned(8)));
-f32 fd_aji_10_neg_one_382;
-f32 fd_aji_10___local_PI_383;
-f32 fd_aji_10___local_3PIO2_385;
-f32 fd_aji_10_one_negone_373[2] __attribute__((aligned(8)));
-f32 fd_aji_10___local_PIO2_384;
-f32 fd_aji_10_one_381;
-f32 fd_aji_10_negone_one_360[2] __attribute__((aligned(8)));
-f32 fd_aji_10_neg_one_365;
-f32 fd_aji_10___local_PI_366;
-f32 fd_aji_10___local_3PIO2_368;
-f32 fd_aji_10_one_negone_359[2] __attribute__((aligned(8)));
-f32 fd_aji_10___local_PIO2_367;
-f32 fd_aji_10_one_364;
-static EvtWord w_door_close[22];
-static EvtWord w_door_open[22];
-static EvtWord e_door_close[22];
-static EvtWord e_door_open[22];
 static BeroEntry bero_entry_data[3];
-static EvtWord bero_peach_evt[30];
 static BeroEntry bero_peach_data[2];
-EvtWord monitor_on[33];
-EvtWord monitor_off[37];
-EvtWord monitor_init[41];
-static EvtWord peach_evt_stg1[1411];
-static EvtWord peach_evt_stg2[463];
-static EvtWord peach_evt_stg3[251];
-EvtWord peach_move[72];
-EvtWord peach_evt_stg3_syuryo_talk[138];
-static EvtWord peach_evt_stg4[235];
-static EvtWord peach_evt_stg5[281];
-static EvtWord peach_evt_stg6[349];
-EvtWord eff_test[36];
-static EvtWord teshita1_init[9];
-static EvtWord teshita2_init[9];
-static EvtWord teshita3_init[9];
-EvtWord kanbu_init[9];
-static EvtWord syuryo_init[24];
+extern EvtWord monitor_on[];
+extern EvtWord monitor_off[];
+extern EvtWord monitor_init[];
+extern EvtWord peach_move[];
+extern EvtWord peach_evt_stg3_syuryo_talk[];
+extern EvtWord eff_test[];
+extern EvtWord kanbu_init[];
 static NpcSetupInfo npcEnt[9];
-EvtWord aji_10_init_evt[279];
-
-f32 fd_aji_10_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
-
-f32 fd_aji_10_neg_one_382 = -1.0f;
-
-f32 fd_aji_10___local_PI_383 = 3.1415927f;
-
-f32 fd_aji_10___local_3PIO2_385 = 4.712389f;
-
-f32 fd_aji_10_one_negone_373[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
-
-f32 fd_aji_10___local_PIO2_384 = 1.5707964f;
-
-f32 fd_aji_10_one_381 = 1.0f;
-
-f32 fd_aji_10_negone_one_360[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
-
-f32 fd_aji_10_neg_one_365 = -1.0f;
-
-f32 fd_aji_10___local_PI_366 = 3.1415927f;
-
-f32 fd_aji_10___local_3PIO2_368 = 4.712389f;
-
-f32 fd_aji_10_one_negone_359[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
-
-f32 fd_aji_10___local_PIO2_367 = 1.5707964f;
-
-f32 fd_aji_10_one_364 = 1.0f;
+extern EvtWord aji_10_init_evt[];
 
 static EVT_BEGIN(w_door_close)
     MULTIPLY_FLOAT(LW(0), FLOAT(0.25f))
@@ -277,7 +219,6 @@ USER_FUNC(monitor_cap_init) {
     return EVT_RETURN_DONE;
 }
 
-
 USER_FUNC(monitor_kanbu_flag_onoff) {
     monitor_wp->kanbu = evtGetValue(event, event->args[0]);
     return EVT_RETURN_DONE;
@@ -301,7 +242,7 @@ void monitor_cap_capture(CameraId cameraId, void* param) {
     C_MTXPerspective(projMtx, 60.0f, 1.2666667f, 1.0f, 1000.0f);
     GXSetProjection(projMtx, GX_PERSPECTIVE);
     if (monitor_wp->kanbu) {
-        npc = npcNameToPtr("\203J\203\223\203u\201[");
+        npc = npcNameToPtr("カンブー");
         {
             static const Vec monitor_kanbu_pos = {0.0f, 28.0f, 46.0f};
             static const Vec monitor_kanbu_up = {0.0f, 1.0f, 0.0f};
@@ -317,7 +258,7 @@ void monitor_cap_capture(CameraId cameraId, void* param) {
             C_MTXLookAt(lookAt, &pos, &up, &target);
         }
     } else {
-        npc = npcNameToPtr("\216\350\211\272\202P");
+        npc = npcNameToPtr("手下１");
         {
             static const Vec monitor_teshita_pos = {0.0f, 25.0f, 30.0f};
             static const Vec monitor_teshita_up = {0.0f, 1.0f, 0.0f};

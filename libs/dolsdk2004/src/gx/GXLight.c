@@ -1,4 +1,3 @@
-#define MATH_NO_SQRTF 1
 #include <math.h>
 #include <dolphin/gx.h>
 #include <dolphin/os.h>
@@ -29,7 +28,6 @@ void GXInitLightAttn(GXLightObj* lt_obj, f32 a0, f32 a1, f32 a2, f32 k0, f32 k1,
     obj->k[2] = k2;
 }
 
-#ifdef GXLIGHT_UNUSED_FUNCS // FAKE: dead-stripped in the original binary; excluded to keep data layout
 void GXInitLightAttnA(GXLightObj* lt_obj, f32 a0, f32 a1, f32 a2) {
     __GXLightObjInt_struct* obj;
 
@@ -40,9 +38,7 @@ void GXInitLightAttnA(GXLightObj* lt_obj, f32 a0, f32 a1, f32 a2) {
     obj->a[1] = a1;
     obj->a[2] = a2;
 }
-#endif
 
-#ifdef GXLIGHT_UNUSED_FUNCS // FAKE: dead-stripped in the original binary; excluded to keep data layout
 void GXGetLightAttnA(const GXLightObj* lt_obj, f32* a0, f32* a1, f32* a2) {
     __GXLightObjInt_struct* obj;
 
@@ -53,9 +49,7 @@ void GXGetLightAttnA(const GXLightObj* lt_obj, f32* a0, f32* a1, f32* a2) {
     *a1 = obj->a[1];
     *a2 = obj->a[2];
 }
-#endif
 
-#ifdef GXLIGHT_UNUSED_FUNCS // FAKE: dead-stripped in the original binary; excluded to keep data layout
 void GXInitLightAttnK(GXLightObj* lt_obj, f32 k0, f32 k1, f32 k2) {
     __GXLightObjInt_struct* obj;
 
@@ -66,9 +60,7 @@ void GXInitLightAttnK(GXLightObj* lt_obj, f32 k0, f32 k1, f32 k2) {
     obj->k[1] = k1;
     obj->k[2] = k2;
 }
-#endif
 
-#ifdef GXLIGHT_UNUSED_FUNCS // FAKE: dead-stripped in the original binary; excluded to keep data layout
 void GXGetLightAttnK(const GXLightObj* lt_obj, f32* k0, f32* k1, f32* k2) {
     __GXLightObjInt_struct* obj;
 
@@ -79,7 +71,6 @@ void GXGetLightAttnK(const GXLightObj* lt_obj, f32* k0, f32* k1, f32* k2) {
     *k1 = obj->k[1];
     *k2 = obj->k[2];
 }
-#endif
 
 void GXInitLightSpot(GXLightObj* lt_obj, f32 cutoff, GXSpotFn spot_func) {
     f32 a0, a1, a2;
@@ -198,7 +189,6 @@ void GXInitLightPos(GXLightObj* lt_obj, f32 x, f32 y, f32 z) {
     obj->lpos[2] = z;
 }
 
-#ifdef GXLIGHT_UNUSED_FUNCS // FAKE: dead-stripped in the original binary; excluded to keep data layout
 void GXGetLightPos(const GXLightObj* lt_obj, f32* x, f32* y, f32* z) {
     __GXLightObjInt_struct* obj;
 
@@ -210,7 +200,6 @@ void GXGetLightPos(const GXLightObj* lt_obj, f32* x, f32* y, f32* z) {
     *y = obj->lpos[1];
     *z = obj->lpos[2];
 }
-#endif
 
 void GXInitLightDir(GXLightObj* lt_obj, f32 nx, f32 ny, f32 nz) {
     __GXLightObjInt_struct* obj;
@@ -223,7 +212,6 @@ void GXInitLightDir(GXLightObj* lt_obj, f32 nx, f32 ny, f32 nz) {
     obj->ldir[2] = -nz;
 }
 
-#ifdef GXLIGHT_UNUSED_FUNCS // FAKE: dead-stripped in the original binary; excluded to keep data layout
 void GXGetLightDir(const GXLightObj* lt_obj, f32* nx, f32* ny, f32* nz) {
     __GXLightObjInt_struct* obj;
 
@@ -234,9 +222,7 @@ void GXGetLightDir(const GXLightObj* lt_obj, f32* nx, f32* ny, f32* nz) {
     *ny = -obj->ldir[1];
     *nz = -obj->ldir[2];
 }
-#endif
 
-#ifdef GXLIGHT_UNUSED_FUNCS // FAKE: dead-stripped in the original binary; excluded to keep data layout
 void GXInitSpecularDir(GXLightObj* lt_obj, f32 nx, f32 ny, f32 nz) {
     f32 mag;
     f32 vx;
@@ -264,9 +250,7 @@ void GXInitSpecularDir(GXLightObj* lt_obj, f32 nx, f32 ny, f32 nz) {
     obj->lpos[1] = ny * -1000000000000000000.0f;
     obj->lpos[2] = nz * -1000000000000000000.0f;
 }
-#endif
 
-#ifdef GXLIGHT_UNUSED_FUNCS // FAKE: dead-stripped in the original binary; excluded to keep data layout
 void GXInitSpecularDirHA(GXLightObj* lt_obj, f32 nx, f32 ny, f32 nz, f32 hx, f32 hy, f32 hz) {
     __GXLightObjInt_struct* obj;
 
@@ -281,7 +265,6 @@ void GXInitSpecularDirHA(GXLightObj* lt_obj, f32 nx, f32 ny, f32 nz, f32 hx, f32
     obj->lpos[1] = ny * -1000000000000000000.0f;
     obj->lpos[2] = nz * -1000000000000000000.0f;
 }
-#endif
 
 void GXInitLightColor(GXLightObj* lt_obj, GXColor color) {
     __GXLightObjInt_struct* obj;
@@ -293,7 +276,6 @@ void GXInitLightColor(GXLightObj* lt_obj, GXColor color) {
     *(u32*)&obj->Color = *(u32*)&color;
 }
 
-#ifdef GXLIGHT_UNUSED_FUNCS // FAKE: dead-stripped in the original binary; excluded to keep data layout
 void GXGetLightColor(const GXLightObj* lt_obj, GXColor* color) {
     __GXLightObjInt_struct* obj;
 
@@ -303,7 +285,6 @@ void GXGetLightColor(const GXLightObj* lt_obj, GXColor* color) {
 
     *(u32*)color = *(u32*)&obj->Color;
 }
-#endif
 
 #if DEBUG
 #define WRITE_SOME_LIGHT_REG1(val, addr) \
@@ -413,7 +394,6 @@ void GXLoadLightObjImm(const GXLightObj* lt_obj, GXLightID light) {
     __GXData->bpSentNot = 1;
 }
 
-#ifdef GXLIGHT_UNUSED_FUNCS // FAKE: dead-stripped in the original binary; excluded to keep data layout
 void GXLoadLightObjIndx(u32 lt_obj_indx, GXLightID light) {
     u32 reg;
     u32 addr;
@@ -442,7 +422,6 @@ void GXLoadLightObjIndx(u32 lt_obj_indx, GXLightID light) {
 #endif
     __GXData->bpSentNot = 1;
 }
-#endif
 
 #define GXCOLOR_AS_U32(color) (*((u32*)&(color)))
 

@@ -1,7 +1,6 @@
 #include "battle/battle_unit.h"
 #include "evt/evt_cmd.h"
 
-#pragma force_active on
 #include "driver/fadedrv.h"
 #include "mario/mariost.h"
 #include "driver/swdrv.h"
@@ -179,79 +178,48 @@ USER_FUNC(kpa_chg_pose);
 static USER_FUNC(evtflash);
 void bossrobot_batu(CameraId camera, void* param);
 USER_FUNC(evt_countdown_stop);
-#ifdef VERSION_G8ME01
-#endif
 void mri_stg3_012_cb(s32 type, void* param);
 
-f32 fd_mri_01_negone_one_374[2] __attribute__((aligned(8)));
-f32 fd_mri_01_neg_one_382;
-f32 fd_mri_01___local_PI_383;
-f32 fd_mri_01___local_3PIO2_385;
-f32 fd_mri_01_one_negone_373[2] __attribute__((aligned(8)));
-f32 fd_mri_01___local_PIO2_384;
-f32 fd_mri_01_one_381;
-f32 fd_mri_01_negone_one_360[2] __attribute__((aligned(8)));
-f32 fd_mri_01_neg_one_365;
-f32 fd_mri_01___local_PI_366;
-f32 fd_mri_01___local_3PIO2_368;
-f32 fd_mri_01_one_negone_359[2] __attribute__((aligned(8)));
-f32 fd_mri_01___local_PIO2_367;
-f32 fd_mri_01_one_364;
-static EvtWord guide_init[29];
-static EvtWord guide_talk[20];
-static EvtWord rival_init[30];
-static EvtWord rival_talk[8];
-static EvtWord elder_init[39];
 s32 puni_return_data[204];
-EvtWord puni_return[99];
-EvtWord elder_talk_sub[376];
+extern EvtWord puni_return[];
+extern EvtWord elder_talk_sub[];
 s32 irai_item_tbl[2];
 static s32 iri_17_item_tbl[2];
-static EvtWord elder_talk[177];
-EvtWord puni_1_init[24];
-EvtWord puni_1_talk[43];
-EvtWord puni_2_init[24];
-EvtWord puni_2_talk[20];
-EvtWord puni_init[9];
-static EvtWord baba_init[9];
-static EvtWord baba_talk[8];
-static EvtWord sister_init[31];
-EvtWord sister_jump[48];
-static EvtWord sister_talk[230];
+extern EvtWord puni_1_init[];
+extern EvtWord puni_1_talk[];
+extern EvtWord puni_2_init[];
+extern EvtWord puni_2_talk[];
+extern EvtWord puni_init[];
+extern EvtWord sister_jump[];
 static NpcSetupInfo npcEnt[9];
-EvtWord bero_00_doa_close[10];
-EvtWord bero_00_doa_open[10];
-static EvtWord bero_01_doa_close[10];
-static EvtWord bero_01_doa_open[10];
-EvtWord out_mri_event[5];
+extern EvtWord bero_00_doa_close[];
+extern EvtWord bero_00_doa_open[];
+extern EvtWord out_mri_event[];
 static BeroEntry bero_entry_data[4];
-EvtWord bigtree_firstbattle[734];
-EvtWord meet_rival[2247];
-EvtWord rival_nakama[1137];
-EvtWord elder_kaisetsu[206];
-EvtWord puni_taiki[119];
+extern EvtWord bigtree_firstbattle[];
+extern EvtWord meet_rival[];
+extern EvtWord rival_nakama[];
+extern EvtWord elder_kaisetsu[];
+extern EvtWord puni_taiki[];
 s32 puni_position[102];
-EvtWord boss_battle_init[215];
-EvtWord dai3kanbu_suikomare[81];
-EvtWord boss_robot_pera[34];
-EvtWord boss_robot_pera_after[19];
-EvtWord boss_battle[1224];
-EvtWord starstone_item[19];
-EvtWord boss_robot_electro[43];
-EvtWord boss_robot_kemuri[49];
-EvtWord boss_battle_win_init[49];
-EvtWord boss_battle_win[1493];
-static EvtWord door_switch_init[17];
-EvtWord ueki_puni_nigeru[100];
-EvtWord evt_ueki_01[18];
-static EvtWord evt_ueki_02[24];
-EvtWord evt_ueki_03[49];
-static EvtWord evt_ueki_08[8];
+extern EvtWord boss_battle_init[];
+extern EvtWord dai3kanbu_suikomare[];
+extern EvtWord boss_robot_pera[];
+extern EvtWord boss_robot_pera_after[];
+extern EvtWord boss_battle[];
+extern EvtWord starstone_item[];
+extern EvtWord boss_robot_electro[];
+extern EvtWord boss_robot_kemuri[];
+extern EvtWord boss_battle_win_init[];
+extern EvtWord boss_battle_win[];
+extern EvtWord ueki_puni_nigeru[];
+extern EvtWord evt_ueki_01[];
+extern EvtWord evt_ueki_03[];
 static KusaAccess ueki_access_data[5];
-EvtWord puni_mario_wait[49];
-EvtWord mri_01_koopa_first_evt[400];
-EvtWord mri_01_koopa_second_evt[682];
-EvtWord mri_01_init_evt[464];
+extern EvtWord puni_mario_wait[];
+extern EvtWord mri_01_koopa_first_evt[];
+extern EvtWord mri_01_koopa_second_evt[];
+extern EvtWord mri_01_init_evt[];
 
 static USER_FUNC(evtflash) {
     if (isFirstCall) {
@@ -328,34 +296,6 @@ USER_FUNC(elder_talk_sub_fadeoff) {
     puniFadeOff(evtGetValue(event, event->args[0]));
     return EVT_RETURN_DONE;
 }
-
-f32 fd_mri_01_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
-
-f32 fd_mri_01_neg_one_382 = -1.0f;
-
-f32 fd_mri_01___local_PI_383 = 3.1415927f;
-
-f32 fd_mri_01___local_3PIO2_385 = 4.712389f;
-
-f32 fd_mri_01_one_negone_373[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
-
-f32 fd_mri_01___local_PIO2_384 = 1.5707964f;
-
-f32 fd_mri_01_one_381 = 1.0f;
-
-f32 fd_mri_01_negone_one_360[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
-
-f32 fd_mri_01_neg_one_365 = -1.0f;
-
-f32 fd_mri_01___local_PI_366 = 3.1415927f;
-
-f32 fd_mri_01___local_3PIO2_368 = 4.712389f;
-
-f32 fd_mri_01_one_negone_359[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
-
-f32 fd_mri_01___local_PIO2_367 = 1.5707964f;
-
-f32 fd_mri_01_one_364 = 1.0f;
 
 static EVT_BEGIN(guide_init)
     SWITCH(GSW(0))
@@ -2107,8 +2047,8 @@ EVT_END()
 
 void bossrobot_batu(CameraId camera, void* param) {
     u8* alpha = param;
-    NpcEntry* robot = npcNameToPtr("\203{\203X\203\215\203{\203b\203g");
-    NpcEntry* batu = npcNameToPtr("\203{\203X\203\215\203{\203b\203g\203o\203c");
+    NpcEntry* robot = npcNameToPtr("ボスロボット");
+    NpcEntry* batu = npcNameToPtr("ボスロボットバツ");
     Mtx* mtxs = *animPoseGetAnimPosePtr(robot->poseId)->worldMatrices;
     s32 idx = animPoseGetGroupIdx(robot->poseId, "locator23");
     Mtx rot;
@@ -2137,9 +2077,9 @@ void bossrobot_batu(CameraId camera, void* param) {
 
 USER_FUNC(bossrobot) {
     u8 alpha = evtGetValue(event, event->args[0]);
-    NpcEntry* robot = npcNameToPtr("\203{\203X\203\215\203{\203b\203g");
-    NpcEntry* batu = npcNameToPtr("\203{\203X\203\215\203{\203b\203g\203o\203c");
-    NpcEntry* maru = npcNameToPtr("\203{\203X\203\215\203{\203b\203g\203}\203\213");
+    NpcEntry* robot = npcNameToPtr("ボスロボット");
+    NpcEntry* batu = npcNameToPtr("ボスロボットバツ");
+    NpcEntry* maru = npcNameToPtr("ボスロボットマル");
     AnimationPose* pose;
     Mtx* mtxs;
     s32 idx;
@@ -2291,7 +2231,11 @@ EVT_BEGIN(boss_battle_init)
 EVT_END()
 
 EVT_BEGIN(dai3kanbu_suikomare)
+#ifdef VERSION_G8MP01
+    BEGIN_INLINE_EVENT_GET_ID(LW(1))
+#else
     BEGIN_INLINE_EVENT
+#endif
         CALL(evt_sub_intpl_msec_init, 0, 100, 0, 300)
         LOOP(0)
             CALL(evt_sub_intpl_msec_get_value_para, LW(0), LW(1))
@@ -2313,6 +2257,10 @@ EVT_BEGIN(dai3kanbu_suikomare)
     END_INLINE_EVENT
     CALL(evt_npc_glide_position, STRING("第三勢力幹部"), 150, 60, 30, 300, 0, 0, 0, 0)
     DELETE_EVENT(LW(0))
+#ifdef VERSION_G8MP01
+    DELETE_EVENT(LW(1))
+    WAIT_FRAMES(1)
+#endif
     CALL(evt_npc_set_position, STRING("第三勢力幹部"), 0, -1000, 0)
     CALL(evt_npc_set_scale, STRING("第三勢力幹部"), FLOAT(1.0f), FLOAT(1.0f), FLOAT(1.0f))
     RETURN
@@ -3631,7 +3579,7 @@ EVT_BEGIN(mri_01_init_evt)
         CALL(evt_npc_set_ry, STRING("プニ族長老"), 270)
         CALL(evt_npc_flag_onoff, 1, STRING("プニ族長老"), 32)
         CALL(evt_bero_get_entername, LW(0))
-        IF_STR_EQUAL(LW(0), STRING("player\0"))
+        IF_STR_EQUAL(LW(0), STRING("player"))
             CALL(evt_mario_set_pos, -280, 0, 30)
             CALL(evt_mario_set_dir, 90, 0, 0)
             CALL(evt_npc_set_position, STRING("ババ"), -355, 0, 30)

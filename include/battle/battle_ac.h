@@ -24,10 +24,6 @@ typedef struct BattleACDispParams {
     f32 gaugeRatio;                 // 0x28, power gauge fill, 0..1
 } BattleACDispParams;
 
-// FAKE: slideTimer read through a byte offset from a register-held index (i = 4 maps to slideTimer); the plain field schedules the
-// address differently (ac_power_gauge_lv 98.86%, (&slideTimer)[i - 4] 78.95%). Used by ac_air_gauge, ac_power_gauge_lv, ac_timing_a.
-#define AC_SLIDE_TIMER_AT(disp, i) (*(s32*)((u8*)&(disp)->slideTimer + (i) - 4))
-
 typedef struct BattleActions {
     struct BattleUnit* mAcUnit;      // 0x0
     s32 setupFlags;                  // 0x4, BattleActionCommandSetup a4; bit0: auto-play while confused
@@ -59,7 +55,7 @@ typedef struct BattleActions {
     };
     u8 work[0x30C - 0x2BC];          // 0x2BC, per-command work (each ac_*.c casts it to its own struct)
 } BattleActions;
-// NB: 0x308 is as far as I can pin to this struct (0x1F98 in battleAcMain_PendulumCraneTiming, TODO?)
+// NB: 0x308 is as far as this struct is pinned (battleAcMain_PendulumCraneTiming also uses 0x1F98, owner unknown)
 
 void BattleActionCommandManagerInit(BattleWork* wp);
 void BattleActionCommandManager(BattleWork* wp);

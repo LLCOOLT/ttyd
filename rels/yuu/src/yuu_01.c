@@ -2,7 +2,6 @@
 #include "battle/battle_unit.h"
 #include "evt/evt_cmd.h"
 
-#pragma force_active on
 #include "manager/evtmgr_cmd.h"
 #include "driver/camdrv.h"
 #include "mario/mario.h"
@@ -31,8 +30,8 @@ BOOL marioChkSwirlPower(void);
 void marioSetSwirlPower(s32 time, f32 speed, f32 angle);
 void monteCountDisp(void);
 void marioChgShipMotion(void);
-typedef struct MonteSub { s32 unk0; Vec pos; f32 scale; u8 unk14[0x38 - 0x14]; } MonteSub;
-typedef struct Monte { u8 hidden; u8 unk1; s16 num; u8 state; u8 unk5[3]; MonteSub sub; MiniGameWork* wp; } Monte;
+typedef struct MonteSub { s32 flags; Vec pos; f32 scale; u8 iconData[0x38 - 0x14]; } MonteSub; /* mirrors IconEntry */
+typedef struct Monte { u8 hidden; u8 pad_1; s16 num; u8 state; u8 pad_5[3]; MonteSub sub; MiniGameWork* wp; } Monte;
 typedef struct MonteTable { f32 x0; f32 x1; f32 y0; f32 y1; s32 num; } MonteTable;
 static void* yuunpc_wp;
 static Monte* monte_p;
@@ -95,63 +94,20 @@ void yuuminigame_init_2fune(EventEntry* event, BOOL isFirstCall);
 static void monte_disp(CameraId camera, void* param);
 static BOOL get_monte_check(Vec* a, Vec* b);
 
-f32 fd_yuu_01_negone_one_374[2] __attribute__((aligned(8)));
-f32 fd_yuu_01_neg_one_382;
-f32 fd_yuu_01___local_PI_383;
-f32 fd_yuu_01___local_3PIO2_385;
-f32 fd_yuu_01_one_negone_373[2] __attribute__((aligned(8)));
-f32 fd_yuu_01___local_PIO2_384;
-f32 fd_yuu_01_one_381;
-f32 fd_yuu_01_negone_one_360[2] __attribute__((aligned(8)));
-f32 fd_yuu_01_neg_one_365;
-f32 fd_yuu_01___local_PI_366;
-f32 fd_yuu_01___local_3PIO2_368;
-f32 fd_yuu_01_one_negone_359[2] __attribute__((aligned(8)));
-f32 fd_yuu_01___local_PIO2_367;
-f32 fd_yuu_01_one_364;
 const char* s_nametbl[21];
 const char* a2_nametbl[21];
 const char* a_nametbl[21];
 s32 turn_tbl[22];
 s32 hoko_tbl[22];
 static MonteTable montetable[6];
-static EvtWord minigame_view_monte[4];
-EvtWord yuu_01_kaijo_init[12];
-EvtWord yuu_01_kaijo_init2[12];
-EvtWord minigame02_main[37];
-EvtWord minigame02_start_cam[40];
-EvtWord minigame02_start_cam_cancel[17];
-EvtWord minigame02_start[101];
-EvtWord minigame02_end[172];
-EvtWord yuu_01_init_evt[VERSION_PICK(1076, 1166)];
-
-f32 fd_yuu_01_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
-
-f32 fd_yuu_01_neg_one_382 = -1.0f;
-
-f32 fd_yuu_01___local_PI_383 = 3.1415927f;
-
-f32 fd_yuu_01___local_3PIO2_385 = 4.712389f;
-
-f32 fd_yuu_01_one_negone_373[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
-
-f32 fd_yuu_01___local_PIO2_384 = 1.5707964f;
-
-f32 fd_yuu_01_one_381 = 1.0f;
-
-f32 fd_yuu_01_negone_one_360[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
-
-f32 fd_yuu_01_neg_one_365 = -1.0f;
-
-f32 fd_yuu_01___local_PI_366 = 3.1415927f;
-
-f32 fd_yuu_01___local_3PIO2_368 = 4.712389f;
-
-f32 fd_yuu_01_one_negone_359[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
-
-f32 fd_yuu_01___local_PIO2_367 = 1.5707964f;
-
-f32 fd_yuu_01_one_364 = 1.0f;
+extern EvtWord yuu_01_kaijo_init[];
+extern EvtWord yuu_01_kaijo_init2[];
+extern EvtWord minigame02_main[];
+extern EvtWord minigame02_start_cam[];
+extern EvtWord minigame02_start_cam_cancel[];
+extern EvtWord minigame02_start[];
+extern EvtWord minigame02_end[];
+extern EvtWord yuu_01_init_evt[];
 
 const char* s_nametbl[] = {
     NULL, "S_dai_uzu1", "S_dai_uzu2", "S_dai_uzu3", "S_dai_uzu4", "S_uzu1", "S_uzu2", "S_uzu3", "S_uzu4", "S_uzu5",

@@ -1,4 +1,3 @@
-#define MATH_NO_SQRTF 1
 #include "musyx/hardware.h"
 #include "musyx/assert.h"
 #include "musyx/s3d.h"
@@ -7,6 +6,7 @@
 #include "musyx/snd.h"
 #include "musyx/stream.h"
 #include "musyx/synth.h"
+#include "dolphin/os/OSCache.h"
 
 static volatile const u16 itdOffTab[128] = {
     0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  1,  1,  1,  1,  1,  1,  1,  2,  2,  2,  2,

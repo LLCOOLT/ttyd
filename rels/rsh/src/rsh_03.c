@@ -2,7 +2,6 @@
 #include "evt/evt_cmd.h"
 #include "manager/evtmgr_cmd.h"
 
-#pragma force_active on
 #include "mario/mario_pouch.h"
 #include "mario/mario.h"
 #include "driver/npcdrv.h"
@@ -113,97 +112,44 @@ USER_FUNC(evt_mario_get_dispdir);
 USER_FUNC(evt_sub_get_language);
 #endif
 
-f32 fd_rsh_03_negone_one_374[2] __attribute__((aligned(8)));
-f32 fd_rsh_03_neg_one_382;
-f32 fd_rsh_03___local_PI_383;
-f32 fd_rsh_03___local_3PIO2_385;
-f32 fd_rsh_03_one_negone_373[2] __attribute__((aligned(8)));
-f32 fd_rsh_03___local_PIO2_384;
-f32 fd_rsh_03_one_381;
-f32 fd_rsh_03_negone_one_360[2] __attribute__((aligned(8)));
-f32 fd_rsh_03_neg_one_365;
-f32 fd_rsh_03___local_PI_366;
-f32 fd_rsh_03___local_3PIO2_368;
-f32 fd_rsh_03_one_negone_359[2] __attribute__((aligned(8)));
-f32 fd_rsh_03___local_PIO2_367;
-f32 fd_rsh_03_one_364;
 static BeroEntry bero_data_a[3];
 static BeroEntry bero_data_b[3];
 static BeroEntry bero_data_c[3];
-EvtWord init_cook[29];
+extern EvtWord init_cook[];
 s32 item_tbl_cook[2];
-EvtWord talk_cook_nabe_return[47];
+extern EvtWord talk_cook_nabe_return[];
 s32 iri_22_item_tbl[4];
-EvtWord talk_cook[351];
-static EvtWord init_waitless[29];
+extern EvtWord talk_cook[];
 s32 item_tbl_waitless[2];
-#ifdef VERSION_G8ME01
-EvtWord talk_waitless_pias_return[158];
-#else
-EvtWord talk_waitless_pias_return[112];
-#endif
-static EvtWord talk_waitless[268];
-EvtWord move_waitless[49];
+extern EvtWord talk_waitless_pias_return[];
+extern EvtWord move_waitless[];
 static NpcSetupInfo npc_data[4];
-static EvtWord talk_toron[20];
-static EvtWord talk_sarary[31];
-EvtWord dir_target[21];
-EvtWord evt_lanch_missing[761];
-static EvtWord talk_powan[184];
+extern EvtWord dir_target[];
+extern EvtWord evt_lanch_missing[];
 NpcSetupInfo npc_data_lunch[7];
 static const char* msg_tbl[10];
-#ifdef VERSION_G8ME01
-EvtWord evt_lunch_talk[113];
-#else
-EvtWord evt_lunch_talk[101];
-#endif
-EvtWord evt_shop_moamoa_talk[59];
+extern EvtWord evt_lunch_talk[];
+extern EvtWord evt_shop_moamoa_talk[];
 static ShopObj obj_list[6];
 static ShopItem goods_list[6];
 static ShopDb trade_list[18];
 static ShopperData35 shopper_data;
-EvtWord shop_door_open[27];
-EvtWord shop_door_close[31];
-EvtWord evt_shop_open[267];
-#ifdef VERSION_G8ME01
-EvtWord evt_shop_close[420];
-#else
-EvtWord evt_shop_close[317];
-#endif
-EvtWord evt_shop_door_init[36];
+extern EvtWord shop_door_open[];
+extern EvtWord shop_door_close[];
+extern EvtWord evt_shop_open[];
+extern EvtWord evt_shop_close[];
+extern EvtWord evt_shop_door_init[];
 static EvtWord evt_yuka_simi[45];
 static const char* access_tbl[16];
-static EvtWord evt_access[25];
-static EvtWord evt_access_entry[24];
-EvtWord rsh_03_init_evt[269];
-#ifdef VERSION_G8ME01
-EvtWord rsh_03_a_init_evt[141];
-#else
-EvtWord rsh_03_a_init_evt[62];
-#endif
-#ifdef VERSION_G8ME01
-EvtWord rsh_03_b_init_evt[90];
-#else
-EvtWord rsh_03_b_init_evt[11];
-#endif
+extern EvtWord rsh_03_init_evt[];
+extern EvtWord rsh_03_a_init_evt[];
+extern EvtWord rsh_03_b_init_evt[];
 static const char* window_tbl[5];
-#ifdef VERSION_G8ME01
-EvtWord rsh_03_c_init_evt[217];
-#else
-EvtWord rsh_03_c_init_evt[71];
-#endif
-#ifdef VERSION_G8ME01
-EvtWord rsh_03_init_evt_nidome[219];
-#else
-EvtWord rsh_03_init_evt_nidome[140];
-#endif
-EvtWord rsh_03_a_init_evt_nidome[23];
-EvtWord rsh_03_b_init_evt_nidome[11];
-#ifdef VERSION_G8ME01
-EvtWord rsh_03_c_init_evt_nidome[80];
-#else
-EvtWord rsh_03_c_init_evt_nidome[50];
-#endif
+extern EvtWord rsh_03_c_init_evt[];
+extern EvtWord rsh_03_init_evt_nidome[];
+extern EvtWord rsh_03_a_init_evt_nidome[];
+extern EvtWord rsh_03_b_init_evt_nidome[];
+extern EvtWord rsh_03_c_init_evt_nidome[];
 
 USER_FUNC(iri_22_make_item_tbl) {
     EvtWord* args = event->args;
@@ -272,34 +218,6 @@ USER_FUNC(omiseFukki) {
     cam->curveA = 11;
     return EVT_RETURN_DONE;
 }
-
-f32 fd_rsh_03_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
-
-f32 fd_rsh_03_neg_one_382 = -1.0f;
-
-f32 fd_rsh_03___local_PI_383 = 3.1415927f;
-
-f32 fd_rsh_03___local_3PIO2_385 = 4.712389f;
-
-f32 fd_rsh_03_one_negone_373[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
-
-f32 fd_rsh_03___local_PIO2_384 = 1.5707964f;
-
-f32 fd_rsh_03_one_381 = 1.0f;
-
-f32 fd_rsh_03_negone_one_360[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
-
-f32 fd_rsh_03_neg_one_365 = -1.0f;
-
-f32 fd_rsh_03___local_PI_366 = 3.1415927f;
-
-f32 fd_rsh_03___local_3PIO2_368 = 4.712389f;
-
-f32 fd_rsh_03_one_negone_359[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
-
-f32 fd_rsh_03___local_PIO2_367 = 1.5707964f;
-
-f32 fd_rsh_03_one_364 = 1.0f;
 
 static BeroEntry bero_data_a[] = {
     {
@@ -559,7 +477,14 @@ EVT_BEGIN(talk_cook)
         CALL(evt_msg_print, 0, STRING("stg6_rsh_212"), 0, 0)
         CASE_LESS(327)
         CALL(evt_msg_print, 0, STRING("stg6_rsh_219"), 0, 0)
+#ifdef VERSION_G8MP01
+        CALL(evt_party_stop, 0)
+        WAIT_MS(300)
+#endif
         CALL(evt_msg_print_party, STRING("stg6_rsh_219_2"))
+#ifdef VERSION_G8MP01
+        CALL(evt_party_run, 0)
+#endif
         CASE_LESS(346)
         CALL(evt_msg_print, 0, STRING("stg6_rsh_257"), 0, 0)
         CASE_LESS(402)

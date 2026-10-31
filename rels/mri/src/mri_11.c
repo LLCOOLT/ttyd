@@ -6,8 +6,6 @@
 #include "evt/evt_npc.h"
 #include "data_tables.h"
 
-#pragma force_active on
-
 USER_FUNC(evt_bero_get_info);
 USER_FUNC(evt_bero_mapchange);
 USER_FUNC(evt_cam3d_event_from_road);
@@ -81,74 +79,23 @@ USER_FUNC(evt_snd_sfxon_3d);
 USER_FUNC(urouro_init_func);
 USER_FUNC(urouro_main_func);
 
-f32 fd_mri_11_negone_one_374[2] __attribute__((aligned(8)));
-f32 fd_mri_11_neg_one_382;
-f32 fd_mri_11___local_PI_383;
-f32 fd_mri_11___local_3PIO2_385;
-f32 fd_mri_11_one_negone_373[2] __attribute__((aligned(8)));
-f32 fd_mri_11___local_PIO2_384;
-f32 fd_mri_11_one_381;
-f32 fd_mri_11_negone_one_360[2] __attribute__((aligned(8)));
-f32 fd_mri_11_neg_one_365;
-f32 fd_mri_11___local_PI_366;
-f32 fd_mri_11___local_3PIO2_368;
-f32 fd_mri_11_one_negone_359[2] __attribute__((aligned(8)));
-f32 fd_mri_11___local_PIO2_367;
-f32 fd_mri_11_one_364;
-EvtWord toge_7_init[17];
-EvtWord toge_7_talk[44];
-EvtWord toge_8_init[17];
-EvtWord toge_8_talk[44];
-EvtWord toge_9_init[17];
-EvtWord toge_9_talk[44];
-EvtWord toge_10_init[17];
-EvtWord toge_10_regl[19];
-EvtWord toge_10_talk[44];
-EvtWord toge_11_init[17];
-EvtWord toge_11_regl[19];
-EvtWord toge_11_talk[44];
+extern EvtWord toge_7_init[];
+extern EvtWord toge_7_talk[];
+extern EvtWord toge_8_init[];
+extern EvtWord toge_8_talk[];
+extern EvtWord toge_9_init[];
+extern EvtWord toge_9_talk[];
+extern EvtWord toge_10_init[];
+extern EvtWord toge_10_regl[];
+extern EvtWord toge_10_talk[];
+extern EvtWord toge_11_init[];
+extern EvtWord toge_11_regl[];
+extern EvtWord toge_11_talk[];
 static NpcSetupInfo npcEnt[6];
-static EvtWord patolight_sound_off[15];
 static BeroEntry bero_entry_data[3];
-static EvtWord puni_win_offscreen[104];
-static EvtWord puni_win[219];
-static EvtWord puni_lose[86];
-static EvtWord puni_winlose_check[44];
-EvtWord toge_enter_sub[51];
-static EvtWord toge_enter[50];
-static EvtWord puni_vs_toge_battlewait[36];
-static EvtWord puni_vs_toge_init[86];
-static EvtWord puni_vs_toge[136];
+extern EvtWord toge_enter_sub[];
 static KusaAccess ueki_access_data[4];
-EvtWord mri_11_init_evt[192];
-
-f32 fd_mri_11_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
-
-f32 fd_mri_11_neg_one_382 = -1.0f;
-
-f32 fd_mri_11___local_PI_383 = 3.1415927f;
-
-f32 fd_mri_11___local_3PIO2_385 = 4.712389f;
-
-f32 fd_mri_11_one_negone_373[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
-
-f32 fd_mri_11___local_PIO2_384 = 1.5707964f;
-
-f32 fd_mri_11_one_381 = 1.0f;
-
-f32 fd_mri_11_negone_one_360[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
-
-f32 fd_mri_11_neg_one_365 = -1.0f;
-
-f32 fd_mri_11___local_PI_366 = 3.1415927f;
-
-f32 fd_mri_11___local_3PIO2_368 = 4.712389f;
-
-f32 fd_mri_11_one_negone_359[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
-
-f32 fd_mri_11___local_PIO2_367 = 1.5707964f;
-
-f32 fd_mri_11_one_364 = 1.0f;
+extern EvtWord mri_11_init_evt[];
 
 EVT_BEGIN(toge_7_init)
     SWITCH(GSW(0))
@@ -721,7 +668,7 @@ EVT_BEGIN(mri_11_init_evt)
         CALL(evt_hitobj_onoff, STRING("A_hati"), 1, 0)
         CALL(evt_mapobj_flag_onoff, 1, 1, STRING("S_patolight1"), 1)
     END_IF
-    CALL(evt_hitobj_onoff, STRING("A_sunomae\0\0"), 1, 0)
+    CALL(evt_hitobj_onoff, STRING("A_sunomae"), 1, 0)
     RETURN
 EVT_END()
 

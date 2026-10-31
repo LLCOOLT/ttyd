@@ -1,9 +1,9 @@
 #include "battle/battle_unit.h"
 #include "evt/evt_cmd.h"
 
-#pragma force_active on
 #include "battle/battle.h"
 #include "battle/battle_event_default.h"
+#include "manager/evtmgr_cmd.h"
 
 static USER_FUNC(_battle_set_lecture_unit_id);
 USER_FUNC(btlevtcmd_AnimeChangePose);
@@ -32,20 +32,6 @@ USER_FUNC(evt_msg_print);
 USER_FUNC(evt_msg_toge);
 static USER_FUNC(lecture_init);
 
-f32 fd_lecture_frankli_kuriboo_negone_one_374[2] __attribute__((aligned(8)));
-f32 fd_lecture_frankli_kuriboo_neg_one_382;
-f32 fd_lecture_frankli_kuriboo___local_PI_383;
-f32 fd_lecture_frankli_kuriboo___local_3PIO2_385;
-f32 fd_lecture_frankli_kuriboo_one_negone_373[2] __attribute__((aligned(8)));
-f32 fd_lecture_frankli_kuriboo___local_PIO2_384;
-f32 fd_lecture_frankli_kuriboo_one_381;
-f32 fd_lecture_frankli_kuriboo_negone_one_360[2] __attribute__((aligned(8)));
-f32 fd_lecture_frankli_kuriboo_neg_one_365;
-f32 fd_lecture_frankli_kuriboo___local_PI_366;
-f32 fd_lecture_frankli_kuriboo___local_3PIO2_368;
-f32 fd_lecture_frankli_kuriboo_one_negone_359[2] __attribute__((aligned(8)));
-f32 fd_lecture_frankli_kuriboo___local_PIO2_367;
-f32 fd_lecture_frankli_kuriboo_one_364;
 BattleUnitKind unit_lecture_frankli_kuriboo;
 static BattleUnitDefense defence;
 static BattleUnitDefenseAttr defence_attr;
@@ -72,34 +58,6 @@ static USER_FUNC(_battle_set_lecture_unit_id) {
     wp->lectureUnitId = value;
     return EVT_RETURN_DONE;
 }
-
-f32 fd_lecture_frankli_kuriboo_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
-
-f32 fd_lecture_frankli_kuriboo_neg_one_382 = -1.0f;
-
-f32 fd_lecture_frankli_kuriboo___local_PI_383 = 3.1415927f;
-
-f32 fd_lecture_frankli_kuriboo___local_3PIO2_385 = 4.712389f;
-
-f32 fd_lecture_frankli_kuriboo_one_negone_373[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
-
-f32 fd_lecture_frankli_kuriboo___local_PIO2_384 = 1.5707964f;
-
-f32 fd_lecture_frankli_kuriboo_one_381 = 1.0f;
-
-f32 fd_lecture_frankli_kuriboo_negone_one_360[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
-
-f32 fd_lecture_frankli_kuriboo_neg_one_365 = -1.0f;
-
-f32 fd_lecture_frankli_kuriboo___local_PI_366 = 3.1415927f;
-
-f32 fd_lecture_frankli_kuriboo___local_3PIO2_368 = 4.712389f;
-
-f32 fd_lecture_frankli_kuriboo_one_negone_359[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
-
-f32 fd_lecture_frankli_kuriboo___local_PIO2_367 = 1.5707964f;
-
-f32 fd_lecture_frankli_kuriboo_one_364 = 1.0f;
 
 BattleUnitKind unit_lecture_frankli_kuriboo = {
     180,
@@ -245,7 +203,7 @@ static EVT_BEGIN(phase_event)
             CALL(evt_btl_camera_set_mode, 0, 3)
             CALL(evt_btl_camera_set_moveto, 0, -60, 82, 340, -60, 60, 13, 30, 11)
             WAIT_FRAMES(30)
-            CALL(evt_msg_print, 2, STRING("mac_0_092_05\0\0\0"), 0, -2)
+            CALL(evt_msg_print, 2, STRING("mac_0_092_05"), 0, -2)
             CALL(btlevtcmd_ChangeFaceDirection, -2, 1)
             CALL(btlevtcmd_StatusWindowOnOff, 1)
             CALL(evt_btl_camera_set_mode, 0, 0)

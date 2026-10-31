@@ -2,7 +2,6 @@
 #include "evt/evt_cmd.h"
 #include "driver/msgdrv.h"
 
-#pragma force_active on
 #include "mario/mario.h"
 #include "mario/mariost.h"
 #include "driver/npcdrv.h"
@@ -12,6 +11,7 @@
 #include "evt/evt_sub.h"
 #include "evt/evt_npc.h"
 #include "mario/mario_pouch.h"
+#include "manager/evtmgr_cmd.h"
 
 s32 marioRollCancelDisable(void);
 s32 U_marioSlitContinueChk(void);
@@ -106,76 +106,40 @@ USER_FUNC(evt_sub_intpl_msec_init);
 USER_FUNC(evt_win_item_select);
 USER_FUNC(toron_check);
 USER_FUNC(mario_normalize_wait);
-#ifdef VERSION_G8ME01
-#endif
 void yuurei_callback(s32 type, void* param);
 void powan_callback(s32 type, void* param);
 
-f32 fd_rsh_02_negone_one_374[2] __attribute__((aligned(8)));
-f32 fd_rsh_02_neg_one_382;
-f32 fd_rsh_02___local_PI_383;
-f32 fd_rsh_02___local_3PIO2_385;
-f32 fd_rsh_02_one_negone_373[2] __attribute__((aligned(8)));
-f32 fd_rsh_02___local_PIO2_384;
-f32 fd_rsh_02_one_381;
-f32 fd_rsh_02_negone_one_360[2] __attribute__((aligned(8)));
-f32 fd_rsh_02_neg_one_365;
-f32 fd_rsh_02___local_PI_366;
-f32 fd_rsh_02___local_3PIO2_368;
-f32 fd_rsh_02_one_negone_359[2] __attribute__((aligned(8)));
-f32 fd_rsh_02___local_PIO2_367;
-f32 fd_rsh_02_one_364;
 static BeroEntry bero_data_a[3];
 static BeroEntry bero_data_b[3];
 static BeroEntry bero_data_c[3];
-EvtWord evt_powan_msg[36];
-EvtWord evt_nabe[247];
-static EvtWord init_gurume[38];
-static EvtWord talk_gurume[176];
-static EvtWord talk_powan[2];
-EvtWord init_yuurei[250];
-static EvtWord evt_shake[39];
-EvtWord evt_shake2[6];
+extern EvtWord evt_powan_msg[];
+extern EvtWord evt_nabe[];
+extern EvtWord init_yuurei[];
+extern EvtWord evt_shake2[];
 static s32 item_tbl2[2];
-EvtWord talk_yuurei[451];
-static EvtWord init_toron[41];
-static EvtWord talk_toron[8];
-static EvtWord talk_sarary[8];
+extern EvtWord talk_yuurei[];
 static NpcSetupInfo npc_data[6];
 static const char* door_3[7];
 static const char* door_4[7];
 static const char* door_5[7];
-EvtWord evt_1day_end[68];
-EvtWord evt_2day_end[68];
-EvtWord evt_normal_yado[119];
-EvtWord evt_bed[22];
-EvtWord evt_toron_catch[281];
+extern EvtWord evt_1day_end[];
+extern EvtWord evt_2day_end[];
+extern EvtWord evt_normal_yado[];
+extern EvtWord evt_bed[];
+extern EvtWord evt_toron_catch[];
 static s32 item_tbl[2];
-EvtWord evt_toron_catch2[359];
-#ifdef VERSION_G8ME01
-EvtWord evt_toron_appear[437];
-#else
-EvtWord evt_toron_appear[414];
-#endif
-static EvtWord evt_daiji_kami[88];
-static EvtWord evt_yuka_simi[45];
-static EvtWord evt_access[14];
-static EvtWord evt_access2[44];
-static EvtWord evt_access_entry[62];
-EvtWord rsh_02_init_evt[247];
-#ifdef VERSION_G8ME01
-EvtWord rsh_02_a_init_evt[687];
-#else
-EvtWord rsh_02_a_init_evt[685];
-#endif
-EvtWord rsh_02_b_init_evt[168];
+extern EvtWord evt_toron_catch2[];
+extern EvtWord evt_toron_appear[];
+extern EvtWord rsh_02_init_evt[];
+extern EvtWord rsh_02_a_init_evt[];
+extern EvtWord rsh_02_b_init_evt[];
 static const char* window_tbl[4];
-EvtWord rsh_02_c_init_evt[142];
-EvtWord rsh_02_init_evt_nidome[208];
-EvtWord rsh_02_a_init_evt_nidome[337];
-EvtWord rsh_02_b_init_evt_nidome[213];
-EvtWord rsh_02_c_init_evt_nidome[136];
-EvtWord evt_nidome_bed[126];
+extern EvtWord rsh_02_c_init_evt[];
+extern EvtWord rsh_02_init_evt_nidome[];
+extern EvtWord rsh_02_a_init_evt_nidome[];
+extern EvtWord rsh_02_b_init_evt_nidome[];
+extern EvtWord rsh_02_c_init_evt_nidome[];
+extern EvtWord evt_nidome_bed[];
 
 USER_FUNC(mario_normalize_wait) {
     if (!marioRollCancelDisable() && !U_marioSlitContinueChk()) {
@@ -183,34 +147,6 @@ USER_FUNC(mario_normalize_wait) {
     }
     return EVT_RETURN_BLOCK;
 }
-
-f32 fd_rsh_02_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
-
-f32 fd_rsh_02_neg_one_382 = -1.0f;
-
-f32 fd_rsh_02___local_PI_383 = 3.1415927f;
-
-f32 fd_rsh_02___local_3PIO2_385 = 4.712389f;
-
-f32 fd_rsh_02_one_negone_373[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
-
-f32 fd_rsh_02___local_PIO2_384 = 1.5707964f;
-
-f32 fd_rsh_02_one_381 = 1.0f;
-
-f32 fd_rsh_02_negone_one_360[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
-
-f32 fd_rsh_02_neg_one_365 = -1.0f;
-
-f32 fd_rsh_02___local_PI_366 = 3.1415927f;
-
-f32 fd_rsh_02___local_3PIO2_368 = 4.712389f;
-
-f32 fd_rsh_02_one_negone_359[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
-
-f32 fd_rsh_02___local_PIO2_367 = 1.5707964f;
-
-f32 fd_rsh_02_one_364 = 1.0f;
 
 static BeroEntry bero_data_a[] = {
     {
@@ -1357,7 +1293,14 @@ static EVT_BEGIN(evt_daiji_kami)
         ELSE
         CALL(evt_mario_set_dir, 270, 300, 0)
     END_IF
+#ifdef VERSION_G8MP01
+    CALL(evt_party_stop, 0)
+    WAIT_MS(300)
+#endif
     CALL(evt_msg_print_party, STRING("stg6_rsh_180"))
+#ifdef VERSION_G8MP01
+    CALL(evt_party_run, 0)
+#endif
     CALL(evt_mario_get_pos, 0, LW(0), LW(1), LW(2))
     CALL(evt_snd_sfxon_3d, STRING("SFX_VOICE_MARIO_NOD1_6"), LW(0), LW(1), LW(2), 0)
     CALL(evt_mario_set_pose, STRING("M_N_2"))
@@ -2099,7 +2042,7 @@ EVT_BEGIN(evt_nidome_bed)
         CALL(evt_bero_mapchange, STRING("hom_11"), 0)
     END_IF
     IF_STR_EQUAL(LW(0), STRING("rsh_02_c"))
-        CALL(evt_bero_mapchange, STRING("hom_12\0"), 0)
+        CALL(evt_bero_mapchange, STRING("hom_12"), 0)
     END_IF
     RETURN
 EVT_END()

@@ -1,7 +1,6 @@
 #include "battle/battle_unit.h"
 #include "evt/evt_cmd.h"
 
-#pragma force_active on
 #include "string.h"
 #include "memory.h"
 #include "evt/evt_bero.h"
@@ -12,6 +11,7 @@
 #include "muj.h"
 #include "data_tables.h"
 #include "mario/mario_pouch.h"
+#include "manager/evtmgr_cmd.h"
 
 s32* command_work;
 
@@ -119,71 +119,48 @@ USER_FUNC(evt_sub_random);
 USER_FUNC(evt_win_item_select);
 USER_FUNC(muj_npc_guruguru);
 
-f32 fd_muj_05_negone_one_374[2] __attribute__((aligned(8)));
-f32 fd_muj_05_neg_one_382;
-f32 fd_muj_05___local_PI_383;
-f32 fd_muj_05___local_3PIO2_385;
-f32 fd_muj_05_one_negone_373[2] __attribute__((aligned(8)));
-f32 fd_muj_05___local_PIO2_384;
-f32 fd_muj_05_one_381;
-f32 fd_muj_05_negone_one_360[2] __attribute__((aligned(8)));
-f32 fd_muj_05_neg_one_365;
-f32 fd_muj_05___local_PI_366;
-f32 fd_muj_05___local_3PIO2_368;
-f32 fd_muj_05_one_negone_359[2] __attribute__((aligned(8)));
-f32 fd_muj_05___local_PIO2_367;
-f32 fd_muj_05_one_364;
-EvtWord sanders_rotate[28];
-EvtWord sanders_nakama_sub[13];
-EvtWord sanders_nakama[173];
-static EvtWord sanders_init[51];
+extern EvtWord sanders_rotate[];
+extern EvtWord sanders_nakama_sub[];
+extern EvtWord sanders_nakama[];
 static s32 itemsel_table01[2];
-EvtWord sanders_talk_sub[70];
-static EvtWord sanders_talk[178];
-static EvtWord marco_init[24];
-static EvtWord marco_talk[146];
-static EvtWord erumosu_regl[4];
-EvtWord erumosu_a_dead[23];
-EvtWord erumosu_b_dead[12];
+extern EvtWord sanders_talk_sub[];
+extern EvtWord erumosu_a_dead[];
+extern EvtWord erumosu_b_dead[];
 static NpcSetupInfo npcEnt[5];
 NpcSetupInfo npcEnt_after[3];
 static BeroEntry bero_entry_data[3];
-EvtWord hammer_sub[27];
-EvtWord hammer_event[10];
-EvtWord sanders_kyushutsu_sub[250];
-EvtWord erumosu_guruguru[13];
-EvtWord erumosu_guruguru_dir[11];
-EvtWord sanders_kyushutsu[63];
-EvtWord marco_hanauta[2];
-EvtWord marco_and_jewel[84];
-EvtWord blueeye_flush[78];
-EvtWord redeye_flush[78];
-EvtWord dokuroiwa_flush[51];
+extern EvtWord hammer_sub[];
+extern EvtWord hammer_event[];
+extern EvtWord sanders_kyushutsu_sub[];
+extern EvtWord erumosu_guruguru[];
+extern EvtWord erumosu_guruguru_dir[];
+extern EvtWord sanders_kyushutsu[];
+extern EvtWord marco_hanauta[];
+extern EvtWord marco_and_jewel[];
+extern EvtWord blueeye_flush[];
+extern EvtWord redeye_flush[];
+extern EvtWord dokuroiwa_flush[];
 s32 command_seikai[7];
 static s32 itemsel_table[2];
-EvtWord dokuroiwa_touch[127];
-EvtWord case_event_entry[45];
-EvtWord case_event_delete[42];
-EvtWord penalty_event[187];
-static EvtWord cam_shake[33];
-static EvtWord cam_shake2[27];
-EvtWord answer_event[125];
-EvtWord iwa01_hammer[73];
-EvtWord iwa01_ride_a[20];
-EvtWord iwa02_ride[66];
-EvtWord iwa02_hammer[20];
-EvtWord iwa02_ride_a[28];
-EvtWord iwa02_nonride_a[5];
-static EvtWord bombwall_bomb[143];
-EvtWord dokuroiwa_bomb[309];
-EvtWord dokuroiwa_init[123];
-EvtWord muj_05_first[26];
-EvtWord yure_yashi_ha1[180];
-EvtWord yure_yashi[88];
-static EvtWord evt_kusa_1[20];
+extern EvtWord dokuroiwa_touch[];
+extern EvtWord case_event_entry[];
+extern EvtWord case_event_delete[];
+extern EvtWord penalty_event[];
+extern EvtWord answer_event[];
+extern EvtWord iwa01_hammer[];
+extern EvtWord iwa01_ride_a[];
+extern EvtWord iwa02_ride[];
+extern EvtWord iwa02_hammer[];
+extern EvtWord iwa02_ride_a[];
+extern EvtWord iwa02_nonride_a[];
+extern EvtWord dokuroiwa_bomb[];
+extern EvtWord dokuroiwa_init[];
+extern EvtWord muj_05_first[];
+extern EvtWord yure_yashi_ha1[];
+extern EvtWord yure_yashi[];
 static TreeAccess tree_tbl[6];
 static KusaAccess kusa_tbl[8];
-EvtWord muj_05_init_evt[146];
+extern EvtWord muj_05_init_evt[];
 
 USER_FUNC(evt_dokuroiwa_command_check) {
     s32 result;
@@ -228,34 +205,6 @@ USER_FUNC(evt_dokuroiwa_command_init) {
     memset(command_work, 0, 7 * sizeof(s32));
     return EVT_RETURN_DONE;
 }
-
-f32 fd_muj_05_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
-
-f32 fd_muj_05_neg_one_382 = -1.0f;
-
-f32 fd_muj_05___local_PI_383 = 3.1415927f;
-
-f32 fd_muj_05___local_3PIO2_385 = 4.712389f;
-
-f32 fd_muj_05_one_negone_373[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
-
-f32 fd_muj_05___local_PIO2_384 = 1.5707964f;
-
-f32 fd_muj_05_one_381 = 1.0f;
-
-f32 fd_muj_05_negone_one_360[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
-
-f32 fd_muj_05_neg_one_365 = -1.0f;
-
-f32 fd_muj_05___local_PI_366 = 3.1415927f;
-
-f32 fd_muj_05___local_3PIO2_368 = 4.712389f;
-
-f32 fd_muj_05_one_negone_359[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
-
-f32 fd_muj_05___local_PIO2_367 = 1.5707964f;
-
-f32 fd_muj_05_one_364 = 1.0f;
 
 EVT_BEGIN(sanders_rotate)
     CALL(evt_sub_intpl_msec_init, 0, LW(1), LW(2), LW(3))

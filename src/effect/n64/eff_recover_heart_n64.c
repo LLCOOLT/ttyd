@@ -16,11 +16,11 @@ typedef struct EffRecoverHeartN64Work {
     f32 velY;     // 0x14
     f32 velZ;     // 0x18
     f32 rotZ;     // 0x1C
-    f32 unk20;    // 0x20
+    f32 reserved_20; // 0x20, only cleared at entry
     f32 offX;     // 0x24
     s32 alpha;    // 0x28
     s32 frame;    // 0x2C
-    s32 unk30;    // 0x30
+    s32 age;      // 0x30, counts up each frame; never read
     s32 delay;    // 0x34
     f32 scaleW;   // 0x38
     f32 scaleH;   // 0x3C
@@ -33,14 +33,6 @@ typedef struct EffRecoverHeartN64Work {
 #endif
 
 #ifdef __MWERKS__
-__declspec(section ".data") f32 eff_recover_heart_n64_negone_one_a[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
-__declspec(section ".data") f32 fd_recover_heart_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
-__declspec(section ".data") f32 eff_recover_heart_n64_one_negone_a[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
-__declspec(section ".data") f32 fd_recover_heart_one_negone_373[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
-__declspec(section ".data") f32 eff_recover_heart_n64_negone_one_b[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
-__declspec(section ".data") f32 fd_recover_heart_negone_one_360[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
-__declspec(section ".data") f32 eff_recover_heart_n64_one_negone_b[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
-__declspec(section ".data") f32 fd_recover_heart_one_negone_359[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
 #endif
 
 effN64Vtx size32x32_tex32x32_heart_vtx[] = {
@@ -124,7 +116,7 @@ EffectEntry* effRecoverHeartN64Entry(s32 type, s32 count, f32 x, f32 y, f32 z) {
     work->position.y = y;
     work->position.z = z;
     work->frame = 46;
-    work->unk30 = 0;
+    work->age = 0;
     if (count < 0) {
         work->flag = 1;
         count = -count;
@@ -143,7 +135,7 @@ EffectEntry* effRecoverHeartN64Entry(s32 type, s32 count, f32 x, f32 y, f32 z) {
         p->offX = 0.0f;
         p->velX = 0.0f;
         p->velZ = 0.0f;
-        p->unk20 = 0.0f;
+        p->reserved_20 = 0.0f;
         p->rotZ = 0.0f;
         if (i == 1) {
             p->position.x = 0.0f;
@@ -180,7 +172,7 @@ void effRecoverHeartMain(EffectEntry* effect) {
     tmp.z = work->position.z;
     position = tmp;
     work->frame--;
-    work->unk30++;
+    work->age++;
     lifetime = work->frame;
     if (lifetime < 0) {
         effDelete(effect);

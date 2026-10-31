@@ -1582,7 +1582,9 @@ void BtlUnit_SetParamFromPouch(BattleUnit* unit) {
         BtlUnit_ReviseHpFp(unit);
     }
     else if (unit->currentKind >= TYPE_PARTNER_MIN && unit->currentKind < TYPE_PARTNER_MAX) {
-        unit->currentHp = *(s16*)((u8*)pouch->partyData + BattleTransPartyId(unit->currentKind) * sizeof(PouchPartyData) + offsetof(PouchPartyData, currentHP)); // FAKE: byte-offset load so the field offset folds into the index (mulli/addi/lhax), as in the target
+        s32 id = BattleTransPartyId(unit->currentKind);
+        PouchPartyData* party = &pouch->partyData[id];
+        unit->currentHp = party->currentHP;
         BtlUnit_ReviseHpFp(unit);
         info = &wp->partyInfo[unit->currentKind - TYPE_PARTNER_MIN];
         unit->mSizeMultiplier = info->sizeMultiplier;
@@ -1646,7 +1648,8 @@ void BtlUnit_SetParamToPouch(BattleUnit* unit) {
     }
     else if (unit->currentKind >= TYPE_PARTNER_MIN && unit->currentKind < TYPE_PARTNER_MAX) {
         s32 id = BattleTransPartyId(unit->currentKind);
-        *(s16*)((u8*)pouch + id * sizeof(PouchPartyData) + offsetof(PouchPartyData, currentHP)) = unit->currentHp; // FAKE: byte-offset store so the field offset folds into the index (mulli/addi/sthx), as in the target
+        PouchPartyData* party = &pouch->partyData[id];
+        party->currentHP = unit->currentHp;
         info = &wp->partyInfo[unit->currentKind - TYPE_PARTNER_MIN];
         info->sizeMultiplier = unit->mSizeMultiplier;
         info->statusFlags = unit->mStatusFlags;
@@ -1850,7 +1853,7 @@ BOOL BtlUnit_CheckWeaponCost(BattleUnit* unit, BattleWeapon* weapon) {
     if (fp < BtlUnit_GetWeaponCost(unit, weapon)) {
         return FALSE;
     }
-    return ((s32 (*)(void))pouchGetAP)() >= (u8)weapon->baseSpCost * 100;
+    return pouchGetAP() >= weapon->baseSpCost * 100;
 }
 
 void BtlUnit_PayWeaponCost(BattleUnit* unit, BattleWeapon* weapon) {
@@ -1867,7 +1870,7 @@ void BtlUnit_PayWeaponCost(BattleUnit* unit, BattleWeapon* weapon) {
         BtlActRec_AddPoint(&wp->actRecord.partnerFpSpent, cost);
         BtlActRec_AddCount(&wp->actRecord.partnerFpMoves);
     }
-    ((void (*)(s32))pouchAddAP)(-(u8)weapon->baseSpCost * 100);
+    ((void (*)(s32))pouchAddAP)(-weapon->baseSpCost * 100);
 }
 
 BattleUnit* BtlUnit_GetGuardKouraPtr(BattleUnit* unit) {

@@ -1,7 +1,6 @@
 #include "battle/battle_unit.h"
 #include "evt/evt_cmd.h"
 
-#pragma force_active on
 #include "mario/mario.h"
 #include "manager/evtmgr_cmd.h"
 #include "dolphin/mtx.h"
@@ -13,7 +12,6 @@
 #include "driver/hitdrv.h"
 
 void marioShipForceStop(void);
-static inline f32 addf(f32 a, f32 b) { return a + b; }
 double sin(double x);
 void mapObjTranslate(const char* name, f32 x, f32 y, f32 z);
 typedef struct EntryMgrEntry { s32 used; s32 id; f32 reg[3]; } EntryMgrEntry;
@@ -67,65 +65,20 @@ USER_FUNC(namiyoke_fail_stop);
 USER_FUNC(namiyoke_se_check);
 USER_FUNC(namiyoke_set_mapobj);
 
-f32 fd_dou_10_negone_one_374[2] __attribute__((aligned(8)));
-f32 fd_dou_10_neg_one_382;
-f32 fd_dou_10___local_PI_383;
-f32 fd_dou_10___local_3PIO2_385;
-f32 fd_dou_10_one_negone_373[2] __attribute__((aligned(8)));
-f32 fd_dou_10___local_PIO2_384;
-f32 fd_dou_10_one_381;
-f32 fd_dou_10_negone_one_360[2] __attribute__((aligned(8)));
-f32 fd_dou_10_neg_one_365;
-f32 fd_dou_10___local_PI_366;
-f32 fd_dou_10___local_3PIO2_368;
-f32 fd_dou_10_one_negone_359[2] __attribute__((aligned(8)));
-f32 fd_dou_10___local_PIO2_367;
-f32 fd_dou_10_one_364;
 static BeroEntry bero_entry_data[5];
 const char* namiyoke_mapobj[15];
-EvtWord nami_running[72];
-EvtWord namiyoke_fail_kaiten[34];
-EvtWord namiyoke_fail_shizumu[49];
-EvtWord namiyoke_fail_recover[190];
-EvtWord namiyoke_fail[142];
-EvtWord namiyoke_atari_check[21];
-EvtWord namiyoke_main[135];
-EvtWord namiyoke_init[97];
-EvtWord namiyoke_se[100];
-EvtWord namiyoke_check[34];
-static EvtWord yari_trap_sub[107];
-static EvtWord yari_trap[11];
-static EvtWord dou_puka_event_main0[60];
+extern EvtWord nami_running[];
+extern EvtWord namiyoke_fail_kaiten[];
+extern EvtWord namiyoke_fail_shizumu[];
+extern EvtWord namiyoke_fail_recover[];
+extern EvtWord namiyoke_fail[];
+extern EvtWord namiyoke_atari_check[];
+extern EvtWord namiyoke_main[];
+extern EvtWord namiyoke_init[];
+extern EvtWord namiyoke_se[];
+extern EvtWord namiyoke_check[];
 static HitDamageReturn hitDmgRetPoints[4];
-EvtWord dou_10_init_evt[64];
-
-f32 fd_dou_10_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
-
-f32 fd_dou_10_neg_one_382 = -1.0f;
-
-f32 fd_dou_10___local_PI_383 = 3.1415927f;
-
-f32 fd_dou_10___local_3PIO2_385 = 4.712389f;
-
-f32 fd_dou_10_one_negone_373[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
-
-f32 fd_dou_10___local_PIO2_384 = 1.5707964f;
-
-f32 fd_dou_10_one_381 = 1.0f;
-
-f32 fd_dou_10_negone_one_360[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
-
-f32 fd_dou_10_neg_one_365 = -1.0f;
-
-f32 fd_dou_10___local_PI_366 = 3.1415927f;
-
-f32 fd_dou_10___local_3PIO2_368 = 4.712389f;
-
-f32 fd_dou_10_one_negone_359[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
-
-f32 fd_dou_10___local_PIO2_367 = 1.5707964f;
-
-f32 fd_dou_10_one_364 = 1.0f;
+extern EvtWord dou_10_init_evt[];
 
 static BeroEntry bero_entry_data[] = {
     {
@@ -664,6 +617,8 @@ USER_FUNC(dou_namiatari_check) {
     f32 z = evtGetFloat(event, args[2]);
     f32 w = 30.0f;
     f32 d = w;
+    f32 marginX = 20.0f;
+    f32 marginZ = 10.0f;
     f32 mx = mario->position.x;
     f32 mz = mario->position.z;
     BOOL hit;
@@ -679,11 +634,10 @@ USER_FUNC(dou_namiatari_check) {
         d *= r;
     }
     hit = TRUE;
-    // FAKEMATCH (decomp-permuter): the addf inline fixes the fadds operand order
-    if (__fabsf(x - mx) > __fabsf(addf(w, 20.0f))) {
+    if (__fabsf(x - mx) > __fabsf(w + marginX)) {
         hit = FALSE;
     }
-    if (__fabsf(z - mz) > __fabsf(addf(d, 10.0f))) {
+    if (__fabsf(z - mz) > __fabsf(d + marginZ)) {
         hit = FALSE;
     }
     evtSetValue(event, args[3], hit);

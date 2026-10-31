@@ -74,7 +74,7 @@ EffectEntry* effThruHammerN64Entry(s32 type, f32 x, f32 y, f32 z, f32 angle) {
         n = 1;
         break;
     }
-    effect->type = "ThruHammerN64\0\0";
+    effect->type = "ThruHammerN64";
     effect->count = n + 1;
     work = __memAlloc(HEAP_EFFECT, sizeof(EffThruHammerN64Work) * (n + 1));
     effect->userdata = work;
@@ -208,8 +208,6 @@ void effThruHammerDisp(CameraId cameraId, EffectEntry* effect) {
     main_dl(effect, mtx);
 }
 
-#pragma opt_propagation off
-#pragma opt_lifetimes off
 static void main_dl(EffectEntry* effect, Mtx camMtx) {
     EffThruHammerN64Work* work = effect->userdata;
     s32 i;

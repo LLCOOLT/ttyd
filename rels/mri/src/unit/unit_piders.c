@@ -1,7 +1,6 @@
 #include "battle/battle_unit.h"
 #include "evt/evt_cmd.h"
 
-#pragma force_active on
 #include "battle/battle.h"
 #include "battle/battle_unit.h"
 #include "battle/battle_sub.h"
@@ -17,6 +16,7 @@
 #include "evt/evt_eff.h"
 #include "party/party_motion.h"
 #include "battle/battle_database_common.h"
+#include "manager/evtmgr_cmd.h"
 
 typedef struct PidersYarn { f32 x0; f32 y0; f32 z0; f32 x1; f32 y1; f32 z1; u8 alpha; } PidersYarn;
 static void piders_draw_yarn_sub(CameraId camera, void* param);
@@ -75,20 +75,6 @@ static void piders_draw_yarn_sub(CameraId camera, void* param);
 static void piders_get_target(s32* unitIdx, s32* partIdx);
 static void piders_get_next_target(s32* unitIdx, s32* partIdx);
 
-f32 fd_piders_negone_one_374[2] __attribute__((aligned(8)));
-f32 fd_piders_neg_one_382;
-f32 fd_piders___local_PI_383;
-f32 fd_piders___local_3PIO2_385;
-f32 fd_piders_one_negone_373[2] __attribute__((aligned(8)));
-f32 fd_piders___local_PIO2_384;
-f32 fd_piders_one_381;
-f32 fd_piders_negone_one_360[2] __attribute__((aligned(8)));
-f32 fd_piders_neg_one_365;
-f32 fd_piders___local_PI_366;
-f32 fd_piders___local_3PIO2_368;
-f32 fd_piders_one_negone_359[2] __attribute__((aligned(8)));
-f32 fd_piders___local_PIO2_367;
-f32 fd_piders_one_364;
 BattleUnitKind unit_piders;
 static BattleUnitDefense defence;
 static BattleUnitDefenseAttr defence_attr;
@@ -106,16 +92,8 @@ static EvtWord damage_event[10];
 static EvtWord dead_event[189];
 static EvtWord blow_dead_event[104];
 static EvtWord battle_end_event[7];
-static EvtWord yure_event[76];
-static EvtWord move_kuutei_event[83];
-static EvtWord move_kuuchu_event[54];
 static EvtWord unison_phase_event[120];
 static EvtWord attack_event[72];
-static EvtWord damage_check_event_sub[157];
-static EvtWord piders_attack_common_event1[163];
-static EvtWord piders_attack_common_event1_2[109];
-static EvtWord piders_attack_common_event2[47];
-static EvtWord piders_attack_common_event3[70];
 static EvtWord normal_attack_event[87];
 static EvtWord renzoku_attack_event[149];
 static EvtWord renzoku_attack_event_sub[55];
@@ -130,34 +108,6 @@ static USER_FUNC(piders_yarn_init) {
     unit->countersetWeapon = (BattleWeapon*)BTL_ALLOC(sizeof(PidersYarn)); // piders keep their yarn work in the counter-set weapon slot
     return EVT_RETURN_DONE;
 }
-
-f32 fd_piders_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
-
-f32 fd_piders_neg_one_382 = -1.0f;
-
-f32 fd_piders___local_PI_383 = 3.1415927f;
-
-f32 fd_piders___local_3PIO2_385 = 4.712389f;
-
-f32 fd_piders_one_negone_373[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
-
-f32 fd_piders___local_PIO2_384 = 1.5707964f;
-
-f32 fd_piders_one_381 = 1.0f;
-
-f32 fd_piders_negone_one_360[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
-
-f32 fd_piders_neg_one_365 = -1.0f;
-
-f32 fd_piders___local_PI_366 = 3.1415927f;
-
-f32 fd_piders___local_3PIO2_368 = 4.712389f;
-
-f32 fd_piders_one_negone_359[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
-
-f32 fd_piders___local_PIO2_367 = 1.5707964f;
-
-f32 fd_piders_one_364 = 1.0f;
 
 BattleUnitKind unit_piders = {
     27,
@@ -962,7 +912,7 @@ EVT_END()
 
 static EVT_BEGIN(piders_attack_common_event3)
     CALL(btlevtcmd_snd_se, -2, STRING("SFX_ENM_PAIDA_ATTACK2"), -250000000, 0, -250000000)
-    CALL(btlevtcmd_AnimeChangePose, -2, LW(7), STRING("PAI_A_3a\0\0\0"))
+    CALL(btlevtcmd_AnimeChangePose, -2, LW(7), STRING("PAI_A_3a"))
     CALL(btlevtcmd_GetPos, -2, LW(0), LW(1), LW(2))
     ADD(LW(1), 20)
     CALL(btlevtcmd_JumpPartsSetting, -2, LW(7), 0, FLOAT(6.0f), FLOAT(0.25f))

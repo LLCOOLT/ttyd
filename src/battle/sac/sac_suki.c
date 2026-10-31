@@ -23,6 +23,7 @@
 #include "battle/sac/sac_common.h"
 #include "battle/sac/sac_suki.h"
 #include "battle/battle_database_common.h"
+#include "pmario_sound.h"
 
 EffectEntry* effStarStoneEntry(s32 type, f32 x, f32 y, f32 z, f32 size);
 EffectEntry* effStardustN64Entry(s32 type, f32 x, f32 y, f32 z, f32 size);
@@ -33,7 +34,7 @@ void BattleAudienceSoundCallKind(s32 kind);
 
 typedef struct SukiBtn {
     s32 state;  // 0x0
-    s32 unk4;   // 0x4
+    s32 timer;  // 0x4, never used
     s32 button; // 0x8
     Vec pos;    // 0xC
 } SukiBtn;
@@ -220,7 +221,7 @@ USER_FUNC(main_suki) {
         strcpy(w->names[2], "sac_suki_img2");
         strcpy(w->names[3], "sac_suki_img3");
         strcpy(w->names[4], "sac_suki_img4");
-        strcpy(w->names[5], "sac_suki_img5\0\0");
+        strcpy(w->names[5], "sac_suki_img5");
         w->pos = (Vec){0.0f, -1000.0f, 0.0f};
     }
     main_base();

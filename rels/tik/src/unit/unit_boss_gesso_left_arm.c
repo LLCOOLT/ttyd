@@ -8,8 +8,6 @@
 #include "battle/battle_weapon_power.h"
 #include "battle/battle_database_common.h"
 
-#pragma force_active on
-
 USER_FUNC(btlevtcmd_AnimeChangePoseFromTable);
 USER_FUNC(btlevtcmd_CheckDamageCode);
 USER_FUNC(btlevtcmd_CheckDamagePattern);
@@ -27,20 +25,6 @@ USER_FUNC(btlevtcmd_WaitAttackEnd);
 extern EvtWord gesso_arm_damage_pose_event[];
 extern EvtWord gesso_arm_dead_event[];
 
-f32 boss_gesso_left_arm_negone_one_374[2] __attribute__((aligned(8)));
-f32 boss_gesso_left_arm_neg_one_382;
-f32 boss_gesso_left_arm___local_PI_383;
-f32 boss_gesso_left_arm___local_3PIO2_385;
-f32 boss_gesso_left_arm_one_negone_373[2] __attribute__((aligned(8)));
-f32 boss_gesso_left_arm___local_PIO2_384;
-f32 boss_gesso_left_arm_one_381;
-f32 boss_gesso_left_arm_negone_one_360[2] __attribute__((aligned(8)));
-f32 boss_gesso_left_arm_neg_one_365;
-f32 boss_gesso_left_arm___local_PI_366;
-f32 boss_gesso_left_arm___local_3PIO2_368;
-f32 boss_gesso_left_arm_one_negone_359[2] __attribute__((aligned(8)));
-f32 boss_gesso_left_arm___local_PIO2_367;
-f32 boss_gesso_left_arm_one_364;
 BattleUnitKind unit_boss_gesso_left_arm;
 static BattleUnitDefense defence;
 static BattleUnitDefenseAttr defence_attr;
@@ -51,39 +35,10 @@ static BattleDataEntry data_table[3];
 static BattleUnitKindPart parts[1];
 static EvtWord init_event[25];
 static EvtWord damage_event[31];
-EvtWord gesso_left_arm_damage_event[93];
-static EvtWord phase_event[2];
+extern EvtWord gesso_left_arm_damage_event[];
 BattleWeapon weapon_gesso_left_arm_attack;
 static EvtWord attack_event[171];
 static EvtWord wait_event[6];
-
-f32 boss_gesso_left_arm_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
-
-f32 boss_gesso_left_arm_neg_one_382 = -1.0f;
-
-f32 boss_gesso_left_arm___local_PI_383 = 3.1415927f;
-
-f32 boss_gesso_left_arm___local_3PIO2_385 = 4.712389f;
-
-f32 boss_gesso_left_arm_one_negone_373[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
-
-f32 boss_gesso_left_arm___local_PIO2_384 = 1.5707964f;
-
-f32 boss_gesso_left_arm_one_381 = 1.0f;
-
-f32 boss_gesso_left_arm_negone_one_360[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
-
-f32 boss_gesso_left_arm_neg_one_365 = -1.0f;
-
-f32 boss_gesso_left_arm___local_PI_366 = 3.1415927f;
-
-f32 boss_gesso_left_arm___local_3PIO2_368 = 4.712389f;
-
-f32 boss_gesso_left_arm_one_negone_359[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
-
-f32 boss_gesso_left_arm___local_PIO2_367 = 1.5707964f;
-
-f32 boss_gesso_left_arm_one_364 = 1.0f;
 
 BattleUnitKind unit_boss_gesso_left_arm = {
     9,
@@ -316,7 +271,7 @@ static EVT_BEGIN(attack_event)
         CALL(btlevtcmd_snd_se, -2, STRING("SFX_BOSS_GESSO_ARM_MOVE1"), -250000000, 0, -250000000)
         CALL(btlevtcmd_ftof, 44, LW(0))
         WAIT_FRAMES(LW(0))
-        CALL(btlevtcmd_snd_se, -2, STRING("SFX_BOSS_GESSO_ATTACK2\0"), -250000000, 0, -250000000)
+        CALL(btlevtcmd_snd_se, -2, STRING("SFX_BOSS_GESSO_ATTACK2"), -250000000, 0, -250000000)
     END_SIBLING_EVENT
 #ifdef VERSION_G8ME01
     CALL(btlevtcmd_ftof, 67, LW(0))

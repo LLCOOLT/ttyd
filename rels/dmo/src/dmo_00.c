@@ -1,7 +1,6 @@
 #include "battle/battle_unit.h"
 #include "evt/evt_cmd.h"
 
-#pragma force_active on
 #include "manager/evtmgr.h"
 #include "manager/evtmgr_cmd.h"
 #include "mario/mariost.h"
@@ -27,8 +26,9 @@
 #include "evt/evt_paper.h"
 #include "evt/evt_party.h"
 #include "evt/evt_sub.h"
+#include "statuswindow.h"
 
-typedef struct DemoWork { s32 field_0x0; f32 bookRot; s32 page; s32 captured; f32 fade; f32 scale; f32 x; f32 y; void** capBuf; FileEntry* tpl; s32 winOn; s32 winAlpha; } DemoWork;
+typedef struct DemoWork { s32 flags; f32 bookRot; s32 page; s32 captured; f32 fade; f32 scale; f32 x; f32 y; void** capBuf; FileEntry* tpl; s32 winOn; s32 winAlpha; } DemoWork; /* flags: never accessed */
 static DemoWork work;
 char buf[0x200];
 static DemoWork* wp;
@@ -101,33 +101,12 @@ void demo_cap(void);
 void demo_exit(void);
 USER_FUNC(demo_init);
 
-f32 fd_dmo_00_negone_one_374[2] __attribute__((aligned(8)));
-f32 fd_dmo_00_neg_one_382;
-f32 fd_dmo_00___local_PI_383;
-f32 fd_dmo_00___local_3PIO2_385[2];
-f32 fd_dmo_00_one_negone_373[2] __attribute__((aligned(8)));
-f32 fd_dmo_00___local_PIO2_384;
-f32 fd_dmo_00_one_381;
-f32 fd_dmo_00_negone_one_360[2] __attribute__((aligned(8)));
-f32 fd_dmo_00_neg_one_365;
-f32 fd_dmo_00___local_PI_366;
-f32 fd_dmo_00___local_3PIO2_368[2];
-f32 fd_dmo_00_one_negone_359[2] __attribute__((aligned(8)));
-f32 fd_dmo_00___local_PIO2_367;
-f32 fd_dmo_00_one_364;
-f64 fd_dmo_00__three_localstatic4_sqrtf;
-f64 fd_dmo_00__half_localstatic3_sqrtf;
-EvtWord buttonCheck[32];
-EvtWord demo_evt[1489];
-static EvtWord koushukei_dai[63];
-EvtWord roten_move[25];
-EvtWord kuribo_move[25];
-EvtWord chusan_move[25];
-#ifdef VERSION_G8ME01
-EvtWord dmo_00_init_evt[268];
-#else
-EvtWord dmo_00_init_evt[262];
-#endif
+extern EvtWord buttonCheck[];
+extern EvtWord demo_evt[];
+extern EvtWord roten_move[];
+extern EvtWord kuribo_move[];
+extern EvtWord chusan_move[];
+extern EvtWord dmo_00_init_evt[];
 
 USER_FUNC(demo_init) {
     if (isFirstCall) {
@@ -142,8 +121,8 @@ USER_FUNC(demo_init) {
         statusWinDispOff();
         psndSetFlag(4);
     }
-    if (fileAsyncf(4, NULL, "%s/demo.tpl\0\0\0\0", getMarioStDvdRoot()) != 0U) {
-        wp->tpl = fileAllocf(4, "%s/demo.tpl\0\0\0\0", getMarioStDvdRoot());
+    if (fileAsyncf(4, NULL, "%s/demo.tpl", getMarioStDvdRoot()) != 0U) {
+        wp->tpl = fileAllocf(4, "%s/demo.tpl", getMarioStDvdRoot());
         gp->areaFadeOutType = 9;
         gp->areaFadeOutDuration = 500;
         return EVT_RETURN_DONE;
@@ -580,42 +559,6 @@ USER_FUNC(make_msg) {
     sprintf(buf, "<clear><wpos %d %d %d %d><once_stop>", -width / 2 - 62, lines * 28 / 2 - 84, 400, 200);
     return EVT_RETURN_DONE;
 }
-
-f32 fd_dmo_00_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
-
-f32 fd_dmo_00_neg_one_382 = -1.0f;
-
-f32 fd_dmo_00___local_PI_383 = 3.1415927f;
-
-f32 fd_dmo_00___local_3PIO2_385[] = {
-    4.712389f, 0.0f,
-};
-
-f32 fd_dmo_00_one_negone_373[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
-
-f32 fd_dmo_00___local_PIO2_384 = 1.5707964f;
-
-f32 fd_dmo_00_one_381 = 1.0f;
-
-f32 fd_dmo_00_negone_one_360[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
-
-f32 fd_dmo_00_neg_one_365 = -1.0f;
-
-f32 fd_dmo_00___local_PI_366 = 3.1415927f;
-
-f32 fd_dmo_00___local_3PIO2_368[] = {
-    4.712389f, 0.0f,
-};
-
-f32 fd_dmo_00_one_negone_359[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
-
-f32 fd_dmo_00___local_PIO2_367 = 1.5707964f;
-
-f32 fd_dmo_00_one_364 = 1.0f;
-
-f64 fd_dmo_00__three_localstatic4_sqrtf = 3.0;
-
-f64 fd_dmo_00__half_localstatic3_sqrtf = 0.5;
 
 static DemoWork* wp = &work;
 

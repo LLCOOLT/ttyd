@@ -1,7 +1,6 @@
 #include "battle/battle_unit.h"
 #include "evt/evt_cmd.h"
 
-#pragma force_active on
 #include "manager/evtmgr_cmd.h"
 #include "mario/mario.h"
 #include "driver/itemdrv.h"
@@ -19,10 +18,11 @@
 #include "las.h"
 #include "libc_decls.h"
 #include "driver/hitdrv.h"
+#include <math.h>
 
 typedef struct FirebarBall { s32 pose; Vec pos; } FirebarBall;
-typedef struct FirebarSetup { u8 type; u8 count; u8 field_0x2[2]; Vec pos; f32 spacing; f32 field_0x14; f32 speed; void* callback; f32 field_0x20; f32 radius; } FirebarSetup;
-typedef struct FirebarWork { u8 type; u8 count; u16 flags; Vec pos; f32 prevAngle; f32 angle; f32 speed; f32 spacing; f32 field_0x20; f32 scale; f32 field_0x28; f32 radius; void (*callback)(struct FirebarWork* wp, s32 type); s32 hitCount; s32 sfxId; s32 state; f32 shadowAngle; FirebarBall* balls; FirebarSetup* setup; } FirebarWork;
+typedef struct FirebarSetup { u8 type; u8 count; u8 pad_2[2]; Vec pos; f32 spacing; f32 ballSize; f32 speed; void* callback; f32 angleOrEndX; f32 radius; } FirebarSetup; /* ballSize: copied to FirebarWork, never read; angleOrEndX: start angle (type 0) or end x (type 1) */
+typedef struct FirebarWork { u8 type; u8 count; u16 flags; Vec pos; f32 prevAngle; f32 angle; f32 speed; f32 spacing; f32 ballSize; f32 scale; f32 endX; f32 radius; void (*callback)(struct FirebarWork* wp, s32 type); s32 hitCount; s32 sfxId; s32 state; f32 shadowAngle; FirebarBall* balls; FirebarSetup* setup; } FirebarWork;
 void set_damage_root_ypos(f32 y);
 void marioChgMot(s32 motion);
 ItemEntry* itemEntry(const char* name, s32 itemId, s32 mode, s32 flag, void* script, f32 x, f32 y, f32 z);
@@ -39,8 +39,6 @@ void _firebar_rot(FirebarWork* wp);
 void _firebar_trans(FirebarWork* wp);
 double cos(double x);
 s32 _firebar_hitCheck2(FirebarWork* wp);
-static inline s32 fb_fpclassifyf(f32 x) { switch (*(s32*)&x & 0x7F800000) { case 0x7F800000: if (*(s32*)&x & 0x007FFFFF) { return 1; } else { return 2; } break; case 0: if (*(s32*)&x & 0x007FFFFF) { return 5; } else { return 3; } break; default: return 4; } }
-static inline f32 fb_sqrtf(f32 x) { const f64 _half = .5; const f64 _three = 3.0; if (x > 0.0f) { f64 guess = __frsqrte(x); guess = _half * guess * (_three - guess * guess * x); guess = _half * guess * (_three - guess * guess * x); guess = _half * guess * (_three - guess * guess * x); return x * guess; } else if (x < 0.0) { return *(f32*)__float_nan; } else if (fb_fpclassifyf(x) == 1) { return *(f32*)__float_nan; } return x; }
 
 USER_FUNC(coin_entry);
 USER_FUNC(evt_bero_get_info);
@@ -62,58 +60,12 @@ void _firebar_rot(FirebarWork* wp);
 s32 _firebar_hitCheck2(FirebarWork* wp);
 s32 _firebar_hitCheck(FirebarWork* wp, FirebarBall* ball);
 
-f32 fd_las_04_negone_one_374[2] __attribute__((aligned(8)));
-f32 fd_las_04_neg_one_382;
-f32 fd_las_04___local_PI_383;
-f32 fd_las_04___local_3PIO2_385;
-f32 fd_las_04_one_negone_373[2] __attribute__((aligned(8)));
-f32 fd_las_04___local_PIO2_384;
-f32 fd_las_04_one_381;
-f32 fd_las_04_negone_one_360[2] __attribute__((aligned(8)));
-f32 fd_las_04_neg_one_365;
-f32 fd_las_04___local_PI_366;
-f32 fd_las_04___local_3PIO2_368;
-f32 fd_las_04_one_negone_359[2] __attribute__((aligned(8)));
-f32 fd_las_04___local_PIO2_367;
-f32 fd_las_04_one_364;
-static EvtWord w_door_close[22];
-static EvtWord w_door_open[22];
-static EvtWord e_door_close[22];
-static EvtWord e_door_open[22];
 static BeroEntry bero_entry_data[3];
-EvtWord firebar_coin[68];
+extern EvtWord firebar_coin[];
 FirebarSetup firebardesc[7];
-EvtWord firebar_evt[102];
+extern EvtWord firebar_evt[];
 static HitDamageReturn dmgRetPoint[4];
-EvtWord las_04_init_evt[55];
-
-f32 fd_las_04_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
-
-f32 fd_las_04_neg_one_382 = -1.0f;
-
-f32 fd_las_04___local_PI_383 = 3.1415927f;
-
-f32 fd_las_04___local_3PIO2_385 = 4.712389f;
-
-f32 fd_las_04_one_negone_373[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
-
-f32 fd_las_04___local_PIO2_384 = 1.5707964f;
-
-f32 fd_las_04_one_381 = 1.0f;
-
-f32 fd_las_04_negone_one_360[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
-
-f32 fd_las_04_neg_one_365 = -1.0f;
-
-f32 fd_las_04___local_PI_366 = 3.1415927f;
-
-f32 fd_las_04___local_3PIO2_368 = 4.712389f;
-
-f32 fd_las_04_one_negone_359[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
-
-f32 fd_las_04___local_PIO2_367 = 1.5707964f;
-
-f32 fd_las_04_one_364 = 1.0f;
+extern EvtWord las_04_init_evt[];
 
 static EVT_BEGIN(w_door_close)
     MULTIPLY_FLOAT(LW(0), FLOAT(-0.38867188f))
@@ -219,82 +171,82 @@ FirebarSetup firebardesc[] = {
     {
         0, // type
         5, // count
-        {0}, // field_0x2
+        {0}, // pad_2
         {-700.0f, 80.0f, -55.0f}, // pos
         25.0f, // spacing
-        25.0f, // field_0x14
+        25.0f, // ballSize
         0.04f, // speed
         firebar_cb, // callback
-        0.0f, 0.0f, // field_0x20..radius
+        0.0f, 0.0f, // angleOrEndX..radius
     },
     {
         0, // type
         5, // count
-        {0}, // field_0x2
+        {0}, // pad_2
         {-500.0f, 80.0f, 55.0f}, // pos
         25.0f, // spacing
-        25.0f, // field_0x14
+        25.0f, // ballSize
         -0.04f, // speed
         firebar_cb, // callback
-        0.0f, 0.0f, // field_0x20..radius
+        0.0f, 0.0f, // angleOrEndX..radius
     },
     {
         0, // type
         5, // count
-        {0}, // field_0x2
+        {0}, // pad_2
         {-300.0f, 80.0f, -55.0f}, // pos
         25.0f, // spacing
-        25.0f, // field_0x14
+        25.0f, // ballSize
         0.04f, // speed
         firebar_cb, // callback
-        0.0f, 0.0f, // field_0x20..radius
+        0.0f, 0.0f, // angleOrEndX..radius
     },
     {
         0, // type
         4, // count
-        {0}, // field_0x2
+        {0}, // pad_2
         {0.0f, 80.0f, 0.0f}, // pos
         25.0f, // spacing
-        25.0f, // field_0x14
+        25.0f, // ballSize
         0.03f, // speed
         firebar_cb, // callback
-        0.0f, // field_0x20
+        0.0f, // angleOrEndX
         30.0f, // radius
     },
     {
         0, // type
         4, // count
-        {0}, // field_0x2
+        {0}, // pad_2
         {0.0f, 80.0f, 0.0f}, // pos
         25.0f, // spacing
-        25.0f, // field_0x14
+        25.0f, // ballSize
         0.03f, // speed
         firebar_cb, // callback
-        3.1415927f, // field_0x20
+        3.1415927f, // angleOrEndX
         30.0f, // radius
     },
     {
         1, // type
         5, // count
-        {0}, // field_0x2
+        {0}, // pad_2
         {800.0f, -10.0f, -50.0f}, // pos
         25.0f, // spacing
-        25.0f, // field_0x14
+        25.0f, // ballSize
         1.5f, // speed
         firebar_cb, // callback
-        225.0f, // field_0x20
+        225.0f, // angleOrEndX
         0.0f, // radius
     },
     {
         1, // type
         5, // count
-        {0}, // field_0x2
+        {0}, // pad_2
         {800.0f, 15.0f, -50.0f}, // pos
         25.0f, // spacing
-        25.0f, // field_0x14
+        25.0f, // ballSize
         1.5f, // speed
         firebar_cb, // callback
-        225.0f, // field_0x20
+        225.0f, // angleOrEndX
         0.0f, // radius
     },
 };
@@ -381,7 +333,7 @@ s32 _firebar_hitCheck(FirebarWork* wp, FirebarBall* ball) {
     } else if (__fabsf(dy) < mario->wPlayerCollisionBox.y) {
         near = TRUE;
     }
-    if (near && fb_sqrtf(dx * dx + dz * dz) <= mario->wPlayerCollisionBox.x / 2.0f / 2.0f + wp->spacing / 2.0f * wp->scale &&
+    if (near && sqrtf(dx * dx + dz * dz) <= mario->wPlayerCollisionBox.x / 2.0f / 2.0f + wp->spacing / 2.0f * wp->scale &&
         vivianGetStatus() != 1 && vivianGetStatus() != 2) {
         return 1;
     }
@@ -520,7 +472,7 @@ void _firebar_trans(FirebarWork* wp) {
             }
             break;
         case 1:
-            if (__fabsf(wp->pos.x - wp->field_0x28) < 20.0f * __fabsf(wp->speed)) {
+            if (__fabsf(wp->pos.x - wp->endX) < 20.0f * __fabsf(wp->speed)) {
                 wp->state++;
             }
             break;
@@ -590,7 +542,7 @@ USER_FUNC(firebar_entry) {
         wp->pos = setup->pos;
         wp->count = setup->count;
         wp->callback = setup->callback;
-        wp->field_0x20 = setup->field_0x14;
+        wp->ballSize = setup->ballSize;
         wp->spacing = setup->spacing;
         wp->speed = setup->speed;
         wp->scale = 1.0f;
@@ -598,17 +550,17 @@ USER_FUNC(firebar_entry) {
         wp->angle = 0.0f;
         wp->hitCount = 0;
         wp->setup = setup;
-        wp->field_0x28 = setup->field_0x20;
+        wp->endX = setup->angleOrEndX;
         wp->radius = setup->radius;
         wp->sfxId = 0;
         wp->state = 0;
         wp->shadowAngle = 0.0f;
         switch (wp->type) {
             case 0:
-                wp->angle = setup->field_0x20;
+                wp->angle = setup->angleOrEndX;
                 break;
             case 1:
-                if (setup->pos.x < setup->field_0x20) {
+                if (setup->pos.x < setup->angleOrEndX) {
                     wp->speed = __fabsf(setup->speed);
                 } else {
                     wp->speed = -1.0f * __fabsf(setup->speed);

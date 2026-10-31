@@ -1,5 +1,4 @@
 #include "version.h"
-#pragma dollar_identifiers on
 #include "battle/battle.h"
 #include "battle/battle_database_common.h"
 #include "battle/battle_stage.h"
@@ -80,14 +79,6 @@ USER_FUNC(_get_move_frame);
 static void __makeTechMenuFunc(BattleCommand* command, s32* count);
 USER_FUNC(battle_evt_majo_disp_off);
 
-__declspec(section ".data") f32 unit_party_vivian_negone_one_a[2] __attribute__((aligned(8)));
-__declspec(section ".data") static f32 negone_one$374[2] __attribute__((aligned(8)));
-__declspec(section ".data") f32 unit_party_vivian_one_negone_a[2] __attribute__((aligned(8)));
-__declspec(section ".data") static f32 one_negone$373[2] __attribute__((aligned(8)));
-__declspec(section ".data") f32 unit_party_vivian_negone_one_b[2] __attribute__((aligned(8)));
-__declspec(section ".data") static f32 negone_one$360[2] __attribute__((aligned(8)));
-__declspec(section ".data") f32 unit_party_vivian_one_negone_b[2] __attribute__((aligned(8)));
-__declspec(section ".data") static f32 one_negone$359[2] __attribute__((aligned(8)));
 PoseTableEntry pose_table_vivian_stay[24];
 static BattleDataEntry data_table[20];
 BattleUnitKindPart unitpartsdata_Party_Vivian[1];
@@ -98,23 +89,20 @@ typedef struct { StatusVulnerability d; u8 pad[2]; } VivRegist;
 static VivDef defence;
 static VivDefAttr defence_attr;
 static VivRegist regist;
-static EvtWord attack_event[2];
-static EvtWord wait_event[6];
-static EvtWord battle_entry_event[59];
 static EvtWord init_event[68];
 static EvtWord damage_event[16];
-EvtWord vivian_hide_event[209];
+extern EvtWord vivian_hide_event[];
 BattleWeapon partyWeapon_VivianNormalAttack;
 BattleWeapon partyWeapon_VivianShadowGuard;
 BattleWeapon partyWeapon_VivianMagicalPowder;
 BattleWeapon partyWeapon_VivianCharmKissAttack;
-EvtWord partyVivianAttack_NormalAttack[581];
-EvtWord partyVivianAttack_ShadowGuard[430];
-EvtWord partyVivianAttack_MagicalPowder[VERSION_PICK(442, 448)];
-EvtWord partyVivianAttack_CharmKissAttack[464];
-EvtWord vivian_shadow_tail_event[78];
-EvtWord vivian_counter_damage_event[177];
-EvtWord vivian_appeal_event[80];
+extern EvtWord partyVivianAttack_NormalAttack[];
+extern EvtWord partyVivianAttack_ShadowGuard[];
+extern EvtWord partyVivianAttack_MagicalPowder[];
+extern EvtWord partyVivianAttack_CharmKissAttack[];
+extern EvtWord vivian_shadow_tail_event[];
+extern EvtWord vivian_counter_damage_event[];
+extern EvtWord vivian_appeal_event[];
 static EvtWord party_win_reaction[18];
 static EvtWord attack_audience_event[189];
 
@@ -129,21 +117,13 @@ static EvtWord attack_audience_event[189];
 
 
 
-__declspec(section ".data") f32 unit_party_vivian_negone_one_a[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
 
-__declspec(section ".data") static f32 negone_one$374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
 
-__declspec(section ".data") f32 unit_party_vivian_one_negone_a[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
 
-__declspec(section ".data") static f32 one_negone$373[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
 
-__declspec(section ".data") f32 unit_party_vivian_negone_one_b[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
 
-__declspec(section ".data") static f32 negone_one$360[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
 
-__declspec(section ".data") f32 unit_party_vivian_one_negone_b[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
 
-__declspec(section ".data") static f32 one_negone$359[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
 
 PoseTableEntry pose_table_vivian_stay[] = {
     {9, "PTR_D_4"},
@@ -338,7 +318,7 @@ USER_FUNC(battle_evt_majo_disp_on) {
                 unit->mPosition = v;
             }
             animPoseSetEffect(pose, "p_bibi", 1);
-            animPoseSetEffectAnim(pose, "PM_B_2\0", 1);
+            animPoseSetEffectAnim(pose, "PM_B_2", 1);
             event->userdata[0]++;
             break;
         case 2:
@@ -1902,10 +1882,3 @@ USER_FUNC(_disp_heart_entry_stop_check) {
 }
 
 
-#pragma force_active on
-#ifdef VERSION_G8ME01
-u8 gap_07_80418358_sdata[8] = {0};
-#else
-u8 gap_07_80412488_sdata[24] = {0};
-#endif
-#pragma force_active reset

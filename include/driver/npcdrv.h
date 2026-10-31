@@ -214,10 +214,10 @@ typedef struct NpcFieldEntry {
     char mModelName[64];                // 0x0
     char mAnimName[64];                 // 0x40
     u32 mFlags;                         // 0x80
-    f32 wCurrentRenderRotationMinus90Y; // 0x84, TODO better name
-    f32 wRotationY;                     // 0x88, TODO better name
-    f32 wScaleZ_flip;                   // 0x8C, TODO better name
-    f32 wInitToZero4;                   // 0x90, TODO better name
+    f32 savedPeraRotY;                  // 0x84, AnimationPose state saved across a pose reload
+    f32 savedRotationY;                 // 0x88
+    f32 savedScaleZFlip;                // 0x8C
+    f32 savedPeraTargetRotY;            // 0x90
 } NpcFieldEntry;
 
 typedef struct NpcWork {
@@ -285,7 +285,7 @@ void npcRecoveryFieldNpc(void);
 void npcInit(void);
 void npcReset(BOOL inBattle);
 s32 npcGetReactionOfLivingBody(BOOL inBattle);
-s32 npcEntry(const char* a1, const char* animName);
+s32 npcEntry(const char* name, const char* animName);
 NpcTribeInfo* npcGetTribe(const char* tribeName);
 void npcDelete(NpcEntry* entry);
 void npcDeleteGroup(NpcEntry* entry);
@@ -303,7 +303,7 @@ void npcStartForEvent(void);
 void npcStopForOneEvent(NpcEntry* npc);
 void npcStopForEvent(void);
 void npcCheckInterrupt(NpcEntry* npc);
-void npcGroupDead(NpcEntry* npc, u16 arg1);
+void npcGroupDead(NpcEntry* npc, u16 reason);
 f32 npcTransRytoFaceDir(NpcEntry* npc);
 
 FieldBattleData* fbatGetPointer(void);
@@ -320,3 +320,8 @@ extern EvtWord evt_majinai_effect_se_btl[];
 void fbatSandersBombTriggerOn(void);
 
 extern EvtWord _evt_majinai_coin_up_effect[];
+
+s32 npcCalcScore(NpcEntry* npc);
+void npcGetBackItemEntry(NpcEntry* npc);
+void npcSetMarioAutoTalkPose(const char* stayPose, const char* talkPose);
+void npcTuningRy(NpcEntry* npc, f32 angle);

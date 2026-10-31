@@ -1,7 +1,6 @@
 #include "battle/battle_unit.h"
 #include "evt/evt_cmd.h"
 
-#pragma force_active on
 #include "battle/battle.h"
 #include "battle/battle_unit.h"
 #include "battle/battle_sub.h"
@@ -18,6 +17,7 @@
 #include "evt/evt_sub.h"
 #include "party/party_motion.h"
 #include "battle/battle_database_common.h"
+#include "manager/evtmgr_cmd.h"
 
 extern ItemData itemDataTable[];
 void BtlUnit_EquipItem(BattleUnit* unit, s32 flags, ItemType type);
@@ -50,20 +50,6 @@ USER_FUNC(evt_eff);
 #endif
 static USER_FUNC(_steal_item);
 
-f32 fd_borodo_negone_one_374[2] __attribute__((aligned(8)));
-f32 fd_borodo_neg_one_382;
-f32 fd_borodo___local_PI_383;
-f32 fd_borodo___local_3PIO2_385;
-f32 fd_borodo_one_negone_373[2] __attribute__((aligned(8)));
-f32 fd_borodo___local_PIO2_384;
-f32 fd_borodo_one_381;
-f32 fd_borodo_negone_one_360[2] __attribute__((aligned(8)));
-f32 fd_borodo_neg_one_365;
-f32 fd_borodo___local_PI_366;
-f32 fd_borodo___local_3PIO2_368;
-f32 fd_borodo_one_negone_359[2] __attribute__((aligned(8)));
-f32 fd_borodo___local_PIO2_367;
-f32 fd_borodo_one_364;
 BattleUnitKind unit_borodo;
 static BattleWeapon weapon_borodo_attack;
 static BattleUnitDefense defence;
@@ -79,7 +65,6 @@ static BattleDataEntry data_table[1];
 static BattleUnitKindPart parts[1];
 static EvtWord init_event[57];
 static EvtWord damage_event[10];
-static EvtWord phase_event[2];
 static EvtWord attack_event[59];
 static EvtWord _borodo_normal_attack[503];
 static EvtWord _borodo_steal_attack[610];
@@ -90,6 +75,7 @@ static USER_FUNC(_steal_item) {
     EvtWord* args = event->args;
     s32 coins;
     s32 num;
+    s32 count;
     PouchData* pouch = pouchGetPtr();
     BattleUnit* unit;
     BattleUnit* target;
@@ -139,11 +125,17 @@ static USER_FUNC(_steal_item) {
     }
     {
         s32 item = 0;
-        s32 count = 0;
         s32 r;
         s32 i;
+#ifdef VERSION_G8MP01
+        s32 heldMax = GetHeldItemCount; // PAL scans only the held-item slots the bag has
+#else
+        s32 heldMax = MAX_HELD_ITEMS;
+#endif
 
-        for (i = 0; i < 20; i++) {
+        count = 0;
+
+        for (i = 0; i < heldMax; i++) {
             if (pouch->heldItems[i] != 0) {
                 count++;
             }
@@ -167,7 +159,7 @@ static USER_FUNC(_steal_item) {
         } else {
             s32 k;
 
-            for (k = 0; k < 20; k++) {
+            for (k = 0; k < heldMax; k++) {
                 if (pouch->heldItems[k] != 0) {
                     if (--r < 0) {
                         item = pouch->heldItems[k];
@@ -196,34 +188,6 @@ static USER_FUNC(_steal_item) {
     }
     return EVT_RETURN_DONE;
 }
-
-f32 fd_borodo_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
-
-f32 fd_borodo_neg_one_382 = -1.0f;
-
-f32 fd_borodo___local_PI_383 = 3.1415927f;
-
-f32 fd_borodo___local_3PIO2_385 = 4.712389f;
-
-f32 fd_borodo_one_negone_373[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
-
-f32 fd_borodo___local_PIO2_384 = 1.5707964f;
-
-f32 fd_borodo_one_381 = 1.0f;
-
-f32 fd_borodo_negone_one_360[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
-
-f32 fd_borodo_neg_one_365 = -1.0f;
-
-f32 fd_borodo___local_PI_366 = 3.1415927f;
-
-f32 fd_borodo___local_3PIO2_368 = 4.712389f;
-
-f32 fd_borodo_one_negone_359[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
-
-f32 fd_borodo___local_PIO2_367 = 1.5707964f;
-
-f32 fd_borodo_one_364 = 1.0f;
 
 BattleUnitKind unit_borodo = {
     44,
@@ -748,7 +712,7 @@ static EVT_BEGIN(escape_event)
     CALL(btlevtcmd_JumpPosition, -2, LW(0), LW(1), LW(2), FLOAT(20.0f), -2)
     CALL(btlevtcmd_SetPartsBlur, -2, 1, 255, 255, 255, 255, 100, 100, 100, 50, 0)
     CALL(btlevtcmd_OnPartsAttribute, -2, 1, 67108864)
-    CALL(btlevtcmd_snd_se, -2, STRING("SFX_ENM_BORODO_ESCAPE1\0"), -250000000, 0, -250000000)
+    CALL(btlevtcmd_snd_se, -2, STRING("SFX_ENM_BORODO_ESCAPE1"), -250000000, 0, -250000000)
     CALL(btlevtcmd_SetMoveSpeed, -2, FLOAT(9.0f))
     CALL(btlevtcmd_MovePosition, -2, 300, LW(1), LW(2), 0, 0, 0)
     CALL(btlevtcmd_SetPartsBlur, -2, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0)
@@ -824,5 +788,4 @@ EVT_BEGIN(_borodo_emergency_revival_event)
     RETURN
 EVT_END()
 #endif
-
 

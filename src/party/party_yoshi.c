@@ -16,6 +16,7 @@
 #include "mario/mario_hit.h"
 #include "mot/mot_damage.h"
 #include "mot/mot_jump.h"
+#include "mario/mario_cam.h"
 
 typedef struct YoshiWork {
     u8 pad0[0x4];         // 0x0
@@ -40,7 +41,6 @@ extern void partyUpdateKeyData(PartyEntry* party);
 extern s32 psndSFXOn_3D(s32 id, Vec* pos);
 extern void* marioSearchHead(Vec* pos, f32 range, f32* height);
 extern s32 marioChkDamageSink(void);
-extern void marioUpdateCamCollision(Vec* pos);
 double sin(double);
 
 f32 ofs_PYS_S_2[52] = {
@@ -70,9 +70,6 @@ f32 ofs_PYS_F_1[10] = {0.0f, 0.0f, 0.433f, 0.557f, 0.512f, 0.0f, 0.0f, 0.433f, 0
 void yoshi_damageToge(PartyEntry* party);
 
 
-#pragma force_active on
-u32 gap_08_804188AC_sbss;
-#pragma force_active reset
 f32 evt_yoshi_spd;
 s32 evt_yoshi_frm;
 f32 jumpheight;
@@ -963,10 +960,7 @@ void yoshi_use(PartyEntry* party) {
     mario->displayDirection = party->displayDirection;
     mario->displayDirectionTarget = party->displayDirectionTarget;
     mario->position = party->position;
-    {
-        Vec cam = party->position;
-        marioUpdateCamCollision(&cam);
-    }
+    marioUpdateCamCollision(party->position);
 }
 
 void L_yoshiFlyMove(PartyEntry* party) {

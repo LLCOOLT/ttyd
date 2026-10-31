@@ -93,7 +93,7 @@ EffectEntry* effMiniGameEntry(s32 type, f32 x, f32 y, f32 z) {
         break;
     }
 #endif
-    effect->type = "miniGame\0\0\0";
+    effect->type = "miniGame";
     effect->count = n;
     work = __memAlloc(HEAP_EFFECT, effect->count * sizeof(MiniGameWork));
     effect->userdata = work;
@@ -539,10 +539,3 @@ void effMiniGameDisp(CameraId cameraId, EffectEntry* effect) {
     }
 }
 
-#pragma force_active on
-#ifdef VERSION_G8ME01
-u32 gap_minigame_sdata[5] = {0, 0, 0, 0, 0};
-#else
-u32 gap_minigame_sdata[2] = {0, 0};
-#endif
-#pragma force_active reset

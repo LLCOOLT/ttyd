@@ -2,7 +2,6 @@
 #include "eff/eff_scanning.h"
 #include "evt/evt_cmd.h"
 
-#pragma force_active on
 #include "battle/battle.h"
 #include "battle/battle_sub.h"
 #include "manager/evtmgr_cmd.h"
@@ -116,20 +115,6 @@ extern EvtWord majo_unison_phase_event[];
 extern BattleUnitKind unit_boss_majolyne_las;
 extern BattleUnitKind unit_boss_marilyn_las;
 
-f32 fd_boss_rampell_las_negone_one_374[2] __attribute__((aligned(8)));
-f32 fd_boss_rampell_las_neg_one_382;
-f32 fd_boss_rampell_las___local_PI_383;
-f32 fd_boss_rampell_las___local_3PIO2_385;
-f32 fd_boss_rampell_las_one_negone_373[2] __attribute__((aligned(8)));
-f32 fd_boss_rampell_las___local_PIO2_384;
-f32 fd_boss_rampell_las_one_381;
-f32 fd_boss_rampell_las_negone_one_360[2] __attribute__((aligned(8)));
-f32 fd_boss_rampell_las_neg_one_365;
-f32 fd_boss_rampell_las___local_PI_366;
-f32 fd_boss_rampell_las___local_3PIO2_368;
-f32 fd_boss_rampell_las_one_negone_359[2] __attribute__((aligned(8)));
-f32 fd_boss_rampell_las___local_PIO2_367;
-f32 fd_boss_rampell_las_one_364;
 BattleUnitKind unit_boss_rampell_las;
 static BattleUnitDefense defence;
 static BattleUnitDefenseAttr defence_attr;
@@ -140,12 +125,11 @@ static BattleUnitKindPart parts[1];
 static BattleWeapon weapon_rampell_attack;
 static BattleUnitSetup entry_marilyn;
 static BattleUnitSetup entry_majolyne;
-EvtWord mutate_event[584];
+extern EvtWord mutate_event[];
 static EvtWord init_event[198];
 static EvtWord entry_event[46];
 static EvtWord damage_event[22];
 static EvtWord dead_event[261];
-static EvtWord unison_phase_event[87];
 static EvtWord phase_event[68];
 static EvtWord attack_event[29];
 static EvtWord ogg_attack_event[491];
@@ -160,14 +144,9 @@ static BattleWeapon weapon_masao_jump;
 static BattleWeapon weapon_masao_hammer;
 static BattleWeapon weapon_masao_kururin_jump;
 static BattleWeapon weapon_masao_kaiten_hammer;
-static EvtWord mario_zoom[19];
-static EvtWord enemy_zoom[19];
-static EvtWord fmario_zoom[19];
-static EvtWord gparty_zoom[19];
 static EvtWord init_event_fmario[70];
 static EvtWord dead_event_fmario[80];
 static EvtWord attack_event_fmario[52];
-static EvtWord jump_attack_voice[36];
 static EvtWord marioAttackEvent_NormalJump[344];
 static EvtWord marioAttackEvent_KururinJump[469];
 static EvtWord marioAttackEvent_NormalHammer[299];
@@ -179,8 +158,6 @@ static BattleUnitDefenseAttr defence_attr_christine;
 static StatusVulnerability regist_christine;
 static BattleDataEntry data_table_christine[2];
 static BattleUnitKindPart parts_christine[1];
-static EvtWord fmario_zoom_christine[19];
-static EvtWord gparty_zoom_christine[19];
 static EvtWord init_event_christine[72];
 static EvtWord dead_event_christine[80];
 static EvtWord attack_event_christine[690];
@@ -194,14 +171,9 @@ static StatusVulnerability regist_nokotarou;
 static BattleDataEntry data_table_nokotarou[3];
 static BattleUnitKindPart parts_nokotarou[1];
 static EvtWord dmg_turn_event[64];
-static EvtWord wakeup_event[67];
 static EvtWord init_event_nokotarou[92];
 static EvtWord damage_event_nokotarou[6];
 static EvtWord dead_event_nokotarou[80];
-static EvtWord _change_koura_pose[34];
-static EvtWord _change_koura_pose_fast[34];
-static EvtWord _restore_koura_pose[47];
-static EvtWord _koura_rotate_start[99];
 static EvtWord _koura_rotate_stop[13];
 static EvtWord attack_event_nokotarou[33];
 static EvtWord attack_event_nokotarou_koura[393];
@@ -233,23 +205,21 @@ StatusVulnerability regist_vivian;
 BattleDataEntry data_table_vivian[2];
 BattleUnitKindPart parts_vivian[1];
 BattleWeapon weapon_vivian_kagenuke_attack;
-static EvtWord vivian_down[19];
-static EvtWord vivian_up[27];
-EvtWord init_event_vivian[64];
-EvtWord dead_event_vivian[80];
-EvtWord attack_event_vivian[222];
-EvtWord wait_event_vivian[6];
+extern EvtWord init_event_vivian[];
+extern EvtWord dead_event_vivian[];
+extern EvtWord attack_event_vivian[];
+extern EvtWord wait_event_vivian[];
 BattleUnitDefense defence_sanders;
 BattleUnitDefenseAttr defence_attr_sanders;
 StatusVulnerability regist_sanders;
 BattleDataEntry data_table_sanders[2];
 BattleUnitKindPart parts_sanders[1];
 BattleWeapon enemyWeapon_SandersNormalAttack;
-EvtWord init_event_sanders[51];
-EvtWord dead_event_sanders[80];
-EvtWord attack_event_sanders[24];
-EvtWord attack_event_sanders_normal[325];
-EvtWord wait_event_sanders[6];
+extern EvtWord init_event_sanders[];
+extern EvtWord dead_event_sanders[];
+extern EvtWord attack_event_sanders[];
+extern EvtWord attack_event_sanders_normal[];
+extern EvtWord wait_event_sanders[];
 BattleUnitDefense defence_chuchurina;
 BattleUnitDefenseAttr defence_attr_chuchurina;
 StatusVulnerability regist_chuchurina;
@@ -259,39 +229,11 @@ BattleWeapon enemyWeapon_ChuchurinaNormalAttackR;
 BattleWeapon enemyWeapon_ChuchurinaNormalAttackL;
 BattleWeapon enemyWeapon_ChuchurinaNormalAttackRlast;
 BattleWeapon enemyWeapon_ChuchurinaNormalAttackLlast;
-EvtWord init_event_chuchurina[51];
-EvtWord dead_event_chuchurina[80];
-EvtWord attack_event_chuchurina[24];
-EvtWord attack_event_chuchurina_normal[831];
-EvtWord wait_event_chuchurina[6];
-
-f32 fd_boss_rampell_las_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
-
-f32 fd_boss_rampell_las_neg_one_382 = -1.0f;
-
-f32 fd_boss_rampell_las___local_PI_383 = 3.1415927f;
-
-f32 fd_boss_rampell_las___local_3PIO2_385 = 4.712389f;
-
-f32 fd_boss_rampell_las_one_negone_373[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
-
-f32 fd_boss_rampell_las___local_PIO2_384 = 1.5707964f;
-
-f32 fd_boss_rampell_las_one_381 = 1.0f;
-
-f32 fd_boss_rampell_las_negone_one_360[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
-
-f32 fd_boss_rampell_las_neg_one_365 = -1.0f;
-
-f32 fd_boss_rampell_las___local_PI_366 = 3.1415927f;
-
-f32 fd_boss_rampell_las___local_3PIO2_368 = 4.712389f;
-
-f32 fd_boss_rampell_las_one_negone_359[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
-
-f32 fd_boss_rampell_las___local_PIO2_367 = 1.5707964f;
-
-f32 fd_boss_rampell_las_one_364 = 1.0f;
+extern EvtWord init_event_chuchurina[];
+extern EvtWord dead_event_chuchurina[];
+extern EvtWord attack_event_chuchurina[];
+extern EvtWord attack_event_chuchurina_normal[];
+extern EvtWord wait_event_chuchurina[];
 
 BattleUnitKind unit_boss_rampell_las = {
     135,
@@ -3965,7 +3907,7 @@ static USER_FUNC(eff_scanning) {
     BattleUnit* unit = BattleGetUnitPtr(_battleWorkPointer, id);
     EffectEntry* eff = effScanningEntry(0, x, y, z);
 
-    ((effScanningData*)eff->userdata)->field_0x10 = unit->mSizeMultiplier;
+    ((effScanningData*)eff->userdata)->scale = unit->mSizeMultiplier;
     return EVT_RETURN_DONE;
 }
 BOOL BtlUnit_CheckShadowGuard(BattleUnit* unit);

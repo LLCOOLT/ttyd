@@ -101,38 +101,33 @@ USER_FUNC(evt_door_end_wait);
 USER_FUNC(evt_door_set_param);
 USER_FUNC(evt_door_data_copy);
 
-EvtWord door_open_se[151];
-EvtWord door_close_se[151];
-EvtWord door_down_se[33];
-EvtWord house_open_se[32];
-EvtWord evt_dark[34];
-EvtWord evt_dark2[34];
-static EvtWord evt_light[30];
-EvtWord evt_light2[30];
-EvtWord door_up_se[2];
-EvtWord house_close_se[4];
-EvtWord in_houseanim[80];
-EvtWord out_houseanim[72];
-EvtWord in_dooranim[134];
-EvtWord out_dooranim[121];
-EvtWord house_in[216];
-EvtWord house_out[196];
-EvtWord evt_door_setup[56];
-EvtWord door_dark[34];
-EvtWord door_dark2[34];
-EvtWord door_light[30];
-EvtWord door_light2[30];
-EvtWord evt_door_open[508];
-#ifdef VERSION_G8ME01
-EvtWord evt_door_open_bom_01[336];
-#else
-EvtWord evt_door_open_bom_01[338];
-#endif
-EvtWord evt_door_open_roll[225];
-EvtWord evt_door_close[447];
-EvtWord evt_door_close_roll[247];
-EvtWord evt_door_open_quick[220];
-EvtWord evt_door_entry[77];
+extern EvtWord door_open_se[];
+extern EvtWord door_close_se[];
+extern EvtWord door_down_se[];
+extern EvtWord house_open_se[];
+extern EvtWord evt_dark[];
+extern EvtWord evt_dark2[];
+extern EvtWord evt_light2[];
+extern EvtWord door_up_se[];
+extern EvtWord house_close_se[];
+extern EvtWord in_houseanim[];
+extern EvtWord out_houseanim[];
+extern EvtWord in_dooranim[];
+extern EvtWord out_dooranim[];
+extern EvtWord house_in[];
+extern EvtWord house_out[];
+extern EvtWord evt_door_setup[];
+extern EvtWord door_dark[];
+extern EvtWord door_dark2[];
+extern EvtWord door_light[];
+extern EvtWord door_light2[];
+extern EvtWord evt_door_open[];
+extern EvtWord evt_door_open_bom_01[];
+extern EvtWord evt_door_open_roll[];
+extern EvtWord evt_door_close[];
+extern EvtWord evt_door_close_roll[];
+extern EvtWord evt_door_open_quick[];
+extern EvtWord evt_door_entry[];
 
 EVT_BEGIN(door_open_se)
     CALL(evt_door_param, LW(0), 8, LW(1))

@@ -121,24 +121,24 @@ USER_FUNC(evt_sub_intpl_get_value);
 USER_FUNC(evt_sub_intpl_init);
 USER_FUNC(evt_sub_random);
 
-EvtWord btldefaultevt_Damage[1133];
-EvtWord btldefaultevt_ChangeParty[174];
-EvtWord btldefaultevt_BiribiriMove[29];
-EvtWord btldefaultevt_guard_move[85];
-EvtWord btldefaultevt_guard_return[98];
-EvtWord btldefaultevt_Appeal[145];
-EvtWord _Defence_core[81];
-EvtWord btldefaultevt_Escape[657];
-EvtWord btldefaultevt_Confuse[19];
-EvtWord btldefaultevt_CantMoveZeroGravity[44];
-EvtWord btldefaultevt_SuitoruBadgeEffect[122];
-EvtWord btldefaultevt_avoid_counter_event[34];
-EvtWord btldefaultevt_ProtectPartner[10];
-EvtWord btldefaultevt_Dummy[2];
-EvtWord btldefaultevt_Wait[5];
-EvtWord btldefaultevt_LectureEnd[6];
-EvtWord btldefaultevt_Defend[7];
-EvtWord btldefaultevt_DefendParty[7];
+extern EvtWord btldefaultevt_Damage[];
+extern EvtWord btldefaultevt_ChangeParty[];
+extern EvtWord btldefaultevt_BiribiriMove[];
+extern EvtWord btldefaultevt_guard_move[];
+extern EvtWord btldefaultevt_guard_return[];
+extern EvtWord btldefaultevt_Appeal[];
+extern EvtWord _Defence_core[];
+extern EvtWord btldefaultevt_Escape[];
+extern EvtWord btldefaultevt_Confuse[];
+extern EvtWord btldefaultevt_CantMoveZeroGravity[];
+extern EvtWord btldefaultevt_SuitoruBadgeEffect[];
+extern EvtWord btldefaultevt_avoid_counter_event[];
+extern EvtWord btldefaultevt_ProtectPartner[];
+extern EvtWord btldefaultevt_Dummy[];
+extern EvtWord btldefaultevt_Wait[];
+extern EvtWord btldefaultevt_LectureEnd[];
+extern EvtWord btldefaultevt_Defend[];
+extern EvtWord btldefaultevt_DefendParty[];
 
 EVT_BEGIN(btldefaultevt_Damage)
     CALL(btlevtcmd_SetRotate, LW(10), 0, 0, 0)

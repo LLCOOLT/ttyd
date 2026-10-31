@@ -1,7 +1,6 @@
 #include "battle/battle_unit.h"
 #include "evt/evt_cmd.h"
 
-#pragma force_active on
 #include "battle/battle.h"
 #include "battle/battle_event_default.h"
 #include "battle/battle_event_cmd.h"
@@ -10,6 +9,7 @@
 #include "battle/battle_weapon_power.h"
 #include "party/party_motion.h"
 #include "battle/battle_database_common.h"
+#include "manager/evtmgr_cmd.h"
 
 USER_FUNC(btlevtcmd_AnimeChangePose);
 USER_FUNC(btlevtcmd_AnimeChangePoseFromTable);
@@ -84,20 +84,6 @@ extern EvtWord zakogun_entry[];
 extern s32 zakogun_escape3[];
 extern s32 zakogun_ext_init2[];
 
-f32 fd_boss_kanbu3_negone_one_374[2] __attribute__((aligned(8)));
-f32 fd_boss_kanbu3_neg_one_382;
-f32 fd_boss_kanbu3___local_PI_383;
-f32 fd_boss_kanbu3___local_3PIO2_385;
-f32 fd_boss_kanbu3_one_negone_373[2] __attribute__((aligned(8)));
-f32 fd_boss_kanbu3___local_PIO2_384;
-f32 fd_boss_kanbu3_one_381;
-f32 fd_boss_kanbu3_negone_one_360[2] __attribute__((aligned(8)));
-f32 fd_boss_kanbu3_neg_one_365;
-f32 fd_boss_kanbu3___local_PI_366;
-f32 fd_boss_kanbu3___local_3PIO2_368;
-f32 fd_boss_kanbu3_one_negone_359[2] __attribute__((aligned(8)));
-f32 fd_boss_kanbu3___local_PIO2_367;
-f32 fd_boss_kanbu3_one_364;
 BattleUnitKind unit_boss_kanbu3;
 static BattleUnitDefense defence;
 static BattleUnitDefense defence_guard;
@@ -121,44 +107,16 @@ static EvtWord damage_event[315];
 #endif
 static EvtWord dead_event[402];
 static EvtWord phase_event[55];
-EvtWord call_event[284];
+extern EvtWord call_event[];
 static EvtWord attack_event[136];
 static EvtWord guard_event[56];
 static EvtWord guard_cancel_event[69];
-EvtWord no_event[27];
+extern EvtWord no_event[];
 static EvtWord charge_event[71];
 static EvtWord wait_event[6];
 static PoseTableEntry pose_table[18];
 static PoseTableEntry pose_table_guard[18];
 static EvtWord normal_attack_event[365];
-
-f32 fd_boss_kanbu3_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
-
-f32 fd_boss_kanbu3_neg_one_382 = -1.0f;
-
-f32 fd_boss_kanbu3___local_PI_383 = 3.1415927f;
-
-f32 fd_boss_kanbu3___local_3PIO2_385 = 4.712389f;
-
-f32 fd_boss_kanbu3_one_negone_373[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
-
-f32 fd_boss_kanbu3___local_PIO2_384 = 1.5707964f;
-
-f32 fd_boss_kanbu3_one_381 = 1.0f;
-
-f32 fd_boss_kanbu3_negone_one_360[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
-
-f32 fd_boss_kanbu3_neg_one_365 = -1.0f;
-
-f32 fd_boss_kanbu3___local_PI_366 = 3.1415927f;
-
-f32 fd_boss_kanbu3___local_3PIO2_368 = 4.712389f;
-
-f32 fd_boss_kanbu3_one_negone_359[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
-
-f32 fd_boss_kanbu3___local_PIO2_367 = 1.5707964f;
-
-f32 fd_boss_kanbu3_one_364 = 1.0f;
 
 BattleUnitKind unit_boss_kanbu3 = {
     99,
@@ -1266,9 +1224,9 @@ static EVT_BEGIN(normal_attack_event)
         CALL(btlevtcmd_AnimeChangePose, -2, 1, STRING("A_1C"))
         WAIT_FRAMES(25)
         BEGIN_SIBLING_EVENT
-            CALL(btlevtcmd_snd_se, -2, STRING("SFX_BOSS_KANBU_HIP_ATTACK2\0"), -250000000, 0, -250000000)
+            CALL(btlevtcmd_snd_se, -2, STRING("SFX_BOSS_KANBU_HIP_ATTACK2"), -250000000, 0, -250000000)
             WAIT_FRAMES(7)
-            CALL(btlevtcmd_snd_se, -2, STRING("SFX_BOSS_KANBU_HIP_ATTACK2\0"), -250000000, 0, -250000000)
+            CALL(btlevtcmd_snd_se, -2, STRING("SFX_BOSS_KANBU_HIP_ATTACK2"), -250000000, 0, -250000000)
         END_SIBLING_EVENT
         CALL(btlevtcmd_AnimeChangePose, -2, 1, STRING("D_1"))
         WAIT_FRAMES(15)

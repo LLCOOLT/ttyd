@@ -2,7 +2,6 @@
 #include "eff/eff_starstone.h"
 #include "evt/evt_cmd.h"
 
-#pragma force_active on
 #include "driver/effdrv.h"
 #include "driver/npcdrv.h"
 #include "driver/itemdrv.h"
@@ -12,6 +11,7 @@
 #include "evt/evt_sub.h"
 #include "tou.h"
 #include "evt/evt_npc.h"
+#include "manager/evtmgr_cmd.h"
 
 USER_FUNC(evt_bero_exec_wait);
 USER_FUNC(evt_bero_get_info);
@@ -101,79 +101,20 @@ USER_FUNC(evt_npc_get_reglid);
 USER_FUNC(evt_npc_restart_regular_event);
 #endif
 
-f32 fd_tou_08_negone_one_374[2] __attribute__((aligned(8)));
-f32 fd_tou_08_neg_one_382;
-f32 fd_tou_08___local_PI_383;
-f32 fd_tou_08___local_3PIO2_385;
-f32 fd_tou_08_one_negone_373[2] __attribute__((aligned(8)));
-f32 fd_tou_08___local_PIO2_384;
-f32 fd_tou_08_one_381;
-f32 fd_tou_08_negone_one_360[2] __attribute__((aligned(8)));
-f32 fd_tou_08_neg_one_365;
-f32 fd_tou_08___local_PI_366;
-f32 fd_tou_08___local_3PIO2_368;
-f32 fd_tou_08_one_negone_359[2] __attribute__((aligned(8)));
-f32 fd_tou_08___local_PIO2_367;
-f32 fd_tou_08_one_364;
-static EvtWord evt_toile[42];
-static EvtWord n_door_open[12];
-static EvtWord n_door_close[12];
-static EvtWord toile_in[13];
-static EvtWord toile_out[35];
 static BeroEntry bero_data[3];
-EvtWord init_togenoko[12];
-EvtWord talk_togenoko[136];
-EvtWord init_togemet[12];
-EvtWord talk_togemet[136];
-EvtWord init_hammerbros[12];
-EvtWord talk_hammerbros[136];
-static EvtWord init_uranoko[12];
-static EvtWord talk_uranoko[136];
+extern EvtWord init_togenoko[];
+extern EvtWord talk_togenoko[];
+extern EvtWord init_togemet[];
+extern EvtWord talk_togemet[];
+extern EvtWord init_hammerbros[];
+extern EvtWord talk_hammerbros[];
 static NpcSetupInfo npcEnt[7];
-static EvtWord evt_sensyu[70];
-EvtWord evt_1st_sub[107];
-static EvtWord evt_1st_leagu[747];
-EvtWord evt_toile_door[236];
-EvtWord evt_toile_door2[136];
-#ifdef VERSION_G8ME01
-EvtWord evt_champion_win[290];
-#else
-EvtWord evt_champion_win[271];
-#endif
-static EvtWord bed_entry[10];
-EvtWord evt_tou_08_cake[53];
-static EvtWord epilogue_npc_entry[84];
-static EvtWord epilogue_evt_sub[322];
-static EvtWord epilogue_evt[83];
-EvtWord tou_08_init_evt[289];
-
-f32 fd_tou_08_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
-
-f32 fd_tou_08_neg_one_382 = -1.0f;
-
-f32 fd_tou_08___local_PI_383 = 3.1415927f;
-
-f32 fd_tou_08___local_3PIO2_385 = 4.712389f;
-
-f32 fd_tou_08_one_negone_373[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
-
-f32 fd_tou_08___local_PIO2_384 = 1.5707964f;
-
-f32 fd_tou_08_one_381 = 1.0f;
-
-f32 fd_tou_08_negone_one_360[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
-
-f32 fd_tou_08_neg_one_365 = -1.0f;
-
-f32 fd_tou_08___local_PI_366 = 3.1415927f;
-
-f32 fd_tou_08___local_3PIO2_368 = 4.712389f;
-
-f32 fd_tou_08_one_negone_359[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
-
-f32 fd_tou_08___local_PIO2_367 = 1.5707964f;
-
-f32 fd_tou_08_one_364 = 1.0f;
+extern EvtWord evt_1st_sub[];
+extern EvtWord evt_toile_door[];
+extern EvtWord evt_toile_door2[];
+extern EvtWord evt_champion_win[];
+extern EvtWord evt_tou_08_cake[];
+extern EvtWord tou_08_init_evt[];
 
 static EVT_BEGIN(evt_toile)
     IF_INT_LESS(GSW(0), 157)
@@ -1312,12 +1253,12 @@ EVT_BEGIN(tou_08_init_evt)
         CASE_DEFAULT
         SWITCH(GSW(0))
             CASE_BETWEEN(127, 137)
-            CALL(evt_snd_bgmon, 512, STRING("BGM_STG3_TOU2\0\0"))
+            CALL(evt_snd_bgmon, 512, STRING("BGM_STG3_TOU2"))
             CALL(evt_snd_envon, 272, STRING("ENV_STG3_TOU6"))
             CALL(evt_snd_bgmoff, 26624)
             CASE_GREATER_OR_EQUAL(165)
             IF_INT_NOT_EQUAL(GSW(0), 402)
-                CALL(evt_snd_bgmon, 512, STRING("BGM_STG3_TOU2\0\0"))
+                CALL(evt_snd_bgmon, 512, STRING("BGM_STG3_TOU2"))
                 CALL(evt_snd_envon, 272, STRING("ENV_STG3_TOU6"))
                 CALL(evt_snd_bgmoff, 26624)
             END_IF
@@ -1326,7 +1267,7 @@ EVT_BEGIN(tou_08_init_evt)
                 CALL(evt_snd_bgmon, 512, STRING("BGM_STG3_TOU1"))
                 CALL(evt_snd_envon, 272, STRING("ENV_STG3_TOU6"))
                 ELSE
-                CALL(evt_snd_bgmon, 512, STRING("BGM_STG3_TOU2\0\0"))
+                CALL(evt_snd_bgmon, 512, STRING("BGM_STG3_TOU2"))
                 CALL(evt_snd_envon, 272, STRING("ENV_STG3_TOU6"))
                 CALL(evt_snd_bgmoff, 26624)
             END_IF

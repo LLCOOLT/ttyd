@@ -1,7 +1,6 @@
 #include "battle/battle_unit.h"
 #include "evt/evt_cmd.h"
 
-#pragma force_active on
 #include "driver/camdrv.h"
 #include "win/win_main.h"
 #include "dolphin/gx.h"
@@ -15,6 +14,7 @@
 #include "evt/evt_sub.h"
 #include "evt/evt_npc.h"
 #include "data_tables.h"
+#include "manager/evtmgr_cmd.h"
 
 static void draw(CameraId camera, void* param);
 typedef struct AaaWork { FileEntry* tpl; s32 alpha; } AaaWork;
@@ -89,81 +89,14 @@ USER_FUNC(mapdraw);
 void mapdelete(void);
 static void draw(CameraId camera, void* param);
 
-f32 fd_aaa_00_negone_one_374[2] __attribute__((aligned(8)));
-f32 fd_aaa_00_neg_one_382;
-f32 fd_aaa_00___local_PI_383;
-f32 fd_aaa_00___local_3PIO2_385[2];
-f32 fd_aaa_00_one_negone_373[2] __attribute__((aligned(8)));
-f32 fd_aaa_00___local_PIO2_384;
-f32 fd_aaa_00_one_381;
-f32 fd_aaa_00_negone_one_360[2] __attribute__((aligned(8)));
-f32 fd_aaa_00_neg_one_365;
-f32 fd_aaa_00___local_PI_366;
-f32 fd_aaa_00___local_3PIO2_368[2];
-f32 fd_aaa_00_one_negone_359[2] __attribute__((aligned(8)));
-f32 fd_aaa_00___local_PIO2_367;
-f32 fd_aaa_00_one_364;
 static NpcSetupInfo npcEnt[3];
-static EvtWord evt_door[15];
-static EvtWord evt_door2[12];
-static EvtWord evt_wall[22];
 static const char* ie_npc[2];
-static EvtWord door_1_open[12];
-static EvtWord door_1_close[14];
 static DoorParam door_1;
-static EvtWord evt_prologue[713];
-#ifdef VERSION_G8ME01
-EvtWord evt_prologue2[196];
-#else
-EvtWord evt_prologue2[193];
-#endif
-#ifdef VERSION_G8ME01
-static EvtWord epilogue_evt[328];
-#else
-static EvtWord epilogue_evt[318];
-#endif
-static EvtWord epilogue_npc_entry[68];
-#ifdef VERSION_G8ME01
-static EvtWord epilogue_evt2[500];
-#else
-static EvtWord epilogue_evt2[495];
-#endif
+extern EvtWord evt_prologue2[];
 static TreeAccess ki_data[2];
 static KusaAccess kusa_data[11];
 static BeroEntry bero_entry_data[2];
-EvtWord aaa_00_init_evt[81];
-
-f32 fd_aaa_00_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
-
-f32 fd_aaa_00_neg_one_382 = -1.0f;
-
-f32 fd_aaa_00___local_PI_383 = 3.1415927f;
-
-f32 fd_aaa_00___local_3PIO2_385[] = {
-    4.712389f, 0.0f,
-};
-
-f32 fd_aaa_00_one_negone_373[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
-
-f32 fd_aaa_00___local_PIO2_384 = 1.5707964f;
-
-f32 fd_aaa_00_one_381 = 1.0f;
-
-f32 fd_aaa_00_negone_one_360[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
-
-f32 fd_aaa_00_neg_one_365 = -1.0f;
-
-f32 fd_aaa_00___local_PI_366 = 3.1415927f;
-
-f32 fd_aaa_00___local_3PIO2_368[] = {
-    4.712389f, 0.0f,
-};
-
-f32 fd_aaa_00_one_negone_359[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
-
-f32 fd_aaa_00___local_PIO2_367 = 1.5707964f;
-
-f32 fd_aaa_00_one_364 = 1.0f;
+extern EvtWord aaa_00_init_evt[];
 
 static NpcSetupInfo npcEnt[] = {
     {

@@ -1,7 +1,6 @@
 #include "battle/battle_unit.h"
 #include "evt/evt_cmd.h"
 
-#pragma force_active on
 #include "manager/evtmgr_cmd.h"
 #include "driver/camdrv.h"
 #include "driver/dispdrv.h"
@@ -114,60 +113,18 @@ void _unresolved(void);
 void _epilog(void);
 void _prolog(void);
 
-f32 fd_kpa_negone_one_374[2] __attribute__((aligned(8)));
-f32 fd_kpa_neg_one_382;
-f32 fd_kpa___local_PI_383;
-f32 fd_kpa___local_3PIO2_385;
-f32 fd_kpa_one_negone_373[2] __attribute__((aligned(8)));
-f32 fd_kpa___local_PIO2_384;
-f32 fd_kpa_one_381;
-f32 fd_kpa_negone_one_360[2] __attribute__((aligned(8)));
-f32 fd_kpa_neg_one_365;
-f32 fd_kpa___local_PI_366;
-f32 fd_kpa___local_3PIO2_368;
-f32 fd_kpa_one_negone_359[2] __attribute__((aligned(8)));
-f32 fd_kpa___local_PIO2_367;
-f32 fd_kpa_one_364;
-EvtWord kpa_init[49];
-EvtWord kpa_read_mobj[291];
-EvtWord kpa_coin_evt[7];
-EvtWord kpa_read_item[34];
-EvtWord kpa_dead[168];
-EvtWord kpa_fall_sub[37];
-EvtWord kpa_bgm_change[180];
-EvtWord kpa_stage_start[168];
+extern EvtWord kpa_init[];
+extern EvtWord kpa_read_mobj[];
+extern EvtWord kpa_coin_evt[];
+extern EvtWord kpa_read_item[];
+extern EvtWord kpa_dead[];
+extern EvtWord kpa_fall_sub[];
+extern EvtWord kpa_bgm_change[];
+extern EvtWord kpa_stage_start[];
 s32 numeric_id[5];
-EvtWord kpa_status_main_evt[9];
-EvtWord kpa_time[88];
-EvtWord kpa_stage_clear[35];
-
-f32 fd_kpa_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
-
-f32 fd_kpa_neg_one_382 = -1.0f;
-
-f32 fd_kpa___local_PI_383 = 3.1415927f;
-
-f32 fd_kpa___local_3PIO2_385 = 4.712389f;
-
-f32 fd_kpa_one_negone_373[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
-
-f32 fd_kpa___local_PIO2_384 = 1.5707964f;
-
-f32 fd_kpa_one_381 = 1.0f;
-
-f32 fd_kpa_negone_one_360[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
-
-f32 fd_kpa_neg_one_365 = -1.0f;
-
-f32 fd_kpa___local_PI_366 = 3.1415927f;
-
-f32 fd_kpa___local_3PIO2_368 = 4.712389f;
-
-f32 fd_kpa_one_negone_359[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
-
-f32 fd_kpa___local_PIO2_367 = 1.5707964f;
-
-f32 fd_kpa_one_364 = 1.0f;
+extern EvtWord kpa_status_main_evt[];
+extern EvtWord kpa_time[];
+extern EvtWord kpa_stage_clear[];
 
 EVT_BEGIN(kpa_init)
     CALL(evt_mario_set_mode, 2)
@@ -292,7 +249,7 @@ void _prolog(void) {
     relSetEvtAddr("kpa_04", kpa_04_init_evt);
     relSetEvtAddr("kpa_05", kpa_05_init_evt);
     relSetEvtAddr("kpa_06", kpa_06_init_evt);
-    relSetEvtAddr("kpa_07\0", kpa_07_init_evt);
+    relSetEvtAddr("kpa_07", kpa_07_init_evt);
 }
 
 void _epilog(void) {
@@ -816,7 +773,7 @@ void kpa_stageclear_disp(CameraId camera, void* param) {
     FontDrawScale(2.0f);
     FontDrawEdge();
     FontDrawColor((GXColor){0xFF, 0xFF, 0xFF, 0xFF});
-    FontDrawString(-140.0f, 40.0f, "\203S\201[\203\213\203C\203\223\201I\201I");
+    FontDrawString(-140.0f, 40.0f, "ゴールイン！！");
     FontDrawEdgeOff();
 }
 

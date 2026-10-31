@@ -3,7 +3,6 @@
 #include "battle/battle_unit.h"
 #include "evt/evt_cmd.h"
 
-#pragma force_active on
 #include "stdio.h"
 #include "manager/evtmgr_cmd.h"
 #include "dolphin/mtx.h"
@@ -12,7 +11,10 @@
 #include "evt/evt_npc.h"
 #include "evt/evt_case.h"
 #include "evt/evt_sub.h"
-
+#ifdef VERSION_G8MP01
+#include "koopa.h"
+#include "kpa.h"
+#endif
 
 USER_FUNC(N_evt_bero_set_mario_bottomless_respawn_pos_to_current_mario_pos);
 USER_FUNC(evt_bero_mapchange);
@@ -85,71 +87,28 @@ void kpa_stg1_014_2_cb(s32 type, smartEntry* smart);
 void kpa_stg1_036_cb(s32 type, smartEntry* smart);
 void kpa_stg1_034_cb(s32 type, smartEntry* smart);
 
-f32 fd_kpa_01_negone_one_374[2] __attribute__((aligned(8)));
-f32 fd_kpa_01_neg_one_382;
-f32 fd_kpa_01___local_PI_383;
-f32 fd_kpa_01___local_3PIO2_385;
-f32 fd_kpa_01_one_negone_373[2] __attribute__((aligned(8)));
-f32 fd_kpa_01___local_PIO2_384;
-f32 fd_kpa_01_one_381;
-f32 fd_kpa_01_negone_one_360[2] __attribute__((aligned(8)));
-f32 fd_kpa_01_neg_one_365;
-f32 fd_kpa_01___local_PI_366;
-f32 fd_kpa_01___local_3PIO2_368;
-f32 fd_kpa_01_one_negone_359[2] __attribute__((aligned(8)));
-f32 fd_kpa_01___local_PIO2_367;
-f32 fd_kpa_01_one_364;
-EvtWord kpa_01_door_open[219];
-EvtWord kpa_01_door_close[237];
-EvtWord kpa_01_touzyo_evt[217];
-EvtWord kpa_01_syuppatu_evt[1729];
-EvtWord kpa_01_pos_check[23];
-EvtWord douzou_1_touch_evt[19];
-EvtWord douzou_2_touch_evt[19];
-EvtWord douzou_3_touch_evt[43];
-EvtWord togenoko_A_talk_evt[8];
-EvtWord togenoko_B_talk_evt[8];
-EvtWord togenoko_C_init_evt[14];
-EvtWord hammer_AB_init_evt[13];
-EvtWord hammer_AB_talk_evt[111];
-EvtWord hammer_C_talk_evt[19];
-EvtWord hammer_D_talk_evt[8];
-EvtWord hammer_E_init_evt[9];
-EvtWord hammer_E_talk_evt[8];
-EvtWord baba_init_evt[13];
-EvtWord kamek_init_evt[9];
-EvtWord hkoopa_init_evt[9];
+extern EvtWord kpa_01_door_open[];
+extern EvtWord kpa_01_door_close[];
+extern EvtWord kpa_01_touzyo_evt[];
+extern EvtWord kpa_01_syuppatu_evt[];
+extern EvtWord kpa_01_pos_check[];
+extern EvtWord douzou_1_touch_evt[];
+extern EvtWord douzou_2_touch_evt[];
+extern EvtWord douzou_3_touch_evt[];
+extern EvtWord togenoko_A_talk_evt[];
+extern EvtWord togenoko_B_talk_evt[];
+extern EvtWord togenoko_C_init_evt[];
+extern EvtWord hammer_AB_init_evt[];
+extern EvtWord hammer_AB_talk_evt[];
+extern EvtWord hammer_C_talk_evt[];
+extern EvtWord hammer_D_talk_evt[];
+extern EvtWord hammer_E_init_evt[];
+extern EvtWord hammer_E_talk_evt[];
+extern EvtWord baba_init_evt[];
+extern EvtWord kamek_init_evt[];
+extern EvtWord hkoopa_init_evt[];
 static NpcSetupInfo npcEnt[13];
-static EvtWord shan_init[46];
-EvtWord kpa_01_init_evt[88];
-
-f32 fd_kpa_01_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
-
-f32 fd_kpa_01_neg_one_382 = -1.0f;
-
-f32 fd_kpa_01___local_PI_383 = 3.1415927f;
-
-f32 fd_kpa_01___local_3PIO2_385 = 4.712389f;
-
-f32 fd_kpa_01_one_negone_373[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
-
-f32 fd_kpa_01___local_PIO2_384 = 1.5707964f;
-
-f32 fd_kpa_01_one_381 = 1.0f;
-
-f32 fd_kpa_01_negone_one_360[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
-
-f32 fd_kpa_01_neg_one_365 = -1.0f;
-
-f32 fd_kpa_01___local_PI_366 = 3.1415927f;
-
-f32 fd_kpa_01___local_3PIO2_368 = 4.712389f;
-
-f32 fd_kpa_01_one_negone_359[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
-
-f32 fd_kpa_01___local_PIO2_367 = 1.5707964f;
-
-f32 fd_kpa_01_one_364 = 1.0f;
+extern EvtWord kpa_01_init_evt[];
 
 EVT_BEGIN(kpa_01_door_open)
     BEGIN_INLINE_EVENT
@@ -1270,3 +1229,10 @@ USER_FUNC(get_togenoko_pos) {
     return EVT_RETURN_DONE;
 }
 
+#ifdef VERSION_G8MP01
+// PAL only: called at the start of kpa_03's jumpstand_evt
+USER_FUNC(kpa_cancel_attack_mode) {
+    kpaCancelAttackMode();
+    return EVT_RETURN_DONE;
+}
+#endif

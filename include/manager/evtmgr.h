@@ -192,7 +192,7 @@ struct EventEntry {
                 OSTime wInterpRelatedTime; // 0x88
                 s32* wInterpWork;          // 0x88, some user funcs keep a work block pointer here instead
             };
-            u32 field_0x90[2];         // 0x90, unknown
+            u32 userdataTail[2];       // 0x90, last two scratch words (only used through userWork)
         };
         EvtWord userWork[8]; // 0x78, the same 0x20 bytes as eight scratch words (user functions that keep more state)
         struct {
@@ -243,12 +243,12 @@ struct EventEntry {
         Vec msgPosVec;                  // 0x184, x/y/z as one Vec (evt_msg speaker position)
     };
     u32 msgPriority;            // 0x190
-    u32 field_0x194;            // 0x194
-    OSTime savedTime;           // 0x198, TODO rename
+    u32 pad_194;                // 0x194, aligns savedTime
+    OSTime savedTime;           // 0x198, start time of a timed wait
     void* restartFrom;          // 0x1A0, validated
     const char* name;           // 0x1A4
     void* currCommand;          // 0x1A8
-    u32 field_0x1AC;            // 0x1AC
+    u32 pad_1AC;                // 0x1AC, pads to the 8-byte alignment
 };
 
 typedef struct EventWork {

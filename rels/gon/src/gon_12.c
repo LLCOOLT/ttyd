@@ -1,12 +1,12 @@
 #include "battle/battle_unit.h"
 #include "evt/evt_cmd.h"
 
-#pragma force_active on
 #include "driver/npcdrv.h"
 #include "evt/evt_npc.h"
 #include "mario/mariost.h"
 #include "system.h"
 #include "evt/evt_bero.h"
+#include "manager/evtmgr_cmd.h"
 
 USER_FUNC(N_evt_bero_set_mario_bottomless_respawn_pos_to_current_mario_pos);
 USER_FUNC(evt_bero_get_info);
@@ -61,58 +61,12 @@ USER_FUNC(evt_snd_envon);
 USER_FUNC(evt_snd_set_rev_mode);
 USER_FUNC(evt_snd_sfxon_3d);
 
-f32 fd_gon_12_negone_one_374[2] __attribute__((aligned(8)));
-f32 fd_gon_12_neg_one_382;
-f32 fd_gon_12___local_PI_383;
-f32 fd_gon_12___local_3PIO2_385;
-f32 fd_gon_12_one_negone_373[2] __attribute__((aligned(8)));
-f32 fd_gon_12___local_PIO2_384;
-f32 fd_gon_12_one_381;
-f32 fd_gon_12_negone_one_360[2] __attribute__((aligned(8)));
-f32 fd_gon_12_neg_one_365;
-f32 fd_gon_12___local_PI_366;
-f32 fd_gon_12___local_3PIO2_368;
-f32 fd_gon_12_one_negone_359[2] __attribute__((aligned(8)));
-f32 fd_gon_12___local_PIO2_367;
-f32 fd_gon_12_one_364;
-static EvtWord door_close[12];
-static EvtWord door_open[12];
 static BeroEntry bero_entry_data[2];
-static EvtWord chuchurina_sogu[610];
-EvtWord chuchurina_talk[2];
+extern EvtWord chuchurina_talk[];
 static NpcSetupInfo npcEnt[2];
-static EvtWord item_get00[37];
-EvtWord item_get01[34];
-EvtWord item_get02[34];
-EvtWord gon_12_init_evt[93];
-
-f32 fd_gon_12_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
-
-f32 fd_gon_12_neg_one_382 = -1.0f;
-
-f32 fd_gon_12___local_PI_383 = 3.1415927f;
-
-f32 fd_gon_12___local_3PIO2_385 = 4.712389f;
-
-f32 fd_gon_12_one_negone_373[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
-
-f32 fd_gon_12___local_PIO2_384 = 1.5707964f;
-
-f32 fd_gon_12_one_381 = 1.0f;
-
-f32 fd_gon_12_negone_one_360[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
-
-f32 fd_gon_12_neg_one_365 = -1.0f;
-
-f32 fd_gon_12___local_PI_366 = 3.1415927f;
-
-f32 fd_gon_12___local_3PIO2_368 = 4.712389f;
-
-f32 fd_gon_12_one_negone_359[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
-
-f32 fd_gon_12___local_PIO2_367 = 1.5707964f;
-
-f32 fd_gon_12_one_364 = 1.0f;
+extern EvtWord item_get01[];
+extern EvtWord item_get02[];
+extern EvtWord gon_12_init_evt[];
 
 static EVT_BEGIN(door_close)
     MULTIPLY_FLOAT(LW(0), FLOAT(-0.44433594f))
@@ -385,7 +339,7 @@ EVT_BEGIN(gon_12_init_evt)
     CALL(evt_mobj_itembox, STRING("mobj_box02"), -175, 0, 50, 0, 0, PTR(item_get02), GSWF(1509))
     CALL(evt_mobj_itembox, STRING("mobj_box03"), -150, 0, 20, 0, 0, 0, 1)
     CALL(evt_mobj_powerupblk, STRING("pblk00"), -150, 60, -25, 0, GSWF(5540), 0)
-    CALL(evt_map_playanim, STRING("hokori\0"), 1, 0)
+    CALL(evt_map_playanim, STRING("hokori"), 1, 0)
     RETURN
 EVT_END()
 

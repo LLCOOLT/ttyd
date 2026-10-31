@@ -5,7 +5,6 @@
 #include "battle/battle_unit.h"
 #include "evt/evt_cmd.h"
 
-#pragma force_active on
 #include "mario/mario.h"
 #include "manager/evtmgr_cmd.h"
 #include "dolphin/os.h"
@@ -27,7 +26,7 @@ void statusWinForceClose(void);
 void statusWinForceCloseClear(void);
 static s32 x_flag_data[2];
 static void lecture_button_disp(CameraId camera, void* param);
-typedef struct LectButtonDisp { s32 unk0; Vec pos; } LectButtonDisp;
+typedef struct LectButtonDisp { s32 dispFlags; Vec pos; } LectButtonDisp; /* dispFlags: never accessed */
 typedef struct LectButton { u8 flags; u8 seq; u8 pad_2[0x8 - 0x2]; LectButtonDisp disp; u8 pad_18[0x40 - 0x18]; s16 iconId; s16 alpha; } LectButton;
 static LectButton lbtn[2];
 static inline void effitemget_cam_move(CameraEntry* camera, Vec ofs) { camera->presetPos = camera->cameraPos; camera->presetAt = camera->cameraAt; PSVECAdd(&camera->cameraPos, &ofs, &camera->storedPos); PSVECAdd(&camera->cameraAt, &ofs, &camera->storedAt); camera->startTimeA = gp->renderTime; camera->durationA = 0; camera->stateA = 3; camera->curveA = 11; }
@@ -133,24 +132,9 @@ static USER_FUNC(lect_status_off);
 static USER_FUNC(lect_mario_ido_sum);
 static f32 lect_mario_ido_sub(f32 elapsed, f32 total, f32 end, f32 start);
 
-f32 fd_evt_lect_hei_negone_one_374[2] __attribute__((aligned(8)));
-f32 fd_evt_lect_hei_neg_one_382;
-f32 fd_evt_lect_hei___local_PI_383;
-f32 fd_evt_lect_hei___local_3PIO2_385;
-f32 fd_evt_lect_hei_one_negone_373[2] __attribute__((aligned(8)));
-f32 fd_evt_lect_hei___local_PIO2_384;
-f32 fd_evt_lect_hei_one_381;
-f32 fd_evt_lect_hei_negone_one_360[2] __attribute__((aligned(8)));
-f32 fd_evt_lect_hei_neg_one_365;
-f32 fd_evt_lect_hei___local_PI_366;
-f32 fd_evt_lect_hei___local_3PIO2_368;
-f32 fd_evt_lect_hei_one_negone_359[2] __attribute__((aligned(8)));
-f32 fd_evt_lect_hei___local_PIO2_367;
-f32 fd_evt_lect_hei_one_364;
-EvtWord nokotaro_party_lecture_init[48];
-EvtWord nokotaro_party_lecture[275];
-static EvtWord all_party_lecture_otosub[11];
-EvtWord all_party_lecture[474];
+extern EvtWord nokotaro_party_lecture_init[];
+extern EvtWord nokotaro_party_lecture[];
+extern EvtWord all_party_lecture[];
 
 static f32 lect_mario_ido_sub(f32 elapsed, f32 total, f32 end, f32 start) {
     f32 rem = total - elapsed;
@@ -457,34 +441,6 @@ static USER_FUNC(effitemget_busaiku) {
     effitemget_cam_move(camera, ofs);
     return EVT_RETURN_DONE;
 }
-
-f32 fd_evt_lect_hei_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
-
-f32 fd_evt_lect_hei_neg_one_382 = -1.0f;
-
-f32 fd_evt_lect_hei___local_PI_383 = 3.1415927f;
-
-f32 fd_evt_lect_hei___local_3PIO2_385 = 4.712389f;
-
-f32 fd_evt_lect_hei_one_negone_373[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
-
-f32 fd_evt_lect_hei___local_PIO2_384 = 1.5707964f;
-
-f32 fd_evt_lect_hei_one_381 = 1.0f;
-
-f32 fd_evt_lect_hei_negone_one_360[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
-
-f32 fd_evt_lect_hei_neg_one_365 = -1.0f;
-
-f32 fd_evt_lect_hei___local_PI_366 = 3.1415927f;
-
-f32 fd_evt_lect_hei___local_3PIO2_368 = 4.712389f;
-
-f32 fd_evt_lect_hei_one_negone_359[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
-
-f32 fd_evt_lect_hei___local_PIO2_367 = 1.5707964f;
-
-f32 fd_evt_lect_hei_one_364 = 1.0f;
 
 EVT_BEGIN(nokotaro_party_lecture_init)
     CALL(evt_mario_set_pos, 350, 0, 0)

@@ -14,7 +14,6 @@
 HitEntry* marioChkLandon(f32* outY, f32 y);
 HitEntry* marioSearchGround(f32* a, f32* b, f32* c, f32 d, f32 e);
 f32 marioGetFallSpd(void);
-void marioChgMotSub(s32 a, s32 b);
 void set_damage_root_ypos(f32 y);
 void kpa_hip(void);
 
@@ -340,7 +339,13 @@ s32 U_chkground(void) {
         mario->jumpPeakAirTime = 0;
         mario->dispFlags &= ~4;
         mario->flags &= ~0x80;
+#ifdef VERSION_G8MP01
+        if (!marioBgmodeChk()) {
+            camFollowYOn();
+        }
+#else
         camFollowYOn();
+#endif
         attr = hitGetAttr(hit);
         if (attr & 0x200) {
             set_damage_root_ypos(mario->position.y);

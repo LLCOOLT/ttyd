@@ -32,7 +32,7 @@ void _btlYoshiDisp(CameraId camera, YoshiGundanPart* p);
 void _yoshi_slide_move_sound(BattleUnit* unit, PoseSoundTiming* s);
 static void __makeTechMenuFunc(BattleCommand* command, s32* count);
 
-typedef struct YoshiGundanPart {
+struct YoshiGundanPart {
     f32 x, y, z;
     f32 vx, vy, vz;
     u8 pad18[0xC];
@@ -41,7 +41,7 @@ typedef struct YoshiGundanPart {
     u8 pad26[2];
     s32 delay;
     s32 state;
-} YoshiGundanPart;
+};
 
 typedef struct YoshiGundanWork {
     s32 state;
@@ -128,14 +128,6 @@ USER_FUNC(_get_nomikomi_hit_position);
 USER_FUNC(btl_yoshi_yoroyoro_jump_move);
 USER_FUNC(btl_yoshi_yoroyoro_jump_calc_param);
 
-__declspec(section ".data") f32 unit_party_yoshi_negone_one_a[2] __attribute__((aligned(8)));
-__declspec(section ".data") f32 fd_yoshi_negone_one_374[2] __attribute__((aligned(8)));
-__declspec(section ".data") f32 unit_party_yoshi_one_negone_a[2] __attribute__((aligned(8)));
-__declspec(section ".data") f32 fd_yoshi_one_negone_373[2] __attribute__((aligned(8)));
-__declspec(section ".data") f32 unit_party_yoshi_negone_one_b[2] __attribute__((aligned(8)));
-__declspec(section ".data") f32 fd_yoshi_negone_one_360[2] __attribute__((aligned(8)));
-__declspec(section ".data") f32 unit_party_yoshi_one_negone_b[2] __attribute__((aligned(8)));
-__declspec(section ".data") f32 fd_yoshi_one_negone_359[2] __attribute__((aligned(8)));
 PoseTableEntry pose_table_yoshi_stay[25];
 static BattleDataEntry data_table[8];
 static BattleUnitDefense defence;
@@ -146,7 +138,6 @@ PoseTableEntry pose_table_egg_y[4];
 PoseTableEntry pose_table_egg_p[4];
 BattleUnitKindPart unitpartsdata_Party_Yoshi[7];
 BattleUnitKind unitdata_Party_Yoshi;
-static EvtWord battle_entry_event[59];
 static EvtWord init_event[54];
 static EvtWord damage_event[16];
 BattleWeapon partyWeapon_YoshiNormalAttack;
@@ -158,12 +149,12 @@ BattleWeapon partyWeapon_YoshiNomikomi_Involved;
 BattleWeapon partyWeapon_YoshiEggAttack_Minimini;
 BattleWeapon partyWeapon_YoshiCallGuard;
 PoseSoundTiming posesound_normal_attack[15];
-EvtWord partyYoshiAttack_NormalAttack[1025];
-EvtWord partyYoshiAttack_Nomikomi[1000];
-EvtWord partyYoshiAttack_EggAttack[1266];
-EvtWord _egg_attack_event[195];
-EvtWord partyYoshiAttack_CallGuard[553];
-EvtWord yoshi_appeal_event[39];
+extern EvtWord partyYoshiAttack_NormalAttack[];
+extern EvtWord partyYoshiAttack_Nomikomi[];
+extern EvtWord partyYoshiAttack_EggAttack[];
+extern EvtWord _egg_attack_event[];
+extern EvtWord partyYoshiAttack_CallGuard[];
+extern EvtWord yoshi_appeal_event[];
 static EvtWord party_win_reaction[25];
 static EvtWord attack_audience_event[290];
 static EvtWord attack_event[2];
@@ -171,21 +162,13 @@ static EvtWord wait_event[6];
 u8 _yoshig_tpl_no_tbl[8] __attribute__((aligned(4)));
 
 
-__declspec(section ".data") f32 unit_party_yoshi_negone_one_a[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
 
-__declspec(section ".data") f32 fd_yoshi_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
 
-__declspec(section ".data") f32 unit_party_yoshi_one_negone_a[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
 
-__declspec(section ".data") f32 fd_yoshi_one_negone_373[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
 
-__declspec(section ".data") f32 unit_party_yoshi_negone_one_b[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
 
-__declspec(section ".data") f32 fd_yoshi_negone_one_360[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
 
-__declspec(section ".data") f32 unit_party_yoshi_one_negone_b[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
 
-__declspec(section ".data") f32 fd_yoshi_one_negone_359[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
 
 PoseTableEntry pose_table_yoshi_stay[] = {
     {9, "PYS_D_5"},
@@ -1994,14 +1977,12 @@ u8 _yoshig_tpl_no_tbl[8] __attribute__((aligned(4))) = { // battle tex id per sw
 
 USER_FUNC(yoshi_original_color_anim_set) {
     BattleWork* wp = _battleWorkPointer;
+    EvtWord* args = event->args;
     BattleUnitPart* part;
     const char* name;
-    EvtWord* args = event->args;
     s32 id;
 
-    if (part && part) { // FAKE: empty test of the uninitialised part pointer; removing it changes codegen
-    }
-    id = evtGetValue(event, args[0]);
+    id = evtGetValue(event, *args++);
     id = BattleTransID(event, id);
     BattleGetUnitPtr(wp, id);
     switch (pouchGetPartyColor(4)) {
@@ -2021,7 +2002,7 @@ USER_FUNC(yoshi_original_color_anim_set) {
         name = "c_babyyoshi6";
         break;
     case 6:
-        name = "c_babyyoshi7\0\0\0"; // FAKE: explicit padding; without it the string pool tail shifts
+        name = "c_babyyoshi7";
         break;
     case 0:
     default:
@@ -2045,8 +2026,6 @@ USER_FUNC(yoshi_original_color_anim_set) {
         return EVT_RETURN_DONE;
     }
     return EVT_RETURN_BLOCK;
-    name++;
-    name--;
 }
 
 #define ADD_WEAPON(w)                                                                              \
@@ -2350,7 +2329,7 @@ USER_FUNC(_gundan_yoshi_run_effect) {
         w->timer = 0.0f;
         event->userdata[0] = 0;
         { Vec tmp; tmp.x = (f32)id; }
-        event->userdata[1] = ((s32 (*)(const char*))psndSFXOn)("SFX_BTL_YOSHI_TAIGUN1");
+        event->userdata[1] = psndSFXOn("SFX_BTL_YOSHI_TAIGUN1");
     } else {
         w = (YoshiGundanWork*)unit->countersetWeapon;
     }

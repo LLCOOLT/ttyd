@@ -73,7 +73,7 @@ u8 enemy_monoshiri_sort_table[] = {
     0xB0, 0xB1, 0xB2, 0xB3, 0xB4, 0xB5, 0xB6, 0xB7, 0xB8, 0xB9, 0xBA, 0xBB, 0xBC, 0xBD, 0xBE, 0xBF,
     0xC0, 0xC1, 0xC2, 0xC3, 0xC4, 0xC5, 0xC6, 0xC7, 0xC8, 0xC9, 0xCA, 0xCB, 0xCC, 0xCD, 0xCE, 0xCF,
     0xD0, 0xD1, 0xD2, 0xD3, 0xD4, 0xD5, 0xD6, 0xD7, 0xD8, 0xD9, 0xDA, 0xDB, 0xDC, 0xDD, 0xDE, 0xDF,
-    0xE0, 0xE1, 0xE2, 0xE3, 0xE4, 0xE5, 0xE6, 0x00,
+    0xE0, 0xE1, 0xE2, 0xE3, 0xE4, 0xE5, 0xE6,
 };
 
 #include "driver/dispdrv.h"
@@ -396,7 +396,7 @@ s32 winRootMain(WindowWork* w) {
             winItemExit(w);
             winBadgeExit(w);
             winLogExit(w);
-            if (w->party.field_0x19C && w->party.cursor != w->party.field_0x1FC) {
+            if (w->party.switchRequested && w->party.cursor != w->party.openCursor) {
                 return -2;
             }
             if (w->item.useItem) {
@@ -708,12 +708,12 @@ void winMsgMain(WindowWork* wp) {
                 if (wp->msgLine < 0) {
                     wp->msgLine = 0;
                 } else {
-                    ((void (*)(s32))psndSFXOn)(0x20006);
+                    psndSFXOn(SFX_NAME_WORD(0x20006));
                 }
             } else if (keyGetDirTrg(0) & 0x200) {
                 if (wp->msgLine / 2 < (wp->msgLines + 1) / 2 - 1) {
                     wp->msgLine += 2;
-                    ((void (*)(s32))psndSFXOn)(0x20006);
+                    psndSFXOn(SFX_NAME_WORD(0x20006));
                 }
             }
             break;
@@ -799,7 +799,7 @@ void winMsgDisp(WindowWork* wp, f32 x, f32 y) {
     }
     if (wp->msg != NULL) {
         GXSetScissor(0, (u32)(240.0f - (by -= 14.0f)), 0x260, 0x38);
-        if (strcmp(wp->msg, "msg_lottery_number\0") == 0) {
+        if (strcmp(wp->msg, "msg_lottery_number") == 0) {
             n = lotteryGetPtr()->number;
             sprintf(buf, msgSearch(wp->msg), n);
             winFontInit();
@@ -2215,23 +2215,29 @@ void winSortMain(WindowWork* wp) {
     } else
 #endif
     if (trg & 0x200) {
-        ((void (*)(s32))psndSFXOn)(0x20013);
+        psndSFXOn(SFX_NAME_WORD(0x20013));
         wp->sortActive = 0;
         wp->sortTgtX = -600.0f;
     } else if (rep & 0x1000) {
-        ((void (*)(s32))psndSFXOn)(0x20005);
+        psndSFXOn(SFX_NAME_WORD(0x20005));
+#ifdef VERSION_G8MP01
+        wp->sortRev = 0;
+#endif
         wp->sortSel--;
         if (wp->sortSel < 0) {
             wp->sortSel = wp->sortNum - 1;
         }
     } else if (rep & 0x2000) {
-        ((void (*)(s32))psndSFXOn)(0x20005);
+        psndSFXOn(SFX_NAME_WORD(0x20005));
+#ifdef VERSION_G8MP01
+        wp->sortRev = 0;
+#endif
         wp->sortSel++;
         if (wp->sortSel >= wp->sortNum) {
             wp->sortSel = 0;
         }
     } else if (trg & 0x100) {
-        ((void (*)(s32))psndSFXOn)(0x20012);
+        psndSFXOn(SFX_NAME_WORD(0x20012));
         sort_data[wp->sortType][wp->sortSel].func(wp);
     }
 #ifndef VERSION_G8ME01
@@ -2576,7 +2582,13 @@ void winRootBgCaptureDisp(s32 unused, WindowWork* bg) {
     GXSetTexCopySrc(0, 0, gp->fbWidth, gp->efbHeight);
     GXSetTexCopyDst(gp->fbWidth, gp->efbHeight, GX_TF_RGB565, GX_FALSE);
     GXCopyTex(bg->texBuf->address, GX_FALSE);
+#ifdef VERSION_G8MP01
+    GXPixModeSync();
+    DCFlushRange(bg->texBuf->address, GXGetTexBufferSize(gp->fbWidth, gp->efbHeight, GX_TF_RGB565, GX_FALSE, 0));
+    GXInvalidateTexAll();
+#else
     GXTexModeSync();
+#endif
     bg->texBufValid = 1;
     N_mapDispOff();
     camDispOff((CameraId)4);
@@ -2596,10 +2608,18 @@ void winRootBgDrawDisp(s32 unused, WindowWork* bg) {
         GXSetTevOp(GX_TEVSTAGE0, GX_REPLACE);
         GXSetNumTexGens(1);
         GXSetTexCoordGen2(GX_TEXCOORD0, GX_TG_MTX2x4, GX_TG_TEX0, GX_IDENTITY, GX_FALSE, GX_PTIDENTITY);
+#ifdef VERSION_G8MP01
+        GXSetBlendMode(GX_BM_NONE, GX_BL_ONE, GX_BL_ZERO, GX_LO_OR);
+#else
         GXSetBlendMode(GX_BM_BLEND, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA, GX_LO_CLEAR);
+#endif
         GXSetZCompLoc(GX_TRUE);
         GXSetAlphaCompare(GX_ALWAYS, 0, GX_AOP_AND, GX_ALWAYS, 0);
+#ifdef VERSION_G8MP01
+        GXSetZMode(GX_FALSE, GX_LEQUAL, GX_FALSE);
+#else
         GXSetZMode(GX_FALSE, GX_ALWAYS, GX_FALSE);
+#endif
         GXLoadPosMtxImm(camGetPtr((CameraId)8)->view, 0);
         GXSetCurrentMtx(0);
         GXInitTexObj(&obj, bg->texBuf->address, gp->fbWidth, gp->efbHeight, GX_TF_RGB565, GX_CLAMP, GX_CLAMP, GX_FALSE);

@@ -1,7 +1,6 @@
 #include "battle/battle_unit.h"
 #include "evt/evt_cmd.h"
 
-#pragma force_active on
 #include "battle/battle.h"
 #include "battle/battle_sub.h"
 #include "battle/battle_event_default.h"
@@ -10,6 +9,7 @@
 #include "battle/battle_event_subset.h"
 #include "battle/battle_weapon_power.h"
 #include "battle/battle_database_common.h"
+#include "manager/evtmgr_cmd.h"
 
 USER_FUNC(btlevtcmd_AnimeChangePose);
 USER_FUNC(btlevtcmd_AnimeChangePoseFromTable);
@@ -37,20 +37,6 @@ static USER_FUNC(teresa_check_move);
 static USER_FUNC(teresa_check_teresa);
 static USER_FUNC(teresa_check_trans);
 
-f32 fd_teresa_negone_one_374[2] __attribute__((aligned(8)));
-f32 fd_teresa_neg_one_382;
-f32 fd_teresa___local_PI_383;
-f32 fd_teresa___local_3PIO2_385;
-f32 fd_teresa_one_negone_373[2] __attribute__((aligned(8)));
-f32 fd_teresa___local_PIO2_384;
-f32 fd_teresa_one_381;
-f32 fd_teresa_negone_one_360[2] __attribute__((aligned(8)));
-f32 fd_teresa_neg_one_365;
-f32 fd_teresa___local_PI_366;
-f32 fd_teresa___local_3PIO2_368;
-f32 fd_teresa_one_negone_359[2] __attribute__((aligned(8)));
-f32 fd_teresa___local_PIO2_367;
-f32 fd_teresa_one_364;
 BattleUnitKind unit_teresa;
 static BattleUnitDefense defence;
 static BattleUnitDefenseAttr defence_attr;
@@ -68,7 +54,11 @@ static EvtWord attack_event[153];
 static EvtWord normal_attack_event[354];
 static EvtWord trans_myself_event[196];
 static EvtWord trans_event[289];
+#ifdef VERSION_G8MP01
+static EvtWord move_event[101];
+#else
 static EvtWord move_event[84];
+#endif
 static EvtWord move_event_sub[103];
 static EvtWord wait_event[6];
 
@@ -143,34 +133,6 @@ static USER_FUNC(teresa_check_trans) {
     }
     return EVT_RETURN_DONE;
 }
-
-f32 fd_teresa_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
-
-f32 fd_teresa_neg_one_382 = -1.0f;
-
-f32 fd_teresa___local_PI_383 = 3.1415927f;
-
-f32 fd_teresa___local_3PIO2_385 = 4.712389f;
-
-f32 fd_teresa_one_negone_373[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
-
-f32 fd_teresa___local_PIO2_384 = 1.5707964f;
-
-f32 fd_teresa_one_381 = 1.0f;
-
-f32 fd_teresa_negone_one_360[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
-
-f32 fd_teresa_neg_one_365 = -1.0f;
-
-f32 fd_teresa___local_PI_366 = 3.1415927f;
-
-f32 fd_teresa___local_3PIO2_368 = 4.712389f;
-
-f32 fd_teresa_one_negone_359[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
-
-f32 fd_teresa___local_PIO2_367 = 1.5707964f;
-
-f32 fd_teresa_one_364 = 1.0f;
 
 BattleUnitKind unit_teresa = {
     75,
@@ -749,18 +711,32 @@ static EVT_BEGIN(move_event)
     WAIT_FRAMES(30)
     SET_VALUE(LW(12), 80)
     LABEL(0)
+#ifdef VERSION_G8MP01
+    // BUG: the count is cleared on every pass of the loop, so LW(15) never reaches 2 and the 145 minimum below never applies
+    SET_VALUE(LW(15), 0)
+#endif
     CALL(teresa_check_teresa, LW(3), LW(5))
     IF_INT_EQUAL(LW(5), 1)
         CALL(btlevtcmd_GetUnitWork, LW(3), 0, LW(6))
         IF_INT_EQUAL(LW(6), 0)
             SPAWN_EVENT(PTR(move_event_sub))
             ADD(LW(12), 20)
+#ifdef VERSION_G8MP01
+            ADD(LW(15), 1)
+#endif
         END_IF
     END_IF
     CALL(btlevtcmd_GetSelectNextEnemy, LW(3), LW(4))
     IF_INT_NOT_EQUAL(LW(3), -1)
         GOTO(0)
     END_IF
+#ifdef VERSION_G8MP01
+    IF_INT_GREATER_OR_EQUAL(LW(15), 2)
+        IF_INT_LESS(LW(12), 145)
+            SET_VALUE(LW(12), 145)
+        END_IF
+    END_IF
+#endif
     WAIT_FRAMES(LW(12))
     CALL(btlevtcmd_AnimeChangePose, -2, 1, STRING("S_1"))
     RETURN
@@ -792,7 +768,7 @@ static EVT_BEGIN(move_event_sub)
             CALL(btlevtcmd_AnimeChangePose, -2, 1, STRING("T_1"))
         END_IF
     END_SIBLING_EVENT
-    CALL(btlevtcmd_snd_se, -2, STRING("SFX_ENM_TELESA_MOVE1\0\0\0"), -250000000, 0, -250000000)
+    CALL(btlevtcmd_snd_se, -2, STRING("SFX_ENM_TELESA_MOVE1"), -250000000, 0, -250000000)
     CALL(btlevtcmd_GetPartsPos, LW(3), 1, LW(0), LW(1), LW(2))
     SET_VALUE(LW(1), 40)
     CALL(btlevtcmd_DivePosition, LW(3), LW(0), LW(1), LW(2), 60, 10, 4, 0, -1)

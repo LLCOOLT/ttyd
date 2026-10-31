@@ -8,12 +8,12 @@
 f32 sinfd(f32 degrees);
 
 typedef struct CraneTimingParams {
-    u8 field_0x0[0x3C - 0x0]; // 0x0, BattleActions header
+    u8 header[0x3C - 0x0];     // 0x0, BattleActions header up to params[1]
     s32 unitId;               // 0x3C
     s32 partsId;              // 0x40
     s32 startDelay;           // 0x44
     s32 randomRange;          // 0x48
-    u8 field_0x4C[0x50 - 0x4C];
+    u8 pad_4C[0x50 - 0x4C];   // 0x4C, params[5], unused here
     s32 maxFrames;            // 0x50
 } CraneTimingParams;
 

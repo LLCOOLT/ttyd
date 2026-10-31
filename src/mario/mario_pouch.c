@@ -17,8 +17,9 @@
 #ifdef VERSION_G8ME01
 #include "mario/mariost.h"
 #endif
+#include "driver/swdrv.h"
 
-#define CHECK_ITEM(id) ((s32 (*)(s32))pouchCheckItem)(id)
+#define CHECK_ITEM(id) pouchCheckItem(id)
 
 extern ItemData itemDataTable[];
 
@@ -95,10 +96,12 @@ void pouchInit(void) {
 			party->techLevel = 0;
 		}
 	}
-#ifdef VERSION_G8ME01
+#if defined(VERSION_G8MP01)
+	strcpy(mpp->yoshiName, "Yoshi");
+#elif defined(VERSION_G8ME01)
 	strcpy(mpp->yoshiName, msgSearch("name_party3"));
 #else
-	strcpy(mpp->yoshiName, "チビヨッシー\0\0\0");
+	strcpy(mpp->yoshiName, "チビヨッシー");
 #endif
 }
 
@@ -213,7 +216,7 @@ static inline BOOL pouchAdd(s16 *t1, s16 *t2, s32 size, ItemType type)
 }
 BOOL pouchGetItem(ItemType type)
 {
-  s16 *new_var[2];
+  s16 *itemLists[2];
   s32 size;
   BOOL ok;
   if (type == ITEM_COIN)
@@ -254,7 +257,7 @@ BOOL pouchGetItem(ItemType type)
     {
       mpp->currentFP++;
       // FAKE: dead store (function returns right after); steers register allocation
-      new_var[1] = (void *) 0;
+      itemLists[1] = (void *) 0;
     }
     return 1;
   }
@@ -318,29 +321,29 @@ BOOL pouchGetItem(ItemType type)
     swSet(type - 0x70);
   }
   size = 0;
-  new_var[0] = (void *) 0;
-  new_var[1] = (void *) 0;
+  itemLists[0] = (void *) 0;
+  itemLists[1] = (void *) 0;
   if ((type >= 0x79) && (type < 0xEC))
   {
-    new_var[0] = mpp->heldItems;
-    size = (((s32 (*)(s32)) pouchCheckItem)(1)) ? (20) : (10);
+    itemLists[0] = mpp->heldItems;
+    size = (pouchCheckItem(1)) ? (20) : (10);
     ok = 1;
   }
   else
     if ((type >= 1) && (type < 0x79))
   {
-    new_var[1] = (void *) 0;
+    itemLists[1] = (void *) 0;
     size = 0x79;
     ok = 1;
-    new_var[0] = mpp->keyItems;
+    itemLists[0] = mpp->keyItems;
   }
   else
     if ((type >= 0xF0) && (type < 0x153))
   {
     size = 200;
     ok = 1;
-    new_var[0] = mpp->badges;
-    new_var[1] = mpp->equippedBadges;
+    itemLists[0] = mpp->badges;
+    itemLists[1] = mpp->equippedBadges;
   }
   else
   {
@@ -350,11 +353,11 @@ BOOL pouchGetItem(ItemType type)
   {
     return 0;
   }
-  return pouchAdd(new_var[0], new_var[1], size, type);
+  return pouchAdd(itemLists[0], itemLists[1], size, type);
 }
 
 
-u32 pouchCheckItem(u32 itemId) {
+s32 pouchCheckItem(u32 itemId) {
 	s32 id = itemId;
 	s32 i;
 	u32 itemCnt;
@@ -419,7 +422,7 @@ BOOL pouchRemoveItem(ItemType type)
   {
     table1 = mpp->heldItems;
     table2 = (void *) 0;
-    maximum = (((s32 (*)(s32)) pouchCheckItem)(ITEM_STRANGE_SACK)) ? (20) : (10);
+    maximum = (pouchCheckItem(ITEM_STRANGE_SACK)) ? (20) : (10);
     valid = 1;
   }
   else
@@ -504,15 +507,24 @@ BOOL pouchRemoveItemIndex(ItemType type, s32 index) {
 	return FALSE;
 }
 
+#ifdef VERSION_G8MP01
+char* strupr(char* str);
+#endif
+
 void pouchHiraToKata(const char* src, char* dst) {
 	u16 c;
 	s32 len = strlen(src) / 2;
+#ifdef VERSION_G8ME01
+	u16* s;
+	u16* d;
+#else
 	u16* s = (u16*)src;
 	u16* d = (u16*)dst;
+#endif
 	s32 i;
 #ifdef VERSION_G8ME01
 	if ((u32)gp->language == 0) {
-		s = (u16*)src; /* FAKE: s and d re-assigned (both already hold these values) inside the language branch */
+		s = (u16*)src;
 		d = (u16*)dst;
 		for (i = 0; i < len; i++) {
 			c = *s;
@@ -528,7 +540,61 @@ void pouchHiraToKata(const char* src, char* dst) {
 		}
 		dst[i * 2] = 0;
 	} else {
+#ifdef VERSION_G8MP01
+		// PAL: sort key of a Latin name: drops <...> message tags, upper-cases, folds accented vowels to
+		// A E I O U, spells the OE ligature out and drops C-cedilla
+		char buf[0x400];
+		char* key = dst;
+		BOOL inTag = FALSE;
+		s32 n;
+
+		for (; *(s8*)src; src++) {
+			switch (*(s8*)src) {
+			case '<':
+				inTag = TRUE;
+				break;
+			case '>':
+				inTag = FALSE;
+				break;
+			default:
+				if (!inTag) {
+					*dst = *(s8*)src;
+					*++dst = 0;
+				}
+				break;
+			}
+		}
+		strupr(key);
+		for (i = 0; i < strlen(key); i++) {
+			u8 ch = key[i];
+			if ((ch >= 0xC0 && ch <= 0xC6) || (ch >= 0xE0 && ch <= 0xE6)) {
+				ch = 'A';
+			} else if ((ch >= 0xC8 && ch <= 0xCB) || (ch >= 0xE8 && ch <= 0xEB)) {
+				ch = 'E';
+			} else if ((ch >= 0xCC && ch <= 0xCF) || (ch >= 0xEC && ch <= 0xEF)) {
+				ch = 'I';
+			} else if ((ch >= 0xD2 && ch <= 0xD6) || (ch >= 0xF2 && ch <= 0xF6)) {
+				ch = 'O';
+			} else if ((ch >= 0xD9 && ch <= 0xDC) || (ch >= 0xF9 && ch <= 0xFC)) {
+				ch = 'U';
+			}
+			key[i] = ch;
+		}
+		n = 0;
+		for (i = 0; i < strlen(key); i++) {
+			u8 ch = key[i];
+			if (ch == 0x8C || ch == 0x9C) {
+				buf[n++] = 'O';
+				buf[n++] = 'E';
+			} else if (ch != 0xC7 && ch != 0xE7) {
+				buf[n++] = ch;
+			}
+			buf[n] = 0;
+		}
+		strcpy(key, buf);
+#else
 		strcpy(dst, src);
+#endif
 	}
 }
 #else
@@ -548,6 +614,9 @@ void pouchHiraToKata(const char* src, char* dst) {
 }
 #endif
 
+#ifdef VERSION_G8MP01
+#define pouchAiueoConv pouchHiraToKata
+#else
 static inline void pouchAiueoConv(const char* src, char* dst) {
 #ifdef VERSION_G8ME01
 	u16* s;
@@ -564,7 +633,7 @@ static inline void pouchAiueoConv(const char* src, char* dst) {
 #endif
 #ifdef VERSION_G8ME01
 	if ((u32)gp->language == 0) {
-		s = (u16*)src; /* FAKE: s and d set inside the language branch, the same spelling as in pouchHiraToKata */
+		s = (u16*)src;
 		d = (u16*)dst;
 		for (i = 0; i < len; i++) {
 			c = *s;
@@ -598,6 +667,7 @@ static inline void pouchAiueoConv(const char* src, char* dst) {
 	}
 	dst[i * 2] = 0;
 }
+#endif
 #endif
 
 s32 comp_aiueo(const void* a, const void* b) {
@@ -646,12 +716,29 @@ void pouchSortItem(s32 mode) {
 	BOOL swap;
 	s16 t2, t1;
 	PouchData* pp[1];
-#ifdef VERSION_G8ME01
+#if defined(VERSION_G8MP01)
+	char keyA[0x80];
+	s16 bj;
+	s32 l;
+	s32 count;
+	const char* ida;
+	const char* idb;
+	s32 ca;
+	s32 cb;
+	s16 bn;
+	char keyB[0x80];
+#elif defined(VERSION_G8ME01)
 	s16 bn;
 	s16 bj;
 	const char* idb;
 	s32 ca;
 	s32 cb;
+	ItemData* a;
+	ItemData* b;
+	s32 m;
+	s32 l;
+	s32 count;
+	const char* ida;
 #endif
 
 	pp[0] = mpp;
@@ -687,33 +774,81 @@ void pouchSortItem(s32 mode) {
 		else if (mode == 10) qqsort(keys, n, 2, comp_kind_r);
 		memcpy(pp[0]->keyItems, keys, sizeof(keys));
 	}
-#ifdef VERSION_G8ME01
+#if defined(VERSION_G8MP01)
 	if ((u32)(mode - 4) <= 2 || (u32)(mode - 11) <= 1 || mode == 13) {
-		/* FAKE: block-scoped (shadowing j/i) locals and separate sort counter m steer register colouring */
-		ItemData* a;
-		ItemData* b;
-		s32 m;
-		s32 j;
-		s32 i;
-		const char* ida;
-
-		i = 0;
+		count = 0;
 		for (n = 0; n < 200; n++) {
 			if (pp[0]->badges[n] != 0) {
-				badges[i] = pp[0]->badges[n];
-				i++;
-				equipped[i - 1] = pp[0]->equippedBadges[n];
+				badges[count] = pp[0]->badges[n];
+				count++;
+				equipped[count - 1] = pp[0]->equippedBadges[n];
 			}
 		}
-		for (n = i; n < 200; n++) {
+		for (n = count; n < 200; n++) {
 			badges[n] = 0;
 			equipped[n] = 0;
 		}
-		for (m = 0; m < i - 1; m++) {
-			for (j = m + 1; j < i; j++) {
+		for (j = 0; j < count - 1; j++) {
+			for (l = j + 1; l < count; l++) {
+				BOOL swap;
+				bn = badges[j];
+				bj = badges[l];
+				ida = msgSearch(itemDataTable[bn].name);
+				idb = msgSearch(itemDataTable[bj].name);
+				ca = itemDataTable[bn].bp_cost;
+				cb = itemDataTable[bj].bp_cost;
+				swap = FALSE;
+				pouchHiraToKata(ida, keyA);
+				pouchHiraToKata(idb, keyB);
+				ida = keyA;
+				idb = keyB;
+				if (mode == 4) {
+					if (strcmp(ida, idb) > 0) swap = TRUE;
+				} else if (mode == 11) {
+					if (strcmp(ida, idb) < 0) swap = TRUE;
+				} else if (mode == 5) {
+					if (itemDataTable[bn].type_sort_order > itemDataTable[bj].type_sort_order) swap = TRUE;
+				} else if (mode == 12) {
+					if (itemDataTable[bn].type_sort_order < itemDataTable[bj].type_sort_order) swap = TRUE;
+				} else if (mode == 6) {
+					if (ca > cb) swap = TRUE;
+					else if (ca == cb && itemDataTable[bn].type_sort_order > itemDataTable[bj].type_sort_order) swap = TRUE;
+				} else if (mode == 13) {
+					if (ca < cb) swap = TRUE;
+					else if (ca == cb && itemDataTable[bn].type_sort_order < itemDataTable[bj].type_sort_order) swap = TRUE;
+				}
+				if (swap) {
+					t1 = badges[j];
+					t2 = equipped[j];
+					badges[j] = badges[l];
+					equipped[j] = equipped[l];
+					badges[l] = t1;
+					equipped[l] = t2;
+				}
+			}
+		}
+		memcpy(pp[0]->badges, badges, sizeof(badges));
+		memcpy(pp[0]->equippedBadges, equipped, sizeof(equipped));
+	}
+#elif defined(VERSION_G8ME01)
+	if ((u32)(mode - 4) <= 2 || (u32)(mode - 11) <= 1 || mode == 13) {
+		count = 0;
+		for (n = 0; n < 200; n++) {
+			if (pp[0]->badges[n] != 0) {
+				badges[count] = pp[0]->badges[n];
+				count++;
+				equipped[count - 1] = pp[0]->equippedBadges[n];
+			}
+		}
+		for (n = count; n < 200; n++) {
+			badges[n] = 0;
+			equipped[n] = 0;
+		}
+		for (m = 0; m < count - 1; m++) {
+			for (l = m + 1; l < count; l++) {
 				BOOL swap;
 				bn = badges[m];
-				bj = badges[j];
+				bj = badges[l];
 				a = &itemDataTable[bn];
 				ida = msgSearch(a->name);
 				b = &itemDataTable[bj];
@@ -739,10 +874,10 @@ void pouchSortItem(s32 mode) {
 				if (swap) {
 					t1 = badges[m];
 					t2 = equipped[m];
-					badges[m] = badges[j];
-					equipped[m] = equipped[j];
-					badges[j] = t1;
-					equipped[j] = t2;
+					badges[m] = badges[l];
+					equipped[m] = equipped[l];
+					badges[l] = t1;
+					equipped[l] = t2;
 				}
 			}
 		}
@@ -829,7 +964,7 @@ s32 pouchSetCoin(s32 coins) {
 	return mpp->coins;
 }
 
-s16 pouchGetSuperCoin(void) {
+s32 pouchGetSuperCoin(void) {
 	return mpp->mShineSpriteCount;
 }
 
@@ -838,7 +973,7 @@ s16 pouchSetSuperCoin(s16 count) {
 	return mpp->mShineSpriteCount;
 }
 
-s16 pouchGetStarPiece(void) {
+s32 pouchGetStarPiece(void) {
 	return mpp->mStarPieceCount;
 }
 
@@ -858,7 +993,7 @@ s16 pouchAddHP(s32 points) {
 	return mpp->currentHP;
 }
 
-s16 pouchGetHP(void) {
+s32 pouchGetHP(void) {
 	return mpp->currentHP;
 }
 
@@ -878,7 +1013,7 @@ void pouchSetMaxHP(s16 points) {
 	mpp->baseMaxHP = mpp->maximumHP;
 }
 
-s16 pouchGetPartyHP(PartyId partnerId) {
+s32 pouchGetPartyHP(PartyId partnerId) {
 	return mpp->partyData[partnerId].currentHP;
 }
 
@@ -892,7 +1027,7 @@ void pouchSetPartyHP(PartyId partnerId, s16 points) {
 	}
 }
 
-s16 pouchGetFP(void) {
+s32 pouchGetFP(void) {
 	return mpp->currentFP;
 }
 
@@ -912,7 +1047,7 @@ void pouchSetMaxFP(s16 points) {
 	mpp->baseMaxFP = mpp->maximumFP;
 }
 
-s16 pouchGetAP(void) {
+s32 pouchGetAP(void) {
 	return mpp->currentSP;
 }
 
@@ -981,8 +1116,8 @@ s32 pouchGetHammerLv(void) {
 }
 
 s32 pouchGetPartyAttackLv(PartyId partyId) {
-	// FAKE: &mpp->partyData[partyId] is formed by hand (same address) so the scaled index gets the field offset before the base is added (addi + lhax), as in the target
-	return ((PouchPartyData*)((u8*)mpp + partyId * sizeof(PouchPartyData)))->attackLevel;
+	PouchPartyData* party = &mpp->partyData[partyId];
+	return party->attackLevel;
 }
 
 BOOL pouchAddKeepItem(s16 id) {
@@ -1280,22 +1415,22 @@ f32 pouchGetAudienceNum(void);
 s16 pouchGetMaxAP(void);
 void pouchSetAP(s16 points);
 void pouchAddAP(s16 points);
-s16 pouchGetAP(void);
+s32 pouchGetAP(void);
 void pouchSetMaxFP(s16 points);
 void pouchSetFP(s16 points);
 s16 pouchGetMaxFP(void);
-s16 pouchGetFP(void);
+s32 pouchGetFP(void);
 void pouchSetPartyHP(PartyId partnerId, s16 points);
-s16 pouchGetPartyHP(PartyId partnerId);
+s32 pouchGetPartyHP(PartyId partnerId);
 void pouchSetMaxHP(s16 points);
 void pouchSetHP(s16 points);
 s16 pouchGetMaxHP(void);
-s16 pouchGetHP(void);
+s32 pouchGetHP(void);
 s16 pouchAddHP(s32 points);
 s16 pouchAddStarPiece(s16 count);
-s16 pouchGetStarPiece(void);
+s32 pouchGetStarPiece(void);
 s16 pouchSetSuperCoin(s16 count);
-s16 pouchGetSuperCoin(void);
+s32 pouchGetSuperCoin(void);
 s32 pouchSetCoin(s32 coins);
 s16 pouchAddCoin(s16 coins);
 s32 pouchGetCoin(void);
@@ -1307,7 +1442,7 @@ s32 comp_aiueo(const void* a, const void* b);
 void pouchHiraToKata(const char* src, char* dst);
 BOOL pouchRemoveItemIndex(ItemType type, s32 index);
 BOOL pouchRemoveItem(ItemType type);
-u32 pouchCheckItem(u32 itemId);
+s32 pouchCheckItem(u32 itemId);
 BOOL pouchGetItem(ItemType type);
 s32 pouchGetEmptyKeepItemCnt(void);
 s32 pouchGetEmptyHaveItemCnt(void);

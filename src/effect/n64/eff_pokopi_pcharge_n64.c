@@ -9,14 +9,6 @@
 #include <stdlib.h>
 #include "eff/eff_magic1_n64.h"
 
-__declspec(section ".data") f32 lbl_pcharge_0[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
-__declspec(section ".data") f32 fd_pcharge_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
-__declspec(section ".data") f32 lbl_pcharge_1[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
-__declspec(section ".data") f32 fd_pcharge_one_negone_373[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
-__declspec(section ".data") f32 lbl_pcharge_2[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
-__declspec(section ".data") f32 fd_pcharge_negone_one_360[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
-__declspec(section ".data") f32 lbl_pcharge_3[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
-__declspec(section ".data") f32 fd_pcharge_one_negone_359[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
 
 static effN64Vtx size10x10_tex32x32_vtx[] = {
     {0, -5, 0, 0, 0, 0, 0, 0, 255},
@@ -93,8 +85,8 @@ static effN64Vtx size128x10_tex32x32_2_vtx[] = {
     {128, 5, 0, 0, 4096, 0, 0, 0, 255},
     {0, 5, 0, 1024, 4096, 0, 0, 0, 255},
 };
-u8 n_data[16] = {11, 11, 11, 11, 17, 11, 11, 21, 21, 21, 21, 21, 21};
-static u8 vx_data[16] = {20, 5, 20, 20, 10, 20, 20, 8, 8, 8, 1, 1, 1};
+u8 n_data[13] = {11, 11, 11, 11, 17, 11, 11, 21, 21, 21, 21, 21, 21};
+static u8 vx_data[13] = {20, 5, 20, 20, 10, 20, 20, 8, 8, 8, 1, 1, 1};
 
 void effPokopiPchargeMain(EffectEntry* effect);
 void effPokopiPchargeDisp(CameraId cameraId, EffectEntry* effect);
@@ -109,7 +101,7 @@ EffectEntry* effPokopiPchargeN64Entry(s32 type, s32 lifetime, f32 x, f32 y, f32 
 
     effect = effEntry();
     count = n_data[type];
-    effect->type = "PokopiPchargeN64\0\0\0";
+    effect->type = "PokopiPchargeN64";
     effect->count = count;
     work = __memAlloc(HEAP_EFFECT, count * sizeof(EffPokopiPchargeN64Elem));
     effect->userdata = work;
@@ -347,7 +339,7 @@ void effPokopiPchargeDisp(CameraId cameraId, EffectEntry* effect) {
             case 2:
                 effSetVtxDescN64(size10x10_tex32x32_vtx);
                 GXBegin(GX_TRIANGLES, GX_VTXFMT0, 6);
-                ((void (*)())tri2)(type * 4, type * 4 + 1, type * 4 + 2, 0, type * 4, type * 4 + 2, type * 4 + 3, 0);
+                tri2(type * 4, type * 4 + 1, type * 4 + 2, 0, type * 4, type * 4 + 2, type * 4 + 3, 0);
                 break;
             case 3:
             case 4:
@@ -355,7 +347,7 @@ void effPokopiPchargeDisp(CameraId cameraId, EffectEntry* effect) {
                 effSetVtxDescN64(size10x10_tex32x32_2_vtx);
                 type -= 3;
                 GXBegin(GX_TRIANGLES, GX_VTXFMT0, 6);
-                ((void (*)())tri2)(type * 4, type * 4 + 1, type * 4 + 2, 0, type * 4, type * 4 + 2, type * 4 + 3, 0);
+                tri2(type * 4, type * 4 + 1, type * 4 + 2, 0, type * 4, type * 4 + 2, type * 4 + 3, 0);
                 break;
             case 6:
             case 7:
@@ -363,18 +355,18 @@ void effPokopiPchargeDisp(CameraId cameraId, EffectEntry* effect) {
             case 11:
                 effSetVtxDescN64(size128x10_tex32x32_vtx);
                 GXBegin(GX_TRIANGLES, GX_VTXFMT0, 6);
-                ((void (*)())tri2)(0, 1, 2, 0, 0, 2, 3, 0);
+                tri2(0, 1, 2, 0, 0, 2, 3, 0);
                 break;
             case 9:
             case 12:
                 effSetVtxDescN64(&size10x10_tex32x32_2_vtx[8]);
                 GXBegin(GX_TRIANGLES, GX_VTXFMT0, 6);
-                ((void (*)())tri2)(0, 1, 2, 0, 0, 2, 3, 0);
+                tri2(0, 1, 2, 0, 0, 2, 3, 0);
                 break;
             case 10:
                 effSetVtxDescN64(size128x10_tex32x32_2_vtx);
                 GXBegin(GX_TRIANGLES, GX_VTXFMT0, 6);
-                ((void (*)())tri2)(0, 1, 2, 0, 0, 2, 3, 0);
+                tri2(0, 1, 2, 0, 0, 2, 3, 0);
                 break;
         }
     }

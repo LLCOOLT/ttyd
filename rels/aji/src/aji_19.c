@@ -1,13 +1,15 @@
 #include "battle/battle_unit.h"
 #include "evt/evt_cmd.h"
 
-#pragma force_active on
 #include "mario/mario.h"
 #include "mario/mario_party.h"
 #include "party.h"
 #include "driver/hitdrv.h"
 #include "string.h"
 #include "evt/evt_bero.h"
+#ifdef VERSION_G8MP01
+#include "mario/mariost.h"
+#endif
 
 BOOL hitIsGroup(HitEntry* target, HitEntry* group);
 static BOOL _hitIsGroupSub(HitEntry* target, HitEntry* node, BOOL checkSibling);
@@ -30,55 +32,9 @@ static USER_FUNC(mario_chk);
 static BOOL hitIsGroup(HitEntry* target, HitEntry* group);
 static BOOL _hitIsGroupSub(HitEntry* target, HitEntry* node, BOOL checkSibling);
 
-f32 fd_aji_19_negone_one_374[2] __attribute__((aligned(8)));
-f32 fd_aji_19_neg_one_382;
-f32 fd_aji_19___local_PI_383;
-f32 fd_aji_19___local_3PIO2_385;
-f32 fd_aji_19_one_negone_373[2] __attribute__((aligned(8)));
-f32 fd_aji_19___local_PIO2_384;
-f32 fd_aji_19_one_381;
-f32 fd_aji_19_negone_one_360[2] __attribute__((aligned(8)));
-f32 fd_aji_19_neg_one_365;
-f32 fd_aji_19___local_PI_366;
-f32 fd_aji_19___local_3PIO2_368;
-f32 fd_aji_19_one_negone_359[2] __attribute__((aligned(8)));
-f32 fd_aji_19___local_PIO2_367;
-f32 fd_aji_19_one_364;
-static EvtWord w_door_close[22];
-static EvtWord w_door_open[22];
-static EvtWord e_door_close[22];
-static EvtWord e_door_open[22];
 static BeroEntry bero_entry_data[3];
-EvtWord evt_hajimete[33];
-EvtWord aji_19_init_evt[56];
-
-f32 fd_aji_19_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
-
-f32 fd_aji_19_neg_one_382 = -1.0f;
-
-f32 fd_aji_19___local_PI_383 = 3.1415927f;
-
-f32 fd_aji_19___local_3PIO2_385 = 4.712389f;
-
-f32 fd_aji_19_one_negone_373[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
-
-f32 fd_aji_19___local_PIO2_384 = 1.5707964f;
-
-f32 fd_aji_19_one_381 = 1.0f;
-
-f32 fd_aji_19_negone_one_360[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
-
-f32 fd_aji_19_neg_one_365 = -1.0f;
-
-f32 fd_aji_19___local_PI_366 = 3.1415927f;
-
-f32 fd_aji_19___local_3PIO2_368 = 4.712389f;
-
-f32 fd_aji_19_one_negone_359[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
-
-f32 fd_aji_19___local_PIO2_367 = 1.5707964f;
-
-f32 fd_aji_19_one_364 = 1.0f;
+extern EvtWord evt_hajimete[];
+extern EvtWord aji_19_init_evt[];
 
 static EVT_BEGIN(w_door_close)
     MULTIPLY_FLOAT(LW(0), FLOAT(0.25f))
@@ -188,33 +144,40 @@ EVT_BEGIN(aji_19_init_evt)
     RETURN
 EVT_END()
 
+// Conveyor push per frame: PAL scales the 60 Hz speed to the frame rate
+#ifdef VERSION_G8MP01
+#define BELT_SPEED (60.0f / gp->framerate)
+#else
+#define BELT_SPEED 1.0f
+#endif
+
 static USER_FUNC(mario_chk) {
     MarioWork* mario = marioGetPtr();
     PartyEntry* party;
 
     if (mario != NULL && mario->hitobjStandOn != NULL) {
         if (hitIsGroup(mario->hitobjStandOn, hitNameToPtr("A_b_ue"))) {
-            mario->floorMove.x = 1.0f;
+            mario->floorMove.x = BELT_SPEED;
         } else if (hitIsGroup(mario->hitobjStandOn, hitNameToPtr("A_b_shita"))) {
-            mario->floorMove.x = -1.0f;
+            mario->floorMove.x = -BELT_SPEED;
         }
     }
     party = partyGetPtr(marioGetPartyId());
     if (party != NULL && party->hitobjStandOn != NULL) {
         if (hitIsGroup(party->hitobjStandOn, hitNameToPtr("A_b_ue"))) {
-            party->floorMoveX = 1.0f;
+            party->floorMoveX = BELT_SPEED;
         }
         if (hitIsGroup(party->hitobjStandOn, hitNameToPtr("A_b_shita"))) {
-            party->floorMoveX = -1.0f;
+            party->floorMoveX = -BELT_SPEED;
         }
     }
     party = partyGetPtr(marioGetExtraPartyId());
     if (party != NULL && party->hitobjStandOn != NULL) {
         if (hitIsGroup(party->hitobjStandOn, hitNameToPtr("A_b_ue"))) {
-            party->floorMoveX = 1.0f;
+            party->floorMoveX = BELT_SPEED;
         }
         if (hitIsGroup(party->hitobjStandOn, hitNameToPtr("A_b_shita"))) {
-            party->floorMoveX = -1.0f;
+            party->floorMoveX = -BELT_SPEED;
         }
     }
     return EVT_RETURN_BLOCK;

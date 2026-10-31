@@ -4,7 +4,6 @@
 #include "battle/battle_unit.h"
 #include "evt/evt_cmd.h"
 
-#pragma force_active on
 #include "mario/mario.h"
 #include "manager/evtmgr_cmd.h"
 #include "dolphin/os.h"
@@ -30,13 +29,14 @@
 #include "evt/evt_lecture.h"
 #include "party/party_motion.h"
 #include "evt/evt_snd.h"
+#include "mario/mario_cam.h"
 
 static OSTime wwstart;
 void statusWinForceClose(void);
 void statusWinForceCloseClear(void);
 static s32 x_flag_data[2];
 static void lecture_button_disp(CameraId camera, void* param);
-typedef struct LectButtonDisp { s32 unk0; Vec pos; } LectButtonDisp;
+typedef struct LectButtonDisp { s32 dispFlags; Vec pos; } LectButtonDisp; /* dispFlags: never accessed */
 typedef struct LectButton { u8 flags; u8 seq; u8 pad_2[0x8 - 0x2]; LectButtonDisp disp; u8 pad_18[0x40 - 0x18]; s16 iconId; s16 alpha; } LectButton;
 static LectButton lbtn[2];
 static inline void effitemget_cam_move(CameraEntry* camera, Vec ofs) { camera->presetPos = camera->cameraPos; camera->presetAt = camera->cameraAt; PSVECAdd(&camera->cameraPos, &ofs, &camera->storedPos); PSVECAdd(&camera->cameraAt, &ofs, &camera->storedAt); camera->startTimeA = gp->renderTime; camera->durationA = 0; camera->stateA = 3; camera->curveA = 11; }
@@ -106,25 +106,11 @@ static USER_FUNC(x_flag_add);
 static f32 lect_mario_ido_sub(f32 elapsed, f32 total, f32 end, f32 start);
 extern s32 evt_mario_dispflag_onoff[];
 
-f32 fd_evt_lect_eki_negone_one_374[2] __attribute__((aligned(8)));
-f32 fd_evt_lect_eki_neg_one_382;
-f32 fd_evt_lect_eki___local_PI_383;
-f32 fd_evt_lect_eki___local_3PIO2_385;
-f32 fd_evt_lect_eki_one_negone_373[2] __attribute__((aligned(8)));
-f32 fd_evt_lect_eki___local_PIO2_384;
-f32 fd_evt_lect_eki_one_381;
-f32 fd_evt_lect_eki_negone_one_360[2] __attribute__((aligned(8)));
-f32 fd_evt_lect_eki_neg_one_365;
-f32 fd_evt_lect_eki___local_PI_366;
-f32 fd_evt_lect_eki___local_3PIO2_368;
-f32 fd_evt_lect_eki_one_negone_359[2] __attribute__((aligned(8)));
-f32 fd_evt_lect_eki___local_PIO2_367;
-f32 fd_evt_lect_eki_one_364;
-EvtWord boots_lv3_juyoitem_lecture_init[104];
-EvtWord boots_lv3_juyoitem_lecture_sub01[29];
-EvtWord boots_lv3_juyoitem_lecture_sub02[78];
-EvtWord boots_lv3_juyoitem_lecture[479];
-EvtWord all_juyoitem_lecture_rel[252];
+extern EvtWord boots_lv3_juyoitem_lecture_init[];
+extern EvtWord boots_lv3_juyoitem_lecture_sub01[];
+extern EvtWord boots_lv3_juyoitem_lecture_sub02[];
+extern EvtWord boots_lv3_juyoitem_lecture[];
+extern EvtWord all_juyoitem_lecture_rel[];
 
 static f32 lect_mario_ido_sub(f32 elapsed, f32 total, f32 end, f32 start) {
     f32 rem = total - elapsed;
@@ -431,34 +417,6 @@ static USER_FUNC(effitemget_busaiku) {
     effitemget_cam_move(camera, ofs);
     return EVT_RETURN_DONE;
 }
-
-f32 fd_evt_lect_eki_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
-
-f32 fd_evt_lect_eki_neg_one_382 = -1.0f;
-
-f32 fd_evt_lect_eki___local_PI_383 = 3.1415927f;
-
-f32 fd_evt_lect_eki___local_3PIO2_385 = 4.712389f;
-
-f32 fd_evt_lect_eki_one_negone_373[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
-
-f32 fd_evt_lect_eki___local_PIO2_384 = 1.5707964f;
-
-f32 fd_evt_lect_eki_one_381 = 1.0f;
-
-f32 fd_evt_lect_eki_negone_one_360[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
-
-f32 fd_evt_lect_eki_neg_one_365 = -1.0f;
-
-f32 fd_evt_lect_eki___local_PI_366 = 3.1415927f;
-
-f32 fd_evt_lect_eki___local_3PIO2_368 = 4.712389f;
-
-f32 fd_evt_lect_eki_one_negone_359[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
-
-f32 fd_evt_lect_eki___local_PIO2_367 = 1.5707964f;
-
-f32 fd_evt_lect_eki_one_364 = 1.0f;
 
 EVT_BEGIN(boots_lv3_juyoitem_lecture_init)
     CALL(evt_mario_get_pos, 0, LW(3), LW(4), LW(5))
