@@ -23,6 +23,20 @@
 #include "battle/battle_menu_disp.h"
 #include "manager/fontmgr.h"
 
+// DEMO_PICK(demo, retail): the value in the 2004 demo, or the retail value.
+#ifdef VERSION_G8ME01_DEMO
+#define DEMO_PICK(demo, retail) (demo)
+#else
+#define DEMO_PICK(demo, retail) (retail)
+#endif
+
+// The demo draws these icons with icon flag 4; retail uses 0x10.
+#ifdef VERSION_G8ME01_DEMO
+#define ICON_DISP_FLAGS 4
+#else
+#define ICON_DISP_FLAGS 0x10
+#endif
+
 
 void BattleMenuDisp_ActSelect_Init(BattleWork* wp, BattleCursor* cursor, BattleCommandAct* acts, s32 a);
 void BattleMenuDisp_ActSelect_Disp(BattleWork* wp);
@@ -99,12 +113,6 @@ s32 _getHammerIconId(void);
 
 s32 _jump_badge_table[8] = {ITEM_POWER_JUMP, ITEM_MULTIBOUNCE, ITEM_SHRINK_STOMP, ITEM_SLEEPY_STOMP, ITEM_SOFT_STOMP, ITEM_TORNADO_JUMP, ITEM_POWER_BOUNCE, ITEM_MEGA_JUMP};
 s32 _hammer_badge_table[9] = {ITEM_POWER_SMASH, ITEM_PIERCING_BLOW, ITEM_HAMMER_THROW, ITEM_HEAD_RATTLE, ITEM_ICE_SMASH, ITEM_FIRE_DRIVE, ITEM_QUAKE_HAMMER, ITEM_MEGA_SMASH, ITEM_MEGA_QUAKE};
-
-EVT_BEGIN(_btl_cmd_error_msg_event)
-    CALL(_get_msg, LW(0))
-    CALL(btlevtcmd_AnnounceMessage, 0, 0, -30, LW(0), 60)
-    RETURN
-EVT_END()
 
 void BattleCommandInit(BattleWork* wp) {
 	wp->commandMenu.state = 0;
@@ -436,7 +444,7 @@ s32 _btlcmd_MakeSelectWeaponTable(BattleWork* wp, s32 type) {
 					cmd->weapon[num].name = msgSearch(itemDataTable[cmd->weapon[num].weapon->itemId].name);
 				}
 				if (wp->flags & 0x9000000 && wp->lectureUnitId != -1) {
-					cmd->weapon[num].weapon = BtlUnit_GetData(BattleGetUnitPtr(wp, wp->lectureUnitId), 0x44);
+					cmd->weapon[num].weapon = BtlUnit_GetData(BattleGetUnitPtr(wp, wp->lectureUnitId), DEMO_PICK(0x43, 0x44));
 				}
 				num++;
 			}
@@ -483,7 +491,7 @@ s32 _btlcmd_MakeSelectWeaponTable(BattleWork* wp, s32 type) {
 					cmd->weapon[num].name = msgSearch(itemDataTable[cmd->weapon[num].weapon->itemId].name);
 				}
 				if (wp->flags & 0xA000000 && wp->lectureUnitId != -1) {
-					cmd->weapon[num].weapon = BtlUnit_GetData(BattleGetUnitPtr(wp, wp->lectureUnitId), 0x45);
+					cmd->weapon[num].weapon = BtlUnit_GetData(BattleGetUnitPtr(wp, wp->lectureUnitId), DEMO_PICK(0x44, 0x45));
 				}
 				num++;
 			}
@@ -605,7 +613,9 @@ s32 _btlcmd_MakeSelectWeaponTable(BattleWork* wp, s32 type) {
 				cmd->weapon[num].weapon = &defaultWeapon_Dummy_NoItem;
 				cmd->weapon[num].enabled = 0;
 				cmd->weapon[num].disableReason = 0;
+#ifndef VERSION_G8ME01_DEMO
 				cmd->weapon[num].icon = ICON_162;
+#endif
 				if (cmd->weapon[num].weapon->name) {
 					cmd->weapon[num].name = msgSearch(cmd->weapon[num].weapon->name);
 				} else {
@@ -660,6 +670,12 @@ BattleCheckPartyEntry _checkPartyTable[8] = {
 	{UNIT_BOBBERY, "btl_cmd_pt_sanders", ICON_157, "btl_hlp_cmd_operation_party6"},
 	{UNIT_MS_MOWZ, "btl_cmd_pt_chuchurina", ICON_161, "btl_hlp_cmd_operation_party7"},
 };
+
+EVT_BEGIN(_btl_cmd_error_msg_event)
+    CALL(_get_msg, LW(0))
+    CALL(btlevtcmd_AnnounceMessage, 0, 0, -30, LW(0), 60)
+    RETURN
+EVT_END()
 
 void _btlcmd_UpdateSelectWeaponTable(BattleWork* wp, s32 type) {
 	BattleUnit* unit;
@@ -771,7 +787,9 @@ void _btlcmd_MakeOperationTable(BattleWork* wp) {
 			cmd->operation[0].enabled = 0;
 			cmd->operation[0].disableReason = 3;
 		}
+#ifndef VERSION_G8ME01_DEMO
 		cmd->operation[0].cost = 0;
+#endif
 		num = 1;
 	}
 	if (pouch->mStarPowersObtained != 0) {
@@ -780,7 +798,9 @@ void _btlcmd_MakeOperationTable(BattleWork* wp) {
 		cmd->operation[num].name = msgSearch("btl_cmd_op_appeal");
 		cmd->operation[num].icon = ICON_164;
 		cmd->operation[num].disableReason = 0;
+#ifndef VERSION_G8ME01_DEMO
 		cmd->operation[num].cost = 0;
+#endif
 		cmd->operation[num].help = "btl_hlp_cmd_operation_appeal";
 		num++;
 	}
@@ -835,7 +855,9 @@ void _btlcmd_MakeOperationTable(BattleWork* wp) {
 	cmd->operation[num].name = msgSearch("btl_cmd_op_defend");
 	cmd->operation[num].icon = ICON_165;
 	cmd->operation[num].disableReason = 0;
+#ifndef VERSION_G8ME01_DEMO
 	cmd->operation[num].cost = 0;
+#endif
 	cmd->operation[num].help = "btl_hlp_cmd_operation_defend";
 	if (unit->mAttributeFlags & 0x10) {
 		cmd->operation[num].enabled = 0;
@@ -846,7 +868,9 @@ void _btlcmd_MakeOperationTable(BattleWork* wp) {
 	cmd->operation[idx].enabled = BtlUnit_CanActStatus(unit);
 	cmd->operation[idx].name = msgSearch("btl_cmd_op_escape");
 	cmd->operation[idx].icon = ICON_163;
+#ifndef VERSION_G8ME01_DEMO
 	cmd->operation[idx].cost = 0;
+#endif
 	if (cmd->operation[idx].enabled) {
 		cmd->operation[idx].disableReason = 0;
 	} else {
@@ -1417,7 +1441,7 @@ void BattleCommandDisplay(BattleWork* wp) {
 
 	if (cmd != NULL) {
 		SelectedItemCoordinateColorUpDate();
-		dispEntry(CAMERA_2D, 902.0f, 0, BattleDrawEnemyHP, wp);
+		dispEntry(CAMERA_2D, DEMO_PICK(501.0f, 902.0f), 0, BattleDrawEnemyHP, wp);
 		if (cmd->flags & 1) {
 			dispEntry(CAMERA_2D, 500.0f, 0, BattleCommandDisplay_ActMenuDisp, wp);
 		}
@@ -1877,7 +1901,7 @@ void BattleCommandDisplay_WeaponMultiItemCancelCheckDisp(CameraId camId, void* p
 	pos.x = -40.0f;
 	pos.y = -42 - wp->commandMenu.cursor[13].absPos * 25;
 	pos.z = 0.0f;
-	iconDispGx(&pos, 0x14, ICON_1F0, 1.0f);
+	iconDispGx(&pos, DEMO_PICK(0xC, 0x14), ICON_1F0, 1.0f);
 }
 
 #pragma dont_inline on
@@ -2212,7 +2236,7 @@ void BattleCommandDisplay_TargetSelectMenuDisp(CameraId camId, void* param) {
 			icon.x = screen1.x;
 			icon.y = screen1.y;
 			icon.z = 0.0f;
-			iconDispGx(&icon, 0x10, ICON_1EF, 1.0f);
+			iconDispGx(&icon, ICON_DISP_FLAGS, ICON_1EF, 1.0f);
 			if (unit->currentKind == 0xe2) {
 				name = pouchGetYoshiName();
 			} else {
@@ -2226,7 +2250,7 @@ void BattleCommandDisplay_TargetSelectMenuDisp(CameraId camId, void* param) {
 			icon.x = screen1.x;
 			icon.y = screen1.y;
 			icon.z = 0.0f;
-			iconDispGx(&icon, 0x18, ICON_1EF, 1.0f);
+			iconDispGx(&icon, DEMO_PICK(0x14, 0x18), ICON_1EF, 1.0f);
 			if (unit->currentKind == 0xe2) {
 				name = pouchGetYoshiName();
 			} else {
@@ -2250,7 +2274,7 @@ void BattleCommandDisplay_TargetSelectMenuDisp(CameraId camId, void* param) {
 				icon.x = screen2.x;
 				icon.y = screen2.y;
 				icon.z = 0.0f;
-				iconDispGx(&icon, 0x10, ICON_1EF, 1.0f);
+				iconDispGx(&icon, ICON_DISP_FLAGS, ICON_1EF, 1.0f);
 				if (unit2->currentKind == 0xe2) {
 					name = pouchGetYoshiName();
 				} else {
@@ -2264,7 +2288,7 @@ void BattleCommandDisplay_TargetSelectMenuDisp(CameraId camId, void* param) {
 				icon.x = screen2.x;
 				icon.y = screen2.y;
 				icon.z = 0.0f;
-				iconDispGx(&icon, 0x18, ICON_1EF, 1.0f);
+				iconDispGx(&icon, DEMO_PICK(0x14, 0x18), ICON_1EF, 1.0f);
 				if (unit2->currentKind == 0xe2) {
 					name = pouchGetYoshiName();
 				} else {
@@ -2316,7 +2340,7 @@ void BattleCommandDisplay_ProtectPartnerSelectMenuDisp(CameraId camId, void* par
 	icon.x = screen.x;
 	icon.y = screen.y;
 	icon.z = 0.0f;
-	iconDispGx(&icon, 0x10, ICON_1EF, 1.0f);
+	iconDispGx(&icon, ICON_DISP_FLAGS, ICON_1EF, 1.0f);
 	len = strlen(msgSearch(unit->mKindParams->name));
 	w = 6.25f * len;
 	windowDispGX_Waku_col(0, (GXColor){0xFF, 0xFF, 0xFF, 0xCF}, icon.x - w, 80.0f + icon.y, 12.5f * len, 32.0f, 10.0f);
@@ -2395,6 +2419,26 @@ void _btlcmd_SetAttackEvent(BattleUnit* unit, BattleCommand* cmd) {
 				BtlActRec_AddCount(&wp->actRecord.partnerEscapes);
 			}
 			break;
+#ifdef VERSION_G8ME01_DEMO
+		case 1:
+			UEVT(unit) = WEVT(&badgeWeapon_Charge);
+			unit->attackEventFlags = 0;
+			if (unit->currentKind == 0xde) {
+				BtlActRec_AddCount(&wp->actRecord.marioCharges);
+			} else {
+				BtlActRec_AddCount(&wp->actRecord.partnerCharges);
+			}
+			break;
+		case 2:
+			UEVT(unit) = WEVT(&badgeWeapon_SuperCharge);
+			unit->attackEventFlags = 0;
+			if (unit->currentKind == 0xde) {
+				BtlActRec_AddCount(&wp->actRecord.marioSuperCharges);
+			} else {
+				BtlActRec_AddCount(&wp->actRecord.partnerSuperCharges);
+			}
+			break;
+#else
 		case 1:
 			unit->attackEventFlags = 0;
 			if (unit->currentKind == 0xde) {
@@ -2415,6 +2459,7 @@ void _btlcmd_SetAttackEvent(BattleUnit* unit, BattleCommand* cmd) {
 				BtlActRec_AddCount(&wp->actRecord.partnerSuperCharges);
 			}
 			break;
+#endif
 		case 0:
 			UEVT(unit) = btldefaultevt_ChangeParty;
 			unit->attackEventFlags = 1;
@@ -2462,14 +2507,20 @@ void _btlcmd_SetAttackEvent(BattleUnit* unit, BattleCommand* cmd) {
 			BtlActRec_AddCount(&wp->actRecord.marioHammerMoves);
 			break;
 		case 4:
+#ifdef VERSION_G8ME01_DEMO
+			if (weapon->hpDamageFn) {
+#else
 			if (_check_weapon_type_attack(weapon)) {
+#endif
 				BtlActRec_AddCount(&wp->actRecord.marioSpecialAttacks);
 			} else {
 				BtlActRec_AddCount(&wp->actRecord.marioSpecialSupports);
 			}
 			break;
 		case 2:
+#ifndef VERSION_G8ME01_DEMO
 			if ((EvtWord)weapon == (EvtWord)&ItemWeaponData_Naniga_Okorukana) break; // FAKE: integer compare gives the target's signed cmpw
+#endif
 			if (unit->currentKind == 0xde) {
 				if (_check_weapon_type_attack(weapon)) {
 					BtlActRec_AddCount(&wp->actRecord.marioAttackItems);
@@ -2564,14 +2615,22 @@ s32 _check_present_item(void) {
 	case 0x7b:
 		BtlUnit_RecoverHp(unit, 1);
 		BtlUnit_GetPos(unit, &pos.x, &pos.y, &pos.z);
+#ifdef VERSION_G8ME01_DEMO
+		pos.y += BtlUnit_GetHeight(unit);
+#else
 		pos.y += unit->mSizeMultiplier * BtlUnit_GetHeight(unit) + 5.0f;
+#endif
 		effRecoveryEntry(0, 1, pos.x, pos.y, pos.z);
 		BattleAudience_SetPresentItemNo(0);
 		return 0;
 	case 0x7c:
 		BtlUnit_RecoverFp(unit, 1);
 		BtlUnit_GetPos(unit, &pos.x, &pos.y, &pos.z);
+#ifdef VERSION_G8ME01_DEMO
+		pos.y += BtlUnit_GetHeight(unit);
+#else
 		pos.y += unit->mSizeMultiplier * BtlUnit_GetHeight(unit) + 5.0f;
+#endif
 		effRecoveryEntry(1, 1, pos.x, pos.y, pos.z);
 		BattleAudience_SetPresentItemNo(0);
 		return 0;
@@ -2796,6 +2855,12 @@ void* BattleSetConfuseAct(BattleWork* wp, BattleUnit* unit) {
 			return btldefaultevt_Wait;
 		case 3:
 			return btldefaultevt_Escape;
+#ifdef VERSION_G8ME01_DEMO
+		case 1:
+			return WEVT(&badgeWeapon_Charge);
+		case 2:
+			return WEVT(&badgeWeapon_SuperCharge);
+#else
 		case 1:
 			if (unit->currentKind == 0xde) {
 				return WEVT(&badgeWeapon_Charge);
@@ -2806,6 +2871,7 @@ void* BattleSetConfuseAct(BattleWork* wp, BattleUnit* unit) {
 				return WEVT(&badgeWeapon_SuperCharge);
 			}
 			return WEVT(&badgeWeapon_SuperChargeP);
+#endif
 		case 8:
 			return BtlUnit_GetData(unit, 2);
 		case 0:
@@ -2823,7 +2889,11 @@ void* BattleSetConfuseAct(BattleWork* wp, BattleUnit* unit) {
 			if (cnt) {
 				cursor->absPos = list[irand(cnt)];
 			} else {
+#ifdef VERSION_G8ME01_DEMO
+				return subsetevt_confuse_flustered;
+#else
 				return NULL;
+#endif
 			}
 			}
 			if (!cmd->party[cursor->absPos].enabled) {

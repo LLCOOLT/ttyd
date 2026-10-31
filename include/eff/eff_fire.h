@@ -34,7 +34,9 @@ typedef struct EffFireWork {
     f32 scaleY;     // 0x7C
     s32 reserved_80;     // 0x80, only set to 0
     s32 reserved_84;     // 0x84, only set to 0
-    s32 useMapBlend;     // 0x88, adds the map blend-colour TEV stage
+#ifndef VERSION_G8ME01_DEMO
+    s32 useMapBlend;     // 0x88, adds the map blend-colour TEV stage (not in the demo)
+#endif
 } EffFireWork;
 
 EffectEntry* effFireEntry(s32 type, s32 duration, f32 x, f32 y, f32 z, f32 scale);

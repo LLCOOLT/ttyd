@@ -172,7 +172,11 @@ static EVT_BEGIN(item_evt)
     CALL(evt_snd_bgmoff, 512)
     CALL(evt_mario_key_onoff, 0)
     CALL(evt_mobj_get_position, STRING("gon07treasure"), LW(0), LW(1), LW(2))
+#ifdef VERSION_G8ME01_DEMO
+    CALL(evt_item_entry, STRING("k_slit"), 34, LW(0), LW(1), LW(2), 15, -1, 0)
+#else
     CALL(evt_item_entry, STRING("k_slit"), 34, LW(0), LW(1), LW(2), 16, -1, 0)
+#endif
     CALL(evt_item_flag_on, STRING("k_slit"), 2)
     CALL(evt_mobj_wait_animation_end, STRING("gon07treasure"))
     CALL(evt_item_get_item, STRING("k_slit"))
@@ -287,6 +291,11 @@ static EVT_BEGIN(bomb_wall_evt)
         CALL(evt_mapobj_flag_onoff, 1, 1, STRING("S_ana_before"), 1)
         CALL(evt_mapobj_flag_onoff, 1, 0, STRING("S_ana_after"), 1)
     END_IF
+#ifdef VERSION_G8ME01_DEMO
+    CALL(evt_hitobj_onoff, STRING("san"), 1, 0)
+    SET_VALUE(LW(0), STRING("e_bero"))
+    CALL_CHILD(PTR(bero_case_switch_on))
+#endif
     CALL(evt_img_release, STRING("img"))
     CALL(evt_mapobj_clear_offscreen, 1, STRING("S_ana"))
     CALL(evt_paper_delete, STRING("OFF_d_bom_ver2"))
@@ -296,9 +305,11 @@ static EVT_BEGIN(bomb_wall_evt)
     WAIT_MS(2000)
     CALL(evt_snd_bgmoff, 513)
     CALL(evt_snd_bgmon, 288, 0)
+#ifndef VERSION_G8ME01_DEMO
     CALL(evt_hitobj_onoff, STRING("san"), 1, 0)
     SET_VALUE(LW(0), STRING("e_bero"))
     CALL_CHILD(PTR(bero_case_switch_on))
+#endif
     SET_VALUE(GSWF(1495), 1)
     CALL(evt_mario_key_onoff, 1)
     CALL(evt_exit_case_evt)

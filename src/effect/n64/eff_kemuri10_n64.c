@@ -137,7 +137,9 @@ EffectEntry* effKemuri10N64Entry(s32 type, f32 x, f32 y, f32 z, f32 dx, f32 dy, 
     work->rot[1][3] = zr;
     work->rot[2][3] = zr;
     work->scale = 0.1f * scale;
+#ifndef VERSION_G8ME01_DEMO
     work->camera = 4;
+#endif
     return effect;
 }
 
@@ -155,7 +157,9 @@ void effKemuri10Main(EffectEntry* effect) {
     tmp.z = work->position.z;
     position = tmp;
     timer = work->timer;
+#ifndef VERSION_G8ME01_DEMO
     camera = work->camera;
+#endif
     work->timer = timer - 1;
     work->counter++;
     timer = work->timer;
@@ -183,7 +187,11 @@ void effKemuri10Main(EffectEntry* effect) {
         work->scale *= 1.05f;
         work++;
     }
+#ifdef VERSION_G8ME01_DEMO
+    dispEntry(CAMERA_3D, dispCalcZ(&position), 2, (DispCallback)effKemuri10Disp, effect);
+#else
     dispEntry((CameraId)camera, dispCalcZ(&position), 2, (DispCallback)effKemuri10Disp, effect);
+#endif
 }
 
 void effKemuri10Disp(CameraId cameraId, EffectEntry* effect) {

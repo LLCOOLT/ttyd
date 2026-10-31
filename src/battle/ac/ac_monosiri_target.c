@@ -7,6 +7,13 @@
 #include "system.h"
 #include <string.h>
 #include "version.h"
+
+// The demo draws the action command icons with icon flag 4; retail uses 0x10.
+#ifdef VERSION_G8ME01_DEMO
+#define AC_ICON_FLAGS 4
+#else
+#define AC_ICON_FLAGS 0x10
+#endif
 // US battle texture ids are 0x16 higher for these entries.
 #define BTL_TEX(id) ((id) + VERSION_PICK(0, 0x16))
 
@@ -193,7 +200,7 @@ static void actionCommandDisp(f32 x, f32 y) {
     if (__fabs(cw->pos.x - cw->targetPos.x) < 15.0) {
         icon = pressedIcon;
     }
-    ((void (*)(Vec*, s32, s32, f32))iconDispGx)(&(Vec){-200.0f + x, 50.0f + y, 0.0f}, 0x10, icon, 1.0f);
+    ((void (*)(Vec*, s32, s32, f32))iconDispGx)(&(Vec){-200.0f + x, 50.0f + y, 0.0f}, AC_ICON_FLAGS, icon, 1.0f);
 }
 #pragma dont_inline reset
 

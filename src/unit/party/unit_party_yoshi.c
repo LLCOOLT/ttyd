@@ -28,7 +28,12 @@ void btlDispTexPlane(u32 id, GXColor color, s32 unk, f32 tX, f32 tY, f32 tZ, f32
 
 
 typedef struct YoshiGundanPart YoshiGundanPart;
+#ifdef VERSION_G8ME01_DEMO
+struct YoshiGundanWork;
+void _btlYoshiDisp(CameraId camera, struct YoshiGundanWork* w);
+#else
 void _btlYoshiDisp(CameraId camera, YoshiGundanPart* p);
+#endif
 void _yoshi_slide_move_sound(BattleUnit* unit, PoseSoundTiming* s);
 static void __makeTechMenuFunc(BattleCommand* command, s32* count);
 
@@ -129,6 +134,13 @@ USER_FUNC(btl_yoshi_yoroyoro_jump_move);
 USER_FUNC(btl_yoshi_yoroyoro_jump_calc_param);
 
 PoseTableEntry pose_table_yoshi_stay[25];
+
+// The demo's pose ids from 58 on are 2 lower.
+#ifdef VERSION_G8ME01_DEMO
+#define DEMO_POSE(id) ((id) >= 58 ? (id) - 2 : (id))
+#else
+#define DEMO_POSE(id) (id)
+#endif
 static BattleDataEntry data_table[8];
 static BattleUnitDefense defence;
 static BattleUnitDefenseAttr defence_attr;
@@ -170,6 +182,11 @@ u8 _yoshig_tpl_no_tbl[8] __attribute__((aligned(4)));
 
 
 
+// The demo defines regist first and data_table after the egg pose tables.
+#ifdef VERSION_G8ME01_DEMO
+static StatusVulnerability regist = {100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100};
+#endif
+
 PoseTableEntry pose_table_yoshi_stay[] = {
     {9, "PYS_D_5"},
     {2, "PYS_D_5"},
@@ -186,18 +203,19 @@ PoseTableEntry pose_table_yoshi_stay[] = {
     {42, "PYS_R_1"},
     {57, "PYS_D_2"},
     {56, "PYS_D_2"},
-    {60, "PYS_D_4"},
-    {61, "PYS_D_2"},
-    {65, "PYS_T_1"},
+    {DEMO_POSE(60), "PYS_D_4"},
+    {DEMO_POSE(61), "PYS_D_2"},
+    {DEMO_POSE(65), "PYS_T_1"},
     {52, "PYS_I_1"},
-    {67, "PYS_C_1"},
-    {66, "PYS_O_1"},
-    {64, "PYS_F_1"},
+    {DEMO_POSE(67), "PYS_C_1"},
+    {DEMO_POSE(66), "PYS_O_1"},
+    {DEMO_POSE(64), "PYS_F_1"},
     {49, "PYS_F_1"},
     {45, "PYS_G_1"},
-    {69, "PYS_S_1"},
+    {DEMO_POSE(69), "PYS_S_1"},
 };
 
+#ifndef VERSION_G8ME01_DEMO
 static BattleDataEntry data_table[] = {
     {5, yoshi_appeal_event},
     {6, attack_audience_event},
@@ -208,33 +226,49 @@ static BattleDataEntry data_table[] = {
     {47, btldefaultevt_avoid_counter_event},
     {0, NULL},
 };
+#endif
 
 static BattleUnitDefense defence = {{0, 0, 0, 0, 0}};
 
 static BattleUnitDefenseAttr defence_attr = {{0, 0, 0, 0, 0}};
 
+#ifndef VERSION_G8ME01_DEMO
 static StatusVulnerability regist = {100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100};
+#endif
 
 PoseTableEntry pose_table_egg_g[] = {
     {28, "CHU_C_1"},
     {31, "CHU_C_1"},
     {39, "CHU_C_1"},
-    {69, "CHU_C_1"},
+    {DEMO_POSE(69), "CHU_C_1"},
 };
 
 PoseTableEntry pose_table_egg_y[] = {
     {28, "CHU_C_2"},
     {31, "CHU_C_2"},
     {39, "CHU_C_2"},
-    {69, "CHU_C_2"},
+    {DEMO_POSE(69), "CHU_C_2"},
 };
 
 PoseTableEntry pose_table_egg_p[] = {
     {28, "CHU_C_3"},
     {31, "CHU_C_3"},
     {39, "CHU_C_3"},
-    {69, "CHU_C_3"},
+    {DEMO_POSE(69), "CHU_C_3"},
 };
+
+#ifdef VERSION_G8ME01_DEMO
+static BattleDataEntry data_table[] = {
+    {5, yoshi_appeal_event},
+    {6, attack_audience_event},
+    {1, __makeTechMenuFunc},
+    {48, btldefaultevt_Dummy},
+    {64, party_win_reaction},
+    {7, subset_attack_ready_jump_event},
+    {47, btldefaultevt_avoid_counter_event},
+    {0, NULL},
+};
+#endif
 
 BattleUnitKindPart unitpartsdata_Party_Yoshi[] = {
     {1, "btl_un_yoshi", "c_babyyoshi", 0.0f, 0.0f, 0.0f, 16.0f, 24.0f, 5.0f, 0.0f, 24.0f, 0.0f, 20, 24, 255, &defence, &defence_attr, 0x9, 0, pose_table_yoshi_stay},
@@ -348,6 +382,14 @@ static EVT_BEGIN(damage_event)
     CALL_CHILD(PTR(btldefaultevt_Damage))
     RETURN
 EVT_END()
+
+// The demo defines wait_event here; retail defines it near the end of the file.
+#ifdef VERSION_G8ME01_DEMO
+static EVT_BEGIN(wait_event)
+    CALL(btlevtcmd_AnimeChangePoseFromTable, -2, 1)
+    RETURN
+EVT_END()
+#endif
 
 BattleWeapon partyWeapon_YoshiNormalAttack = {
     "btl_wn_pys_normal", // name
@@ -584,7 +626,11 @@ BattleWeapon partyWeapon_YoshiNomikomi_Involved = {
     NULL, // fpDamageFn
     {0}, // fpDamageWork
     0x2100260, // targetClassFlags
+#ifdef VERSION_G8ME01_DEMO
+    0x20002000, // targetPropertyFlags
+#else
     0x20102000, // targetPropertyFlags
+#endif
     0, 0, // element..damagePattern
     3, // acLevel
     2, // reserved_6F
@@ -1438,7 +1484,7 @@ EVT_BEGIN(partyYoshiAttack_EggAttack)
         CASE_DEFAULT
         CALL(btlevtcmd_AnimeSetPoseTable, -2, LW(12), PTR(pose_table_egg_g))
     END_SWITCH
-    CALL(btlevtcmd_AnimeChangePoseType, -2, LW(12), 69)
+    CALL(btlevtcmd_AnimeChangePoseType, -2, LW(12), DEMO_POSE(69))
     CALL(btlevtcmd_SetPartsWork, -2, LW(12), 1, 4)
     CALL(btlevtcmd_SetPartsWork, -2, LW(12), 2, PTR(&partyWeapon_YoshiEggAttack_Minimini))
     LABEL(20)
@@ -1583,7 +1629,7 @@ EVT_BEGIN(partyYoshiAttack_EggAttack)
     CALL(btlevtcmd_SetPartsWork, -2, LW(12), 7, LW(15))
     CALL(btlevtcmd_AnimeWaitPlayComplete, -2, 1)
     WAIT_FRAMES(10)
-    CALL(btlevtcmd_AnimeChangePoseType, -2, 1, 69)
+    CALL(btlevtcmd_AnimeChangePoseType, -2, 1, DEMO_POSE(69))
     LABEL(90)
     IF_INT_NOT_EQUAL(LW(12), LW(13))
         ADD(LW(12), 1)
@@ -1730,7 +1776,11 @@ EVT_BEGIN(partyYoshiAttack_CallGuard)
         SET_VALUE(LW(1), 14)
         SET_VALUE(LW(2), 30)
     END_SWITCH
+#ifdef VERSION_G8ME01_DEMO
+    CALL(btlevtcmd_AcSetParamAll, 15, LW(0), 178, LW(1), LW(2), 17, 18, -250000000)
+#else
     CALL(btlevtcmd_AcSetParamAll, 15, LW(0), 178, LW(1), LW(2), 20, 61, -250000000)
+#endif
     CALL(btlevtcmd_AcSetGaugeParam, 60, 80, 100, 100)
     CALL(btlevtcmd_AcSetFlag, 64)
     CALL(btlevtcmd_SetupAC, -2, 6, 1, 0)
@@ -1745,6 +1795,13 @@ EVT_BEGIN(partyYoshiAttack_CallGuard)
     CALL(btlevtcmd_StartAC, 1)
     CALL(btlevtcmd_ResultAC)
     CALL(btlevtcmd_AnimeChangePose, -2, 1, STRING("PYS_A_11"))
+#ifdef VERSION_G8ME01_DEMO
+    // The demo puts the effect at Yoshi's feet and plays no sound.
+    CALL(btlevtcmd_GetPos, -2, LW(0), LW(1), LW(2))
+    CALL(btlevtcmd_GetFaceDirection, -2, LW(5))
+    MULTIPLY(LW(5), 30)
+    CALL(evt_eff, STRING(""), STRING("kiss"), 3, LW(0), LW(1), LW(2), LW(5), 0, 0, 0, 0, 0, 0, 0)
+#else
     CALL(btlevtcmd_GetHeight, -2, LW(6))
     CALL(btlevtcmd_GetStatusMg, -2, LW(0))
     MULTIPLY_FLOAT(LW(6), LW(0))
@@ -1754,6 +1811,7 @@ EVT_BEGIN(partyYoshiAttack_CallGuard)
     MULTIPLY(LW(5), 30)
     CALL(evt_eff, 0, STRING("kiss"), 3, LW(0), LW(1), LW(2), LW(5), 0, 0, 0, 0, 0, 0, 0)
     CALL(evt_snd_sfxon_3d, STRING("SFX_ENM_TOGENOKO_CALL1"), LW(0), LW(1), LW(2), 0)
+#endif
     CALL(btlevtcmd_ftof, 33, LW(0))
     BEGIN_SIBLING_EVENT_GET_ID(LW(15))
         WAIT_FRAMES(LW(0))
@@ -1861,7 +1919,7 @@ EVT_END()
 
 EVT_BEGIN(yoshi_appeal_event)
     CALL(btlevtcmd_RunDataEventChild, -2, 7)
-    CALL(btlevtcmd_AnimeChangePoseType, -2, 1, 66)
+    CALL(btlevtcmd_AnimeChangePoseType, -2, 1, DEMO_POSE(66))
     CALL(btlevtcmd_GetPos, -2, LW(0), LW(1), LW(2))
     CALL(evt_snd_sfxon_3d, STRING("SFX_MARIO_APPEAL1"), LW(0), LW(1), LW(2), 0)
     WAIT_FRAMES(40)
@@ -1905,7 +1963,7 @@ static EVT_BEGIN(attack_audience_event)
         CASE_DEFAULT
         CALL(btlevtcmd_AnimeSetPoseTable, -2, LW(12), PTR(pose_table_egg_g))
     END_SWITCH
-    CALL(btlevtcmd_AnimeChangePoseType, -2, LW(12), 69)
+    CALL(btlevtcmd_AnimeChangePoseType, -2, LW(12), DEMO_POSE(69))
     CALL(btlevtcmd_SetPartsMoveSpeed, -2, LW(12), FLOAT(7.5f))
     CALL(btlevtcmd_SetPartsFallAccel, -2, LW(12), FLOAT(0.099609375f))
     CALL(btlevtcmd_OnPartsAttribute, -2, LW(12), 50331648)
@@ -1965,10 +2023,12 @@ static EVT_BEGIN(attack_event)
     RETURN
 EVT_END()
 
+#ifndef VERSION_G8ME01_DEMO
 static EVT_BEGIN(wait_event)
     CALL(btlevtcmd_AnimeChangePoseFromTable, -2, 1)
     RETURN
 EVT_END()
+#endif
 
 u8 _yoshig_tpl_no_tbl[8] __attribute__((aligned(4))) = { // battle tex id per sweat frame (US ids +0x16)
     VERSION_PICK(0x46, 0x5C), VERSION_PICK(0x49, 0x5F), VERSION_PICK(0x47, 0x5D), VERSION_PICK(0x46, 0x5C),
@@ -2360,7 +2420,11 @@ USER_FUNC(_gundan_yoshi_run_effect) {
             f32 sc;
             p = &w->parts[irand(256)];
             sc = 1.0f + 0.05f * (f32)irand(20);
+#ifdef VERSION_G8ME01_DEMO
+            effKemuTestEntry(0, p->x, 5.0f + p->y + (f32)irand(10), p->z, sc);
+#else
             effKemuTestEntry(0, p->x, 5.0f + p->y + (f32)irand(15), 65.0f, sc);
+#endif
         }
         w->timer *= 0.00390625f;
         pos.x = w->timer;
@@ -2377,17 +2441,35 @@ USER_FUNC(_gundan_yoshi_run_effect) {
         unit->countersetWeapon = NULL;
         return EVT_RETURN_DONE;
     }
+#ifdef VERSION_G8ME01_DEMO
+    // The demo draws every Yoshi from one display callback.
+    dispEntry(CAMERA_3D, 0.0f, 2, (DispCallback)_btlYoshiDisp, w);
+#else
     for (i = 0; i < 256; i++) {
         dispEntry(CAMERA_3D, dispCalcZ((Vec*)p), VERSION_PICK(2, 1), (DispCallback)_btlYoshiDisp, &w->parts[i]);
     }
+#endif
     } while (0);
     return EVT_RETURN_BLOCK;
 }
+#ifdef VERSION_G8ME01_DEMO
+void _btlYoshiDisp(CameraId camera, YoshiGundanWork* w) {
+    YoshiGundanPart* p;
+    s32 i;
+    f32 s;
+    for (i = 0; i < 256; i++) {
+        p = &w->parts[i];
+        s = (p->vx < 0.0f) ? 0.4f : -0.4f;
+        ((void (*)(f32, f32, f32, f32, f32, u32, GXColor, s32))btlDispTexPlane)(p->x, p->y + 20.0f, p->z, s, 0.4f, _yoshig_tpl_no_tbl[p->frame], (GXColor){255,255,255,255}, 0);
+    }
+}
+#else
 void _btlYoshiDisp(CameraId camera, YoshiGundanPart* p) {
     f32 s;
     s = (p->vx < 0.0f) ? 0.4f : -0.4f;
     ((void (*)(f32, f32, f32, f32, f32, u32, GXColor, s32))btlDispTexPlane)(p->x, p->y + 20.0f, p->z, s, 0.4f, _yoshig_tpl_no_tbl[p->frame], (GXColor){255,255,255,255}, 0);
 }
+#endif
 
 void yoshiStrippedPool(f32* f, s32 i) {
     *f = (f32)i;

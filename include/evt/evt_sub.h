@@ -31,7 +31,11 @@ extern EvtWord evt_sub_stopwatch[];
 extern EvtWord evt_sub_tree_access_entry[];
 
 extern WinMgrDesc coinget_window_desc[1];
+#ifdef VERSION_G8ME01_DEMO
+extern EvtWord kusa_evt[41]; // the demo scripts have no SET_TYPE(0)
+#else
 extern EvtWord kusa_evt[43];
+#endif
 extern EvtWord mail_evt[80];
 extern EvtWord mail_evt_bom_01[65];
 extern EvtWord mail_evt_gor_01[61];
@@ -54,4 +58,8 @@ extern EvtWord mail_evt_tou_01[67];
 extern EvtWord mail_evt_usu_01[61];
 extern EvtWord mail_evt_win_01[61];
 extern s32 tree_data[75];
+#ifdef VERSION_G8ME01_DEMO
+extern EvtWord tree_evt[249];
+#else
 extern EvtWord tree_evt[251];
+#endif

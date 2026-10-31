@@ -86,7 +86,12 @@ void effLaserMain(EffectEntry* effect) {
             break;
         case 2:
             if (fadeIsFinish()) {
+#ifdef VERSION_G8ME01_DEMO
+                // fade type 14 in the demo
+                fadeEntry(14, 100, (GXColor){ 0xFF, 0xFF, 0xFF, 0xFF });
+#else
                 fadeEntry(16, 100, (GXColor){ 0xFF, 0xFF, 0xFF, 0xFF });
+#endif
                 animPoseSetAnim(work->poseId, "A_1", TRUE);
                 animPoseSetLocalTimeRate(work->poseId, 0.5f);
                 work->state++;

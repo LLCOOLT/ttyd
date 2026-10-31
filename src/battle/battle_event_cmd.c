@@ -22,6 +22,20 @@
 #include "pmario_sound.h"
 #include <math.h>
 
+// Pose types from 58 on are two lower in the demo (retail added two before them).
+#ifdef VERSION_G8ME01_DEMO
+#define POSE_TYPE(n) ((n) - 2)
+#else
+#define POSE_TYPE(n) (n)
+#endif
+
+// DEMO_PICK(demo, retail): the value in the 2004 demo, or the retail value.
+#ifdef VERSION_G8ME01_DEMO
+#define DEMO_PICK(demo, retail) (demo)
+#else
+#define DEMO_PICK(demo, retail) (retail)
+#endif
+
 //s32* eventId
 USER_FUNC(btlevtcmd_WaitEventEnd) {
     s32 id;
@@ -3622,7 +3636,12 @@ USER_FUNC(btlevtcmd_DispItemIcon) {
     time = evtGetValue(event, args[4]);
     if (isFirstCall) {
         event->userdata[0] = time;
+#ifdef VERSION_G8ME01_DEMO
+        event->userdatap[1] = itemEntry(NULL, item, 0x10, -1, 0, x, y, z);
+        itemFlagOn(event->userdatap[1], 0x100);
+#else
         event->userdatap[1] = itemEntry(NULL, item, 0x11, -1, 0, x, y, z);
+#endif
         return EVT_RETURN_BLOCK;
     }
     if (--event->userdata[0] > 0) {
@@ -3667,8 +3686,14 @@ USER_FUNC(btlevtcmd_CommandFlyItem) {
                 pos.y += unit->mSizeMultiplier * BtlUnit_GetHeight(unit);
             }
         }
+#ifdef VERSION_G8ME01_DEMO
+        event->userdatap[1] = itemEntry(NULL, item, 0x10, -1, 0, pos.x, pos.y, pos.z);
+        effItemGetEntry(10, pos.x, 12.0f + pos.y, pos.z - 5.0f);
+        itemFlagOn(event->userdatap[1], 0x100);
+#else
         event->userdatap[1] = itemEntry(NULL, item, 0x11, -1, 0, pos.x, pos.y, pos.z);
         effItemGetEntry(10, pos.x, 12.0f + pos.y, pos.z - 5.0f);
+#endif
         if (kind == 0xDE) {
             psndSFXOn_3D("SFX_ITEM_MARIO_USE1", &pos);
         } else if (kind >= 0xE0 && kind < 0xE7) {
@@ -4261,7 +4286,7 @@ USER_FUNC(btlevtcmd_GetConfuseActEvent) {
     while (!evt) {
         evt = BattleSetConfuseAct(_battleWorkPointer, unit);
         i++;
-        if (i > 20) {
+        if (i > DEMO_PICK(10, 20)) {
             evt = subsetevt_confuse_flustered;
         }
     }
@@ -5182,6 +5207,46 @@ USER_FUNC(btlevtcmd_ACSuccessEffect) {
     psndSFX_pit(psndSFXOn_3D(name, &pos), 0);
     return EVT_RETURN_DONE;
 }
+#elif defined(VERSION_G8ME01_DEMO)
+// The demo has fixed widths, a different base scale, and no scaling or clamping of the position.
+USER_FUNC(btlevtcmd_ACSuccessEffect) {
+    EvtWord* args = event->args;
+    s32 type;
+    f32 scale;
+    f32 w;
+    Vec pos;
+    f32 h;
+    const char* name;
+    s32 eff;
+    EffectEntry* entry;
+
+    type = evtGetValue(event, args[0]);
+    scale = 0.65f;
+    pos.x = (f32)evtGetValue(event, args[1]);
+    pos.y = (f32)evtGetValue(event, args[2]);
+    pos.z = (f32)evtGetValue(event, args[3]);
+    switch (type) {
+        case 0: w = 120.0f; scale *= 0.3f; name = "SFX_SYSTEM_NICE_25PERCENT1"; eff = 0; break;
+        case 1: scale *= 0.6f; name = "SFX_SYSTEM_NICE_50PERCENT1"; w = 120.0f; eff = 0; break;
+        case 2: scale *= 1.2f; name = "SFX_SYSTEM_NICE1"; w = 120.0f; eff = 0; break;
+        case 3: scale *= 1.2f; name = "SFX_SYSTEM_GOOD1"; w = 120.0f; eff = 1; break;
+        case 4: scale *= 1.2f; name = "SFX_SYSTEM_GREAT1"; w = 150.0f; eff = 2; break;
+        case 5: name = "SFX_SYSTEM_WONDERFUL1"; w = 225.0f; eff = 3; break;
+        case 6: name = "SFX_SYSTEM_EXCELLENT1"; w = 225.0f; eff = 4; break;
+        default: return EVT_RETURN_DONE;
+    }
+    w += 20.0f;
+    h = 0.5f * w;
+    if (pos.y < 80.0f) {
+        entry = effNiceEntry(eff, pos.x - h, 50.0f + pos.y, pos.z);
+    }
+    else {
+        entry = effNiceEntry(eff, pos.x - h, pos.y - 50.0f, pos.z);
+    }
+    ((NiceEffectWork*)entry->userdata)->overallScale = scale;
+    psndSFX_pit(psndSFXOn_3D(name, &pos), 0);
+    return EVT_RETURN_DONE;
+}
 #else
 USER_FUNC(btlevtcmd_ACSuccessEffect) {
     EvtWord* args = event->args;
@@ -5587,14 +5652,14 @@ USER_FUNC(btlevtcmd_CheckDefinePosetype) {
         end = 28;
     } else if (type < 40) {
         end = 39;
-    } else if (type < 70) {
-        end = 69;
+    } else if (type < POSE_TYPE(70)) {
+        end = POSE_TYPE(69);
     } else {
         evtSetValue(event, out, 0);
         return EVT_RETURN_DONE;
     }
     for (; table; table += 2) {
-        if (table[0] >= 70) {
+        if (table[0] >= POSE_TYPE(70)) {
             res = 0;
             break;
         }
@@ -6479,16 +6544,19 @@ USER_FUNC(btlevtcmd_snd_voice) {
     BattleWork* wp = _battleWorkPointer;
     s32 id, type;
     BattleUnit* unit;
+    s32 r;
 
     id = evtGetValue(event, args[0]);
     type = evtGetValue(event, args[1]);
     unit = BattleGetUnitPtr(wp, BattleTransID(event, id));
     switch (type) {
         case 1:
-            BtlUnit_snd_se(unit, _mario_acrobat_voice_table[irand(5)], EVTDAT_POINTER_MAX, 0);
+            r = irand(5);
+            BtlUnit_snd_se(unit, _mario_acrobat_voice_table[r], EVTDAT_POINTER_MAX, 0);
             break;
         case 2:
-            BtlUnit_snd_se(unit, _mario_attack_voice_table[irand(10)], EVTDAT_POINTER_MAX, 0);
+            r = irand(10);
+            BtlUnit_snd_se(unit, _mario_attack_voice_table[r], EVTDAT_POINTER_MAX, 0);
             break;
     }
     return EVT_RETURN_DONE;
@@ -6542,7 +6610,7 @@ USER_FUNC(btlevtcmd_InviteApInfoReport) {
     return EVT_RETURN_DONE;
 }
 
-#ifdef VERSION_G8MP01
+#if defined(VERSION_G8MP01) || defined(VERSION_G8ME01_DEMO)
 USER_FUNC(btlevtcmd_SetEventHit) {
     BattleWork* wp = _battleWorkPointer;
     EvtWord* args = event->args;

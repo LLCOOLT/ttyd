@@ -292,7 +292,11 @@ EVT_BEGIN(nokonoko_F_talk)
             CALL(evt_pouch_get_haveitemcnt, LW(0))
             IF_INT_GREATER(LW(0), 0)
                 CALL(evt_msg_continue)
+#ifdef VERSION_G8ME01_DEMO
+                CALL(evt_win_item_select, 1, LW(0))
+#else
                 CALL(evt_win_item_select, 0, 1, LW(0), 0)
+#endif
                 ELSE
                 SET_VALUE(LW(0), -1)
                 SET_VALUE(LF(0), 1)
@@ -318,7 +322,11 @@ EVT_BEGIN(nokonoko_F_talk)
                 IF_INT_EQUAL(LW(0), 206)
                     CALL(evt_pouch_remove_item, 206, LW(0))
                     CALL(evt_msg_print, 0, STRING("irai_15_005"), 0, 0)
+#ifdef VERSION_G8ME01_DEMO
+                    CALL(evt_item_entry, STRING("df"), 167, 0, -1000, 0, 16, -1, 0)
+#else
                     CALL(evt_item_entry, STRING("df"), 167, 0, -1000, 0, 17, -1, 0)
+#endif
                     CALL(evt_item_get_item, STRING("df"))
                     CALL(evt_item_get_item_end_wait, STRING("df"))
                     CALL(evt_msg_print, 0, STRING("irai_15_007"), 0, 0)
@@ -346,7 +354,11 @@ EVT_BEGIN(nokonoko_F_talk)
             CALL(evt_pouch_get_haveitemcnt, LW(0))
             IF_INT_GREATER(LW(0), 0)
                 CALL(evt_msg_continue)
+#ifdef VERSION_G8ME01_DEMO
+                CALL(evt_win_item_select, 1, LW(0))
+#else
                 CALL(evt_win_item_select, 0, 1, LW(0), 0)
+#endif
                 ELSE
                 SET_VALUE(LW(0), -1)
                 SET_VALUE(LF(0), 1)
@@ -354,7 +366,11 @@ EVT_BEGIN(nokonoko_F_talk)
             IF_INT_EQUAL(LW(0), 159)
                 CALL(evt_pouch_remove_item, 159, LW(0))
                 CALL(evt_msg_print, 0, STRING("irai_15_013"), 0, 0)
+#ifdef VERSION_G8ME01_DEMO
+                CALL(evt_item_entry, STRING("df"), 167, 0, -1000, 0, 16, -1, 0)
+#else
                 CALL(evt_item_entry, STRING("df"), 167, 0, -1000, 0, 17, -1, 0)
+#endif
                 CALL(evt_item_get_item, STRING("df"))
                 CALL(evt_item_get_item_end_wait, STRING("df"))
                 CALL(evt_msg_print, 0, STRING("irai_15_015"), 0, 0)
@@ -767,7 +783,9 @@ EVT_BEGIN(first_time_camera)
     CALL(evt_cam3d_evt_off, 500, 4)
     CALL(evt_snd_bgmon_f, 768, STRING("BGM_STG1_NOK1"), 2000)
     SET_VALUE(GSW(0), 26)
+#ifndef VERSION_G8ME01_DEMO
     CALL(N_evt_bero_set_mario_bottomless_respawn_pos_to_current_mario_pos)
+#endif
     CALL(evt_party_run, 0)
     CALL(evt_mario_key_onoff, 1)
     CALL(evt_snd_bgm_scope, 0, 0)
@@ -1385,7 +1403,11 @@ EVT_BEGIN(nok_00_koopa_evt)
     SET_VALUE(LW(0), 6)
     CALL_CHILD(PTR(evt_memcard_save))
     CALL(evt_mario_set_mode, 0)
+#ifdef VERSION_G8ME01_DEMO
+    CALL(evt_fade_set_mapchange_type, 1, 57, 0, 56, 0)
+#else
     CALL(evt_fade_set_mapchange_type, 1, 59, 0, 58, 0)
+#endif
     CALL(evt_bero_mapchange, STRING("mri_00"), STRING(""))
     RETURN
 EVT_END()

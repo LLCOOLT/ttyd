@@ -46,6 +46,11 @@ USER_FUNC(btlevtcmd_RecoverFp);
 USER_FUNC(btlevtcmd_RecoverHp);
 USER_FUNC(evt_eff);
 
+#ifdef VERSION_G8ME01_DEMO
+// the demo keeps these in .data, ahead of the effect scripts
+u16 tex_id_list_small[5] = {0x2B, 0x2D, 0x2F, 0x2E, 0x2C};
+u16 tex_id_list_big[5] = {0x30, 0x32, 0x34, 0x33, 0x31};
+#endif
 
 EVT_BEGIN(kinoko_effect)
     CALL(btlevtcmd_GetUnitId, -3, LW(3))
@@ -201,8 +206,10 @@ u16 tex_id_list_small[5] = {0x41, 0x43, 0x45, 0x44, 0x42};
 u16 tex_id_list_big[5] = {0x46, 0x48, 0x4A, 0x49, 0x47};
 #define BBS_ICON_OFS 8
 #else
+#ifndef VERSION_G8ME01_DEMO
 u16 tex_id_list_small[5] = {0x2B, 0x2D, 0x2F, 0x2E, 0x2C};
 u16 tex_id_list_big[5] = {0x30, 0x32, 0x34, 0x33, 0x31};
+#endif
 #define BBS_ICON_OFS 0
 #endif
 
@@ -577,7 +584,11 @@ void BattleBreakSlot_Main(void) {
 			if (slot->phaseTimer == BREAK_END(150)) {
 				BattleAudienceAddTargetNum(0.0f, updown);
 				slot->phase = 8;
+#ifdef VERSION_G8ME01_DEMO
+				slot->flags &= ~2;
+#else
 				slot->flags &= ~4;
+#endif
 #ifdef VERSION_G8ME01
 				{
 #else
@@ -762,20 +773,28 @@ void BattleBreakSlot_Main(void) {
 						rr->index = 0;
 					}
 					rr->item = rr->cards[rr->index];
-					if ((aud->flags & 0x4000) && BattleBreakSlotReelGetPtr(0)->item == 4 &&
+					if ((aud->flags & AUDIENCE_FLAG(0x4000)) && BattleBreakSlotReelGetPtr(0)->item == 4 &&
 					    BattleBreakSlotReelGetPtr(1)->item == 4 && rr->item == 4) {
 						break;
 					}
+#ifndef VERSION_G8ME01_DEMO
 					if ((slot->flags & 2) && BattleBreakSlotReelGetPtr(0)->item == 4 &&
 					    BattleBreakSlotReelGetPtr(1)->item == 4 && rr->item == 4) {
 						break;
 					}
+#endif
 					if ((slot->flags & 1) && rr->item != 3) {
 						break;
 					}
+#ifdef VERSION_G8ME01_DEMO
+					if ((slot->flags & 2) && rr->item != 2) {
+						break;
+					}
+#else
 					if ((slot->flags & 4) && rr->item != 3) {
 						break;
 					}
+#endif
 					if (((u32)dbg2->flags & 0x80000) && rr->item != dbg2->slotItem) {
 						break;
 					}
@@ -850,7 +869,7 @@ void BattleBreakSlotDispReel(CameraId camId, void* param) {
 	for (; i < 3; i++, reel++) {
 		if ((reel->flags & 1) && reel->state >= 1 && reel->state <= 4) {
 			PSMTXTrans(trans, 42.0f * i + 226.0f, 122.0f, 0.0f);
-			iconDispGxCol(trans, 0x10, 0x1D4 + BBS_ICON_OFS, (GXColor){0xFF, 0xFF, 0xFF, 0xD0});
+			iconDispGxCol(trans, ICON_DISP_2D, 0x1D4 + BBS_ICON_OFS, (GXColor){0xFF, 0xFF, 0xFF, 0xD0});
 		}
 	}
 
@@ -948,9 +967,15 @@ void BattleBreakSlot_PointInc(void) {
 			if (slot->flags & 1) {
 				item_appear_force(reel, 3);
 			}
+#ifdef VERSION_G8ME01_DEMO
+			if (slot->flags & 2) {
+				item_appear_force(reel, 2);
+			}
+#else
 			if (slot->flags & 4) {
 				item_appear_force(reel, 3);
 			}
+#endif
 			break;
 		case 1:
 			reel->index = irand(reel->numCards) - 1;
@@ -964,9 +989,15 @@ void BattleBreakSlot_PointInc(void) {
 			if (slot->flags & 1) {
 				item_appear_force(reel, 3);
 			}
+#ifdef VERSION_G8ME01_DEMO
+			if (slot->flags & 2) {
+				item_appear_force(reel, 2);
+			}
+#else
 			if (slot->flags & 4) {
 				item_appear_force(reel, 3);
 			}
+#endif
 			break;
 		case 2:
 			do {

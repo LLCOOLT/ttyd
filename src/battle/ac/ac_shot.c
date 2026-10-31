@@ -327,7 +327,7 @@ static void actionCommandDisp(f32 x, f32 y) {
         f32 px = -200.0f + x;
         pos.x = px;
         pos.y = 25.0f + y;
-        iconDispGx(&pos, 0x10, 0x8c + AC_ICON_OFS, 1.0f);
+        iconDispGx(&pos, ICON_DISP_2D, 0x8c + AC_ICON_OFS, 1.0f);
         limit = sw->speed / 100.0f;
         if (disp->gaugeRatio <= limit) {
             disp->gaugeRatio += 0.01f;
@@ -353,7 +353,7 @@ static void actionCommandDisp(f32 x, f32 y) {
         MTXTrans(m1, px - 88.0f * (1.0f - disp->gaugeRatio), 33.0f + y, 0.0f);
         MTXScale(m2, disp->gaugeRatio, 1.0f, 1.0f);
         MTXConcat(m1, m2, m3);
-        iconDispGxCol(m3, 0x10, 0x8d + AC_ICON_OFS, (GXColor){disp->color.r, disp->color.g, disp->color.b, disp->color.a});
+        iconDispGxCol(m3, ICON_DISP_2D, 0x8d + AC_ICON_OFS, (GXColor){disp->color.r, disp->color.g, disp->color.b, disp->color.a});
     }
 }
 

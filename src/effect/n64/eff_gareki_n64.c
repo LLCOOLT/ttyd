@@ -28,6 +28,8 @@ void gareki_dl(s32 type);
 void effGarekiMain(EffectEntry* effect);
 void effGarekiDisp(CameraId cameraId, EffectEntry* effect);
 
+static f32 vx_data[] = {-1.0f, -0.5f, 0.5f, 1.0f, -1.0f, -0.5f, 0.5f, 1.0f};
+
 static f32 trans_data[] = {-5.0f, -4.0f, -3.0f, -2.0f, 2.0f, -3.0f, 5.0f, -4.0f, -4.0f, 2.0f, -1.0f, 4.0f, 3.0f, 2.0f, 5.0f, 4.0f};
 
 static effN64Vtx stg__s_v[] = {
@@ -93,15 +95,13 @@ static effN64Vtx stg__s_v[] = {
     {1, -4, 0, 1024, 2304, 255, 255, 255, 255},
 };
 
-static f32 vx_data[] = {-1.0f, -0.5f, 0.5f, 1.0f, -1.0f, -0.5f, 0.5f, 1.0f};
-
 EffectEntry* effGarekiN64Entry(f32 x, f32 y, f32 z, f32 groundY) {
     f32* tp;
-    s32 i;
     EffGarekiN64Work* work;
     f32* vp;
     EffectEntry* effect;
     EffGarekiN64Work* piece;
+    s32 i;
 
     effect = effEntry();
     effect->type = "GarekiN64";

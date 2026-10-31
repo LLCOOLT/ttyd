@@ -29,7 +29,11 @@ extern void qqsort(void* array, s32 num, s32 size, void* compare);
 s32 comp_aiueo(const void* a, const void* b);
 s32 comp_kind(s16* a, s16* b);
 
+#ifdef VERSION_G8ME01_DEMO
+s16 _party_max_hp_table[9][4] = {
+#else
 s16 _party_max_hp_table[8][4] = {
+#endif
 	{0, 0, 0, 0},
 	{10, 20, 30, 200},
 	{10, 15, 25, 200},
@@ -37,7 +41,10 @@ s16 _party_max_hp_table[8][4] = {
 	{10, 20, 30, 200},
 	{15, 25, 35, 200},
 	{15, 20, 30, 200},
-	{15, 20, 25, 200}
+	{15, 20, 25, 200},
+#ifdef VERSION_G8ME01_DEMO
+	{0, 0, 0, 0},
+#endif
 };
 s32 comp_aiueo_r(const void* a, const void* b);
 s32 comp_kind_r(s16* a, s16* b);
@@ -229,7 +236,11 @@ BOOL pouchGetItem(ItemType type)
   }
   if (type == ITEM_PIANTA_TOKEN)
   {
+#ifdef VERSION_G8ME01_DEMO
+    if (yuwp->tokens < 0x7FFFFFFF) // the demo has no 99999 cap
+#else
     if (yuwp->tokens < 99999)
+#endif
     {
       yuwp->tokens++;
     }
@@ -461,6 +472,27 @@ BOOL pouchRemoveItem(ItemType type)
   return 0;
 }
 
+#ifdef VERSION_G8ME01_DEMO
+// The demo's pouchRemoveItemIndex shifts the second table wrongly: it clears the slot it has just filled
+// instead of the one it moved from.
+static inline void pouchShiftIndex(s16* table1, s16* table2, int i, s32 maximum) {
+  table1[i] = ITEM_NULL;
+  if (table2 != 0) table2[i] = ITEM_NULL;
+  for (; i < maximum - 1; i++)
+  {
+    table1[i] = table1[i + 1];
+    table1[i + 1] = ITEM_NULL;
+    if (table2 != 0)
+    {
+      table2[i] = table2[i + 1];
+      table2[i] = ITEM_NULL;
+    }
+  }
+}
+#else
+#define pouchShiftIndex pouchShift
+#endif
+
 BOOL pouchRemoveItemIndex(ItemType type, s32 index) {
 	s16* table1, * table2, * p;
 	BOOL valid;
@@ -500,7 +532,7 @@ BOOL pouchRemoveItemIndex(ItemType type, s32 index) {
 	}
 	for (i = index; i < maximum; p++, i++) {
 		if (type == *p) {
-			pouchShift(table1, table2, i, maximum);
+			pouchShiftIndex(table1, table2, i, maximum);
 			return TRUE;
 		}
 	}
@@ -511,6 +543,7 @@ BOOL pouchRemoveItemIndex(ItemType type, s32 index) {
 char* strupr(char* str);
 #endif
 
+#ifndef VERSION_G8ME01_DEMO
 void pouchHiraToKata(const char* src, char* dst) {
 	u16 c;
 	s32 len = strlen(src) / 2;
@@ -614,6 +647,8 @@ void pouchHiraToKata(const char* src, char* dst) {
 }
 #endif
 
+#endif
+
 #ifdef VERSION_G8MP01
 #define pouchAiueoConv pouchHiraToKata
 #else
@@ -670,6 +705,16 @@ static inline void pouchAiueoConv(const char* src, char* dst) {
 #endif
 #endif
 
+#ifdef VERSION_G8ME01_DEMO
+// The demo compares the item names as they are, without the kana conversion.
+s32 comp_aiueo(const void* a, const void* b) {
+	s16 ia = *(s16*)a;
+	s16 ib = *(s16*)b;
+	s32 r = strcmp(msgSearch(itemDataTable[ia].name), msgSearch(itemDataTable[ib].name));
+	if (r > 0) return 1;
+	return -(r < 0);
+}
+#else
 s32 comp_aiueo(const void* a, const void* b) {
 	char bufA[0x80];
 	char bufB[0x80];
@@ -680,6 +725,7 @@ s32 comp_aiueo(const void* a, const void* b) {
 	pouchAiueoConv(msgSearch(itemDataTable[ib].name), bufB);
 	return strcmp(bufA, bufB);
 }
+#endif
 
 s32 comp_kind(s16* a, s16* b) {
 	s16 x = itemDataTable[*a].type_sort_order;
@@ -688,6 +734,15 @@ s32 comp_kind(s16* a, s16* b) {
 	return -(x < y);
 }
 
+#ifdef VERSION_G8ME01_DEMO
+s32 comp_aiueo_r(const void* a, const void* b) {
+	s16 ia = *(s16*)a;
+	s16 ib = *(s16*)b;
+	s32 r = strcmp(msgSearch(itemDataTable[ia].name), msgSearch(itemDataTable[ib].name));
+	if (r < 0) return 1;
+	return -(r > 0);
+}
+#else
 s32 comp_aiueo_r(const void* a, const void* b) {
 	char bufA[0x80];
 	char bufB[0x80];
@@ -698,6 +753,7 @@ s32 comp_aiueo_r(const void* a, const void* b) {
 	pouchAiueoConv(msgSearch(itemDataTable[ib].name), bufB);
 	return strcmp(bufB, bufA);
 }
+#endif
 
 s32 comp_kind_r(s16* a, s16* b) {
 	s16 x = itemDataTable[*a].type_sort_order;
@@ -915,6 +971,14 @@ void pouchSortItem(s32 mode) {
 					if (a->type_sort_order > b->type_sort_order) swap = TRUE;
 				} else if (mode == 12) {
 					if (a->type_sort_order < b->type_sort_order) swap = TRUE;
+#ifdef VERSION_G8ME01_DEMO
+				// The demo sorts by BP cost alone, with no tie-break on the sort order.
+				} else if (mode == 6) {
+					if (ca > cb) swap = TRUE;
+				} else if (mode == 13) {
+					if (ca < cb) swap = TRUE;
+				}
+#else
 				} else if (mode == 6) {
 					if (ca > cb) swap = TRUE;
 					else if (ca == cb && a->type_sort_order > b->type_sort_order) swap = TRUE;
@@ -922,6 +986,7 @@ void pouchSortItem(s32 mode) {
 					if (ca < cb) swap = TRUE;
 					else if (ca == cb && a->type_sort_order < b->type_sort_order) swap = TRUE;
 				}
+#endif
 				if (swap) {
 					t1 = badges[n];
 					t2 = equipped[n];
@@ -931,9 +996,16 @@ void pouchSortItem(s32 mode) {
 					equipped[j] = t2;
 				}
 			}
+#ifdef VERSION_G8ME01_DEMO
+			// The demo copies the lists back after every pass of the outer loop.
+			memcpy(pp[0]->badges, badges, sizeof(badges));
+			memcpy(pp[0]->equippedBadges, equipped, sizeof(equipped));
+		}
+#else
 		}
 		memcpy(pp[0]->badges, badges, sizeof(badges));
 		memcpy(pp[0]->equippedBadges, equipped, sizeof(equipped));
+#endif
 	}
 #endif
 }
@@ -1120,6 +1192,38 @@ s32 pouchGetPartyAttackLv(PartyId partyId) {
 	return party->attackLevel;
 }
 
+#ifdef VERSION_G8ME01_DEMO
+// The demo stores into the first empty slot and removes by id alone, without shifting the list.
+BOOL pouchAddKeepItem(s16 id) {
+	s32 i;
+
+	for (i = 0; i < MAX_STORED_ITEMS; i++) {
+		if (mpp->storedItems[i] == 0) {
+			break;
+		}
+	}
+	if (i < MAX_STORED_ITEMS) {
+		mpp->storedItems[i] = id;
+		return TRUE;
+	}
+	return FALSE;
+}
+
+BOOL pouchRemoveKeepItem(s32 id) {
+	s32 i;
+
+	for (i = 0; i < MAX_STORED_ITEMS; i++) {
+		if (mpp->storedItems[i] == id) {
+			break;
+		}
+	}
+	if (i < MAX_STORED_ITEMS) {
+		mpp->storedItems[i] = 0;
+		return TRUE;
+	}
+	return FALSE;
+}
+#else
 BOOL pouchAddKeepItem(s16 id) {
 	s32 i, j;
 
@@ -1153,6 +1257,7 @@ BOOL pouchRemoveKeepItem(s32 id, s32 index) {
 	}
 	return FALSE;
 }
+#endif
 
 void pouchReviseMarioParam(void) {
 	int i;
@@ -1254,6 +1359,7 @@ BOOL pouchEquipBadgeID(s32 badgeId) {
 	return FALSE;
 }
 
+#ifndef VERSION_G8ME01_DEMO
 BOOL N_pouchUnEquipBadgeID(s32 badgeId) {
 	int i;
 
@@ -1268,8 +1374,15 @@ BOOL N_pouchUnEquipBadgeID(s32 badgeId) {
 	return FALSE;
 }
 
+#endif
+
 s32 pouchArriveBadge(s32 id) {
+#ifdef VERSION_G8ME01_DEMO
+	// The demo stocks an arriving badge in the bargain table.
+	return badgeShop_add(bdsw->bargain_table, (s16)id, 1);
+#else
 	return badgeShop_add(bdsw->special_table, (s16)id, 1);
+#endif
 }
 
 void pouchMajinaiInit(s32 curseCount) {
@@ -1405,7 +1518,11 @@ BOOL pouchEquipBadgeIndex(s32 index);
 s16 pouchGetStarPoint(void);
 void pouchRevisePartyParam(void);
 void pouchReviseMarioParam(void);
+#ifdef VERSION_G8ME01_DEMO
+BOOL pouchRemoveKeepItem(s32 id);
+#else
 BOOL pouchRemoveKeepItem(s32 id, s32 index);
+#endif
 BOOL pouchAddKeepItem(s16 id);
 s32 pouchGetPartyAttackLv(PartyId partyId);
 s32 pouchGetHammerLv(void);

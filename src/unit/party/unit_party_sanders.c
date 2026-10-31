@@ -90,7 +90,11 @@ static void __makeTechMenuFunc(BattleCommand* command, s32* count);
 
 PoseTableEntry pose_table_sanders_stay[25];
 PoseTableEntry pose_table_counter_sanders[20];
+#ifdef VERSION_G8ME01_DEMO
+static BattleDataEntry data_table[8];
+#else
 static BattleDataEntry data_table[9];
+#endif
 BattleUnitKindPart unitpartsdata_Party_Sanders[1];
 BattleUnitKind unitdata_Party_Sanders;
 static EvtWord init_event[63];
@@ -125,7 +129,40 @@ static EvtWord party_win_reaction[9];
 
 
 
+static BattleUnitDefense defence = {{0, 0, 0, 0, 0}};
+
+static BattleUnitDefenseAttr defence_attr = {{0, 0, 0, 0, 0}};
+
+static StatusVulnerability regist = {100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100};
+
 PoseTableEntry pose_table_sanders_stay[] = {
+#ifdef VERSION_G8ME01_DEMO
+    {9, "D_4"},
+    {2, "D_4"},
+    {3, "X_1"},
+    {4, "D_2"},
+    {5, "X_1"},
+    {1, "N_1"},
+    {27, "D_3"},
+    {28, "S_1"},
+    {37, "G_2"},
+    {31, "G_1"},
+    {39, "D_1"},
+    {40, "W_1"},
+    {42, "R_1"},
+    {57, "D_2"},
+    {56, "D_2"},
+    {58, "D_4"},
+    {59, "D_2"},
+    {63, "T_1"},
+    {52, "I_1"},
+    {65, "C_1"},
+    {64, "O_1"},
+    {62, "R_3"},
+    {49, "J_1A"},
+    {45, "G_1"},
+    {67, "S_1"},
+#else
     {9, "D_4"},
     {2, "D_4"},
     {3, "X_1"},
@@ -151,9 +188,32 @@ PoseTableEntry pose_table_sanders_stay[] = {
     {49, "J_1A"},
     {45, "G_1"},
     {69, "S_1"},
+#endif
 };
 
 PoseTableEntry pose_table_counter_sanders[] = {
+#ifdef VERSION_G8ME01_DEMO
+    {1, "N_2"},
+    {27, "D_3"},
+    {28, "A_3"},
+    {37, "G_2"},
+    {31, "G_1"},
+    {39, "D_1"},
+    {40, "W_1"},
+    {42, "R_1"},
+    {57, "D_2"},
+    {56, "D_2"},
+    {58, "D_4"},
+    {59, "D_2"},
+    {63, "T_1"},
+    {52, "I_1"},
+    {65, "C_1"},
+    {64, "O_1"},
+    {62, "R_3"},
+    {49, "J_1A"},
+    {45, "G_1"},
+    {67, "A_3"},
+#else
     {1, "N_2"},
     {27, "D_3"},
     {28, "A_3"},
@@ -174,6 +234,7 @@ PoseTableEntry pose_table_counter_sanders[] = {
     {49, "J_1A"},
     {45, "G_1"},
     {69, "A_3"},
+#endif
 };
 
 static BattleDataEntry data_table[] = {
@@ -183,7 +244,9 @@ static BattleDataEntry data_table[] = {
     {48, btldefaultevt_Dummy},
     {64, party_win_reaction},
     {7, subset_attack_ready_jump_event},
+#ifndef VERSION_G8ME01_DEMO
     {66, sanders_battle_end_event},
+#endif
     {47, btldefaultevt_avoid_counter_event},
     {0, NULL},
 };
@@ -560,8 +623,13 @@ EVT_BEGIN(partySandersAttack_FirstAttack)
     CALL(btlevtcmd_GetHeight, -2, LW(6))
     DIVIDE(LW(6), 2)
     ADD(LW(1), LW(6))
+#ifdef VERSION_G8ME01_DEMO
+    CALL(evt_eff64, STRING(""), STRING("bomb_n64"), 0, LW(0), LW(1), LW(2), 0, 0, 0, 0, 0, 0, 0, 0)
+    CALL(evt_btl_camera_shake_h, 0, 2, 0, 10, 13)
+#else
     CALL(evt_eff64, STRING(""), STRING("bomb_n64"), 1, LW(0), LW(1), LW(2), 0, 0, 0, 0, 0, 0, 0, 0)
     CALL(evt_btl_camera_shake_h, 0, 5, 0, 10, 13)
+#endif
     CALL(btlevtcmd_StageDispellFog)
     CALL(btlevtcmd_WeaponAftereffect, LW(12))
     CALL(btlevtcmd_CheckDamage, -2, LW(3), LW(4), LW(12), 131328, LW(5))
@@ -994,6 +1062,10 @@ EVT_BEGIN(partySandersAttack_NormalAttack)
     CALL(btlevtcmd_GetHeight, -2, LW(6))
     DIVIDE(LW(6), 2)
     ADD(LW(1), LW(6))
+#ifdef VERSION_G8ME01_DEMO
+    CALL(evt_eff64, STRING(""), STRING("bomb_n64"), 0, LW(0), LW(1), LW(2), 0, 0, 0, 0, 0, 0, 0, 0)
+    CALL(evt_btl_camera_shake_h, 0, 2, 0, 10, 13)
+#else
     CALL(btlevtcmd_GetResultAC, LW(6))
     IF_BITS_SET(LW(6), 2)
         CALL(evt_eff64, STRING(""), STRING("bomb_n64"), 1, LW(0), LW(1), LW(2), 0, 0, 0, 0, 0, 0, 0, 0)
@@ -1001,6 +1073,7 @@ EVT_BEGIN(partySandersAttack_NormalAttack)
         CALL(evt_eff64, STRING(""), STRING("bomb_n64"), 0, LW(0), LW(1), LW(2), 0, 0, 0, 0, 0, 0, 0, 0)
     END_IF
     CALL(evt_btl_camera_shake_h, 0, 5, 0, 10, 13)
+#endif
     CALL(btlevtcmd_StageDispellFog)
     IF_INT_NOT_EQUAL(LW(5), 1)
         IF_INT_EQUAL(LW(5), 3)
@@ -1611,12 +1684,21 @@ EVT_BEGIN(partySandersAttack_SuperBombAttack)
     IF_BITS_SET(LW(0), 2)
         CALL(btlevtcmd_AcGetOutputParam, 2, LW(0))
         SWITCH(LW(0))
+#ifdef VERSION_G8ME01_DEMO
+            CASE_LESS_OR_EQUAL(2)
+            SET_VALUE(LW(0), -1)
+            CASE_LESS_OR_EQUAL(4)
+            SET_VALUE(LW(0), 0)
+            CASE_LESS_OR_EQUAL(6)
+            SET_VALUE(LW(0), 1)
+#else
             CASE_LESS_OR_EQUAL(3)
             SET_VALUE(LW(0), -1)
             CASE_LESS_OR_EQUAL(5)
             SET_VALUE(LW(0), 0)
             CASE_LESS_OR_EQUAL(7)
             SET_VALUE(LW(0), 1)
+#endif
             CASE_DEFAULT
             SET_VALUE(LW(0), 2)
         END_SWITCH
@@ -1858,7 +1940,11 @@ EVT_BEGIN(partySandersAttack_CounterSet)
     ELSE
         CALL(btlevtcmd_AcGetOutputParam, 0, LW(0))
         SUBTRACT(LW(0), 1)
+#ifdef VERSION_G8ME01_DEMO
+        CALL(btlevtcmd_GetResultPrizeLv, LW(3), LW(0), LW(6))
+#else
         CALL(btlevtcmd_GetResultPrizeLv, -1, LW(0), LW(6))
+#endif
         CALL(btlevtcmd_GetPos, -2, LW(0), LW(1), LW(2))
         CALL(btlevtcmd_ACSuccessEffect, LW(6), LW(0), LW(1), LW(2))
         CALL(btlevtcmd_AudienceDeclareACResult, LW(12), LW(6))
@@ -1881,6 +1967,21 @@ EVT_BEGIN(partySandersAttack_CounterSet)
     RETURN
 EVT_END()
 #endif
+
+static EVT_BEGIN(attack_event)
+    RETURN
+EVT_END()
+
+BattleUnitSetup entry_bomzou = {
+    &unit_bomzou, // mUnitKindParams
+    2, // alliance
+    {0}, // pad_05
+    0x4000001, // attackPhase
+    {1000.0f, 0.0f, 1000.0f}, // position
+    0, // hitOffsetX
+    {0}, // unitWork
+    NULL, // itemDropTable
+};
 
 #ifdef VERSION_G8ME01
 EVT_BEGIN(partySandersAttack_TimeBombSet)
@@ -2130,7 +2231,11 @@ EVT_END()
 
 EVT_BEGIN(sanders_appeal_event)
     CALL(btlevtcmd_RunDataEventChild, -2, 7)
+#ifdef VERSION_G8ME01_DEMO
+    CALL(btlevtcmd_AnimeChangePoseType, -2, 1, 64)
+#else
     CALL(btlevtcmd_AnimeChangePoseType, -2, 1, 66)
+#endif
     CALL(btlevtcmd_GetPos, -2, LW(0), LW(1), LW(2))
     CALL(evt_snd_sfxon_3d, STRING("SFX_MARIO_APPEAL1"), LW(0), LW(1), LW(2), 0)
     CALL(btlevtcmd_AnimeWaitPlayComplete, -2, 1)
@@ -2141,7 +2246,11 @@ EVT_BEGIN(sanders_appeal_event)
     DIVIDE(LW(6), 2)
     ADD(LW(1), LW(6))
     CALL(evt_eff64, STRING(""), STRING("bomb_n64"), 0, LW(0), LW(1), LW(2), 0, 0, 0, 0, 0, 0, 0, 0)
+#ifdef VERSION_G8ME01_DEMO
+    CALL(evt_btl_camera_shake_h, 0, 2, 0, 10, 13)
+#else
     CALL(evt_btl_camera_shake_h, 0, 5, 0, 10, 13)
+#endif
     CALL(btlevtcmd_StageDispellFog)
     BEGIN_INLINE_EVENT
         CALL(evt_btl_camera_set_mode, 0, 0)
@@ -2156,6 +2265,12 @@ EVT_BEGIN(sanders_appeal_event)
     CALL(btlevtcmd_GetHomePos, -2, LW(0), LW(1), LW(2))
     CALL(btlevtcmd_JumpPosition, -2, LW(0), LW(1), LW(2), 90, -1)
     CALL(btlevtcmd_StartWaitEvent, -2)
+    RETURN
+EVT_END()
+
+static EVT_BEGIN(party_win_reaction)
+    CALL(btlevtcmd_AnimeChangePose, -2, 1, STRING("Y_1"))
+    WAIT_FRAMES(48)
     RETURN
 EVT_END()
 
@@ -2260,9 +2375,17 @@ static EVT_BEGIN(attack_audience_event)
     WAIT_MS(1000)
     CALL(evt_snd_sfxoff, LW(14))
     CALL(btlevtcmd_SetScale, -2, FLOAT(1.0f), FLOAT(1.0f), FLOAT(1.0f))
+#ifdef VERSION_G8ME01_DEMO
+    CALL(evt_snd_sfxon, STRING("SFX_BTL_THUNDERS_ATTACK4"), 0)
+#else
     CALL(evt_snd_sfxon, STRING("SFX_BTL_THUNDERS_ATTACK3"), 0)
+#endif
     CALL(btlevtcmd_GetPos, -2, LW(0), LW(1), LW(2))
+#ifdef VERSION_G8ME01_DEMO
+    CALL(evt_eff, STRING(""), STRING("sandars"), 3, LW(0), LW(1), LW(2), 0, 0, 0, 0, 0, 0, 0, 0)
+#else
     CALL(evt_eff64, STRING(""), STRING("bomb_n64"), 1, LW(0), LW(1), LW(2), 0, 0, 0, 0, 0, 0, 0, 0)
+#endif
     CALL(evt_btl_camera_shake_h, 0, 10, 0, 20, 13)
     CALL(_attack_aud, LW(3), 0)
     CALL(evt_btl_camera_set_mode, 0, 3)
@@ -2301,38 +2424,13 @@ static EVT_BEGIN(attack_audience_event)
 EVT_END()
 #endif
 
+#ifndef VERSION_G8ME01_DEMO
 EVT_BEGIN(sanders_battle_end_event)
     CALL(btlevtcmd_OnOffStatus, -2, 22, 0, 0, 0)
     CALL(btlevtcmd_AnimeSetPoseTable, -2, 1, PTR(pose_table_sanders_stay))
     RETURN
 EVT_END()
-
-static BattleUnitDefense defence = {{0, 0, 0, 0, 0}};
-
-static BattleUnitDefenseAttr defence_attr = {{0, 0, 0, 0, 0}};
-
-static StatusVulnerability regist = {100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100};
-
-static EVT_BEGIN(attack_event)
-    RETURN
-EVT_END()
-
-BattleUnitSetup entry_bomzou = {
-    &unit_bomzou, // mUnitKindParams
-    2, // alliance
-    {0}, // pad_05
-    0x4000001, // attackPhase
-    {1000.0f, 0.0f, 1000.0f}, // position
-    0, // hitOffsetX
-    {0}, // unitWork
-    NULL, // itemDropTable
-};
-
-static EVT_BEGIN(party_win_reaction)
-    CALL(btlevtcmd_AnimeChangePose, -2, 1, STRING("Y_1"))
-    WAIT_FRAMES(48)
-    RETURN
-EVT_END()
+#endif
 
 USER_FUNC(_sanders_make_extra_work_area) {
     BattleWork* wp = _battleWorkPointer;

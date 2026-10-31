@@ -17,10 +17,16 @@ extern BattleWeapon ItemWeaponData_FirstLovePuddingBiribiri;
 extern BattleWeapon ItemWeaponData_FreshJuice;
 extern BattleWeapon ItemWeaponData_Funyafunya_Kun;
 extern BattleWeapon ItemWeaponData_FutarideForever;
+#ifdef VERSION_G8ME01_DEMO
+extern BattleWeapon ItemWeaponData_FireCandy;
+#endif
 extern BattleWeapon ItemWeaponData_Guruguru_Memawashi;
 extern BattleWeapon ItemWeaponData_HealthySalad;
 extern BattleWeapon ItemWeaponData_Honey_Syrup;
 extern BattleWeapon ItemWeaponData_IceCandy;
+#ifdef VERSION_G8ME01_DEMO
+extern BattleWeapon ItemWeaponData_FireCandy; // the demo's Fire Candy is a battle item
+#endif
 extern BattleWeapon ItemWeaponData_Irekaeeru;
 extern BattleWeapon ItemWeaponData_Jiwajiwa_Kinoko;
 extern BattleWeapon ItemWeaponData_Jiwajiwa_Syrup;

@@ -140,10 +140,14 @@ void imgDisp(CameraId camId, void* param) {
 		}
 	}
 	if (first == -1) {
+#ifndef VERSION_G8ME01_DEMO
 		entry->flags |= 0x10000000;
+#endif
 		return;
 	}
+#ifndef VERSION_G8ME01_DEMO
 	entry->flags &= ~0x10000000;
+#endif
 	animSetPaperTexMtx(mp[0], mp[1], mp[2]);
 	animSetPaperTexObj(texs[0], texs[1], texs[2], datas[0], datas[1], datas[2],
 	                   entry->shadows[0].offscreenId != -1 ? 1 : 0, entry->shadows[1].offscreenId != -1 ? 1 : 0);
@@ -191,6 +195,9 @@ void imgDisp(CameraId camId, void* param) {
 	animPoseDrawMtx(entry->poseId, m3, 2, 0.0f, scale);
 	animPoseDrawMtx(entry->poseId, m3, 3, 0.0f, scale);
 	animSetPaperTexMtx(NULL, NULL, NULL);
+#ifdef VERSION_G8ME01_DEMO
+	sysWaitDrawSync();
+#else
 	e2 = wp->entries;
 	for (i = 0; i < wp->count; i++, e2++) {
 		if ((e2->flags & 1) && e2->poseId != -1 && !(e2->flags & 2) && strcmp(e2->name, entry->name) != 0 &&
@@ -198,6 +205,7 @@ void imgDisp(CameraId camId, void* param) {
 			break;
 	}
 	if (i < wp->count) sysWaitDrawSync();
+#endif
 }
 
 void mapSetMaterialLight(s32 flags, Vec position);
@@ -288,6 +296,9 @@ static inline void imgCaptureCopy(ImageShadow* sh, ImageEntry* entry) {
 
 void imgCapture_Prim(ImageEntry* entry, s32 id) {
 	ImageShadow* sh = &entry->shadows[id];
+#ifdef VERSION_G8ME01_DEMO
+	void* src;
+#endif
 	s32 offId;
 	u16 w, h;
 	s32 alloc, fmt, dstFmt;
@@ -303,6 +314,20 @@ void imgCapture_Prim(ImageEntry* entry, s32 id) {
 			if (sh->flags & 0x100) {
 				offscreenGetTexObj(offId, &obj, &buf);
 				if (obj) {
+#ifdef VERSION_G8ME01_DEMO
+					src = buf->address;
+					w = GXGetTexObjWidth(obj);
+					h = GXGetTexObjHeight(obj);
+					fmt = GXGetTexObjFmt(obj);
+					size = GXGetTexBufferSize(w, h, fmt, 0, 0);
+					if (sh->allocMode == 1) {
+						sh->data = smartAlloc(size, 1);
+					} else if (sh->allocMode == 2) {
+						sh->data = smartAlloc(size, 0);
+					}
+					memcpy(sh->data->address, src, size);
+					DCFlushRange(sh->data->address, size);
+#else
 					w = GXGetTexObjWidth(obj);
 					h = GXGetTexObjHeight(obj);
 					fmt = GXGetTexObjFmt(obj);
@@ -314,6 +339,7 @@ void imgCapture_Prim(ImageEntry* entry, s32 id) {
 					}
 					memcpy(sh->data->address, buf->address, size);
 					DCFlushRange(sh->data->address, size);
+#endif
 					GXInitTexObj(&sh->texObj, sh->data->address, w, h, fmt, 0, 0, 0);
 					GXInitTexObjLOD(&sh->texObj, 0, 0, 0.0f, 0.0f, 0.0f, 0, 0, 0);
 					offscreenGetBoundingBox(offId, &sh->rect.left, &sh->rect.top, &sh->rect.width, &sh->rect.height);
@@ -463,7 +489,11 @@ void imgMain(void) { //1:1
 					if (entry->shadows[shadow].flags & 4) break;
 				}
 				if (shadow != 3) {
+#ifdef VERSION_G8ME01_DEMO
+					dispEntry(entry->camId, 0.0f, 1, imgDisp, entry);
+#else
 					dispEntry(entry->camId, entry->order, 1, imgDisp, entry);
+#endif
 					switch (entry->shadowId) {
 						case 0:
 							animPoseSetMaterialFlagOff(entry->poseId, 0x10000);
@@ -594,10 +624,14 @@ void imgShadowDisp(CameraId camId, void* param) {
 		}
 	}
 	if (first == -1) {
+#ifndef VERSION_G8ME01_DEMO
 		entry->flags |= 0x10000000;
+#endif
 		return;
 	}
+#ifndef VERSION_G8ME01_DEMO
 	entry->flags &= ~0x10000000;
+#endif
 	animSetPaperTexMtx((void*)mp[0], (void*)mp[1], (void*)mp[2]);
 	animSetPaperTexObj(objs[0], objs[1], objs[2], datas[0], datas[1], datas[2],
 	                   entry->shadows[0].offscreenId != -1 ? 1 : 0, entry->shadows[1].offscreenId != -1 ? 1 : 0);

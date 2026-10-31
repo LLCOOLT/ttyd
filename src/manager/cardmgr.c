@@ -45,6 +45,14 @@ const char str_802CCCAC[0x20] = "%2d月%2d日のセーブデータです";
 //.sbss
 static CardWork* wp;
 
+// Set once a card has been opened; memcard_open then reads its serial number.
+// The demo keeps it in bit 0x4000 (retail moved it to make room for the insert watch).
+#ifdef VERSION_G8ME01_DEMO
+#define CARD_FLAG_SERIAL 0x4000
+#else
+#define CARD_FLAG_SERIAL 0x2000
+#endif
+
 //.sdata
 const char* version = VERSION_PICK("009", "010");
 
@@ -57,7 +65,11 @@ static inline void make_header(void);
 #endif
 static inline void make_data(void);
 
+#ifdef VERSION_G8ME01_DEMO
+static void memcard_probe(void);
+#else
 static inline void memcard_probe(void);
+#endif
 static inline void memcard_mount(void);
 static inline void memcard_unmount(void);
 static inline void memcard_check(void);
@@ -121,6 +133,11 @@ void cardBufReset(void) {
 	wp->op = 0;
 	wp->result = CARD_RESULT_NOCARD;
 	wp->flags = 0;
+#ifdef VERSION_G8ME01_DEMO
+	if (flags & 0x8000) {
+		wp->flags |= 0x8000;
+	}
+#endif
 }
 
 void cardInit(void) {
@@ -147,6 +164,7 @@ void cardInit(void) {
 	CARDInit();
 }
 
+#ifndef VERSION_G8ME01_DEMO
 void cardInsertWatchStart(void) {
 	wp->prevInserted = wp->chan;
 	wp->busyFrames = 10;
@@ -164,11 +182,14 @@ BOOL cardInsertChanged(void) {
     }
     return FALSE;
 }
+#endif
 
 BOOL cardIsExec(void) {
+#ifndef VERSION_G8ME01_DEMO
     if (wp == NULL) {
         return FALSE;
     }
+#endif
     if (wp->flags & 2) {
         return TRUE;
     }
@@ -183,6 +204,7 @@ s32 cardGetCode(void) {
 }
 
 void cardMain(void) {
+#ifndef VERSION_G8ME01_DEMO
 	s32 inserted;
 
 	if (wp->flags & 0x8000) {
@@ -195,6 +217,7 @@ void cardMain(void) {
 			wp->busyFrames--;
 		}
 	}
+#endif
 
 	switch (wp->op) {
 		case 1:
@@ -316,6 +339,14 @@ void cardCopy2Main(s32 slot) {
 #ifdef VERSION_G8MP01
     s32 framerate;
 #endif
+#elif defined(VERSION_G8ME01_DEMO)
+    CardSaveSlot* save;
+    void* backup1;
+    void* backup2;
+    s32 backup4;
+    s32 backup5;
+    s32 backup6;
+    u32 backup3;
 #else
     void* backup2;
     u32 backup3;
@@ -347,11 +378,15 @@ void cardCopy2Main(s32 slot) {
     memcpy(yuwp, &save->data.parlor, sizeof(PiantaParlorWork));
     memcpy(&_jdt.readFlags, &save->data.informant, sizeof(InformantUnknown));
     gp->resetType = 0;
+#ifndef VERSION_G8ME01_DEMO
     gp->resetButtonDown = 0;
+#endif
 #ifdef VERSION_G8ME01
     gp->softResetWait = 0;
 #endif
+#ifndef VERSION_G8ME01_DEMO
     gp->dvdError = 0;
+#endif
     gp->retraceTime = OSGetTime();
     strcpy(gp->currentAreaName, "123");
     gp->relocationBase = NULL;
@@ -448,7 +483,9 @@ void cardWrite(s32 slot) {
         gp->resetButtonDown = 0;
         gp->softResetWait = 0;
 #endif
+#ifndef VERSION_G8ME01_DEMO
         gp->dvdError = 0;
+#endif
         memcpy(&save->data.global, gp, sizeof(GlobalWork));
         memcpy(&save->data.pouch, pouchGetPtr(), sizeof(PouchData));
         memcpy(save->data.deadInfo, fbatGetPointer()->deadInfo, sizeof(save->data.deadInfo));
@@ -461,6 +498,7 @@ void cardWrite(s32 slot) {
     }
 }
 
+#ifndef VERSION_G8ME01_DEMO
 static inline void memcard_probe(void) {
     s32 memSize, sectorSize;
     s32 result;
@@ -495,6 +533,7 @@ static inline void memcard_probe(void) {
     }
     wp->flags &= ~1;
 }
+#endif
 void write_main(void) {
     if (wp->result) {
         wp->op = 8;
@@ -569,7 +608,7 @@ void write_main(void) {
             case 15:
                 wp->op = 0;
                 wp->flags |= 0x100;
-                wp->flags |= 0x2000;
+                wp->flags |= CARD_FLAG_SERIAL;
                 wp->flags &= ~2;
                 if (wp->flags & 0x800) {
                     wp->flags &= ~0x800;
@@ -633,7 +672,7 @@ void write_header_main(void) {
             case 8:
                 wp->op = 0;
                 wp->flags |= 0x100;
-                wp->flags |= 0x2000;
+                wp->flags |= CARD_FLAG_SERIAL;
                 wp->flags &= ~2;
                 break;
         }
@@ -722,7 +761,7 @@ void read_main(void) {
             case 14:
                 wp->op = 0;
                 wp->flags |= 0x100;
-                wp->flags |= 0x2000;
+                wp->flags |= CARD_FLAG_SERIAL;
                 wp->flags &= ~2;
                 break;
         }
@@ -742,7 +781,7 @@ void cardReadAll(void) {
         wp->result = 0;
         wp->flags |= 2;
         wp->flags &= ~0x700;
-        wp->flags &= ~0x2000;
+        wp->flags &= ~CARD_FLAG_SERIAL;
     }
 }
 
@@ -832,7 +871,7 @@ void read_all_main(void) {
             case 14:
                 wp->op = 0;
                 wp->flags |= 0x100;
-                wp->flags |= 0x2000;
+                wp->flags |= CARD_FLAG_SERIAL;
                 wp->flags &= ~2;
                 break;
         }
@@ -851,7 +890,7 @@ void cardCreate(void) {
         wp->result = 0;
         wp->flags |= 2;
         wp->flags &= ~0x700;
-        wp->flags &= ~0x2000;
+        wp->flags &= ~CARD_FLAG_SERIAL;
         wp->flags &= ~0x800;
     }
 }
@@ -915,7 +954,7 @@ void create_main(void) {
             case 13:
                 wp->op = 0;
                 wp->flags |= 0x100;
-                wp->flags |= 0x2000;
+                wp->flags |= CARD_FLAG_SERIAL;
                 wp->flags &= ~2;
                 break;
         }
@@ -934,7 +973,7 @@ void cardFormat(void) {
         wp->result = 0;
         wp->flags |= 2;
         wp->flags &= ~0x700;
-        wp->flags &= ~0x2000;
+        wp->flags &= ~CARD_FLAG_SERIAL;
     }
 }
 
@@ -1207,6 +1246,51 @@ static inline void make_data(void) {
 }
 
 
+#ifdef VERSION_G8ME01_DEMO
+// The demo is not inlined, and it still tests a slot B result that it never
+// probes (resultB is read uninitialized, as in the original code).
+static void memcard_probe(void) {
+    s32 memSize;
+    s32 sectorSize;
+    s32 result;
+    s32 resultB;
+    s32 timeout;
+    s32 i;
+
+    wp->flags |= 1;
+    timeout = 1000000;
+    i = 0;
+    while ((result = CARDProbeEx(0, &memSize, &sectorSize)) == CARD_RESULT_BUSY) {
+        if (++i > timeout) {
+            result = CARD_RESULT_FATAL_ERROR;
+            break;
+        }
+        timeout = (u32)timeout;
+    }
+
+    if (result == CARD_RESULT_READY && sectorSize != 0x2000) {
+        result = CARD_RESULT_WRONGDEVICE;
+    }
+    if (result == CARD_RESULT_READY) {
+        wp->result = CARD_RESULT_READY;
+        wp->chan = 0;
+    } else if (resultB == CARD_RESULT_READY) {
+        wp->result = CARD_RESULT_READY;
+        wp->chan = 1;
+    } else if (result == CARD_RESULT_WRONGDEVICE) {
+        wp->result = CARD_RESULT_WRONGDEVICE;
+        wp->chan = 0;
+    } else if (resultB == CARD_RESULT_WRONGDEVICE) {
+        wp->result = CARD_RESULT_WRONGDEVICE;
+        wp->chan = 1;
+    } else {
+        wp->result = result;
+        wp->chan = -1;
+    }
+    wp->flags &= ~1;
+}
+#endif
+
 void mountDetachCallback(s32 chan, s32 result) {
 	; //stubbed in retail
 }
@@ -1368,7 +1452,7 @@ void memcard_open(void) {
 
     serialNo = 0;
     wp->flags |= 1;
-    if (wp->flags & 0x2000) {
+    if (wp->flags & CARD_FLAG_SERIAL) {
         i = 0;
         while (result = CARDGetSerialNo(wp->chan, &serialNo), result == -1) {
             if (++i > 1000000) {

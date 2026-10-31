@@ -31,6 +31,9 @@ static inline void effitemget_cam_move(CameraEntry* camera, Vec ofs) { camera->p
 void hitGrpFlagOn(const char* name, u32 flags);
 static Vec daiv;
 void marioRollTryCancel(void);
+#ifdef VERSION_G8ME01_DEMO
+void marioRollCancel(void);
+#endif
 void motSlitCancel3(void);
 BOOL marioRollKeyDisable(void);
 
@@ -201,7 +204,11 @@ static void lecture_button_disp(CameraId camera, void* param) {
             }
             pos = disp->pos;
             pos.y += ofs;
+#ifdef VERSION_G8ME01_DEMO
+            iconDispGxAlpha(&pos, 0x84, btn->iconId, btn->alpha, 1.0f);
+#else
             iconDispGxAlpha(&pos, 0x50, btn->iconId, btn->alpha, 1.0f);
+#endif
         }
     }
 }
@@ -456,7 +463,11 @@ static USER_FUNC(evtflash) {
     }
     switch (event->userdata[2]) {
         case 0:
+#ifdef VERSION_G8ME01_DEMO
+            fadeEntry(8, 40, (GXColor){0xFF, 0xFF, 0xFF, 0xFF});
+#else
             fadeEntry(10, 40, (GXColor){0xFF, 0xFF, 0xFF, 0xFF});
+#endif
             event->userdata[2]++;
         case 1:
             if (fadeIsFinish() != TRUE) {
@@ -476,7 +487,11 @@ static USER_FUNC(evtflash) {
             event->userdata[2]++;
             return EVT_RETURN_BLOCK;
         case 3:
+#ifdef VERSION_G8ME01_DEMO
+            fadeEntry(7, 40, (GXColor){0xFF, 0xFF, 0xFF, 0xFF});
+#else
             fadeEntry(9, 40, (GXColor){0xFF, 0xFF, 0xFF, 0xFF});
+#endif
             event->userdata[2]++;
         case 4:
             if (fadeIsFinish() != TRUE) {
@@ -513,7 +528,11 @@ static USER_FUNC(evt_nomal_cange) {
     MarioWork* mario = marioGetPtr();
 
     if (isFirstCall) {
+#ifdef VERSION_G8ME01_DEMO
+        marioRollCancel();
+#else
         marioRollTryCancel();
+#endif
         if (mario->flags & 0x100000) {
             motSlitCancel3();
         }
@@ -571,7 +590,12 @@ EVT_BEGIN(slit_majin_lecture)
     CALL(evt_mario_set_pose, STRING("M_S_1"))
     CALL(evt_msg_toge, 1, 0, 0, 0)
     CALL(evt_msg_print, 0, STRING("stg1_gon_12_13"), 0, STRING("ペラ魔人"))
+#ifdef VERSION_G8ME01_DEMO
+    CALL(evt_msg_toge, 1, 0, 0, 0)
+    CALL(evt_msg_print, 0, STRING("stg1_gon_12_14"), 0, STRING("ペラ魔人"))
+#else
     CALL(evt_msg_print_add, 0, STRING("stg1_gon_12_14"))
+#endif
     LOOP(0)
         LOOP(0)
             CALL(lecture_button_flag_on_off, 0, 2, 1)
@@ -599,8 +623,13 @@ EVT_BEGIN(slit_majin_lecture)
             SET_VALUE(LW(7), 0)
             CALL(evt_cam_letter_box_disable, 1)
             CALL(mainwindow_opendisable)
+#ifdef VERSION_G8ME01_DEMO
+            CALL(evt_mario_trigflag_onoff, 1, 0x80000000)
+            CALL(evt_mario_trigflag_onoff, 1, 0x40000000)
+#else
             CALL(evt_mario_trigflag_onoff, 1, 134217728)
             CALL(evt_mario_trigflag_onoff, 1, 67108864)
+#endif
             CALL(evt_mario_set_enable_key, 32)
             CALL(evt_mario_key_onoff, 1)
             CALL(evt_mario_key_onoff, 1)
@@ -629,12 +658,19 @@ EVT_BEGIN(slit_majin_lecture)
                     END_IF
                 END_IF
             END_LOOP
+#ifndef VERSION_G8ME01_DEMO
             CALL(evt_msg_continue)
+#endif
             CALL(evt_mario_key_onoff, 0)
             CALL(evt_mario_key_onoff, 0)
             CALL(lect_status_on)
+#ifdef VERSION_G8ME01_DEMO
+            CALL(evt_mario_trigflag_onoff, 0, 0x80000000)
+            CALL(evt_mario_trigflag_onoff, 0, 0x40000000)
+#else
             CALL(evt_mario_trigflag_onoff, 0, 134217728)
             CALL(evt_mario_trigflag_onoff, 0, 67108864)
+#endif
             CALL(evt_mario_set_enable_key, 0)
             CALL(mainwindow_openenable)
             CALL(x_flag_set, 0, 2)
@@ -657,20 +693,40 @@ EVT_BEGIN(slit_majin_lecture)
             IF_INT_EQUAL(LW(11), 1)
                 BREAK_LOOP
                 ELSE
+#ifdef VERSION_G8ME01_DEMO
+                CALL(evt_msg_continue)
+#endif
                 CALL(evt_msg_toge, 1, 0, 0, 0)
                 CALL(evt_msg_print, 0, STRING("stg1_gon_12_15_1"), 0, STRING("ペラ魔人"))
             END_IF
         END_LOOP
+#ifdef VERSION_G8ME01_DEMO
+        CALL(evt_msg_print_add, 0, STRING("stg1_gon_12_15"))
+#else
         CALL(evt_msg_toge, 1, 0, 0, 0)
         CALL(evt_msg_print, 0, STRING("stg1_gon_12_15"), 0, STRING("ペラ魔人"))
+#endif
         CALL(evt_msg_select, 0, STRING("stg1_gon_12_15_yn"))
+#ifdef VERSION_G8ME01_DEMO
+        CALL(evt_msg_continue)
+#endif
         IF_INT_EQUAL(LW(0), 0)
+#ifdef VERSION_G8ME01_DEMO
+            CALL(evt_msg_toge, 1, 0, 0, 0)
+            CALL(evt_msg_print, 0, STRING("stg1_gon_12_16"), 0, STRING("ペラ魔人"))
+#else
             CALL(evt_msg_print_add, 0, STRING("stg1_gon_12_16"))
+#endif
             ELSE
             BREAK_LOOP
         END_IF
     END_LOOP
+#ifdef VERSION_G8ME01_DEMO
+    CALL(evt_msg_toge, 1, 0, 0, 0)
+    CALL(evt_msg_print, 0, STRING("stg1_gon_12_17"), 0, STRING("ペラ魔人"))
+#else
     CALL(evt_msg_print_add, 0, STRING("stg1_gon_12_17"))
+#endif
     CALL(evt_npc_set_anim, STRING("ペラ魔人"), STRING("P_2"))
     WAIT_MS(200)
     CALL(evt_npc_set_camid, STRING("ペラ魔人"), 4)

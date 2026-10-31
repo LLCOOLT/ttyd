@@ -33,6 +33,8 @@ typedef struct EffFireFlowerN64Work {
 #ifdef __MWERKS__
 #endif
 
+static s8 scale_data[] = "27<AFKPUZ_dgigd";
+
 effN64Vtx size4x4_tex4x4_vtx[] = {
     {-2, -2, 0, 0, 0, 255, 0, 0, 255},
     {2, -2, 0, 512, 0, 255, 0, 0, 255},
@@ -53,8 +55,6 @@ static effN64Vtx size32x32_tex32x32_vtx[] = {
     {16, 32, 2, 1024, 1024, 255, 255, 255, 255},
     {-16, 32, 2, 0, 1024, 255, 255, 255, 255},
 };
-
-static s8 scale_data[] = "27<AFKPUZ_dgigd";
 
 void effFireFlowerMain(EffectEntry* effect);
 void effFireFlowerDisp(CameraId cameraId, EffectEntry* effect);

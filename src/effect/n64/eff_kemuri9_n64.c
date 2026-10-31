@@ -10,6 +10,187 @@
 double sin(double x);
 double cos(double x);
 
+#ifdef VERSION_G8ME01_DEMO
+// The demo draws the smoke as N64 quads, blending two frames of one texture strip.
+typedef struct EffKemuri9N64Work {
+    u16 type;        // 0x0
+    u8 pad_2[2];     // 0x2
+    Vec position;    // 0x4
+    f32 dirX;        // 0x10
+    f32 velY;        // 0x14
+    f32 dirZ;        // 0x18
+    f32 radius;      // 0x1C
+    f32 radiusEnd;   // 0x20
+    s32 timer;       // 0x24
+    s32 counter;     // 0x28
+    s32 lifetime;    // 0x2C
+    f32 anim;        // 0x30, animation frame 0..8
+} EffKemuri9N64Work;
+
+static effN64Vtx size16x16_tex32x32_vtx[] = {
+    {-8, -8, 0, 0, 0, 0, 0, 0, 255},
+    {8, -8, 0, -1024, 0, 0, 0, 0, 255},
+    {8, 8, 0, -1024, 1024, 0, 0, 0, 255},
+    {-8, 8, 0, 0, 1024, 0, 0, 0, 255},
+};
+
+static effN64Vtx size32x32_tex32x32_vtx[] = {
+    {-16, -16, 0, 0, 0, 0, 0, 0, 255},
+    {16, -16, 0, -1024, 0, 0, 0, 0, 255},
+    {16, 16, 0, -1024, 1024, 0, 0, 0, 255},
+    {-16, 16, 0, 0, 1024, 0, 0, 0, 255},
+};
+
+void effKemuri9Main(EffectEntry* effect);
+void effKemuri9Disp(CameraId cameraId, EffectEntry* effect);
+
+EffectEntry* effKemuri9N64Entry(s32 type, s32 count, s32 life, f32 x, f32 y, f32 z, f32 radiusEnd, f32 angle) {
+    EffectEntry* effect;
+    EffKemuri9N64Work* work;
+    EffKemuri9N64Work* p;
+    s32 i;
+    f32 ang;
+
+    effect = effEntry();
+    effect->type = "Kemuri9N64";
+    effect->count = count + 1;
+    work = __memAlloc(HEAP_EFFECT, (count + 1) * sizeof(EffKemuri9N64Work));
+    effect->userdata = work;
+    effect->callback = effKemuri9Main;
+    work->timer = life;
+    work->counter = 0;
+    work->lifetime = life;
+    work->anim = 0.0f;
+    work->type = type;
+    work->position.x = x;
+    work->position.y = y;
+    work->position.z = z;
+    work->radius = 10.0f;
+    work->radiusEnd = radiusEnd;
+    p = work + 1;
+    for (i = 1; i < count + 1; i++, p++) {
+        p->position.x = 0.0f;
+        p->position.y = 0.0f;
+        p->position.z = 0.0f;
+        ang = 6.2831855f * (angle + (f32)((i - 1) * 360 / count)) / 360.0f;
+        p->dirX = sin(ang);
+        p->velY = 0.0f;
+        p->dirZ = cos(ang);
+    }
+    return effect;
+}
+
+void effKemuri9Main(EffectEntry* effect) {
+    EffKemuri9N64Work* work = effect->userdata;
+    s32 i;
+    s32 ir;
+    Vec position;
+    Vec tmp = {0.0f, 0.0f, 0.0f};
+
+    tmp.x = work->position.x;
+    tmp.y = work->position.y;
+    tmp.z = work->position.z;
+    position = tmp;
+    work->anim = 8.0f * (f32)work->counter / (f32)work->lifetime;
+    work->counter++;
+    work->timer--;
+    if (work->timer < 0) {
+        effDelete(effect);
+        return;
+    }
+    work->radius += 0.1f * (work->radiusEnd - work->radius);
+    ir = (s32)work->radius;
+    work++;
+    for (i = 1; i < effect->count; i++, work++) {
+        work->velY += 0.04f;
+        work->velY *= 0.9f;
+        work->position.x = (f32)ir * work->dirX;
+        work->position.y += work->velY;
+        work->position.z = (f32)ir * work->dirZ;
+    }
+    dispEntry(CAMERA_3D, dispCalcZ(&position), 2, (DispCallback)effKemuri9Disp, effect);
+}
+
+void effKemuri9Disp(CameraId cameraId, EffectEntry* effect) {
+    CameraEntry* camera = camGetPtr(cameraId);
+    EffKemuri9N64Work* work = effect->userdata;
+    BOOL last;
+    s32 i;
+    s32 frame;
+    s32 u;
+    s32 blend;
+    u16 type;
+    GXTexObj texObj;
+    Mtx mtx;
+    Mtx scale;
+    Mtx rot;
+    Mtx view;
+
+    type = work->type;
+    frame = (s32)work->anim;
+    blend = (s32)(256.0f * (work->anim - (f32)frame));
+    last = frame == 7;
+    effGetTexObjN64(0xE, &texObj);
+    GXLoadTexObj(&texObj, GX_TEXMAP0);
+    if ((s32)type < 2) {
+        GXSetTevColor(GX_TEVREG0, (GXColor){0xE6, 0xDE, 0xDE, 0x82});
+    } else {
+        GXSetTevColor(GX_TEVREG0, (GXColor){0xFF, 0x28, 0x0A, 0xA0});
+    }
+    GXSetTevColor(GX_TEVREG1, (GXColor){0, 0, 0, blend});
+    GXSetNumChans(0);
+    GXSetNumTexGens(2);
+    GXSetTexCoordGen2(GX_TEXCOORD0, GX_TG_MTX2x4, GX_TG_TEX0, GX_TEXMTX0, GX_FALSE, GX_PTIDENTITY);
+    GXSetTexCoordGen2(GX_TEXCOORD1, GX_TG_MTX2x4, GX_TG_TEX0, GX_TEXMTX1, GX_FALSE, GX_PTIDENTITY);
+    GXSetNumTevStages(3);
+    GXSetTevOrder(GX_TEVSTAGE0, GX_TEXCOORD0, GX_TEXMAP0, GX_COLOR_NULL);
+    GXSetTevColorOp(GX_TEVSTAGE0, GX_TEV_ADD, GX_TB_ZERO, GX_CS_SCALE_1, GX_TRUE, GX_TEVPREV);
+    GXSetTevAlphaOp(GX_TEVSTAGE0, GX_TEV_ADD, GX_TB_ZERO, GX_CS_SCALE_1, GX_TRUE, GX_TEVPREV);
+    GXSetTevColorIn(GX_TEVSTAGE0, GX_CC_ZERO, GX_CC_ZERO, GX_CC_ZERO, GX_CC_C0);
+    GXSetTevAlphaIn(GX_TEVSTAGE0, GX_CA_ZERO, GX_CA_ZERO, GX_CA_ZERO, GX_CA_TEXA);
+    GXSetTevOrder(GX_TEVSTAGE1, GX_TEXCOORD1, GX_TEXMAP0, GX_COLOR_NULL);
+    GXSetTevColorOp(GX_TEVSTAGE1, GX_TEV_ADD, GX_TB_ZERO, GX_CS_SCALE_1, GX_TRUE, GX_TEVPREV);
+    GXSetTevAlphaOp(GX_TEVSTAGE1, GX_TEV_ADD, GX_TB_ZERO, GX_CS_SCALE_1, GX_TRUE, GX_TEVPREV);
+    GXSetTevColorIn(GX_TEVSTAGE1, GX_CC_ZERO, GX_CC_ZERO, GX_CC_ZERO, GX_CC_CPREV);
+    GXSetTevAlphaIn(GX_TEVSTAGE1, GX_CA_APREV, GX_CA_TEXA, GX_CA_A1, GX_CA_ZERO);
+    GXSetTevOrder(GX_TEVSTAGE2, GX_TEXCOORD_NULL, GX_TEXMAP_NULL, GX_COLOR_NULL);
+    GXSetTevColorOp(GX_TEVSTAGE2, GX_TEV_ADD, GX_TB_ZERO, GX_CS_SCALE_1, GX_TRUE, GX_TEVPREV);
+    GXSetTevAlphaOp(GX_TEVSTAGE2, GX_TEV_ADD, GX_TB_ZERO, GX_CS_SCALE_1, GX_TRUE, GX_TEVPREV);
+    GXSetTevColorIn(GX_TEVSTAGE2, GX_CC_ZERO, GX_CC_ZERO, GX_CC_ZERO, GX_CC_CPREV);
+    GXSetTevAlphaIn(GX_TEVSTAGE2, GX_CA_ZERO, GX_CA_APREV, GX_CA_A0, GX_CA_ZERO);
+    GXSetCullMode(GX_CULL_NONE);
+    PSMTXTrans(mtx, work->position.x, work->position.y, work->position.z);
+    PSMTXRotRad(rot, 'y', 0.017453292f * -camGetPtr(cameraId)->viewYaw);
+    PSMTXConcat(mtx, rot, view);
+    PSMTXConcat(camera->view, view, view);
+    u = frame * 32;
+    PSMTXScale(scale, 0.00390625f, 0.03125f, 0.0f);
+    PSMTXTrans(mtx, (f32)u, 0.0f, 0.0f);
+    PSMTXConcat(scale, mtx, mtx);
+    GXLoadTexMtxImm(mtx, GX_TEXMTX0, GX_MTX2x4);
+    if (last) {
+        PSMTXScale(scale, 0.00390625f, 0.03125f, 0.0f);
+        PSMTXTrans(mtx, (f32)(u + 32), 32.0f, 0.0f);
+        PSMTXConcat(scale, mtx, mtx);
+        GXLoadTexMtxImm(mtx, GX_TEXMTX1, GX_MTX2x4);
+    } else {
+        PSMTXScale(scale, 0.00390625f, 0.03125f, 0.0f);
+        PSMTXTrans(mtx, (f32)(u + 32), 0.0f, 0.0f);
+        PSMTXConcat(scale, mtx, mtx);
+        GXLoadTexMtxImm(mtx, GX_TEXMTX1, GX_MTX2x4);
+    }
+    work++;
+    for (i = 1; i < effect->count; i++, work++) {
+        PSMTXTrans(mtx, work->position.x, work->position.y, work->position.z);
+        PSMTXConcat(view, mtx, mtx);
+        GXLoadPosMtxImm(mtx, GX_PNMTX0);
+        GXSetCurrentMtx(GX_PNMTX0);
+        effSetVtxDescN64((s32)type == 1 ? size16x16_tex32x32_vtx : size32x32_tex32x32_vtx);
+        GXBegin(GX_TRIANGLES, GX_VTXFMT0, 6);
+        tri2(0, 1, 2, 0, 0, 2, 3, 0);
+    }
+}
+#else
 typedef struct EffKemuri9N64Work {
     u16 type;        // 0x0
     u8 pad_2[2];     // 0x2
@@ -210,3 +391,4 @@ void effKemuri9Disp(CameraId cameraId, EffectEntry* effect) {
         GXTexCoord2f32(0.0f, 1.0f);
     }
 }
+#endif

@@ -53,7 +53,7 @@ BOOL battleSeqEndCheck() {
 void BattleInit(FieldBattleInfo* info) {
     BattleWork* wp;
 
-#ifdef VERSION_G8ME01
+#if defined(VERSION_G8ME01) || defined(VERSION_G8ME01_DEMO)
     wp = _battleWorkPointer = (BattleWork*)BattleAlloc(sizeof(BattleWork));
 #else
     wp = _battleWorkPointer = (BattleWork*)_mapAlloc(sizeof(BattleWork));
@@ -154,7 +154,7 @@ void BattleEnd(void) {
     if (subMenu) {
         BattleFree(subMenu);
     }
-#ifdef VERSION_G8ME01
+#if defined(VERSION_G8ME01) || defined(VERSION_G8ME01_DEMO)
     BattleFree(wp);
 #else
     _mapFree(wp);
@@ -165,15 +165,15 @@ void BattleEnd(void) {
 extern BattleUnitSetup entryunit_party[7];
 
 BOOL Btl_UnitSetup(BattleWork* wp) {
+    BattleUnit* party;
+    BattleUnit* mario;
     int i;
     BattleUnitSetup* enemyData;
     NpcBattleInfo* setup;
     BattleGroupSetup* groupSetup;
     PouchData* pouch;
     BattleUnit* system;
-    BattleUnit* mario;
     BattleUnitType partyId;
-    BattleUnit* party;
     BattleUnit* enemy;
     ItemType heldItem;
     int j;
@@ -209,10 +209,19 @@ BOOL Btl_UnitSetup(BattleWork* wp) {
     }
 
     enemyData = groupSetup->enemyData;
+#ifdef VERSION_G8ME01_DEMO
+    heldItem = ITEM_NULL;
+#endif
     for (i = 0; i < groupSetup->numEnemies; enemyData++, i++) {
         enemy = BtlUnit_Entry(enemyData);
         enemy->groupSetupId = i;
+#ifdef VERSION_G8ME01_DEMO
+        enemy->heldItem = heldItem;
+#else
         enemy->heldItem = ITEM_NULL;
+#endif
+#ifndef VERSION_G8ME01_DEMO
+        // The demo's enemies carry no held or stolen items.
         heldItem = setup->stolenItems[enemy->groupSetupId];
         if (heldItem) {
             enemy->heldItem = heldItem;
@@ -221,6 +230,7 @@ BOOL Btl_UnitSetup(BattleWork* wp) {
             enemy->heldItem = setup->heldItems[i];
             BtlUnit_EquipItem(enemy, EQUIP_RESET, setup->heldItems[i]);
         }
+#endif
         enemy->dropTable = setup->itemDropLists[i];
         enemy->currentHp = enemy->maxHp;
         enemy->currentFp = enemy->maxFp;

@@ -85,7 +85,11 @@ BattleUnitSetup entry_chorogun;
 extern EvtWord call_chorogun_event[];
 extern EvtWord escape_chorogun_event[];
 static EvtWord init_event[43];
+#ifdef VERSION_G8ME01_DEMO
+static EvtWord damage_event[108];
+#else
 static EvtWord damage_event[131];
+#endif
 static EvtWord counter_damage_event[30];
 static EvtWord return_event[24];
 static EvtWord attack_event[500];
@@ -180,8 +184,13 @@ static PoseTableEntry pose_table[] = {
     {40, "CBN_W_1"},
     {56, "CBN_X_1"},
     {57, "CBN_X_1"},
+#ifdef VERSION_G8ME01_DEMO
+    {63, "CBN_T_1"},
+    {67, "CBN_S_1"},
+#else
     {65, "CBN_T_1"},
     {69, "CBN_S_1"},
+#endif
 };
 
 static BattleDataEntry data_table[] = {
@@ -328,6 +337,7 @@ EVT_END()
 EVT_BEGIN(escape_chorogun_event)
     WAIT_MS(2000)
     CALL(get_gold_chorobon_id, LW(4))
+#ifndef VERSION_G8ME01_DEMO
     CALL(btlevtcmd_GetUnitId, -2, LW(0))
     IF_INT_EQUAL(LW(0), -1)
         RETURN
@@ -339,10 +349,14 @@ EVT_BEGIN(escape_chorogun_event)
     CALL(btlevtcmd_SetUnitWork, LW(4), 1, 1)
     CALL(btlevtcmd_GetUnitId, -2, LW(10))
     CALL_CHILD(PTR(chorogun_dead_reward))
+#endif
     CALL(chorogun_escape_all)
     WAIT_MS(1000)
     CALL(btlevtcmd_GetUnitWork, LW(4), 2, LW(3))
     CALL(btlevtcmd_KillUnit, LW(3), 0)
+#ifdef VERSION_G8ME01_DEMO
+    CALL(btlevtcmd_SetUnitWork, LW(4), 1, 1)
+#endif
     RETURN
 EVT_END()
 
@@ -363,9 +377,11 @@ EVT_END()
 static EVT_BEGIN(damage_event)
     SET_VALUE(LW(10), -2)
     SET_VALUE(LW(11), 1)
+#ifndef VERSION_G8ME01_DEMO
     CALL(btlevtcmd_GetUnitWork, -2, 2, LW(0))
     CALL(btlevtcmd_GetUnitId, LW(0), LW(1))
     IF_INT_NOT_EQUAL(LW(1), -1)
+#endif
         CALL(btlevtcmd_GetUnitWork, -2, 1, LW(0))
         IF_INT_EQUAL(LW(0), 0)
             CALL(btlevtcmd_CheckDamageCode, -2, 512, LW(0))
@@ -374,15 +390,23 @@ static EVT_BEGIN(damage_event)
                 IF_INT_EQUAL(LW(0), 0)
                     CALL(btlevtcmd_GetUnitWork, -2, 0, LW(0))
                     IF_INT_NOT_EQUAL(LW(0), 0)
+#ifndef VERSION_G8ME01_DEMO
                         CALL(btlevtcmd_SetUnitWork, -2, 1, 1)
+#endif
                         CALL(btlevtcmd_WaitAttackEnd)
+#ifndef VERSION_G8ME01_DEMO
                         CALL(btlevtcmd_GetUnitWork, -2, 2, LW(10))
                         CALL_CHILD(PTR(chorogun_dead_reward))
                         SET_VALUE(LW(10), -2)
+#endif
                         CALL(chorogun_escape_all)
                         CALL(btlevtcmd_GetUnitWork, -2, 2, LW(3))
                         CALL(btlevtcmd_KillUnit, LW(3), 0)
+#ifdef VERSION_G8ME01_DEMO
+                    CALL(btlevtcmd_SetUnitWork, -2, 1, 1)
+#else
                     END_IF
+#endif
                 END_IF
             END_IF
         END_IF

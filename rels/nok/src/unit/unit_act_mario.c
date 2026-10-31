@@ -146,8 +146,13 @@ static PoseTableEntry pose_table[] = {
     {39, "EM_D_1"},
     {42, "EM_R_1"},
     {40, "EM_W_1"},
+#ifdef VERSION_G8ME01_DEMO
+    {63, "EM_T_1"},
+    {67, "EM_S_1"},
+#else
     {65, "EM_T_1"},
     {69, "EM_S_1"},
+#endif
 };
 
 static BattleDataEntry data_table[] = {
@@ -327,30 +332,50 @@ EVT_BEGIN(_battle_event)
     CALL(btlevtcmd_AnimeChangePoseType, LW(5), LW(6), 28)
     CALL(btlevtcmd_GetUnitWork, -2, 2, LW(5))
     CALL(btlevtcmd_GetBodyId, LW(5), LW(6))
+#ifdef VERSION_G8ME01_DEMO
+    CALL(btlevtcmd_AnimeChangePoseType, LW(5), LW(6), 63)
+#else
     CALL(btlevtcmd_AnimeChangePoseType, LW(5), LW(6), 65)
+#endif
     WAIT_MS(1000)
     CALL_CHILD(PTR(_act_teresa_attack))
     CALL(btlevtcmd_AnimeChangePoseType, LW(5), LW(6), 28)
     CALL(btlevtcmd_GetUnitWork, -2, 3, LW(5))
     CALL(btlevtcmd_GetBodyId, LW(5), LW(6))
+#ifdef VERSION_G8ME01_DEMO
+    CALL(btlevtcmd_AnimeChangePoseType, LW(5), LW(6), 63)
+#else
     CALL(btlevtcmd_AnimeChangePoseType, LW(5), LW(6), 65)
+#endif
     WAIT_MS(1000)
     CALL_CHILD(PTR(_act_teresa_attack))
     CALL(btlevtcmd_AnimeChangePoseType, LW(5), LW(6), 28)
     CALL(btlevtcmd_GetUnitWork, -2, 4, LW(5))
     CALL(btlevtcmd_GetBodyId, LW(5), LW(6))
+#ifdef VERSION_G8ME01_DEMO
+    CALL(btlevtcmd_AnimeChangePoseType, LW(5), LW(6), 63)
+#else
     CALL(btlevtcmd_AnimeChangePoseType, LW(5), LW(6), 65)
+#endif
     WAIT_MS(1000)
     CALL_CHILD(PTR(_act_atmic_teresa_press_attack))
     CALL(btlevtcmd_AnimeChangePoseType, LW(5), LW(6), 28)
     CALL(btlevtcmd_GetUnitWork, -2, 5, LW(5))
     CALL(btlevtcmd_GetBodyId, LW(5), LW(6))
+#ifdef VERSION_G8ME01_DEMO
+    CALL(btlevtcmd_AnimeChangePoseType, LW(5), LW(6), 63)
+#else
     CALL(btlevtcmd_AnimeChangePoseType, LW(5), LW(6), 65)
+#endif
     WAIT_MS(1500)
     CALL(btlevtcmd_AnimeChangePoseType, LW(5), LW(6), 28)
     CALL(btlevtcmd_GetUnitWork, -2, 7, LW(5))
     CALL(btlevtcmd_GetBodyId, LW(5), LW(6))
+#ifdef VERSION_G8ME01_DEMO
+    CALL(btlevtcmd_AnimeChangePoseType, LW(5), LW(6), 63)
+#else
     CALL(btlevtcmd_AnimeChangePoseType, LW(5), LW(6), 65)
+#endif
     WAIT_MS(1500)
     CALL(btlevtcmd_AnimeChangePoseType, LW(5), LW(6), 28)
     GOTO(0)
@@ -385,7 +410,11 @@ EVT_END()
 
 EVT_BEGIN(_act_mario_jump_attack)
     CALL(btlevtcmd_JumpSetting, -2, 20, FLOAT(0.0f), FLOAT(0.69921875f))
+#ifdef VERSION_G8ME01_DEMO
+    CALL(btlevtcmd_AnimeChangePoseType, -2, 1, 63)
+#else
     CALL(btlevtcmd_AnimeChangePoseType, -2, 1, 65)
+#endif
     WAIT_MS(1000)
     CALL_CHILD(_act_target_enemy)
     CALL(btlevtcmd_SetFallAccel, -2, FLOAT(0.69921875f))
@@ -436,7 +465,11 @@ EVT_BEGIN(_act_mario_jump_attack)
 EVT_END()
 
 EVT_BEGIN(_act_clauda_press_attack)
+#ifdef VERSION_G8ME01_DEMO
+    CALL(btlevtcmd_AnimeChangePoseType, LW(5), LW(6), 63)
+#else
     CALL(btlevtcmd_AnimeChangePoseType, LW(5), LW(6), 65)
+#endif
     WAIT_MS(1000)
     CALL_CHILD(_act_target_enemy)
     CALL(btlevtcmd_CalculateFaceDirection, LW(5), -1, LW(3), LW(4), 16, LW(15))
@@ -528,7 +561,11 @@ EVT_END()
 
 EVT_BEGIN(_act_clauda_breath_attack)
     CALL(btlevtcmd_JumpSetting, LW(5), 20, FLOAT(0.0f), FLOAT(0.69921875f))
+#ifdef VERSION_G8ME01_DEMO
+    CALL(btlevtcmd_AnimeChangePoseType, LW(5), LW(6), 63)
+#else
     CALL(btlevtcmd_AnimeChangePoseType, LW(5), LW(6), 65)
+#endif
     WAIT_MS(1000)
     CALL(_clauda_breath_effect_ready)
     CALL(btlevtcmd_AnimeChangePose, LW(5), LW(6), STRING("PWD_A2_1"))

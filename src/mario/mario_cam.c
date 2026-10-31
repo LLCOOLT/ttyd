@@ -56,6 +56,9 @@ f32 marioGetCamFollowRate(void) {
 }
 
 void marioPreCamera(void) {
+#ifdef VERSION_G8ME01_DEMO
+    marioGetPtr()->targetYaw = revise360((100.0f * camGetPtr(CAMERA_3D)->viewYaw + 5.0f) / 100.0f);
+#else
     f32 roundingFactor;
     if (camGetPtr(CAMERA_3D)->viewYaw >= 0.0f) {
         roundingFactor = 0.5f;
@@ -63,6 +66,7 @@ void marioPreCamera(void) {
         roundingFactor = -0.5f;
     }
     marioGetPtr()->targetYaw = revise360((s32)((1000.0f * camGetPtr(CAMERA_3D)->viewYaw) + roundingFactor) / 1000.0f);
+#endif
 }
 
 void marioCamMain(void) {

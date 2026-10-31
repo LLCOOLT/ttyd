@@ -130,6 +130,15 @@ s32 marioGetPlaneStatus(void) {
 	return 1;
 }
 
+#ifdef VERSION_G8ME01_DEMO
+void mario_plane_cancel(void) {
+	MarioWork* mp = marioGetPtr();
+	if ((u16)mp->currMotionId == 0x18 && (s32)mp->currSubMotionId >= 12 && (s32)mp->currSubMotionId < 20) {
+		mp->currSubMotionId = 50;
+		mp->mot.plane.groundY = mp->position.y;
+	}
+}
+#else
 BOOL mario_plane_cancel(void) {
 	MarioWork* mp = marioGetPtr();
 	if ((u16)mp->currMotionId != 0x18) {
@@ -142,6 +151,7 @@ BOOL mario_plane_cancel(void) {
 	}
 	return FALSE;
 }
+#endif
 
 void marioForcePlaneAnime(void) {
 	MarioWork* mp = marioGetPtr();
@@ -317,11 +327,22 @@ void mot_plane(void) {
 	}
 #endif
 	flyMain();
+#ifdef VERSION_G8ME01_DEMO
+	if (marioKeyOffChk() && !(mp->trigFlags & 0x1000000)) {
+		MarioWork* m = marioGetPtr();
+		if ((u16)m->currMotionId == 0x18 && (s32)m->currSubMotionId >= 12 && (s32)m->currSubMotionId < 20) {
+			m->currSubMotionId = 50;
+			m->mot.plane.groundY = m->position.y;
+		}
+		return;
+	}
+#else
 	if (marioKeyOffChk() && !(mp->trigFlags & 4)) {
 		if (planeCancel()) {
 			return;
 		}
 	}
+#endif
 	if ((s32)mp->currSubMotionId == 20 || (s32)mp->currSubMotionId == 30) {
 		camFollowYOff();
 		mp->camShiftTargetY = 0.0f;
@@ -464,7 +485,9 @@ void mot_plane(void) {
 		break;
 	case 70: {
 		Vec p;
+#ifndef VERSION_G8ME01_DEMO
 		set_damage_root_ypos(mp->position.y);
+#endif
 		p = mp->position;
 		marioSetSplash(0, &p);
 		mp->multiTimer = 16;
@@ -882,14 +905,20 @@ BOOL chkCollision(f32* outY) {
 		y = mp->motPlane->tipPos.y;
 		z = mp->motPlane->tipPos.z;
 		mp->hitobjStandOn = NULL;
+#ifdef VERSION_G8ME01_DEMO
+		dist = 2.0f;
+		hit = marioHitCheck(&ox, &oy, &oz, &dist, &nx, &ny, &nz, x, y, z, 0.0f, -1.0f, 0.0f);
+#else
 		dist = 10.1f;
 		hit = marioHitCheck(&ox, &oy, &oz, &dist, &nx, &ny, &nz, x, y + r, z, 0.0f, -1.0f, 0.0f);
+#endif
 		if (hit != NULL) {
 			mp->hitobjStandOn = hit;
 			ret = TRUE;
 			*outY = oy;
 		}
 	}
+#ifndef VERSION_G8ME01_DEMO
 	if (!ret) {
 		PSVECSubtract(&mp->motPlane->tipPos, &mp->motPlane->frontPos, &dir);
 		dist = PSVECMag(&dir);
@@ -901,6 +930,7 @@ BOOL chkCollision(f32* outY) {
 			*outY = hpos.y;
 		}
 	}
+#endif
 	mp->hitobjHead = NULL;
 	if (mp->hitobjStandOn == NULL) {
 		x = mp->motPlane->frontPos.x;

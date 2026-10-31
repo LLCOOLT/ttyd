@@ -247,7 +247,9 @@ static EVT_BEGIN(init_0)
 EVT_END()
 
 static EVT_BEGIN(main_0)
+#ifndef VERSION_G8ME01_DEMO
     SET_TYPE(239)
+#endif
     CALL(evt_mobj_hitevt_onoff, STRING("me"), 0)
     IF_INT_NOT_EQUAL(1, 0)
         SET_VALUE(LW(10), 0)
@@ -475,7 +477,9 @@ EVT_BEGIN(init_1)
 EVT_END()
 
 EVT_BEGIN(main_1)
+#ifndef VERSION_G8ME01_DEMO
     SET_TYPE(239)
+#endif
     CALL(evt_mobj_hitevt_onoff, STRING("me"), 0)
     IF_INT_NOT_EQUAL(1, 0)
         SET_VALUE(LW(10), 0)
@@ -692,7 +696,11 @@ s32 key_tbl00[] = {
 EVT_BEGIN(evt_chk00)
     CALL(evt_pouch_check_item, 12, LW(0))
     IF_INT_GREATER(LW(0), 0)
+#ifdef VERSION_G8ME01_DEMO
+        CALL(evt_win_item_select, PTR(key_tbl00), LW(0))
+#else
         CALL(evt_win_item_select, 0, PTR(key_tbl00), LW(0), 0)
+#endif
         IF_INT_EQUAL(LW(0), -1)
             CALL(evt_mobj_exec_cancel, STRING("me"))
         END_IF
@@ -714,7 +722,11 @@ s32 key_tbl01[] = {
 EVT_BEGIN(evt_chk01)
     CALL(evt_pouch_check_item, 14, LW(0))
     IF_INT_GREATER(LW(0), 0)
+#ifdef VERSION_G8ME01_DEMO
+        CALL(evt_win_item_select, PTR(key_tbl01), LW(0))
+#else
         CALL(evt_win_item_select, 0, PTR(key_tbl01), LW(0), 0)
+#endif
         IF_INT_EQUAL(LW(0), -1)
             CALL(evt_mobj_exec_cancel, STRING("me"))
         END_IF
@@ -786,10 +798,19 @@ EVT_BEGIN(gon_05_init_evt)
     CALL(evt_mobj_switch_float_blk, STRING("sw_1"), FLOAT(-2.5f), 100, -175, STRING("blk_1"), 0, PTR(main_1), LSWF(5))
     CALL(evt_mobj_flag_onoff, 1, STRING("blk_1"), 128)
     IF_INT_LESS(GSW(0), 53)
+#ifdef VERSION_G8ME01_DEMO
+        CALL(evt_item_entry, STRING("key00"), 14, 200, 1340, 150, 15, -1, PTR(key_get))
+#else
         CALL(evt_item_entry, STRING("key00"), 14, 200, 1340, 150, 16, -1, PTR(key_get))
+#endif
     END_IF
+#ifdef VERSION_G8ME01_DEMO
+    CALL(evt_item_entry, STRING("item00"), 125, -200, 240, -150, 15, GSWF(5606), 0)
+    CALL(evt_item_entry, STRING("item01"), 273, 210, 915, 150, 15, GSWF(1503), 0)
+#else
     CALL(evt_item_entry, STRING("item00"), 125, -200, 240, -150, 16, GSWF(5606), 0)
     CALL(evt_item_entry, STRING("item01"), 273, 210, 915, 150, 16, GSWF(1503), 0)
+#endif
     IF_INT_LESS(GSW(0), 47)
         CALL(evt_mobj_lock, STRING("mobj_lock00"), 12, -240, 750, 0, 90, PTR(evt_chk00), PTR(evt_unlock00), GSWF(1489))
         SET_VALUE(LW(0), STRING("w_bero_3"))

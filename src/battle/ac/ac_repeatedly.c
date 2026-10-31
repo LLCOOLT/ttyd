@@ -59,7 +59,11 @@ void battleAcDelete_Repeatedly(BattleWork* work);
 
 #define PadNow(m) (BattlePadCheckNow(m))
 
+#ifdef VERSION_G8ME01_DEMO
+static s32 _power_table[] = {80, 60, 50, 40, 28, 16, 8};
+#else
 static s32 _power_table[] = {55, 50, 45, 40, 35, 30, 25};
+#endif
 
 static void _init_param(BattleWork* work) {
     BattleActions* ac = &work->actionCommands;
@@ -379,12 +383,12 @@ static void actionCommandDisp(f32 x, f32 y) {
             Vec pos = {0.0f, 0.0f, 0.0f};
             pos.x = -200.0f + x;
             pos.y = 70.0f + y;
-            iconDispGx(&pos, 0x10, icon2, 1.0f);
+            iconDispGx(&pos, ICON_DISP_2D, icon2, 1.0f);
         } else {
             Vec pos = {0.0f, 0.0f, 0.0f};
             pos.x = -200.0f + x;
             pos.y = 70.0f + y;
-            iconDispGx(&pos, 0x10, icon1, 1.0f);
+            iconDispGx(&pos, ICON_DISP_2D, icon1, 1.0f);
         }
     } else {
         odd = (d->frame / 7) & 1;
@@ -417,13 +421,13 @@ static void actionCommandDisp(f32 x, f32 y) {
                     Vec pos = {0.0f, 0.0f, 0.0f};
                     pos.x = (-200.0f + x) + (f32)(i * 40);
                     pos.y = 70.0f + y;
-                    iconDispGx(&pos, 0x10, icon, 1.0f);
+                    iconDispGx(&pos, ICON_DISP_2D, icon, 1.0f);
                 }
             } else {
                 Vec pos = {0.0f, 0.0f, 0.0f};
                 pos.x = (-200.0f + x) + (f32)(i * 40);
                 pos.y = 70.0f + y;
-                iconDispGx(&pos, 0x10, b, 0.5f);
+                iconDispGx(&pos, ICON_DISP_2D, b, 0.5f);
             }
         }
     }
@@ -460,7 +464,7 @@ static void actionCommandDisp(f32 x, f32 y) {
         Vec pos = {0.0f, 0.0f, 0.0f};
         pos.x = (-288.0f + x) + (176.0f * r->pos) / 100.0f;
         pos.y = 45.0f + y;
-        iconDispGx(&pos, 0x10, ICON_096, 1.0f);
+        iconDispGx(&pos, ICON_DISP_2D, ICON_096, 1.0f);
     }
     d->frame++;
     d->frame2++;

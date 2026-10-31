@@ -103,7 +103,7 @@ typedef struct PartyWorkBomhei { // party_bomhei.c
     s16 timer;                   // 0x178
     u8 state;                    // 0x17A, 10/20/30/40/100...
     u8 syncFrame;                // 0x17B, index into m_w_7_sync
-    s32 reserved_17C;                  // 0x17C, init -1
+    s32 liftSfxId;               // 0x17C, init -1; the demo keeps the sfx 0x939 id here
     s32 sfxId;                   // 0x180, fuse sfx (0x93C)
     s32 sfxId2;                  // 0x184, sfx 0x93D
 } PartyWorkBomhei;
@@ -126,7 +126,11 @@ typedef struct PartyWorkVivian { // party_vivian.c
     f32 shadowSize;              // 0x174, 10..20; party.c reads it as the in-use shadow size
     u8 pad178[0x17C - 0x178];    // 0x178
     f32 followOfs;               // 0x17C, 0..-13, movePos distance behind Mario
+#ifdef VERSION_G8ME01_DEMO
+    s16 tailFlags;               // 0x180, demo: Vivian bit 0 = tail off (retail keeps it in PartyEntry)
+#else
     u8 pad180[0x182 - 0x180];    // 0x180
+#endif
     s16 marioAnimTime;           // 0x182, local time for Mario's paper anim while hidden
     struct EffectEntry* rippleEffect; // 0x184, effRippleEntry; NULLed when the effect dies (flags == 0)
 } PartyWorkVivian;
@@ -150,7 +154,12 @@ typedef struct PartyEntry {
     char* animName;                     // 0x18, current pose name (strcmp'd with "PYS_S_2" etc.)
     const char* paperAnimName;          // 0x1C, partyChgPaper anim name, as MarioWork.paperAnimName
     u16 poseTime;                       // 0x20, cleared on every pose/paper change (MarioWork.poseTime)
+#ifdef VERSION_G8ME01_DEMO
+    u8 pad_22;                          // 0x22, never accessed
+    s8 splashTimer;                     // 0x23, demo: here instead of 0x4C
+#else
     u8 pad_22[0x24 - 0x22];             // 0x22, never accessed
+#endif
     s32 moveFrames;                     // 0x24, frames left in a move/jump (16 at jump start)
     s16 forceMoveFrames;                // 0x28, partySetForceMove frame count; evt_party_move waits for 0
     s16 mutekiTimer;                    // 0x2A, copied from MarioWork 0x4C (marioSetMutekiTime)
@@ -176,12 +185,26 @@ typedef struct PartyEntry {
     s8 flyRequest;                      // 0x3F, partyMoveFlyInit: 1/3 = go behind Mario, 2 = other; cleared there, never set in C
     f32 homingDist;                     // 0x40, evt_party_set_homing_dist (default 50)
     u32 reserved_44;                    // 0x44, only set to 0x10
+#ifdef VERSION_G8ME01_DEMO
+    union {
+        s32 wallStuckCount;             // 0x48, demo: frames the follow walk hit a wall with its target 100+ away in height
+        // The demo's code never reads these three; they share bytes with wallStuckCount so that retail
+        // code still compiles.
+        struct {
+            s8 wallStuckFrames;         // 0x48
+            s8 noFloorFrames;           // 0x49
+            s8 tailFlags;               // 0x4A
+        };
+    };
+    u8 pad_4C[0x4D - 0x4C];             // 0x4C, never accessed
+#else
     u8 pad_48[0x4C - 0x48];             // 0x48, never accessed
     s8 splashTimer;                     // 0x4C, set to 20 after a water splash, counts down
     s8 wallStuckFrames;                 // 0x4D, frames blocked by a wall
     s8 noFloorFrames;                   // 0x4E, frames without floor
     s8 tailFlags;                       // 0x4F, Vivian: bit 0 = tail off
     u8 pad_50[0x51 - 0x50];             // 0x50, never accessed
+#endif
     s8 footmarkMode;                    // 0x51, which footmark list is in use (partyClearFootmark / 2)
     s16 pushCount;                      // 0x52, frames pushed by Mario, capped at 100
     f32 homeDir;                        // 0x54, direction from Mario to the partner's follow spot
@@ -224,18 +247,24 @@ typedef struct PartyEntry {
             f32 groundRotZ;             // 0xCC, groundRot.z
         };
     };
+#ifndef VERSION_G8ME01_DEMO
     u8 pad_D0[0xE0 - 0xD0];             // 0xD0, never accessed
+#endif
     f32 groundSlope;                    // 0xE0, floor angle from partyNrmSet; steps only up to 30
     f32 groundY;                        // 0xE4, floor height found by partySearchGround
     f32 dropDepth;                      // 0xE8, height of a drop below the search depth (0 on floor, -1 none)
-    f32 frontWallDist;                  // 0xEC, distance to the front wall (-1 = none)
+#ifndef VERSION_G8ME01_DEMO
+    f32 frontWallDist;                  // 0xEC, distance to the front wall (-1 = none); not in the demo
+#endif
     f32 height;                         // 0xF0
     f32 width;                          // 0xF4
     f32 camDir;                         // 0xF8, camera yaw; stick input is rotated by it
     f32 moveDir;                        // 0xFC, copied from targetDir when moving
     f32 targetDir;                      // 0x100, angleABf from position to the move target
     f32 moveSpeed;                      // 0x104, distance/18 etc.
-    f32 targetSpeed;                    // 0x108, partySetTargetSpd; follow speed = targetSpeed * playerGravity * partySpdRate
+#ifndef VERSION_G8ME01_DEMO
+    f32 targetSpeed;                    // 0x108, partySetTargetSpd; follow speed = targetSpeed * playerGravity * partySpdRate; not in the demo
+#endif
     f32 displayDirection;               // 0x10C, copied from MarioWork displayDirection
     f32 displayDirectionTarget;         // 0x110, copied from MarioWork displayDirectionTarget
     f32 velY;                           // 0x114, vertical velocity; jump ends when <= 0
@@ -271,7 +300,7 @@ typedef struct PartyEntry {
     s32 actionTime;                     // 0x16C, msec for an evt-driven action (nokotaro kick hold, cloud breathout)
     void* useStruct;                    // 0x170, per-partner heap work (PartyCloud*, YoshiWork*, ...)
     PartyWork work;                     // 0x174, per-partner scratch views
-} PartyEntry; // size 0x188
+} PartyEntry; // size 0x188 (demo 0x16C)
 
 PartyEntry* partyGetPtr(s32 index);
 void partyCtrlOn(void);

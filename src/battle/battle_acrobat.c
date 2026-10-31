@@ -39,11 +39,15 @@ s32 BattleAcrobatMain(BattleWork* work) {
 		return EVT_RETURN_YIELD;
 	}
 	if ((work->badgeEquippedFlags & 4) && (work->mStylishCurFrame > work->mStylishWindowStart && work->mStylishCurFrame <= work->mStylishWindowEnd)) {
+#ifdef VERSION_G8ME01_DEMO
+		dispEntry(CAMERA_3D, 900.0f, 1, _accrobat_timing_icon_disp, unit);
+#else
 		Vec v11 = { 0 };
 		v11.x = unit->mPosition.x;
 		v11.y = unit->mPosition.y;
 		v11.z = 15.0f + unit->mPosition.z;
 		dispEntry(CAMERA_3D, dispCalcZ(&v11), 1, _accrobat_timing_icon_disp, unit);
+#endif
 	}
 	if (unit->badgesEquipped.AutoCommand && (work->mStylishCurFrame > work->mStylishWindowStart && work->mStylishCurFrame <= work->mStylishWindowEnd)) {
 		doSimplified = TRUE;

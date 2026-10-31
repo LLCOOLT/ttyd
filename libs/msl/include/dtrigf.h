@@ -11,8 +11,7 @@
  * here as plain static data with the same values, alignment and order (see docs/FAKES.md):
  * - main.dol units (msl_main.pch defines DTRIGF_WITH_INITIAL_VALUES): what that link keeps, the two 8-byte
  *   constants of each helper with their initial values.
- * - REL units: the named constants only. The compiler emits file-scope statics in reverse order of declaration,
- *   so each set is declared last constant first. */
+ * - REL units: the named constants only, as static locals of empty inline functions (below). */
 
 #ifdef DTRIGF_WITH_INITIAL_VALUES
 
@@ -34,21 +33,31 @@ static DtrigfPairedConstants sincosf_constants[2] = {
 
 #else
 
-static float sincosf_a_one = 1.0f;
-static float sincosf_a___local_PIO2 = 1.57079632679489661923f;
-static long long sincosf_a_one_negone = 0x3F800000BF800000;
-static float sincosf_a___local_3PIO2 = 3.0f * 1.57079632679489661923f;
-static float sincosf_a___local_PI = 3.14159265358979323846f;
-static float sincosf_a_neg_one = -1.0f;
-static long long sincosf_a_negone_one = (long long)0xBF8000003F800000;
+/* REL: each helper's constants are static locals of an (uncalled, empty) inline function, so they carry the
+ * original's names: the compiler names function-scope statics name$N, the form the original's objects have
+ * (negone_one$42 ...), and objdiff pairs them with the original's by that name. The $N numbers are the
+ * compiler's counter, not reproducible exactly: statics are numbered in declaration order but emitted in reverse
+ * order of declaration, while the original's were numbered in declaration order and emitted in reverse order of
+ * first use. So each set is declared last constant first, for the original's storage order. */
+static inline void sincosf_f(void) {
+    static float one = 1.0f;
+    static float __local_PIO2 = 1.57079632679489661923f;
+    static long long one_negone = 0x3F800000BF800000;
+    static float __local_3PIO2 = 3.0f * 1.57079632679489661923f;
+    static float __local_PI = 3.14159265358979323846f;
+    static float neg_one = -1.0f;
+    static long long negone_one = (long long)0xBF8000003F800000;
+}
 
-static float sincosf_f_one = 1.0f;
-static float sincosf_f___local_PIO2 = 1.57079632679489661923f;
-static long long sincosf_f_one_negone = 0x3F800000BF800000;
-static float sincosf_f___local_3PIO2 = 3.0f * 1.57079632679489661923f;
-static float sincosf_f___local_PI = 3.14159265358979323846f;
-static float sincosf_f_neg_one = -1.0f;
-static long long sincosf_f_negone_one = (long long)0xBF8000003F800000;
+static inline void sincosf_a(void) {
+    static float one = 1.0f;
+    static float __local_PIO2 = 1.57079632679489661923f;
+    static long long one_negone = 0x3F800000BF800000;
+    static float __local_3PIO2 = 3.0f * 1.57079632679489661923f;
+    static float __local_PI = 3.14159265358979323846f;
+    static float neg_one = -1.0f;
+    static long long negone_one = (long long)0xBF8000003F800000;
+}
 
 #endif
 

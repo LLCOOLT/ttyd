@@ -8,6 +8,16 @@
 typedef void (*OffscreenCallback)(CameraId cameraId, void* param);
 
 typedef enum FadeType {
+#ifdef VERSION_G8ME01_DEMO
+	// The demo has two fewer fade types below FADE_IN_BLACK, so every value is 2 lower.
+	FADE_IN_BLACK = 7,
+	FADE_OUT_BLACK = 8,
+	FADE_OUT_WHITE = 15,
+	FADE_IN_WHITE2 = 16,
+	TITLE_SCREEN_CURTAIN_LEAVE_GRADUAL2 = 37,
+	MARIO_HEAD_FADE_IN = 50,
+	MARIO_HEAD_FADE_OUT = 51,
+#else
 	FADE_IN_BLACK = 9,
 	FADE_OUT_BLACK = 10,
 
@@ -27,6 +37,7 @@ typedef enum FadeType {
 
 	MARIO_HEAD_FADE_IN = 52,
 	MARIO_HEAD_FADE_OUT = 53,
+#endif
 } FadeType;
 
 typedef struct FadeEntry {

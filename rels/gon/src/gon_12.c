@@ -150,7 +150,9 @@ static EVT_BEGIN(chuchurina_sogu)
         CALL(evt_party_move_pos2, 0, 160, 15, FLOAT(150.0f))
     END_INLINE_EVENT
     CALL(evt_mario_mov_pos2, 130, 0, FLOAT(150.0f))
+#ifndef VERSION_G8ME01_DEMO
     CALL(N_evt_bero_set_mario_bottomless_respawn_pos_to_current_mario_pos)
+#endif
     CALL(evt_party_stop, 0)
     SET_VALUE(GSW(0), 50)
     CALL(evt_mapobj_flag_onoff, 1, 0, STRING("s_heya"), 2)
@@ -259,10 +261,12 @@ static EVT_BEGIN(chuchurina_sogu)
     CALL(evt_cam3d_evt_off, 500, 4)
     CALL(evt_mario_key_onoff, 1)
     CALL(evt_party_run, 0)
+#ifndef VERSION_G8ME01_DEMO
     CALL(evt_mario_get_party, LW(0))
     IF_INT_EQUAL(LW(0), 2)
         SET_VALUE(GSWF(1511), 1)
     END_IF
+#endif
     RETURN
 EVT_END()
 
@@ -288,7 +292,11 @@ static NpcSetupInfo npcEnt[] = {
 static EVT_BEGIN(item_get00)
     CALL(evt_mario_key_onoff, 0)
     CALL(evt_mobj_get_position, STRING("mobj_box00"), LW(0), LW(1), LW(2))
+#ifdef VERSION_G8ME01_DEMO
+    CALL(evt_item_entry, STRING("item00"), 15, LW(0), LW(1), LW(2), 15, -1, 0)
+#else
     CALL(evt_item_entry, STRING("item00"), 15, LW(0), LW(1), LW(2), 16, -1, 0)
+#endif
     CALL(evt_item_flag_on, STRING("item00"), 2)
     CALL(evt_mobj_wait_animation_end, STRING("mobj_box00"))
     CALL(evt_item_get_item, STRING("item00"))
@@ -300,7 +308,11 @@ EVT_END()
 EVT_BEGIN(item_get01)
     CALL(evt_mario_key_onoff, 0)
     CALL(evt_mobj_get_position, STRING("mobj_box01"), LW(0), LW(1), LW(2))
+#ifdef VERSION_G8ME01_DEMO
+    CALL(evt_item_entry, STRING("item01"), 148, LW(0), LW(1), LW(2), 15, -1, 0)
+#else
     CALL(evt_item_entry, STRING("item01"), 148, LW(0), LW(1), LW(2), 16, -1, 0)
+#endif
     CALL(evt_item_flag_on, STRING("item01"), 2)
     CALL(evt_mobj_wait_animation_end, STRING("mobj_box01"))
     CALL(evt_item_get_item, STRING("item01"))
@@ -311,7 +323,11 @@ EVT_END()
 EVT_BEGIN(item_get02)
     CALL(evt_mario_key_onoff, 0)
     CALL(evt_mobj_get_position, STRING("mobj_box02"), LW(0), LW(1), LW(2))
+#ifdef VERSION_G8ME01_DEMO
+    CALL(evt_item_entry, STRING("item02"), 154, LW(0), LW(1), LW(2), 15, -1, 0)
+#else
     CALL(evt_item_entry, STRING("item02"), 154, LW(0), LW(1), LW(2), 16, -1, 0)
+#endif
     CALL(evt_item_flag_on, STRING("item02"), 2)
     CALL(evt_mobj_wait_animation_end, STRING("mobj_box02"))
     CALL(evt_item_get_item, STRING("item02"))
@@ -335,7 +351,11 @@ EVT_BEGIN(gon_12_init_evt)
         SET_VALUE(GSWF(1507), 1)
     END_IF
     CALL(evt_mobj_itembox, STRING("mobj_box00"), -117, 0, -75, 0, 0, PTR(item_get00), GSWF(1507))
+#ifdef VERSION_G8ME01_DEMO
+    CALL(evt_mobj_itembox, STRING("mobj_box01"), -56, 0, -75, 0, 0, PTR(item_get01), GSWF(1508))
+#else
     CALL(evt_mobj_itembox, STRING("mobj_box01"), -56, 0, -25, 0, 0, PTR(item_get01), GSWF(1508))
+#endif
     CALL(evt_mobj_itembox, STRING("mobj_box02"), -175, 0, 50, 0, 0, PTR(item_get02), GSWF(1509))
     CALL(evt_mobj_itembox, STRING("mobj_box03"), -150, 0, 20, 0, 0, 0, 1)
     CALL(evt_mobj_powerupblk, STRING("pblk00"), -150, 60, -25, 0, GSWF(5540), 0)

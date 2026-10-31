@@ -93,8 +93,13 @@ static PoseTableEntry pose_table[] = {
     {39, "D_1"},
     {40, "W_1"},
     {42, "R_1"},
+#ifdef VERSION_G8ME01_DEMO
+    {63, "T_1"},
+    {67, "S_1"},
+#else
     {65, "T_1"},
     {69, "S_1"},
+#endif
 };
 
 static BattleDataEntry data_table[] = {

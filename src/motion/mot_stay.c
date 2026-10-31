@@ -97,7 +97,7 @@ void mot_stay(void) {
 			mario->wMotionTimer = 0;
 		}
 		mario->trigFlags &= ~0x100000;
-#else
+#elif !defined(VERSION_G8ME01_DEMO)
 		mario->wMotionTimer = 0;
 #endif
 		mario->lastGroundPos = mario->position;
@@ -107,6 +107,7 @@ void mot_stay(void) {
 		mario->idleKeyTimer = 0;
 		marioSoundInit();
 		marioResetCamFollowRate();
+#ifndef VERSION_G8ME01_DEMO
 		if (mario->flags & MARIO_FLAG_IS_8_BIT) {
 			marioChgPose("M_S_1");
 			if (!(mario->flags & MARIO_FLAG_FORCED_MOVEMENT)) {
@@ -114,6 +115,7 @@ void mot_stay(void) {
 			}
 			mario->flags &= ~MARIO_FLAG_IS_PUSHING;
 		} else {
+#endif
 			if (mario->flags & MARIO_FLAG_PAPER_MODE) {
 				motSlitContinue();
 			} else if (mario->dispFlags & 0x1000000) {
@@ -134,12 +136,15 @@ void mot_stay(void) {
 			} else {
 				marioChgPoseTime("M_U_2", 10);
 			}
+#ifndef VERSION_G8ME01_DEMO
 		}
+#endif
 		if (!(mario->flags & MARIO_FLAG_FORCED_MOVEMENT)) {
 			mario->baseSpeed = 0.0f;
 		}
 		mario->flags &= ~MARIO_FLAG_IS_PUSHING;
 	}
+#ifndef VERSION_G8ME01_DEMO
 	if (mario->flags & MARIO_FLAG_IS_8_BIT) {
 		marioChkJump();
 		if (mario->controlStickSensitivity > 0.0f) {
@@ -155,6 +160,7 @@ void mot_stay(void) {
 		}
 		return;
 	}
+#endif
 	frames = sysMsec2Frame(1000);
 	if (++mario->idleKeyTimer > frames && !(mario->flags & MARIO_FLAG_IS_CARRYING_BOBBERY) && marioChkKey()) {
 		if (lowHP()) {
@@ -346,6 +352,21 @@ void marioChgMotAuto(void) {
 	}
 }
 
+#ifdef VERSION_G8ME01_DEMO
+void mot_stay_post(void) {
+	MarioWork* mario;
+	mario = marioGetPtr();
+	if (mario->soundId[0] != (u32)-1) {
+		psndSFXOff(mario->soundId[0]);
+		mario->soundId[0] = -1;
+	}
+	mario = marioGetPtr();
+	if (mario->soundId[1] != (u32)-1) {
+		psndSFXOff(mario->soundId[1]);
+		mario->soundId[1] = -1;
+	}
+}
+#else
 void mot_stay_post(void) {
 	MarioWork* mario;
 	MarioMotion id = marioGetPtr()->currMotionId;
@@ -368,3 +389,4 @@ void mot_stay_post(void) {
 		}
 	}
 }
+#endif

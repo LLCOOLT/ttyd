@@ -9,16 +9,27 @@ gives its function boundaries. Then, per module (main.dol or one REL):
    functions anchor the alignment; between anchors, functions pair up in order by similarity, and source
    functions that dtk did not split out are searched for directly in the target gap.
 2. References: every reference made by paired code (and by pointers in paired data) gives a source/target
-   address pair. For main.dol these are read from the instructions; for RELs from the relocation tables (REL
-   references into main.dol vote on main.dol). Each source symbol takes the target address most of its
-   references vote for. Functions are placed only by references to their start (calls, pointers), and those
-   outvote the code pairing when two look-alike functions swapped places.
+   address pair. For main.dol these are read from the instructions (zipped where the code is identical; where
+   it differs, the two functions' lists of referenced addresses are aligned on opcode and register); for RELs
+   from the relocation tables (REL references into main.dol vote on main.dol). Each source symbol takes the
+   target address most of its references vote for. Functions are placed only by references to their start
+   (calls, pointers), and those outvote the code pairing when two look-alike functions swapped places. A
+   variable may move to the small-data twin of its section (.sdata <-> .data, .sbss <-> .bss, .sdata2 <->
+   .rodata) when the versions were built with different -sdata/-sdata2 thresholds; a small-data access and a
+   lis-based one pair up for this.
 3. Neighbours: runs of symbols nothing refers to take the address shift of the placed symbols around them
    while their bytes agree (pointers and relocated words aside). What is left between two placed symbols is
    found by its contents in the target gap, or pairs in order with dtk's own symbol starts there.
-   Placements that break source order are dropped; steps 2-3 repeat until nothing changes.
-4. Splits: each unit's section ranges move with the symbols they hold; section alignments come from dtk's
-   analysis of the target.
+   Placements that break source order (per target section) are dropped, and so are function starts where the
+   code before falls through into them; steps 2-3 repeat until nothing changes.
+4. Splits: each unit's section ranges come from the symbols it holds (those that moved section in their new
+   section); a range never takes in another unit's symbols, starts or ends inside a symbol, or starts
+   unaligned. Section alignments come from dtk's analysis of the target. In main.dol, unported variables at a
+   unit boundary (small data in the source, .data/.bss/.rodata in the target) go to the unit whose code or
+   data refers to them.
+5. Symbols: a function comes before the labels at its address (mwld never finishes linking a split object
+   with a label ahead of its function), @-named compiler symbols are local, and fn_/lbl_<addr> names that would
+   clash with dtk's take their target address.
 
 Source symbols with no confident target are left out of the target symbols (dtk names that address
 fn_/lbl_ itself) and listed in the report, with the ported data whose contents differ and the functions
@@ -46,6 +57,11 @@ SYM_RE = re.compile(r"^(\S+) = (\.[\w.]+):0x([0-9A-Fa-f]+);\s*//\s*(.*)$")
 LOADSTORE = set(range(32, 56))  # lwz .. stfdu
 ADDI, ADDIS, ORI = 14, 15, 24
 
+# A symbol may change section between versions only between a small-data section and its large counterpart, when
+# the versions were compiled with different -sdata/-sdata2 thresholds.
+SECTION_TWINS = {(".sdata", ".data"), (".data", ".sdata"), (".sbss", ".bss"), (".bss", ".sbss"),
+                 (".sdata2", ".rodata"), (".rodata", ".sdata2"), (".sbss2", ".bss"), (".bss", ".sbss2")}
+
 
 # ---------------------------------------------------------------------------------------------------------------
 # Symbols and splits files
@@ -65,16 +81,28 @@ class Sym:
             elif a.startswith("type:"):
                 self.type = a[5:]
 
-    def line(self, name=None, addr=None, size=None):
+    def line(self, name=None, addr=None, size=None, sec=None):
         attrs = []
+        t = self.addr if addr is None else addr
         for a in self.attrs:
             if a.startswith("size:"):
                 if size is not None:
                     a = f"size:0x{size:X}"
+            elif a.startswith("align:"):
+                # an alignment the target address does not have is dropped to the one it has
+                n = int(a[6:], 0)
+                while n > 1 and t % n:
+                    n //= 2
+                if n < 4:
+                    continue
+                a = f"align:{n}"
             attrs.append(a)
         if size is not None and not any(a.startswith("size:") for a in self.attrs) and size:
             attrs.insert(1, f"size:0x{size:X}")
-        return f"{name or self.name} = {self.sec}:0x{(self.addr if addr is None else addr):08X}; // {' '.join(attrs)}"
+        if (name or self.name).startswith("@") and not any(a.startswith("scope:") for a in attrs):
+            # compiler-generated: local to its unit, which matters once units of the target link from the split
+            attrs.insert(2 if len(attrs) > 1 else len(attrs), "scope:local")
+        return f"{name or self.name} = {sec or self.sec}:0x{(self.addr if addr is None else addr):08X}; // {' '.join(attrs)}"
 
 
 def read_symbols(path):
@@ -343,6 +371,80 @@ def branch_pairs(ws, wt, sa, ta):
     return out
 
 
+def stream_refs(ws, base, sda):
+    """The addresses one instruction stream refers to, in order, each keyed by (opcode, register) so that two
+    versions of a function can be aligned on them even when their code differs. A small-data access (off r2/r13)
+    and a lis-based one with the same opcode and register get the same key: a variable that moved between .sdata
+    and .data pairs up."""
+    out = []
+    hs = {}
+    stores = (36, 37, 38, 39, 44, 45, 47, 52, 53, 54, 55)
+    for i, w in enumerate(ws):
+        op = w >> 26
+        rd, ra = (w >> 21) & 31, (w >> 16) & 31
+        if op == 18:
+            if w & 1:
+                if not w & 2:
+                    o = w & 0x03FFFFFC
+                    o -= (o & 0x02000000) << 1
+                    out.append((("bl",), (base + 4 * i + o) & 0xFFFFFFFF))
+                for r in (0, *range(3, 13)):
+                    hs.pop(r, None)
+            continue
+        if op == ADDIS and ra == 0:
+            hs[rd] = (w & 0xFFFF) << 16
+            continue
+        if op in LOADSTORE or op == ADDI:
+            si = w & 0xFFFF
+            si -= (si & 0x8000) << 1
+            a = None
+            if ra in hs:
+                a = (hs[ra] + si) & 0xFFFFFFFF
+            elif ra in (2, 13) and ra in sda:
+                a = (sda[ra] + si) & 0xFFFFFFFF
+            if a is not None:
+                out.append(((op, rd), a))
+                if op == ADDI:
+                    hs[rd] = a
+                    continue
+            if op not in stores:
+                hs.pop(rd, None)
+            continue
+        if op == ORI:
+            if rd in hs:
+                a = hs[rd] | (w & 0xFFFF)
+                out.append(((ADDI, ra), a))  # lis+ori builds the address lis+addi builds elsewhere
+                hs[ra] = a
+                continue
+            hs.pop(ra, None)
+            continue
+        if op == 31:
+            xo = (w >> 1) & 0x3FF
+            if xo == 444 and rd == (w >> 11) & 31:  # mr ra, rs
+                if rd in hs:
+                    hs[ra] = hs[rd]
+                else:
+                    hs.pop(ra, None)
+                continue
+            hs.pop(rd, None)
+            hs.pop(ra, None)
+            continue
+        if op in (7, 8, 12, 13, 20, 21, 23, 24, 25, 26, 27, 28, 29):
+            hs.pop(rd, None)
+            hs.pop(ra, None)
+    return out
+
+
+def aligned_refs(rs, rt):
+    """Address pairs from two stream_refs lists, aligned on their keys."""
+    sm = difflib.SequenceMatcher(None, [k for k, _ in rs], [k for k, _ in rt], autojunk=False)
+    pairs = []
+    for tag, i1, i2, j1, j2 in sm.get_opcodes():
+        if tag == "equal":
+            pairs += [(rs[i1 + k][1], rt[j1 + k][1]) for k in range(i2 - i1)]
+    return pairs
+
+
 # ---------------------------------------------------------------------------------------------------------------
 # Porting one module
 
@@ -372,6 +474,11 @@ class Module:
         for v in tby.values():
             v.sort(key=lambda s: s.addr)
         self.tby_sec = tby
+        # dtk's own functions in the target, per code section: (starts, ends)
+        self.tfuncs = {}
+        for sec, v in tby.items():
+            fs = sorted((x.addr, x.addr + x.size) for x in v if x.type == "function" and x.size)
+            self.tfuncs[sec] = ([a for a, _ in fs], [b for _, b in fs])
 
     # -- code -------------------------------------------------------------------------------------------------
     def match_code(self):
@@ -392,11 +499,50 @@ class Module:
                     continue
                 self._fuzzy(sec, sf[i1:i2], smask[i1:i2], tf[j1:j2], tmask[j1:j2])
 
+    def fn_start_ok(self, sec, t):
+        """A function may start inside one of dtk's target functions only where the code before cannot fall
+        into it (blr, rfi, bctr or an unconditional branch)."""
+        starts, ends = self.tfuncs.get(sec, ([], []))
+        k = bisect.bisect_right(starts, t) - 1
+        if k < 0 or starts[k] == t or t >= ends[k]:
+            return True
+        prev = self.timg.word(sec, t - 4)
+        return prev is not None and (prev in (0x4E800020, 0x4C000064, 0x4E800420) or prev >> 26 == 18 and not prev & 3)
+
+    def fn_size(self, s, sec, t):
+        """A function's size in the target: the source's where the code agrees over it, otherwise that of dtk's
+        function starting there (or the rest of the dtk function it starts in)."""
+        starts, ends = self.tfuncs.get(sec, ([], []))
+        k = bisect.bisect_right(starts, t) - 1
+        if k < 0 or t >= ends[k] or t + s.size == ends[k]:
+            return None
+        if self._bytes_agree(s.sec, s, t, sec) and (starts[k] != t or t + s.size < ends[k]):
+            return None
+        return ends[k] - t
+
     def _set(self, s, taddr, how, size=None):
+        if s.type == "function" and not self.fn_start_ok(s.sec, taddr):
+            self.dropped.add((id(s), taddr))
+            return
         self.map[id(s)] = taddr
         self.how[id(s)] = how
         if size is not None:
             self.size[id(s)] = size
+
+    def sec_at(self, sec, t):
+        """The target section holding t for a symbol of sec: sec itself, or its small-data twin (main.dol only;
+        REL sections are addressed by offset, and RELs have no small data)."""
+        ts, te, _ = self.timg.sections.get(sec, (0, 0, None))
+        if self.timg.relocs is not None or ts <= t <= te:
+            return sec
+        return self.timg.sec_of(t) or sec
+
+    def tsec(self, s):
+        """The target section of a placed symbol (its own section unless it moved to a small-data twin)."""
+        return self.sec_at(s.sec, self.map[id(s)])
+
+    def moved(self, s):
+        return id(s) in self.map and self.tsec(s) != s.sec
 
     def _fuzzy(self, sec, sf, smask, tf, tmask):
         if not sf:
@@ -498,7 +644,8 @@ class Module:
 
     def vote(self, sa, ta, weight=1):
         sec = self.simg.sec_of(sa)
-        if sec is None or self.timg.sec_of(ta) is None:
+        tsec = self.timg.sec_of(ta)
+        if sec is None or tsec is None or tsec != sec and (sec, tsec) not in SECTION_TWINS:
             return
         s = self.sym_at(sec, sa)
         if s is None or s.type == "function" and sa != s.addr:
@@ -508,11 +655,17 @@ class Module:
     def collect_dol_code_refs(self, sda_s, sda_t):
         for sec in (".init", ".text"):
             for s in self.sby_sec.get(sec, []):
-                if s.type != "function" or self.how.get(id(s), "").startswith("code-similar") or id(s) not in self.map:
+                if s.type != "function" or id(s) not in self.map:
                     continue
                 ta = self.map[id(s)]
                 ws = code_words(self.simg, sec, s.addr, s.size)
-                wt = code_words(self.timg, sec, ta, s.size)
+                wt = code_words(self.timg, sec, ta, self.size.get(id(s), s.size))
+                if len(ws) != len(wt) or mask_words(ws) != mask_words(wt):
+                    # different code (paired by similarity, or placed by references): align what the two
+                    # versions refer to
+                    for a, b in aligned_refs(stream_refs(ws, s.addr, sda_s), stream_refs(wt, ta, sda_t)):
+                        self.vote(a, b)
+                    continue
                 for p in code_refs(ws, wt):
                     if len(p) == 3:
                         r, si, ti = p
@@ -616,7 +769,7 @@ class Module:
                     self.size.pop(id(s), None)
                     changed += 1
                 continue
-            if s.type != "function" and n < 3 and not self._bytes_agree(s.sec, s, ta):
+            if s.type != "function" and n < 3 and not self._bytes_agree(s.sec, s, ta, self.sec_at(s.sec, ta)):
                 continue  # one or two references to data whose bytes differ there: wait for more evidence
             self._set(s, ta, f"refs {n}/{tot}")
             changed += 1
@@ -626,15 +779,19 @@ class Module:
         """Drop placements that break source order within a section."""
         dropped = 0
         for sec, syms in self.sby_sec.items():
-            lst = sorted(((self.map[id(s)], i, s) for i, s in enumerate(syms) if id(s) in self.map),
-                         key=lambda x: (x[0], x[1]))
-            kept = {id(x[2]) for x in longest_in_order(lst)}
-            for t, i, s in lst:
-                if id(s) not in kept:
-                    self.map.pop(id(s))
-                    self.size.pop(id(s), None)
-                    self.dropped.add((id(s), t))
-                    dropped += 1
+            groups = defaultdict(list)
+            for i, s in enumerate(syms):
+                if id(s) in self.map:
+                    groups[self.tsec(s)].append((self.map[id(s)], i, s))
+            for lst in groups.values():
+                lst.sort(key=lambda x: (x[0], x[1]))
+                kept = {id(x[2]) for x in longest_in_order(lst)}
+                for t, i, s in lst:
+                    if id(s) not in kept:
+                        self.map.pop(id(s))
+                        self.size.pop(id(s), None)
+                        self.dropped.add((id(s), t))
+                        dropped += 1
         return dropped
 
     # -- neighbours -------------------------------------------------------------------------------------------
@@ -646,6 +803,7 @@ class Module:
         for sec, syms in self.sby_sec.items():
             if sec not in self.timg.sections:
                 continue
+            syms = [s for s in syms if not self.moved(s)]
             ts, te, _ = self.timg.sections[sec]
             auto_starts = {x.addr for x in self.tby_sec.get(sec, [])}
             i = 0
@@ -732,6 +890,7 @@ class Module:
             if sec not in self.timg.sections:
                 continue
             tad = sorted({x.addr for x in self.tby_sec.get(sec, [])})
+            syms = [s for s in syms if not self.moved(s)]
             n = len(syms)
             i = 0
             while i < n:
@@ -771,7 +930,7 @@ class Module:
                     else:
                         continue
                 for s, t in zip(sized, cands):
-                    if (id(s), t) in self.dropped:
+                    if (id(s), t) in self.dropped or s.addr % 4 == 0 and s.size >= 4 and t % 4:
                         continue
                     for x in run:
                         if x.addr == s.addr and id(x) not in self.map:
@@ -821,11 +980,14 @@ class Module:
         lst = longest_in_order([(t, i, s) for i, (s, t) in enumerate(out)])
         return [(s, t) for t, i, s in lst]
 
-    def _bytes_agree(self, sec, s, ta):
+    def _bytes_agree(self, sec, s, ta, tsec=None):
+        tsec = tsec or sec
+        if tsec not in self.timg.sections:
+            return False
         a = self.simg.bytes(sec, s.addr, max(s.size, 4))
         if a is None:
             return True  # bss: the neighbours agree on the shift
-        b = self.timg.bytes(sec, ta, max(s.size, 4))
+        b = self.timg.bytes(tsec, ta, max(s.size, 4))
         if b is None or len(a) != len(b):
             return False
         if s.type == "function":
@@ -862,7 +1024,7 @@ class Module:
             for i, s in enumerate(syms):
                 if id(s) not in self.map:
                     continue
-                by_tgt[sec].append((self.map[id(s)], i, s))
+                by_tgt[self.tsec(s)].append((self.map[id(s)], i, s))
         conflicts = []
         jt_starts = {sec: sorted(x.addr for x in v if x.name.startswith("jumptable_"))
                      for sec, v in self.tby_sec.items()}
@@ -878,14 +1040,17 @@ class Module:
             ts, te, tdata = self.timg.sections[sec]
             for idx, (t, i, s) in enumerate(final):
                 size = self.size.get(id(s))
+                if size is None and s.type == "function" and s.size:
+                    size = self.fn_size(s, sec, t)
                 if size is None and s.size:
                     size = s.size
                     # The next source symbol: if it is ported, the change in distance is a change in size
                     # (when this symbol filled the gap); otherwise stop at the next ported target symbol
-                    srcs = self.sby_sec[sec]
+                    srcs = self.sby_sec[s.sec]
                     nxt_src = next((x for x in srcs[i + 1:] if x.addr > s.addr and x.type != "label"), None)
                     nxt_tgt = next((x[0] for x in final[idx + 1:] if x[0] > t and x[2].type != "label"), te)
-                    if nxt_src is not None and id(nxt_src) in self.map and self.map[id(nxt_src)] > t:
+                    if (nxt_src is not None and id(nxt_src) in self.map and self.map[id(nxt_src)] > t
+                            and self.tsec(nxt_src) == sec and s.sec == sec):
                         sgap = nxt_src.addr - s.addr
                         tgap = self.map[id(nxt_src)] - t
                         if tgap != sgap and s.type != "function":
@@ -909,7 +1074,7 @@ class Module:
                     if t + size > te:
                         size = te - t
                 sizes[id(s)] = size
-                out.append((sec, t, s.line(addr=t, size=size if s.size else None)))
+                out.append((sec, t, s.line(addr=t, size=size if s.size else None, sec=sec)))
                 if s.type != "label" and size:
                     ported_ranges[sec].append((t, t + size))
         self.conflicts = conflicts
@@ -944,7 +1109,9 @@ class Module:
                     size = rngs[k][0] - s.addr
                 out.append((sec, s.addr, s.line(size=size if s.size else None), "auto"))
         order = {n: i for i, n in enumerate(self.timg.order)}
-        out.sort(key=lambda x: (order.get(x[0], 99), x[1]))
+        # at one address the function comes before its labels: mwld never finishes a link whose split object has
+        # a label ahead of the function it starts (dtk keeps this order)
+        out.sort(key=lambda x: (order.get(x[0], 99), x[1], "type:label" in x[2] and "type:function" not in x[2]))
         return out
 
     @staticmethod
@@ -985,22 +1152,25 @@ class Module:
         addrs = self.saddrs.get(sec, [])
         i = bisect.bisect_left(addrs, addr)
         # symbol exactly at addr
+        def placed(x):
+            return id(x) in self.map and not self.moved(x)
+
         if not end:
             j = i
             while j < len(syms) and syms[j].addr == addr:
-                if id(syms[j]) in self.map:
+                if placed(syms[j]):
                     return self.map[id(syms[j])]
                 j += 1
         # nearest mapped symbol before/after
         best = None
         for j in range(i - 1, -1, -1):
             s = syms[j]
-            if id(s) in self.map:
+            if placed(s):
                 best = (s, j)
                 break
         nb = None
         for j in range(i, len(syms)):
-            if id(syms[j]) in self.map:
+            if placed(syms[j]):
                 nb = syms[j]
                 break
         if end and best is not None:
@@ -1041,8 +1211,8 @@ def longest_in_order(lst):
 
 
 def port_splits(mod, header, units):
-    """Each unit's ranges from the ported symbols. Neighbouring units share boundaries."""
-    out_units = []
+    """Each unit's ranges from its own ported symbols (a unit with nothing ported in a section loses that range).
+    Neighbouring units share boundaries."""
     # per section, units in address order
     secs = defaultdict(list)
     for ui, (name, line, ranges) in enumerate(units):
@@ -1057,16 +1227,44 @@ def port_splits(mod, header, units):
             continue
         ts, te, _ = mod.timg.sections[sec]
         ss, se, _ = mod.simg.sections[sec]
-        starts = []
+        placed = [x for x in mod.sby_sec.get(sec, []) if id(x) in mod.map and not mod.moved(x)]
+        paddrs = [x.addr for x in placed]
+
+        def tend(x):
+            size = mod.out_size.get(id(x))
+            return mod.map[id(x)] + (x.size if size is None else size)
+
+        # per range: (start, first placed symbol, end of the last placed symbol, end) from the unit's own symbols
+        local = []
         for a, b, ui, ri in lst:
-            t = ts if a == ss else mod.tmap(sec, a)
-            starts.append(t)
+            inside = placed[bisect.bisect_left(paddrs, a):bisect.bisect_left(paddrs, b)]
+            if not inside:
+                local.append(None)
+                continue
+            first, last = inside[0], max(inside, key=tend)
+            # the bytes before the first and after the last placed symbol, less those that moved section
+            gone = [x for x in mod.sby_sec.get(sec, []) if a <= x.addr < b and mod.moved(x) and x.type != "label"]
+            lead = first.addr - a - sum(x.size for x in gone if x.addr < first.addr)
+            trail = b - last.addr - last.size - sum(x.size for x in gone if x.addr >= last.addr + last.size)
+            local.append((mod.map[id(first)] - max(0, lead), mod.map[id(first)], tend(last),
+                          tend(last) + max(0, trail)))
+        prev = ts
         for k, (a, b, ui, ri) in enumerate(lst):
-            t0 = starts[k]
-            if k + 1 < len(lst) and lst[k + 1][0] == b:
-                t1 = starts[k + 1]
+            if local[k] is None:
+                lost = [x for x in mod.sby_sec.get(sec, []) if a <= x.addr < b and x.size and id(x) not in mod.map]
+                if lost:
+                    problems.append(f"{units[ui][0]} {sec}: nothing ported ({len(lost)} symbols lost)")
+                new[(ui, ri)] = (None, None)
+                continue
+            lo, first_t, end_min, hi = local[k]
+            t0 = ts if a == ss else lo
+            if t0 < prev <= first_t:
+                t0 = prev
+            if k + 1 < len(lst) and lst[k + 1][0] == b and local[k + 1] is not None:
+                n_lo = local[k + 1][0]
+                t1 = n_lo if end_min <= n_lo else hi
             else:
-                t1 = mod.tmap(sec, b, end=True)
+                t1 = hi
                 if b >= se and t1 is not None and t1 >= te - 0x20:
                     t1 = te  # the section's last unit, as in the source
                 elif t1 is not None and t1 < te:
@@ -1078,25 +1276,148 @@ def port_splits(mod, header, units):
                     d = mod.timg.sections[sec][2]
                     if nxt is not None and nxt - t1 < 0x20 and (d is None or not any(d[t1 - ts:nxt - ts])):
                         t1 = nxt
-            if t0 is None or t1 is None or t1 < t0:
-                problems.append(f"{units[ui][0]} {sec}: no target range ({t0}, {t1})")
+            if t1 < t0:
+                problems.append(f"{units[ui][0]} {sec}: no target range (0x{t0:X}, 0x{t1:X})")
                 t0 = t1 = None
+            else:
+                prev = max(prev, t1)
             new[(ui, ri)] = (t0, t1)
-        # enforce order
-        prev = ts
-        for k, (a, b, ui, ri) in enumerate(lst):
-            t0, t1 = new[(ui, ri)]
-            if t0 is None:
+    # Symbols that moved to the small-data twin of their section (another -sdata threshold) stay with their unit:
+    # its range there grows to hold them, or the unit gets a range in that section
+    ranges_of = [list(r) for _, _, r in units]
+    for ui, (name, line, ranges) in enumerate(units):
+        grow = {}
+        for sec, a, b, extra in ranges:
+            syms = mod.sby_sec.get(sec, [])
+            addrs = mod.saddrs.get(sec, [])
+            for x in syms[bisect.bisect_left(addrs, a):bisect.bisect_left(addrs, b)]:
+                if not mod.moved(x) or x.type == "label":
+                    continue
+                t = mod.map[id(x)]
+                e = t + (mod.out_size.get(id(x)) or x.size)
+                r = grow.setdefault(mod.tsec(x), [t, e])
+                r[0], r[1] = min(r[0], t), max(r[1], e)
+        for tsec, (t0, t1) in grow.items():
+            ri = next((k for k, r in enumerate(ranges_of[ui]) if r[0] == tsec), None)
+            if ri is None:
+                ranges_of[ui].append((tsec, None, None, []))
+                new[(ui, len(ranges_of[ui]) - 1)] = (t0, t1)
                 continue
-            if t0 < prev:
-                problems.append(f"{units[ui][0]} {sec}: overlaps previous unit (0x{t0:X} < 0x{prev:X})")
-            prev = max(prev, t1)
+            o0, o1 = new.get((ui, ri), (None, None))
+            if o0 is None or o0 == o1:
+                new[(ui, ri)] = (t0, t1)
+            else:
+                new[(ui, ri)] = (min(o0, t0), max(o1, t1))
+    # A range stretched to its neighbour (shared boundaries) must not take in another unit's symbols, such as the
+    # ones that moved section: clip it at the nearest symbol of another unit on either side
+    hard = defaultdict(list)  # target section -> [(start, end, unit, moved section)]
+    for ui, (name, line, ranges) in enumerate(units):
+        for sec, a, b, extra in ranges:
+            syms = mod.sby_sec.get(sec, [])
+            addrs = mod.saddrs.get(sec, [])
+            for x in syms[bisect.bisect_left(addrs, a):bisect.bisect_left(addrs, b)]:
+                if id(x) in mod.map and x.type != "label" and x.size:
+                    t = mod.map[id(x)]
+                    hard[mod.tsec(x)].append((t, t + (mod.out_size.get(id(x)) or x.size), ui, mod.moved(x)))
+    for v in hard.values():
+        v.sort()
+    for (ui, ri), (t0, t1) in list(new.items()):
+        if t0 is None:
+            continue
+        spans = hard.get(ranges_of[ui][ri][0], [])
+        own = [(a, b) for a, b, u, _ in spans if u == ui and t0 <= a < t1]
+        if not own:
+            continue
+        own_lo, own_hi = min(a for a, _ in own), max(b for _, b in own)
+        k = bisect.bisect_left(spans, (own_hi,))
+        while k < len(spans) and (spans[k][2] == ui or spans[k][0] < own_hi):
+            k += 1
+        if k < len(spans) and spans[k][0] < t1:
+            t1 = spans[k][0]
+        k = bisect.bisect_left(spans, (own_lo,)) - 1
+        while k >= 0 and (spans[k][2] == ui or spans[k][1] > own_lo):
+            k -= 1
+        if k >= 0 and spans[k][1] > t0:
+            t0 = spans[k][1]
+        new[(ui, ri)] = (t0, t1)
+    # enforce order. Where two ranges still overlap and one side has only symbols that moved section in the
+    # overlap, that side gives way: those symbols then lie in the other unit's range (code that moved between
+    # units, or a wrong guess of which unit they belong to)
+    by_sec = defaultdict(list)
+    for (ui, ri), (t0, t1) in new.items():
+        if t0 is not None and t1 > t0:
+            by_sec[ranges_of[ui][ri][0]].append([t0, t1, ui, ri])
+    for sec, lst in by_sec.items():
+        lst.sort()
+        spans = hard.get(sec, [])
+
+        def fixed(u, lo, hi):
+            k = bisect.bisect_left(spans, (lo - 0x10000,))
+            while k < len(spans) and spans[k][0] < hi:
+                a, b, v, mv = spans[k]
+                if v == u and not mv and b > lo:
+                    return True
+                k += 1
+            return False
+
+        start = mod.timg.sections[sec][0]
+        prev = None
+        for r in lst:
+            if r[0] < start:
+                problems.append(f"{units[r[2]][0]} {sec}: starts before the section (0x{r[0]:X})")
+            if prev is not None and r[0] < prev[1]:
+                if prev[1] <= r[1] and not fixed(prev[2], r[0], prev[1]):
+                    prev[1] = r[0]
+                elif not fixed(r[2], r[0], prev[1]):
+                    r[0] = min(prev[1], r[1])
+                else:
+                    problems.append(f"{units[r[2]][0]} {sec}: overlaps {units[prev[2]][0]} (0x{r[0]:X} < 0x{prev[1]:X})")
+            if prev is None or r[1] > prev[1]:
+                prev = r
+        # a range may not start or end inside a target symbol: take the whole symbol where the neighbour leaves
+        # room, otherwise leave it out
+        syms = sorted(mod.out_spans.get(sec, []))
+        sstarts = [x[0] for x in syms]
+        for k, r in enumerate(lst):
+            for end in (False, True):
+                t = r[1] if end else r[0]
+                j = bisect.bisect_left(sstarts, t) - 1
+                while j >= 0 and not syms[j][0] < t < syms[j][1] and syms[j][0] > t - 0x10000:
+                    j -= 1
+                if j < 0 or not syms[j][0] < t < syms[j][1]:
+                    continue
+                a, e = syms[j]
+                if end:
+                    nxt = min((x[0] for x in lst[k + 1:] if x[1] > x[0]), default=None)
+                    r[1] = e if nxt is None or nxt >= e else max(a, r[0])
+                else:
+                    prv = max((x[1] for x in lst[:k] if x[1] > x[0]), default=None)
+                    r[0] = a if prv is None or prv <= a else min(e, r[1])
+            if r[0] % 4 and (r[0] + 3) & ~3 < r[1]:
+                r[0] = (r[0] + 3) & ~3  # a unit starts word-aligned (what precedes is the last one's padding)
+        for k, r in enumerate(lst):
+            if r[1] % 4:
+                # and ends word-aligned: the bytes up to the next word are its padding
+                up = min((r[1] + 3) & ~3, mod.timg.sections[sec][1])
+                nxt = min((x[0] for x in lst[k + 1:] if x[1] > x[0]), default=None)
+                if nxt is None or nxt >= up:
+                    r[1] = up
+            # padding before the next unit belongs to this one
+            nxt = min((x[0] for x in lst[k + 1:] if x[1] > x[0]), default=None)
+            ts_, _, d = mod.timg.sections[sec]
+            if nxt is not None and 0 < nxt - r[1] < 0x20 and (d is None or not any(d[r[1] - ts_:nxt - ts_])):
+                r[1] = nxt
+        for t0, t1, ui, ri in lst:
+            new[(ui, ri)] = (t0, t1)
+    if mod.timg.relocs is None:
+        reassign_by_refs(mod, ranges_of, new, hard)
+    order = {n: i for i, n in enumerate(mod.timg.order)}
     lines = list(header) + [""]
     for ui, (name, line, ranges) in enumerate(units):
         body = []
-        for ri, (sec, a, b, extra) in enumerate(ranges):
+        for ri, (sec, a, b, extra) in sorted(enumerate(ranges_of[ui]), key=lambda x: order.get(x[1][0], 99)):
             t0, t1 = new.get((ui, ri), (None, None))
-            if t0 is None:
+            if t0 is None or t1 == t0:
                 continue
             fmt = f"\t{sec:<11} start:0x{t0:08X} end:0x{t1:08X}"
             if extra:
@@ -1106,6 +1427,88 @@ def port_splits(mod, header, units):
         lines += body
         lines.append("")
     return lines, problems
+
+
+def reassign_by_refs(mod, ranges_of, new, hard):
+    """Variables the target has in .data/.bss/.rodata but the source in small data (another -sdata threshold),
+    when nothing ported names them, lie at a unit boundary of the target, in the wrong unit as often as not. A run
+    of such unported symbols at the end of one unit (or the start of the next) that only the other unit's code or
+    data refers to goes to that unit. A run at the end of a unit that only a unit between the two refers to, one
+    with no range in that section, becomes that unit's range. (main.dol only: the references are read from the
+    target's code and pointers.)"""
+    timg = mod.timg
+    refs = defaultdict(set)
+    for (ui, ri), (t0, t1) in new.items():
+        if t0 is None or t1 <= t0:
+            continue
+        sec = ranges_of[ui][ri][0]
+        if sec not in timg.sections or timg.sections[sec][2] is None:
+            continue
+        if sec in (".init", ".text"):
+            for _, a in stream_refs(code_words(timg, sec, t0, t1 - t0), t0, timg.sda):
+                refs[a].add(ui)
+        else:
+            d = timg.bytes(sec, t0 & ~3, t1 - (t0 & ~3))
+            for k in range(0, len(d) - 3, 4):
+                w = struct.unpack_from(">I", d, k)[0]
+                if timg.sec_of(w) is not None:
+                    refs[w].add(ui)
+    rng = defaultdict(list)
+    for (ui, ri), (t0, t1) in new.items():
+        if t0 is not None and t1 > t0:
+            rng[ranges_of[ui][ri][0]].append([t0, t1, ui, ri])
+    for sec in (".rodata", ".data", ".bss", ".sdata", ".sbss", ".sdata2", ".sbss2"):
+        lst = sorted(rng.get(sec, []))
+        spans = sorted(mod.out_spans.get(sec, []))
+        starts = [a for a, _ in spans]
+        ported = {a for a, _, _, _ in hard.get(sec, [])}
+        has = {r[2] for r in lst}
+        for A, B in zip(lst, lst[1:]):
+            if A[1] != B[0]:
+                continue
+            # back from A's end, run by run: B's, then those of the units between (each before the last)
+            moved, limit = False, B[2]
+            while True:
+                k = bisect.bisect_left(starts, A[1]) - 1
+                run = who = None
+                while k >= 0 and spans[k][0] >= A[0]:
+                    a = spans[k][0]
+                    r = refs.get(a)
+                    if a in ported or not r or len(r) != 1:
+                        break
+                    u = next(iter(r))
+                    if u == A[2] or (who is not None and u != who):
+                        break
+                    if not (u == B[2] == limit or (A[2] < u < limit and u not in has)):
+                        break
+                    who, run = u, a
+                    k -= 1
+                if run is None or run % 4 or run <= A[0]:
+                    break
+                if who == B[2]:
+                    B[0] = run
+                else:
+                    ranges_of[who].append((sec, None, None, []))
+                    new[(who, len(ranges_of[who]) - 1)] = (run, A[1])
+                    has.add(who)
+                A[1], limit, moved = run, who, True
+            if moved:
+                continue
+            # forward from B's start
+            k = bisect.bisect_left(starts, B[0])
+            run = None
+            while k < len(spans) and spans[k][0] < B[1]:
+                a = spans[k][0]
+                if a in ported or refs.get(a) != {A[2]}:
+                    break
+                run = spans[k][1]
+                k += 1
+            if run is not None:
+                nxt = starts[k] if k < len(spans) and spans[k][0] < B[1] else B[1]
+                if nxt % 4 == 0 and nxt < B[1]:
+                    A[1] = B[0] = nxt
+        for t0, t1, ui, ri in lst:
+            new[(ui, ri)] = (t0, t1)
 
 
 def port_module(name, src_cfg, src_orig, tgt_auto, tgt_orig, out_dir, main=None, src_main_same=True):
@@ -1167,11 +1570,23 @@ def write_module(mod, src_cfg, out_dir, report):
     sub = "" if mod.name == "main" else mod.name
     os.makedirs(os.path.join(out_dir, sub), exist_ok=True)
     out = mod.target_symbols()
+    mod.out_spans = defaultdict(list)
+    for o in out:
+        m = re.search(r"size:0x([0-9A-F]+)", o[2])
+        if m and int(m.group(1), 16):
+            mod.out_spans[o[0]].append((o[1], o[1] + int(m.group(1), 16)))
     header, units = read_splits(os.path.join(src_cfg, sub, "splits.txt"))
     auto_header, _ = read_splits(mod.auto_splits)
     header = merge_section_header(header, auto_header)
     slines, problems = port_splits(mod, header, units)
     lines = Module.align_gap_starts(out, slines)
+    # A source symbol named after its address (fn_/lbl_<addr>) can land on another address that dtk names the same
+    # way: it takes the name of its own target address
+    names = Counter(line.split(" ", 1)[0] for line in lines)
+    for k, line in enumerate(lines):
+        m = re.match(r"^(fn|lbl)_([0-9A-F]{8}) = (\S+):0x([0-9A-F]{8});", line)
+        if m and names[line.split(" ", 1)[0]] > 1 and m.group(2) != m.group(4):
+            lines[k] = f"{m.group(1)}_{m.group(4)}" + line[len(m.group(1)) + 9:]
     with open(os.path.join(out_dir, sub, "symbols.txt"), "w", encoding="utf-8", newline="\n") as f:
         f.write("\n".join(lines) + "\n")
     with open(os.path.join(out_dir, sub, "splits.txt"), "w", encoding="utf-8", newline="\n") as f:
@@ -1182,13 +1597,16 @@ def write_module(mod, src_cfg, out_dir, report):
     fn_mapped = sum(1 for s in mod.ssyms if s.type == "function" and id(s) in mod.map)
     report.write(f"== {mod.name}: {len(mod.ssyms) - len(missing)}/{len(mod.ssyms)} symbols ported "
                  f"({fn_mapped}/{fn_total} functions); {dict(hows)}\n")
+    moved = Counter(f"{s.sec}->{mod.tsec(s)}" for s in mod.ssyms if mod.moved(s))
+    if moved:
+        report.write(f"  moved section: {dict(moved)}\n")
     for p in problems:
         report.write(f"  split: {p}\n")
     for s in missing:
         report.write(f"  unported: {s.name} {s.sec}:0x{s.addr:08X} {s.type} size:0x{s.size:X}\n")
     for s in mod.ssyms:
         h = mod.how.get(id(s), "")
-        if h.startswith("code-similar"):
+        if h.startswith("code-similar") and id(s) in mod.map:
             report.write(f"  similar: {s.name} -> 0x{mod.map[id(s)]:08X} ({h})\n")
     # Ported data whose contents differ (pointers / relocated words aside): real version differences, or a
     # wrong placement
@@ -1199,12 +1617,13 @@ def write_module(mod, src_cfg, out_dir, report):
         if mod.simg.sections.get(s.sec, (0, 0, None))[2] is None:
             continue
         ta = mod.map[id(s)]
+        tsec = mod.tsec(s)
         tsize = mod.out_size.get(id(s), s.size)
-        if tsize == s.size and mod._bytes_agree(s.sec, s, ta):
+        if tsize == s.size and mod._bytes_agree(s.sec, s, ta, tsec):
             continue
         changed += 1
         a = mod.simg.bytes(s.sec, s.addr, min(s.size, 16)).hex()
-        b = mod.timg.bytes(s.sec, ta, min(tsize, 16)).hex()
+        b = mod.timg.bytes(tsec, ta, min(tsize, 16)).hex()
         report.write(f"  changed: {s.name} {s.sec}:0x{s.addr:08X} -> 0x{ta:08X} size 0x{s.size:X} -> 0x{tsize:X} "
                      f"[{a}] [{b}]\n")
     report.write(f"  ({changed} ported data symbols differ in content)\n")

@@ -45,6 +45,9 @@ USER_FUNC(evt_hit_bind_mapobj);
 USER_FUNC(evt_hit_bind_update);
 USER_FUNC(evt_hitobj_onoff);
 USER_FUNC(evt_img_alloc_capture);
+#ifdef VERSION_G8ME01_DEMO
+USER_FUNC(evt_img_clear_virtual_point);
+#endif
 USER_FUNC(evt_img_entry);
 USER_FUNC(evt_img_free_capture);
 USER_FUNC(evt_img_onoff);
@@ -402,8 +405,13 @@ static EVT_BEGIN(first_evt)
     CALL(evt_snd_bgm_scope, 0, 1)
     CALL(evt_mario_key_onoff, 0)
     CALL(evt_party_stop, 0)
+#ifdef VERSION_G8ME01_DEMO
+    CALL(evt_fade_set_mapchange_type, 0, -1, -1, 7, 300)
+    CALL(evt_fade_set_mapchange_type, 1, -1, -1, 7, 300)
+#else
     CALL(evt_fade_set_mapchange_type, 0, -1, -1, 9, 300)
     CALL(evt_fade_set_mapchange_type, 1, -1, -1, 9, 300)
+#endif
     CALL(evt_cam_letter_box_onoff, 1, 0)
     CALL(evt_mario_dispflag_onoff, 1, 1)
     CALL(evt_party_dispflg_onoff, 0, 1, 1)
@@ -808,10 +816,12 @@ USER_FUNC(dist_check) {
 }
 
 EVT_BEGIN(moji_msg)
+#ifndef VERSION_G8ME01_DEMO
     CALL(hei_00_mario_keyoff_check, LW(0))
     IF_INT_EQUAL(LW(0), 1)
         RETURN
     END_IF
+#endif
     CALL(evt_mario_key_onoff, 0)
     CALL(evt_msg_print, 0, STRING("stg1_hei_02_01"), 0, 0)
     CALL(evt_mario_key_onoff, 1)
@@ -948,7 +958,9 @@ static EVT_BEGIN(dokan_evt)
     DELETE_EVENT(LW(0))
     CALL(evt_cam3d_evt_set, 145, 100, 450, 145, 40, -140, 1000, 11)
     CALL_CHILD(PTR(cam_shake2))
+#ifndef VERSION_G8ME01_DEMO
     WAIT_MS(1000)
+#endif
     SET_VALUE(GF(1), 1)
     CALL(evt_paper_entry, STRING("OFF_hei_00"))
     CALL(evt_offscreen_entry, STRING("offscreen"))
@@ -958,8 +970,13 @@ static EVT_BEGIN(dokan_evt)
     CALL(evt_img_entry, STRING("img"))
     CALL(evt_img_set_paper, STRING("img"), STRING("OFF_hei_00"))
     CALL(evt_img_alloc_capture, STRING("img"), 0, STRING("offscreen"), 0, 0, 0, 0, 0)
+#ifndef VERSION_G8ME01_DEMO
     CALL(evt_img_set_virtual_point, STRING("img"), 150, 25, 20)
     CALL(evt_img_set_position, STRING("img"), 9, -14)
+#endif
+#ifdef VERSION_G8ME01_DEMO
+    CALL(evt_img_clear_virtual_point, STRING("img"))
+#endif
     CALL(evt_img_set_shadow, STRING("img"), 2)
     WAIT_FRAMES(1)
     SPAWN_EVENT(PTR(evt_snd))
@@ -1008,6 +1025,7 @@ static EVT_BEGIN(dokan_evt)
     RETURN
 EVT_END()
 
+#ifndef VERSION_G8ME01_DEMO
 USER_FUNC(hei_00_mario_keyoff_check) {
     EvtWord* args = event->args;
 
@@ -1018,6 +1036,7 @@ USER_FUNC(hei_00_mario_keyoff_check) {
     }
     return EVT_RETURN_DONE;
 }
+#endif
 
 EVT_BEGIN(setting_sun_stone)
     IF_INT_EQUAL(GSWF(1776), 1)
@@ -1040,7 +1059,11 @@ static s32 itemsel_table00[] = {
 EVT_BEGIN(sun_stone_set_event)
     IF_INT_EQUAL(GSWF(1776), 0)
         CALL(evt_mario_key_onoff, 0)
+#ifdef VERSION_G8ME01_DEMO
+        CALL(evt_win_item_select, PTR(itemsel_table00), LW(0))
+#else
         CALL(evt_win_item_select, 0, PTR(itemsel_table00), LW(0), 0)
+#endif
         IF_INT_EQUAL(LW(0), -1)
             CALL(evt_mario_key_onoff, 1)
             RETURN
@@ -1080,7 +1103,11 @@ static s32 itemsel_table01[] = {
 EVT_BEGIN(moon_stone_set_event)
     IF_INT_EQUAL(GSWF(1777), 0)
         CALL(evt_mario_key_onoff, 0)
+#ifdef VERSION_G8ME01_DEMO
+        CALL(evt_win_item_select, PTR(itemsel_table01), LW(0))
+#else
         CALL(evt_win_item_select, 0, PTR(itemsel_table01), LW(0), 0)
+#endif
         IF_INT_EQUAL(LW(0), -1)
             CALL(evt_mario_key_onoff, 1)
             RETURN
@@ -1102,7 +1129,11 @@ EVT_END()
 static EVT_BEGIN(ki_data_evt_01)
     CALL(evt_item_delete_check, STRING("item_ki01"), LW(0))
     IF_INT_EQUAL(LW(0), 1)
+#ifdef VERSION_G8ME01_DEMO
+        CALL(evt_item_entry, STRING("item_ki01"), 125, -468, 139, -127, 13, GSWF(5598), 0)
+#else
         CALL(evt_item_entry, STRING("item_ki01"), 125, -468, 139, -127, 14, GSWF(5598), 0)
+#endif
     END_IF
     RETURN
 EVT_END()
@@ -1110,7 +1141,11 @@ EVT_END()
 EVT_BEGIN(ki_data_evt_02)
     CALL(evt_item_delete_check, STRING("item_ki02"), LW(0))
     IF_INT_EQUAL(LW(0), 1)
+#ifdef VERSION_G8ME01_DEMO
+        CALL(evt_item_entry, STRING("item_ki02"), 148, -408, 139, -127, 13, GSWF(1778), 0)
+#else
         CALL(evt_item_entry, STRING("item_ki02"), 148, -408, 139, -127, 14, GSWF(1778), 0)
+#endif
     END_IF
     RETURN
 EVT_END()
@@ -1245,7 +1280,11 @@ static EVT_BEGIN(epilogue_evt)
     WAIT_MS(2000)
     CALL(evt_snd_bgmoff_f, 512, 3000)
     CALL(evt_snd_envoff_f, 512, 3000)
+#ifdef VERSION_G8ME01_DEMO
+    CALL(evt_fade_set_mapchange_type, 1, 8, 900, 7, 900)
+#else
     CALL(evt_fade_set_mapchange_type, 1, 10, 900, 9, 900)
+#endif
     CALL(evt_bero_mapchange, STRING("nok_01"), STRING(""))
     RETURN
 EVT_END()

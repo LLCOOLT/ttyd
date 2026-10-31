@@ -193,6 +193,11 @@ void effSstarMain(EffectEntry* effect) {
             w->rotZ = angleABf(0.0f, 0.0f, -w->velocity.y, w->screenSpeedX);
         }
     }
+#ifdef VERSION_G8ME01_DEMO
+    if (mario->position.y - w->position.y > 300.0f) {
+        w->life = -1;
+    }
+#else
     if (gp->inBattle == 0) {
         if (mario->position.y - w->position.y > 300.0f) {
             w->life = -1;
@@ -200,6 +205,7 @@ void effSstarMain(EffectEntry* effect) {
     } else if (w->position.y < -300.0f) {
         w->life = -1;
     }
+#endif
     w->position.x += w->velocity.x;
     w->position.y += w->velocity.y;
     w->position.z += w->velocity.z;

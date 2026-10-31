@@ -824,6 +824,7 @@ static EVT_BEGIN(peach_mail)
     CALL(evt_mario_key_onoff, 0)
     CALL(evt_mario_normalize)
     CALL(evt_party_stop, 0)
+#ifndef VERSION_G8ME01_DEMO
     CALL(evt_mario_get_pos, 0, LW(0), LW(1), LW(2))
     CALL(evt_party_get_pos, 0, LW(3), LW(4), LW(5))
     CALL(evt_sub_get_dist, LW(0), LW(2), LW(3), LW(5), LW(10))
@@ -832,6 +833,7 @@ static EVT_BEGIN(peach_mail)
         CALL(evt_party_set_pos, 0, LW(0), LW(1), LW(2))
         CALL(evt_party_set_dir, 0, 270, 0)
     END_IF
+#endif
     CALL(evt_snd_bgmoff, 1024)
     CALL(evt_snd_bgmon, 1, STRING("BGM_FF_MAIL_RECEPTION1"))
     CALL(evt_mario_get_pos, 0, LW(0), LW(1), LW(2))
@@ -905,8 +907,13 @@ EVT_END()
 
 EVT_BEGIN(christine_hei_01)
     CALL(evt_mario_key_onoff, 0)
+#ifndef VERSION_G8ME01_DEMO
     CALL(evt_bero_exec_wait, 65536)
+#endif
     CALL(evt_party_stop, 0)
+#ifdef VERSION_G8ME01_DEMO
+    CALL(evt_bero_exec_wait, 65536)
+#endif
     CALL(evt_npc_stop_for_event)
     CALL(evt_mario_normalize)
     WAIT_MS(500)
@@ -932,7 +939,11 @@ EVT_BEGIN(hei_01_init_evt)
     CALL(evt_npc_setup, PTR(npcEnt))
     CALL(evt_npc_change_fbat_mode, 1)
     CALL(evt_mobj_badgeblk, STRING("mobj_hatenablk"), 315, 60, -75, 132, 0, GSWF(1785), 0)
+#ifdef VERSION_G8ME01_DEMO
+    CALL(evt_item_entry, STRING("item_01"), 125, 450, 40, -447, 15, GSWF(5599), 0)
+#else
     CALL(evt_item_entry, STRING("item_01"), 125, 450, 40, -447, 16, GSWF(5599), 0)
+#endif
     CALL(evt_item_set_scale, STRING("item_01"), FLOAT(0.5996094f))
     SET_VALUE(LW(0), PTR(kusa_data))
     CALL_CHILD(PTR(evt_sub_kusa_access_entry))
@@ -961,11 +972,13 @@ EVT_BEGIN(hei_01_init_evt)
     CALL(evt_snd_bgmon, 512, STRING("BGM_STG1_HEI1"))
     CALL(evt_snd_envon, 272, STRING("ENV_STG1_HEI2"))
     CALL(evt_mapobj_flag_onoff, 1, 0, STRING("USIROKUSA"), 2)
+#ifndef VERSION_G8ME01_DEMO
     IF_INT_LESS(GSW(0), 25)
         IF_INT_EQUAL(GSWF(1805), 0)
             SPAWN_EVENT(PTR(christine_hei_01))
         END_IF
     END_IF
+#endif
     RETURN
 EVT_END()
 

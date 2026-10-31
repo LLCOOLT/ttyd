@@ -273,11 +273,13 @@ typedef struct FieldBattleData {
     u8 sandersBombTrigger;       // 0x54D
     u8 pad_54E[0x550 - 0x54E];   // 0x54E, never accessed
     FirstStrikeInfo firstStrike; // 0x550
+#ifndef VERSION_G8ME01_DEMO
     s32 battleWait;              // 0x570, frames seq_battle has waited for the first-strike announce (gives up at 200)
-    s32 kpaComboCount;           // 0x574, Bowser stomp combo, score multiplier
-    s32 kpaJumpKills;            // 0x578, Bowser kills during one jump
-    s32 kpaJumpScore;            // 0x57C, score banked during one jump, shown on landing
-} FieldBattleData;
+#endif
+    s32 kpaComboCount;           // 0x574 (demo 0x570), Bowser stomp combo, score multiplier
+    s32 kpaJumpKills;            // 0x578 (demo 0x574), Bowser kills during one jump
+    s32 kpaJumpScore;            // 0x57C (demo 0x578), score banked during one jump, shown on landing
+} FieldBattleData; // size 0x580 (demo 0x57C)
 
 NpcWork* npcGetWorkPtr(void);
 void npcReleaseFieldNpc(void);

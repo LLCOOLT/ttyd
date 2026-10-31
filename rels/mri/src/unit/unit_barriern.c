@@ -231,7 +231,11 @@ static BattleUnitKindPart parts[] = {
     {11, "btl_un_barriern", "c_baria", 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 10, 10, 255, &defence, &defence_attr, 0x13010000, 0, pose_table},
 };
 
+#ifdef VERSION_G8ME01_DEMO
+static StatusVulnerability regist = {20, 90, 80, 0, 80, 100, 0, 0, 100, 80, 100, 80, 100, 80, 80, 0, 80, 100, 80, 100, 100, 95};
+#else
 static StatusVulnerability regist = {30, 80, 100, 0, 70, 100, 0, 0, 100, 90, 100, 90, 100, 95, 70, 0, 90, 100, 70, 100, 100, 95};
+#endif
 
 static BattleWeapon weapon_wakka_attack = {
     NULL, 0, // name..icon
@@ -341,8 +345,13 @@ static PoseTableEntry pose_table[] = {
     {40, "W_1"},
     {56, "X_1"},
     {57, "X_1"},
+#ifdef VERSION_G8ME01_DEMO
+    {63, "T_1"},
+    {67, "S_1"},
+#else
     {65, "T_1"},
     {69, "S_1"},
+#endif
 };
 
 static USER_FUNC(barriern_zanzou) {

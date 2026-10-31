@@ -996,7 +996,11 @@ EVT_BEGIN(sys_01_init_evt)
     CALL(evt_party_set_pos, 0, 0, 0, 0)
     CALL(evt_cam3d_evt_set, 0, 0, 500, 0, 0, 0, 0, 11)
     CALL(bg)
+#ifdef VERSION_G8ME01_DEMO
+    CALL(evt_fade_entry, 30, 0, 0, 0, 0)
+#else
     CALL(evt_fade_entry, 32, 0, 0, 0, 0)
+#endif
     CALL(evt_fade_end_wait)
     BEGIN_INLINE_EVENT
         SET_VALUE(LW(0), 0)
@@ -1031,8 +1035,13 @@ EVT_BEGIN(sys_01_init_evt)
         CALL(display, LW(0))
     END_INLINE_EVENT
     WAIT_MS(3000)
+#ifdef VERSION_G8ME01_DEMO
+    CALL(evt_fade_set_mapchange_type, 0, 15, 1800, 14, 1800)
+    CALL(evt_fade_set_mapchange_type, 1, 15, 1800, 14, 1800)
+#else
     CALL(evt_fade_set_mapchange_type, 0, 17, 1800, 16, 1800)
     CALL(evt_fade_set_mapchange_type, 1, 17, 1800, 16, 1800)
+#endif
     SPAWN_EVENT(PTR(evt_start))
     RETURN
 EVT_END()
@@ -1048,7 +1057,11 @@ EVT_BEGIN(evt_start)
             END_IF
         END_IF
     END_IF
+#ifdef VERSION_G8ME01_DEMO
+    CALL(evt_fade_entry, 33, 0, 0, 0, 0)
+#else
     CALL(evt_fade_entry, 35, 0, 0, 0, 0)
+#endif
     CALL(evt_fade_end_wait)
     CALL(start)
 #ifdef VERSION_G8ME01
@@ -1064,8 +1077,13 @@ EVT_BEGIN(evt_start)
         END_IF
         WAIT_FRAMES(1)
     END_LOOP
+#ifdef VERSION_G8ME01_DEMO
+    CALL(evt_fade_set_mapchange_type, 0, 17, 500, 16, 500)
+    CALL(evt_fade_set_mapchange_type, 1, 17, 500, 16, 500)
+#else
     CALL(evt_fade_set_mapchange_type, 0, 19, 500, 18, 500)
     CALL(evt_fade_set_mapchange_type, 1, 19, 500, 18, 500)
+#endif
     CALL(evt_bero_get_entername, LW(1))
     IF_STR_EQUAL(LW(1), STRING("prologue"))
         SET_VALUE(LW(0), 0)
@@ -1186,8 +1204,13 @@ USER_FUNC(display) {
     g_wp = wp;
     switch (wp->state) {
         case 0:
+#ifdef VERSION_G8ME01_DEMO
+            if (fileAsyncf(4, NULL, "%s/eff/%s/effect_sys.tpl", getMarioStDvdRoot(), lang_prefix[gp->language]) != 0U) {
+                wp->file = fileAllocf(4, "%s/eff/%s/effect_sys.tpl", getMarioStDvdRoot(), lang_prefix[gp->language]);
+#else
             if (fileAsyncf(4, NULL, "%s/e/%s/effect_sys.tpl", getMarioStDvdRoot(), lang_prefix[gp->language]) != 0U) {
                 wp->file = fileAllocf(4, "%s/e/%s/effect_sys.tpl", getMarioStDvdRoot(), lang_prefix[gp->language]);
+#endif
                 wp->state++;
             }
             break;

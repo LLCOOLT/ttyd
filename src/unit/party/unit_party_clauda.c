@@ -287,7 +287,40 @@ BattleWeapon partyWeapon_ClaudaKumogakureAttack = {
     {0, 0, 0, 100, 0, 0, 5, 0, 0, 0, 0, 0}, // stageEffectRates
 };
 
+static BattleUnitDefense defence = {{0, 0, 0, 0, 0}};
+
+static BattleUnitDefenseAttr defence_attr = {{0, 0, 0, 0, 0}};
+
+static StatusVulnerability regist = {100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100};
+
 PoseTableEntry pose_table_clauda_stay[] = {
+#ifdef VERSION_G8ME01_DEMO
+    {9, "PWD_D_5"},
+    {2, "PWD_D_5"},
+    {3, "PWD_X_1"},
+    {4, "PWD_D_2"},
+    {5, "PWD_X_1"},
+    {1, "PWD_N_1"},
+    {27, "PWD_D_3"},
+    {28, "PWD_S_1"},
+    {37, "PWD_G_2"},
+    {31, "PWD_G_1"},
+    {39, "PWD_D_1"},
+    {40, "PWD_W_1"},
+    {42, "PWD_R_1"},
+    {57, "PWD_D_2"},
+    {56, "PWD_D_2"},
+    {58, "PWD_D_3"},
+    {59, "PWD_D_2"},
+    {63, "PWD_T_1"},
+    {52, "PWD_I_1"},
+    {65, "PWD_C_1"},
+    {64, "PWD_O_1"},
+    {62, "PWD_X_1"},
+    {49, "PWD_A4_3"},
+    {45, "PWD_G_1"},
+    {67, "PWD_S_1"},
+#else
     {9, "PWD_D_5"},
     {2, "PWD_D_5"},
     {3, "PWD_X_1"},
@@ -313,6 +346,7 @@ PoseTableEntry pose_table_clauda_stay[] = {
     {49, "PWD_A4_3"},
     {45, "PWD_G_1"},
     {69, "PWD_S_1"},
+#endif
 };
 
 static BattleDataEntry data_table[] = {
@@ -431,6 +465,15 @@ static EVT_BEGIN(damage_event)
     SET_VALUE(LW(10), -2)
     SET_VALUE(LW(11), 1)
     CALL_CHILD(PTR(btldefaultevt_Damage))
+    RETURN
+EVT_END()
+
+static EVT_BEGIN(attack_event)
+    RETURN
+EVT_END()
+
+static EVT_BEGIN(wait_event)
+    CALL(btlevtcmd_AnimeChangePoseFromTable, -2, 1)
     RETURN
 EVT_END()
 
@@ -648,6 +691,22 @@ EVT_BEGIN(partyClaudaAttack_BreathAttack)
     CALL(btlevtcmd_AcGetDifficulty, LW(1))
     SUBTRACT(LW(1), 3)
     SWITCH(LW(1))
+#ifdef VERSION_G8ME01_DEMO
+        CASE_LESS_OR_EQUAL(-3)
+        SET_VALUE(LW(0), 420)
+        CASE_EQUAL(-2)
+        SET_VALUE(LW(0), 360)
+        CASE_EQUAL(-1)
+        SET_VALUE(LW(0), 320)
+        CASE_EQUAL(0)
+        SET_VALUE(LW(0), 300)
+        CASE_EQUAL(1)
+        SET_VALUE(LW(0), 270)
+        CASE_EQUAL(2)
+        SET_VALUE(LW(0), 240)
+        CASE_DEFAULT
+        SET_VALUE(LW(0), 180)
+#else
         CASE_LESS_OR_EQUAL(-3)
         SET_VALUE(LW(0), 300)
         CASE_EQUAL(-2)
@@ -662,6 +721,7 @@ EVT_BEGIN(partyClaudaAttack_BreathAttack)
         SET_VALUE(LW(0), 300)
         CASE_DEFAULT
         SET_VALUE(LW(0), 300)
+#endif
     END_SWITCH
     CALL(btlevtcmd_AcGetDifficulty, LW(1))
     CALL(btlevtcmd_AcSetParamAll, 1, LW(0), 4, 40, 60, 80, 100, LW(1))
@@ -816,6 +876,29 @@ EVT_BEGIN(partyClaudaAttack_PredationAttack)
         CALL(btlevtcmd_AcGetDifficulty, LW(0))
         SUBTRACT(LW(0), 3)
         SWITCH(LW(0))
+#ifdef VERSION_G8ME01_DEMO
+            CASE_LESS_OR_EQUAL(-3)
+            SET_VALUE(LW(0), 120)
+            SET_VALUE(LW(1), 0)
+            CASE_EQUAL(-2)
+            SET_VALUE(LW(0), 100)
+            SET_VALUE(LW(1), 0)
+            CASE_EQUAL(-1)
+            SET_VALUE(LW(0), 80)
+            SET_VALUE(LW(1), 1)
+            CASE_EQUAL(0)
+            SET_VALUE(LW(0), 70)
+            SET_VALUE(LW(1), 2)
+            CASE_EQUAL(1)
+            SET_VALUE(LW(0), 65)
+            SET_VALUE(LW(1), 3)
+            CASE_EQUAL(2)
+            SET_VALUE(LW(0), 60)
+            SET_VALUE(LW(1), 3)
+            CASE_DEFAULT
+            SET_VALUE(LW(0), 50)
+            SET_VALUE(LW(1), 4)
+#else
             CASE_LESS_OR_EQUAL(-3)
             SET_VALUE(LW(0), 120)
             SET_VALUE(LW(1), 0)
@@ -837,13 +920,42 @@ EVT_BEGIN(partyClaudaAttack_PredationAttack)
             CASE_DEFAULT
             SET_VALUE(LW(0), 58)
             SET_VALUE(LW(1), 2)
+#endif
         END_SWITCH
+#ifdef VERSION_G8ME01_DEMO
+        CALL(btlevtcmd_AcSetParamAll, 0, LW(0), LW(1), 6, 3, -250000000, -250000000, -250000000)
+        CALL(btlevtcmd_AcSetGaugeParam, 51, 68, 85, 100)
+#else
         CALL(btlevtcmd_AcSetParamAll, 0, LW(0), LW(1), 5, 3, -250000000, -250000000, -250000000)
         CALL(btlevtcmd_AcSetGaugeParam, 60, 80, 100, 100)
+#endif
         CASE_DEFAULT
         CALL(btlevtcmd_AcGetDifficulty, LW(0))
         SUBTRACT(LW(0), 3)
         SWITCH(LW(0))
+#ifdef VERSION_G8ME01_DEMO
+            CASE_LESS_OR_EQUAL(-3)
+            SET_VALUE(LW(0), 80)
+            SET_VALUE(LW(1), 0)
+            CASE_EQUAL(-2)
+            SET_VALUE(LW(0), 70)
+            SET_VALUE(LW(1), 0)
+            CASE_EQUAL(-1)
+            SET_VALUE(LW(0), 60)
+            SET_VALUE(LW(1), 1)
+            CASE_EQUAL(0)
+            SET_VALUE(LW(0), 50)
+            SET_VALUE(LW(1), 2)
+            CASE_EQUAL(1)
+            SET_VALUE(LW(0), 45)
+            SET_VALUE(LW(1), 3)
+            CASE_EQUAL(2)
+            SET_VALUE(LW(0), 40)
+            SET_VALUE(LW(1), 3)
+            CASE_DEFAULT
+            SET_VALUE(LW(0), 35)
+            SET_VALUE(LW(1), 4)
+#else
             CASE_LESS_OR_EQUAL(-3)
             SET_VALUE(LW(0), 120)
             SET_VALUE(LW(1), 0)
@@ -865,9 +977,15 @@ EVT_BEGIN(partyClaudaAttack_PredationAttack)
             CASE_DEFAULT
             SET_VALUE(LW(0), 58)
             SET_VALUE(LW(1), 2)
+#endif
         END_SWITCH
+#ifdef VERSION_G8ME01_DEMO
+        CALL(btlevtcmd_AcSetParamAll, 0, LW(0), LW(1), 4, 2, -250000000, -250000000, -250000000)
+        CALL(btlevtcmd_AcSetGaugeParam, 25, 50, 75, 100)
+#else
         CALL(btlevtcmd_AcSetParamAll, 0, LW(0), LW(1), 3, 2, -250000000, -250000000, -250000000)
         CALL(btlevtcmd_AcSetGaugeParam, 34, 68, 100, 100)
+#endif
     END_SWITCH
     CALL(btlevtcmd_AcSetFlag, 0)
     CALL(btlevtcmd_SetupAC, -2, 17, 1, 60)
@@ -1122,7 +1240,11 @@ EVT_END()
 
 EVT_BEGIN(clauda_appeal_event)
     CALL(btlevtcmd_RunDataEventChild, -2, 7)
+#ifdef VERSION_G8ME01_DEMO
+    CALL(btlevtcmd_AnimeChangePoseType, -2, 1, 64)
+#else
     CALL(btlevtcmd_AnimeChangePoseType, -2, 1, 66)
+#endif
     CALL(btlevtcmd_GetPos, -2, LW(0), LW(1), LW(2))
     CALL(evt_snd_sfxon_3d, STRING("SFX_MARIO_APPEAL1"), LW(0), LW(1), LW(2), 0)
     CALL(btlevtcmd_GetPos, -2, LW(0), LW(1), LW(2))
@@ -1135,6 +1257,12 @@ EVT_BEGIN(clauda_appeal_event)
     CALL(btlevtcmd_AudienceAppeal, -2)
     WAIT_FRAMES(30)
     CALL(btlevtcmd_StartWaitEvent, -2)
+    RETURN
+EVT_END()
+
+static EVT_BEGIN(party_win_reaction)
+    CALL(btlevtcmd_AnimeChangePose, -2, 1, STRING("PWD_Y_1"))
+    CALL(btlevtcmd_AnimeWaitPlayComplete, -2, 1)
     RETURN
 EVT_END()
 
@@ -1282,27 +1410,6 @@ EVT_BEGIN(attack_good_audience_event)
     ADD(LW(15), 30)
     CALL(btlevtcmd_DivePosition, -2, LW(0), LW(1), LW(2), LW(15), 20, 4, 0, -1)
     CALL(btlevtcmd_StartWaitEvent, -2)
-    RETURN
-EVT_END()
-
-static BattleUnitDefense defence = {{0, 0, 0, 0, 0}};
-
-static BattleUnitDefenseAttr defence_attr = {{0, 0, 0, 0, 0}};
-
-static StatusVulnerability regist = {100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100};
-
-static EVT_BEGIN(attack_event)
-    RETURN
-EVT_END()
-
-static EVT_BEGIN(wait_event)
-    CALL(btlevtcmd_AnimeChangePoseFromTable, -2, 1)
-    RETURN
-EVT_END()
-
-static EVT_BEGIN(party_win_reaction)
-    CALL(btlevtcmd_AnimeChangePose, -2, 1, STRING("PWD_Y_1"))
-    CALL(btlevtcmd_AnimeWaitPlayComplete, -2, 1)
     RETURN
 EVT_END()
 

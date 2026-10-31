@@ -70,12 +70,14 @@ void marioChkGnd2(void);
 void marioChkWallAround(Vec* pos, s32 a1, f32 a2, f32 angle, f32 radius, f32 height);
 
 //.data
+#ifndef VERSION_G8ME01_DEMO
 const char* dotMarioPose[4][6] = {
 	{"Z_1", "S_1", "W_1", "R_1", "U_1", "J_1"},
 	{"Z_15", "S_2", "W_15", "R_15", "U_2", "J_2"},
 	{"Z_17", "S_3", "W_17", "R_17", "U_3", "J_3"},
 	{"Z_18", "S_4", "W_18", "R_18", "U_4", "J_4"}
 };
+#endif
 
 //.sdata
 const char* marioAnimeGroupData[4][3] = {
@@ -89,9 +91,13 @@ const char* marioAnimeGroupData[4][3] = {
 Vec blurPos[8];
 
 //.sbss
+#ifndef VERSION_G8ME01_DEMO
 s32 unk_804186EC;
+#endif
 MarioWork* mp;
+#ifndef VERSION_G8ME01_DEMO
 Vec R_last_position;
+#endif
 s32 blurPosId;
 
 //local prototypes
@@ -159,7 +165,9 @@ void marioSetCharMode(s32 mode) {
 	MarioWork* wp = mp;
 	u32 matFlag;
 	u32 lightFlag;
+#ifndef VERSION_G8ME01_DEMO
 	s32 color;
+#endif
 
 	if (mode == 1) {
 		wp->characterId = 1;
@@ -194,6 +202,7 @@ void marioSetCharMode(s32 mode) {
 		matFlag = animPoseGetMaterialFlag(wp->paperAnimGroupId[marioAnimeId()]);
 		lightFlag = animPoseGetMaterialLightFlag(wp->paperAnimGroupId[marioAnimeId()]);
 		wp->characterId = 0;
+#ifndef VERSION_G8ME01_DEMO
 		if (!mp->characterId) {
 			color = marioBadgeColor();
 			if (!mp->characterId && mp->colorId != color) {
@@ -201,6 +210,7 @@ void marioSetCharMode(s32 mode) {
 				marioSetCharMode(0);
 			}
 		}
+#endif
 		marioCharPoseRelease(wp);
 		wp->paperAnimGroupId[0] = animPoseEntry(marioAnimeGroupData[mp->colorId][0], 2);
 		wp->paperAnimGroupId[1] = animPoseEntry(marioAnimeGroupData[mp->colorId][1], 2);
@@ -217,6 +227,30 @@ void marioSetCharMode(s32 mode) {
 	else {
 		marioSetFamicomMode(1);
 	}
+#ifdef VERSION_G8ME01_DEMO
+	// The demo picks the paper animation by motion only.
+	if (wp->currMotionId == 0x18) {
+		marioForcePlaneAnime();
+		return;
+	}
+	else if (wp->currMotionId == 0x19) {
+		marioForceShipAnime();
+		return;
+	}
+	else if (wp->currMotionId == 0x16) {
+		marioForceRollAnime();
+		return;
+	}
+	else if (wp->currMotionId == 0x15) {
+		marioForceSlitAnime();
+		return;
+	}
+	else if (wp->currMotionId == 0x1a) {
+		marioChgPose("M_Y_2");
+		marioChgPose("M_Y_1");
+		return;
+	}
+#else
 	if (!(wp->flags & 0x2000000)) {
 		if (wp->currMotionId == 0x18) {
 			marioForcePlaneAnime();
@@ -244,6 +278,7 @@ void marioSetCharMode(s32 mode) {
 			return;
 		}
 	}
+#endif
 	if (wp->currMotionId != 0x18 && wp->currMotionId != 0x19 && wp->currMotionId != 0x14) {
 		marioSetSpec();
 	}
@@ -269,10 +304,12 @@ void marioSetFamicomMode(s32 mode) {
 			wp->animName = NULL;
 			marioChgPose("M_S_1");
 		}
+#ifndef VERSION_G8ME01_DEMO
 		else {
 			wp->animName = NULL;
 			marioChgPose("M_S_1");
 		}
+#endif
 	}
 	else {
 		if (wp->flags & 0x80000000) {
@@ -290,10 +327,12 @@ void marioSetFamicomMode(s32 mode) {
 			wp->animName = NULL;
 			marioChgPose("M_S_1");
 		}
+#ifndef VERSION_G8ME01_DEMO
 		else {
 			wp->animName = NULL;
 			marioChgPose("M_S_1");
 		}
+#endif
 	}
 }
 
@@ -330,10 +369,12 @@ void marioEntry(void) {
 	wp->flags |= 1;
 	marioChgPose("M_S_1");
 	if (wp->flags & 0x2000000) {
+#ifndef VERSION_G8ME01_DEMO
 		if (wp->currMotionId == MARIO_MOTION_SLIT) {
 			wp->flags |= 0x100000;
 			marioSlitForceCancel();
 		}
+#endif
 		marioChgMot(MARIO_MOTION_STAY);
 	}
 	else if (wp->currMotionId == MARIO_MOTION_SHIP) {
@@ -388,12 +429,14 @@ BOOL marioCaseEventValidChk(void) {
 	}
 }
 
+#ifndef VERSION_G8ME01_DEMO
 BOOL marioFrontActionValidChk(void) {
 	if (mp->currMotionId == MARIO_MOTION_ROLL || mp->flags & 0x100000) {
 		return FALSE;
 	}
 	return TRUE;
 }
+#endif
 
 static inline s32 marioChkCtrl2(void) { return mp->ctrlOffCount ? 0 : 1; }
 static inline BOOL marioCtrlDisable(void) {
@@ -530,21 +573,29 @@ BOOL marioChkCtrl(void) {
 	return !mp->ctrlOffCount;
 }
 
+#ifndef VERSION_G8ME01_DEMO
 BOOL N_marioChkUseParty(void) {
 	if ((u16)gp->buttonNew[0] & 0x100F) {
 		return TRUE;
 	}
 	return mp->ctrlOffCount;
 }
+#endif
 
 void marioFBattlePrepare(void) {
 	MarioWork* wp = mp;
 
+#ifdef VERSION_G8ME01_DEMO
+	// The demo does not keep Mario's position for the bellows (jabara) motion.
+	marioAdjustMoveDir();
+	wp->flags |= 0x1000;
+#else
 	R_last_position = wp->position;
 	marioAdjustMoveDir();
 	if (wp->currMotionId != MARIO_MOTION_JABARA) {
 		wp->flags |= 0x1000;
 	}
+#endif
 	partyUsePost(partyGetPtr(marioGetPartyId()));
 	partyCtrlOff();
 }
@@ -553,9 +604,11 @@ void marioFBattlePost(void) {
 	MarioWork* wp = mp;
 
 	wp->flags &= ~0x1000;
+#ifndef VERSION_G8ME01_DEMO
 	if (wp->currMotionId == MARIO_MOTION_JABARA) {
 		wp->position = R_last_position;
 	}
+#endif
 	if (wp->currMotionId == MARIO_MOTION_YOSHI) {
 		marioYoshiForceCancel();
 	}
@@ -570,7 +623,11 @@ void marioFBattlePost(void) {
 	}
 #endif
 	partyCtrlOn();
+#ifdef VERSION_G8ME01_DEMO
+	if (wp->currMotionId == MARIO_MOTION_HAMMER) {
+#else
 	if (wp->currMotionId == MARIO_MOTION_HAMMER || wp->currMotionId == MARIO_MOTION_JABARA) {
+#endif
 		marioChgMot(MARIO_MOTION_STAY);
 	}
 }
@@ -800,7 +857,9 @@ void marioInit(void) {
 	mp->wPlayerCollisionBox.z = 20.0f;
 	marioChgPose("M_S_1");
 	mp->reserved_20 = NULL;
+#ifndef VERSION_G8ME01_DEMO
 	mp->bottomlessResetPosition = (Vec){0.0f, 74.0f, 0.0f};
+#endif
 	marioChgMot(MARIO_MOTION_STAY);
 	marioBaloonInit();
 	marioGetRubInit();
@@ -835,6 +894,9 @@ void marioReInit(void) {
 	MarioMotion motion;
 	s32 charId;
 	s32 dotFlag;
+#ifdef VERSION_G8ME01_DEMO
+	BOOL flag22;
+#endif
 	s32 poseId;
 	s32 t;
 	s8 prev0;
@@ -845,7 +907,16 @@ void marioReInit(void) {
 	f32 f1A0;
 	f32 f19C;
 
+#ifdef VERSION_G8ME01_DEMO
+	// the demo carries flag 0x200000 over the reset as flag 0x400000
+	flag22 = FALSE;
+	if ((wp = mp)->flags & 0x200000) {
+		flag22 = TRUE;
+	}
+	dotFlag = wp->flags & 0x80000000;
+#else
 	dotFlag = (wp = mp)->flags & 0x80000000;
+#endif
 	camId = marioGetCamId();
 	charId = wp->characterId;
 	slot0 = wp->currPartySlotId[0];
@@ -872,6 +943,11 @@ void marioReInit(void) {
 		wp->paperPoseId = poseId;
 	}
 	memset(wp, 0, sizeof(MarioWork));
+#ifdef VERSION_G8ME01_DEMO
+	if (flag22) {
+		wp->flags |= 0x400000;
+	}
+#endif
 	marioSoundInit();
 	if (dotFlag) {
 		wp->flags |= 0x80000000;
@@ -923,7 +999,9 @@ void marioReInit(void) {
 		animPoseSetMaterialLightFlagOn(wp->paperAnimGroupId[2], 2);
 	}
 	wp->scale = (Vec){1.0f, 1.0f, 1.0f};
+#ifndef VERSION_G8ME01_DEMO
 	wp->bottomlessResetPosition = (Vec){0.0f, 74.0f, 0.0f};
+#endif
 	partyReInit();
 	marioBaloonInit();
 	marioGetRubInit();
@@ -1018,7 +1096,9 @@ static inline BOOL marioChkRollMot2(void) {
 
 void marioMain(void) {
 	MarioWork* wp = mp;
+#ifndef VERSION_G8ME01_DEMO
 	MarioWork* p;
+#endif
 	u32 flags;
 	f32 y;
 	f32 c, b, a;
@@ -1026,6 +1106,10 @@ void marioMain(void) {
 	if (!(wp->flags & 1)) {
 		return;
 	}
+#ifdef VERSION_G8ME01_DEMO
+	// The demo has no badge 0x143 check here.
+	marioColorChk();
+#else
 	if (N_marioChkUseParty()) {
 		marioColorChk();
 		p = mp;
@@ -1042,13 +1126,25 @@ void marioMain(void) {
 			}
 		}
 	}
+#endif
 	marioSetDirEventMain();
+#ifdef VERSION_G8ME01_DEMO
+	if (!strcmp(gp->currentMapName, "moo_00") || !strcmp(gp->currentMapName, "moo_01") ||
+		!strcmp(gp->currentMapName, "moo_02") || !strcmp(gp->currentMapName, "moo_05") ||
+		!strcmp(gp->currentMapName, "moo_06") || !strcmp(gp->currentMapName, "moo_07")) {
+		wp->playerGravity = 0.5f;
+	}
+	else {
+		wp->playerGravity = 1.0f;
+	}
+#else
 	wp->playerGravity = 1.0f;
 	if (!strcmp(gp->currentMapName, "moo_00") || !strcmp(gp->currentMapName, "moo_01") ||
 		!strcmp(gp->currentMapName, "moo_02") || !strcmp(gp->currentMapName, "moo_05") ||
 		!strcmp(gp->currentMapName, "moo_06") || !strcmp(gp->currentMapName, "moo_07")) {
 		wp->playerGravity = 0.5f;
 	}
+#endif
 	marioPreCamera();
 	marioHitCheckWidth();
 	if (wp->mutekiTimer > 0) {
@@ -1121,7 +1217,11 @@ void marioMain(void) {
 			return;
 		}
 		if (wp->currMotionId == 0x1c) {
+#ifdef VERSION_G8ME01_DEMO
+			marioMove();
+#else
 			marioChkGnd();
+#endif
 			marioChkToge();
 			marioPreDisp();
 			marioBalloonMain();
@@ -1177,7 +1277,11 @@ void marioMain(void) {
 			marioJump();
 			marioChkOverhead();
 			marioMove();
+#ifdef VERSION_G8ME01_DEMO
+			if (wp->airTimer > 5) {
+#else
 			if (!marioChkRollMot2() && wp->airTimer > 5) {
+#endif
 				marioChkGnd2();
 			}
 		}
@@ -1195,7 +1299,11 @@ void marioMain(void) {
 				}
 				marioFall();
 				if (wp->currMotionId != MARIO_MOTION_HIP && wp->currMotionId != MARIO_MOTION_HIP_2) {
+#ifdef VERSION_G8ME01_DEMO
+					if (wp->airTimer > 5) {
+#else
 					if (!marioChkRollMot2() && wp->airTimer > 5) {
+#endif
 						marioChkGnd2();
 					}
 				}
@@ -1237,11 +1345,19 @@ void marioCtrlOff2Main(void) {
 
 	if (mot == MARIO_MOTION_PLANE) return;
 	if (mot == MARIO_MOTION_SHIP) return;
+#ifdef VERSION_G8ME01_DEMO
+	if (mot == MARIO_MOTION_DAMAGE || mot == MARIO_MOTION_DAMAGE_TOGE || mot == MARIO_MOTION_BOTTOMLESS ||
+		mot == MARIO_MOTION_JABARA || mot == MARIO_MOTION_YOSHI ||
+		mot == MARIO_MOTION_JUMP_3) {
+		return;
+	}
+#else
 	if (mot == MARIO_MOTION_DAMAGE || mot == MARIO_MOTION_DAMAGE_TOGE || mot == MARIO_MOTION_BOTTOMLESS ||
 		mot == MARIO_MOTION_JABARA || mot == MARIO_MOTION_YOSHI ||
 		mot == MARIO_MOTION_JUMP_3 || mot == MARIO_MOTION_JUMP_STAND) {
 		return;
 	}
+#endif
 	if (vivianGetStatus()) {
 		return;
 	}
@@ -1258,7 +1374,11 @@ void marioCtrlOff2Main(void) {
 		marioJump();
 		marioChkOverhead();
 		marioMove();
+#ifdef VERSION_G8ME01_DEMO
+		if (wp->airTimer > 5) {
+#else
 		if (!marioChkRollMot() && wp->airTimer > 5) {
+#endif
 			marioChkGnd2();
 		}
 	}
@@ -1278,18 +1398,26 @@ void marioCtrlOff2Main(void) {
 		}
 		marioFall();
 		if (wp->currMotionId != MARIO_MOTION_HIP && wp->currMotionId != MARIO_MOTION_HIP_2) {
+#ifdef VERSION_G8ME01_DEMO
+			if (wp->airTimer > 5) {
+#else
 			if (!marioChkRollMot() && wp->airTimer > 5) {
+#endif
 				marioChkGnd2();
 			}
 		}
 		else {
 			marioChkGnd2();
 		}
+#ifndef VERSION_G8ME01_DEMO
 		marioChkWallAround(&wp->position, 0, 0.0f, 0.0f, wp->wPlayerCollisionBox.z, wp->wPlayerCollisionBox.y);
+#endif
 	}
+#ifndef VERSION_G8ME01_DEMO
 	else {
 		marioChkGnd();
 	}
+#endif
 }
 
 f32 PSVECDistance(const Vec* a, const Vec* b);
@@ -1306,7 +1434,9 @@ static inline void marioMove_screenPos(void) {
 void marioMove(void) {
 	MarioWork* wp = mp;
 	Vec prev;
+#ifndef VERSION_G8ME01_DEMO
 	f32 x2, y2, z2;
+#endif
 	s32 stick;
 
 	prev = wp->position;
@@ -1318,6 +1448,12 @@ void marioMove(void) {
 		}
 	}
 	if (wp->flags & 0x2000000) {
+#ifdef VERSION_G8ME01_DEMO
+		// The demo has no aji_13 camera case.
+		if (wp->controlStickSensitivity && !(wp->dispFlags & 0x20000)) {
+			camFollowYOff();
+		}
+#else
 		if (strcmp(gp->currentMapName, "aji_13")) {
 			if (wp->controlStickSensitivity && !(wp->dispFlags & 0x20000)) {
 				camFollowYOff();
@@ -1329,6 +1465,7 @@ void marioMove(void) {
 				camFollowYOn();
 			}
 		}
+#endif
 		if (wp->currMotionId == 1 || wp->currMotionId == 2) {
 			if (0.0f != prev.x - wp->position.x) {
 				if (PSVECDistance(&prev, &wp->position) <= 1.0f) {
@@ -1519,12 +1656,14 @@ void marioMoveMain(void) {
 		else {
 			marioCheckWall_roll(dist, spd);
 		}
+#ifndef VERSION_G8ME01_DEMO
 		N_dou10_yoko_yari3(&wp->frontWallDist);
 		if (wp->hitobjFront && (hitGetAttr(wp->hitobjFront) & 0x800)) {
 			set_damage_root_ypos(wp->position.y);
 			marioChgMot(MARIO_MOTION_DAMAGE_TOGE);
 			return;
 		}
+#endif
 	}
 	marioChkToge();
 }
@@ -1553,6 +1692,7 @@ s32 marioAnimeId(void) {
 	return id;
 }
 
+#ifndef VERSION_G8ME01_DEMO
 void marioChgDamagePose(void) {
 	MarioWork* wp = mp;
 	MarioMotion mot = wp->currMotionId;
@@ -1565,6 +1705,7 @@ void marioChgDamagePose(void) {
 		}
 	}
 }
+#endif
 
 void marioChgEvtPose(const char* name) {
 	MarioWork* wp = mp;
@@ -1580,6 +1721,16 @@ void marioChgEvtPose(const char* name) {
 		}
 	}
 }
+
+#ifdef VERSION_G8ME01_DEMO
+// The demo defines the table here, after marioMain, which puts its strings after the vector templates in .rodata.
+const char* dotMarioPose[4][6] = {
+	{"Z_1", "S_1", "W_1", "R_1", "U_1", "J_1"},
+	{"Z_15", "S_2", "W_15", "R_15", "U_2", "J_2"},
+	{"Z_17", "S_3", "W_17", "R_17", "U_3", "J_3"},
+	{"Z_18", "S_4", "W_18", "R_18", "U_4", "J_4"}
+};
+#endif
 
 const char* toDotMarioPose(const char* name) {
 	const char* dot = NULL;
@@ -2179,6 +2330,9 @@ void marioDisp(CameraId camId, void* param) {
 	f32 scale;
 	f32 angle;
 	f32 angle2;
+#ifdef VERSION_G8ME01_DEMO
+	f32 yofs = 0.0f;
+#endif
 
 	scale = marioGetScale();
 	MTXScale(mtx, wp->scale.x * scale, wp->scale.y * scale, wp->scale.z * scale);
@@ -2238,10 +2392,17 @@ void marioDisp(CameraId camId, void* param) {
 		MTXScale(scaleMtx, 1.0f, wp->tubeScaleY, 1.0f);
 		MTXConcat(scaleMtx, mtx, mtx);
 	}
+#ifdef VERSION_G8ME01_DEMO
+	MTXTrans(rotMtx,
+		wp->dispOfs2.x + (wp->position.x + wp->dispOfs.x),
+		yofs + (wp->dispOfs2.y + (wp->position.y + wp->dispOfs.y)),
+		wp->dispOfs2.z + (wp->position.z + wp->dispOfs.z));
+#else
 	MTXTrans(rotMtx,
 		wp->dispOfs2.x + (wp->position.x + wp->dispOfs.x),
 		wp->dispOfs2.y + (wp->position.y + wp->dispOfs.y),
 		wp->dispOfs2.z + (wp->position.z + wp->dispOfs.z));
+#endif
 	MTXConcat(rotMtx, mtx, mtx);
 	animPoseDrawMtx(wp->paperAnimGroupId[marioAnimeId()], mtx, 2, 0.0f, 1.0f);
 	animPoseDrawMtx(wp->paperAnimGroupId[marioAnimeId()], mtx, 1, 0.0f, 1.0f);

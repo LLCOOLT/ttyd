@@ -401,7 +401,7 @@ u16 _get_icon_id(s8 dir) {
     (v) = (Vec){0.0f, 0.0f, 0.0f};   \
     (v).x = -200.0f + x;             \
     (v).y = 70.0f + y;               \
-    iconDispGx(&(v), 0x10, (id), 1.0f)
+    iconDispGx(&(v), ICON_DISP_2D, (id), 1.0f)
 
 static void actionCommandDisp(f32 x, f32 y) {
     BattleWork* work = _battleWorkPointer;

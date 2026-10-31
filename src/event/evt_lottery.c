@@ -20,6 +20,160 @@ lottery_info* lotteryGetPtr(void) {
 	return &gp->mLotteryInfo;
 }
 
+#ifdef VERSION_G8ME01_DEMO
+// the demo checks the draw day before the per-shop times, never rerolls a prize number
+// and keeps the buy times when the clock went back
+USER_FUNC(evt_lottery) {
+	lottery_info* lot;
+	s32 day;
+	s32 v;
+	OSCalendarTime a1, a2, d1, d2, b1, b2, e;
+	EvtWord* args = event->args;
+	s32 idx = evtGetValue(event, args[0]);
+
+	OSTime now = OSGetTime();
+
+	dbg_lotteryinfo = TRUE;
+	lot = &gp->mLotteryInfo;
+
+	lot->flags &= ~0x1000;
+	lot->flags &= ~0x2000;
+	lot->flags &= ~0x4000;
+	lot->flags &= ~0x8000;
+
+	if (lot->flags & 8) {
+		if (lot->buyTime < now) {
+			OSTicksToCalendarTime(lot->buyTime, &a1);
+			OSTicksToCalendarTime(now, &a2);
+			if (a1.year != a2.year || a1.mon != a2.mon || a1.mday != a2.mday) {
+				lot->flags &= ~4;
+				lot->flags &= ~8;
+			}
+		}
+		else {
+			lot->flags |= 4;
+			lot->flags &= ~8;
+		}
+	}
+
+	if (!(lot->flags & 1)) {
+		lot->flags |= 1;
+		lot->lastTime = now;
+		lot->todayNum = rand() % 10000;
+	}
+	else if (lot->lastTime < now) {
+		OSTicksToCalendarTime(lot->lastTime, &d1);
+		OSTicksToCalendarTime(now, &d2);
+		if (d1.year != d2.year || d1.mon != d2.mon || d1.mday != d2.mday) {
+			if (idx == 1) {
+				lot->lastTime = now;
+			}
+			if (!(lot->flags & 2)) {
+				lot->todayNum = rand() % 10000;
+			}
+			else if (!(now < lot->buyTime)) {
+				day = (now - lot->buyTime) / OS_TIMER_CLOCK / 60 / 60 / 24;
+				v = lot->days[0];
+				if (day > v) {
+					while (day > v) {
+						v += 395 - rand() % 60;
+					}
+					lot->days[0] = v - day;
+				}
+				v = lot->days[1];
+				if (day > v) {
+					while (day > v) {
+						v += 115 - rand() % 30;
+					}
+					lot->days[1] = v - day;
+				}
+				v = lot->days[2];
+				if (day > v) {
+					while (day > v) {
+						v += 35 - rand() % 10;
+					}
+					lot->days[2] = v - day;
+				}
+				v = lot->days[3];
+				if (day > v) {
+					while (day > v) {
+						v += 10 - rand() % 6;
+					}
+					lot->days[3] = v - day;
+				}
+				if (day == lot->days[0]) {
+					lot->todayNum = lot->number;
+					lot->flags |= 0x1000;
+				}
+				else if (day == lot->days[1]) {
+					lot->todayNum = lot->number % 1000 + rand() % 10 * 1000;
+					lot->flags |= 0x2000;
+				}
+				else if (day == lot->days[2]) {
+					lot->todayNum = lot->number % 100 + rand() % 100 * 100;
+					lot->flags |= 0x4000;
+				}
+				else if (day == lot->days[3]) {
+					lot->todayNum = lot->number % 10 + rand() % 1000 * 10;
+					lot->flags |= 0x8000;
+				}
+				else {
+					for (;;) {
+						lot->todayNum = rand() % 10000;
+						if (lot->todayNum != lot->number) {
+							break;
+						}
+					}
+				}
+			}
+			else {
+				lot->flags |= 4;
+				lot->todayNum = -1;
+			}
+		}
+	}
+	else {
+		lot->flags |= 4;
+		lot->todayNum = -1;
+		if (idx == 1) {
+			lot->lastTime = now;
+		}
+	}
+
+	if (lot->flags & 2) {
+		if (lot->times[idx] < now) {
+			OSTicksToCalendarTime(lot->times[idx], &b1);
+			OSTicksToCalendarTime(now, &b2);
+			if (b1.year == b2.year && b1.mon == b2.mon && b1.mday == b2.mday) {
+				lot->flags &= ~0x10;
+			}
+			else {
+				lot->flags |= 0x10;
+				lot->times[idx] = now;
+			}
+		}
+		else {
+			lot->flags |= 4;
+			lot->todayNum = -1;
+			lot->flags |= 0x10;
+			lot->times[idx] = now;
+		}
+	}
+
+	evtSetValue(event, args[1], lot->flags);
+	evtSetValue(event, args[2], lot->todayNum);
+	OSTicksToCalendarTime(now, &e);
+	if (lot->flags & 2) {
+		OSTime bt;
+		OSTicksToCalendarTime(lot->buyTime, &e);
+		bt = lot->buyTime; OSTicksToCalendarTime(bt + (OSTime)OS_TIMER_CLOCK * 86400 * lot->days[0], &e);
+		bt = lot->buyTime; OSTicksToCalendarTime(bt + (OSTime)OS_TIMER_CLOCK * 86400 * lot->days[1], &e);
+		bt = lot->buyTime; bt += (OSTime)OS_TIMER_CLOCK * 86400 * lot->days[2]; OSTicksToCalendarTime(bt, &e);
+		bt = lot->buyTime; bt += (OSTime)OS_TIMER_CLOCK * 86400 * lot->days[3]; OSTicksToCalendarTime(bt, &e);
+	}
+	return EVT_RETURN_DONE;
+}
+#else
 USER_FUNC(evt_lottery) {
 	lottery_info* lot;
 	s32 day;
@@ -184,7 +338,31 @@ USER_FUNC(evt_lottery) {
 	}
 	return EVT_RETURN_DONE;
 }
+#endif
 
+#ifdef VERSION_G8ME01_DEMO
+// the demo only marks a purchase made with a broken clock
+USER_FUNC(evt_lottery_buy) {
+	EvtWord* args = event->args;
+	OSTime now = OSGetTime();
+	lottery_info* lot = &gp->mLotteryInfo;
+
+	do {
+		lot->number = rand() % 10000;
+	} while (lot->todayNum == lot->number);
+	lot->buyTime = now;
+	lot->days[0] = 395 - rand() % 60;
+	lot->days[1] = 115 - rand() % 30;
+	lot->days[2] = 35 - rand() % 10;
+	lot->days[3] = 10 - rand() % 6;
+	lot->flags |= 2;
+	if (lot->flags & 4) {
+		lot->flags |= 8;
+	}
+	evtSetValue(event, args[0], lot->number);
+	return EVT_RETURN_DONE;
+}
+#else
 USER_FUNC(evt_lottery_buy) {
 	EvtWord* args = event->args;
 	OSTime now = OSGetTime();
@@ -215,6 +393,7 @@ USER_FUNC(evt_lottery_buy) {
 	evtSetValue(event, args[0], lot->number);
 	return EVT_RETURN_DONE;
 }
+#endif
 
 USER_FUNC(evt_lottery_flag) {
 	evtSetValue(event, event->args[0], (&gp->mLotteryInfo)->flags);

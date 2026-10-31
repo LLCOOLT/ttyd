@@ -379,7 +379,11 @@ s32 mri_itemsel_table[] = {
 };
 
 EVT_BEGIN(mri_punipuni_setup)
+#ifdef VERSION_G8ME01_DEMO
+    CALL(evt_item_entry, LW(10), 64, 0, -1000, 0, 15, -1, 0)
+#else
     CALL(evt_item_entry, LW(10), 64, 0, -20000, 0, 16, -1, 0)
+#endif
     CALL(evt_item_flag_on, LW(10), 2)
     RETURN
 EVT_END()
@@ -392,7 +396,11 @@ EVT_BEGIN(mri_punipuni_itemselect)
         CALL(evt_msg_print, 0, STRING("sys_no_item_to_put_on"), 0, 0)
         RETURN
     END_IF
+#ifdef VERSION_G8ME01_DEMO
+    CALL(evt_win_item_select, PTR(mri_itemsel_table), LW(0))
+#else
     CALL(evt_win_item_select, 0, PTR(mri_itemsel_table), LW(0), 0)
+#endif
     IF_INT_EQUAL(LW(0), -1)
         RETURN
     END_IF
@@ -413,7 +421,11 @@ EVT_END()
 EVT_BEGIN(mri_punipuni_itemremove)
     CALL(evt_target_flag_onoff, LW(11), 1, 1)
     CALL(evt_pouch_add_item, 64, LW(0))
+#ifdef VERSION_G8ME01_DEMO
+    CALL(evt_item_set_position, LW(10), 0, -1000, 0)
+#else
     CALL(evt_item_set_position, LW(10), 0, -20000, 0)
+#endif
     CALL(evt_msg_toge, 1, 0, 0, 0)
     CALL(evt_msg_print, 0, STRING("sys_stg2_punitama_off"), 0, 0)
     RETURN
@@ -583,7 +595,11 @@ EVT_BEGIN(mri_countdown)
         END_LOOP
     END_INLINE_EVENT
     WAIT_MS(2000)
+#ifdef VERSION_G8ME01_DEMO
+    CALL(evt_fade_entry, 15, 4000, 0, 0, 0)
+#else
     CALL(evt_fade_entry, 17, 4000, 0, 0, 0)
+#endif
     WAIT_MS(4000)
     CALL(evt_seq_set_seq, 5, 1, 0)
     RETURN
@@ -600,12 +616,16 @@ EVT_END()
 
 EVT_BEGIN(mri_guide_hagure_check)
     CALL(evt_puni_get_lsw_index, LSW(0), 0, LW(0), LW(1), LW(2), LW(3))
+#ifndef VERSION_G8ME01_DEMO
     CALL(evt_puni_get_trap_index, 1, LW(4))
+#endif
     SET_VALUE(LW(1), 0)
+#ifndef VERSION_G8ME01_DEMO
     IF_INT_NOT_EQUAL(LW(4), 0)
         SET_VALUE(LW(1), 3)
         DEBUG_PUT_MSG(STRING("ガイド・トラップにはまっている"))
     END_IF
+#endif
     IF_INT_NOT_EQUAL(LW(0), 0)
         SET_VALUE(LW(1), 1)
         DEBUG_PUT_MSG(STRING("ガイド・別のエリアにはぐれている"))
@@ -615,7 +635,9 @@ EVT_BEGIN(mri_guide_hagure_check)
         SET_VALUE(LW(1), 2)
         DEBUG_PUT_MSG(STRING("ガイド・同じエリアではぐれている"))
     END_IF
+#ifndef VERSION_G8ME01_DEMO
     DEBUG_PUT_MSG(STRING("ガイド・普通の状態"))
+#endif
     RETURN
 EVT_END()
 
@@ -625,7 +647,9 @@ EVT_BEGIN(mri_guide_goryu)
         RETURN
     END_IF
     CALL(evt_puni_set_lsw_index, LSW(0), 0, 0, 0, 0, 0)
+#ifndef VERSION_G8ME01_DEMO
     CALL(evt_puni_set_trap_index, 1, 0)
+#endif
     CALL(evt_puni_init_puni, 1, 30, 0, -1000, 0, 0)
     CALL(evt_puni_flag_onoff, 1, 1, 65536)
     CALL(evt_mario_get_pos, 0, LW(0), LW(1), LW(2))

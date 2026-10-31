@@ -122,7 +122,11 @@ static BattleUnitDefense defence = {{1, 1, 1, 1, 1}};
 
 static BattleUnitDefenseAttr defence_attr = {{0, 0, 0, 0, 0}};
 
+#ifdef VERSION_G8ME01_DEMO
+static StatusVulnerability regist = {0, 60, 50, 0, 50, 100, 100, 90, 100, 90, 100, 90, 100, 90, 90, 10, 90, 100, 90, 100, 100, 50};
+#else
 static StatusVulnerability regist = {0, 95, 50, 0, 50, 100, 100, 90, 100, 100, 100, 100, 100, 95, 90, 10, 90, 100, 90, 100, 100, 50};
+#endif
 
 static BattleUnitKindPart parts[] = {
     {1, "btl_un_honenoko", "c_karon_g_h", 0.0f, 0.0f, 0.0f, 0.0f, 35.0f, 0.0f, 0.0f, 45.0f, 0.0f, 20, 30, 255, &defence, &defence_attr, 0x9, 0, pose_table},
@@ -196,8 +200,13 @@ static PoseTableEntry pose_table[] = {
     {40, "KRN_W_1"},
     {56, "KRN_X_1"},
     {57, "KRN_X_1"},
+#ifdef VERSION_G8ME01_DEMO
+    {63, "KRN_T_1"},
+    {67, "KRN_S_1"},
+#else
     {65, "KRN_T_1"},
     {69, "KRN_S_1"},
+#endif
 };
 
 static BattleDataEntry data_table[] = {

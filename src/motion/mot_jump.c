@@ -17,7 +17,12 @@ BOOL marioPriCheckJabara(void);
 #ifdef VERSION_G8ME01
 #define kpa_fall_80213C38 kpa_fall
 #endif
+#ifdef VERSION_G8ME01_DEMO
 void kpa_fall_80213C38(void);
+void marioSlitResume(void);
+#else
+void kpa_fall_80213C38(void);
+#endif
 void kpa_jump(void);
 void kpa_jumpNpc(void);
 void kpaChgPose(const char* a, const char* b);
@@ -369,11 +374,17 @@ void mot_jump(void) {
 		mario->multiTimer = 2;
 		mario->currSubMotionId = 0;
 		marioPreJump();
+#ifdef VERSION_G8ME01_DEMO
+		if (mario->currMotionId != 8) {
+			camFollowYOff();
+		}
+#else
 		if (mario->currMotionId == 8) {
 			camFollowYOn();
 		} else {
 			camFollowYOff();
 		}
+#endif
 		chgPoseB(mario);
 		if (mario->currMotionId != 8) {
 			jumpSfx(mario);
@@ -453,7 +464,11 @@ void mot_upstairs(void) {
 			if (mario->flags & 0x100000) {
 				motSlitContinue();
 			} else if (mario->dispFlags & 0x1000000) {
+#ifdef VERSION_G8ME01_DEMO
+				marioSlitResume();
+#else
 				marioChgMot2(0x15);
+#endif
 			} else {
 				marioChgMotAuto();
 			}

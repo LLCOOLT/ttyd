@@ -89,6 +89,9 @@ void caseMain(void) {
 	HitEntry* push;
 	HitEntry* h1fc;
 	HitEntry* h1f4;
+#ifdef VERSION_G8ME01_DEMO
+	s32 fbatMode;
+#endif
 
 	mario = marioGetPtr();
 	partyGetPtr(marioGetPartyId());
@@ -100,8 +103,14 @@ void caseMain(void) {
 	h1fc = mario->hitobjHammer;
 	h1f4 = mario->hitobjHead;
 	btn = mario->buttonTrg;
+#ifdef VERSION_G8ME01_DEMO
+	// the demo has no N_fbatPreventMarioEventChk: only field battle modes 0 and 1 allow case events
+	if ((u32)marioStGetSystemLevel() == 0 && !winCheck() && gp->inBattle == 0 &&
+	    ((fbatMode = fbatGetPointer()->mode) == 0 || fbatMode == 1) && marioCaseEventValidChk()) {
+#else
 	if ((u32)marioStGetSystemLevel() == 0 && !winCheck() && gp->inBattle == 0 &&
 	    !N_fbatPreventMarioEventChk() && marioCaseEventValidChk()) {
+#endif
 		if (mario->currMotionId != 0 && mario->currMotionId != 1 && mario->currMotionId != 2 &&
 		    yoshiGetStatus() != 1) {
 			btn = 0;

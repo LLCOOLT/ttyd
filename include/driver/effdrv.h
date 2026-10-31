@@ -19,7 +19,11 @@ typedef struct EffectEntry {
 typedef struct EffectSet {
     s16 id;           // 0x0
     const char* name; // 0x4
-} EffectSet;
+#ifdef VERSION_G8ME01_DEMO
+    const char* jpName;       // 0x8, debug name (Japanese)
+    const char** typeNames;   // 0xC, NULL-terminated debug names of the effect's types, or NULL
+#endif
+} EffectSet; // size 0x8, 0x10 demo
 
 typedef struct EffectWork {
     s32 count;            // 0x0

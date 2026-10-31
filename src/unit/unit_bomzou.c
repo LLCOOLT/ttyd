@@ -29,49 +29,30 @@ USER_FUNC(evt_sub_random);
 
 static BattleUnitDefense defence;
 static BattleUnitDefenseAttr defence_attr;
+BattleUnitKind unit_bomzou;
+BattleWeapon weapon_bomzou_explosion;
 static StatusVulnerability regist;
 static PoseTableEntry pose_table_3[4];
 static PoseTableEntry pose_table_2[4];
 static PoseTableEntry pose_table_1[4];
-BattleUnitKind unit_bomzou;
-BattleWeapon weapon_bomzou_explosion;
+static BattleDataEntry data_table[4];
 static BattleUnitKindPart parts[1];
 static EvtWord init_event[70];
-static EvtWord phase_event[67];
-static EvtWord wait_event[57];
-extern EvtWord end_battle_evt[];
-static EvtWord explosion_event[173];
-static BattleDataEntry data_table[4];
 static EvtWord damage_event[10];
+static EvtWord phase_event[67];
 static EvtWord attack_event[5];
+static EvtWord wait_event[57];
 static EvtWord dead_event[6];
+extern EvtWord end_battle_evt[];
+#ifdef VERSION_G8ME01_DEMO
+static EvtWord explosion_event[172];
+#else
+static EvtWord explosion_event[173];
+#endif
 
 static BattleUnitDefense defence = {{0, 0, 0, 0, 0}};
 
 static BattleUnitDefenseAttr defence_attr = {{0, 0, 0, 0, 0}};
-
-static StatusVulnerability regist = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
-
-static PoseTableEntry pose_table_3[] = {
-    {28, "B_2"},
-    {31, "B_2"},
-    {39, "B_2"},
-    {69, "B_2"},
-};
-
-static PoseTableEntry pose_table_2[] = {
-    {28, "B_3"},
-    {31, "B_3"},
-    {39, "B_3"},
-    {69, "B_3"},
-};
-
-static PoseTableEntry pose_table_1[] = {
-    {28, "B_4"},
-    {31, "B_4"},
-    {39, "B_4"},
-    {69, "B_4"},
-};
 
 BattleUnitKind unit_bomzou = {
     219,
@@ -170,6 +151,48 @@ BattleWeapon weapon_bomzou_explosion = {
     {0, 10, 10, 100, 30, 5, 5, 5, 5, 0, 0, 0}, // stageEffectRates
 };
 
+static StatusVulnerability regist = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
+
+static PoseTableEntry pose_table_3[] = {
+    {28, "B_2"},
+    {31, "B_2"},
+    {39, "B_2"},
+#ifdef VERSION_G8ME01_DEMO
+    {67, "B_2"},
+#else
+    {69, "B_2"},
+#endif
+};
+
+static PoseTableEntry pose_table_2[] = {
+    {28, "B_3"},
+    {31, "B_3"},
+    {39, "B_3"},
+#ifdef VERSION_G8ME01_DEMO
+    {67, "B_3"},
+#else
+    {69, "B_3"},
+#endif
+};
+
+static PoseTableEntry pose_table_1[] = {
+    {28, "B_4"},
+    {31, "B_4"},
+    {39, "B_4"},
+#ifdef VERSION_G8ME01_DEMO
+    {67, "B_4"},
+#else
+    {69, "B_4"},
+#endif
+};
+
+static BattleDataEntry data_table[] = {
+    {49, dead_event},
+    {53, explosion_event},
+    {63, end_battle_evt},
+    {0, NULL},
+};
+
 static BattleUnitKindPart parts[] = {
     {1, "btl_un_bomzou", "c_bakudan", 0.0f, 0.0f, 0.0f, 15.0f, 25.0f, 0.0f, 0.0f, 30.0f, 0.0f, 20, 30, 255, &defence, &defence_attr, 0x80009, 0, pose_table_3},
 };
@@ -193,6 +216,13 @@ static EVT_BEGIN(init_event)
         CALL(btlevtcmd_AnimeSetPoseTable, -2, 1, PTR(pose_table_1))
     END_SWITCH
     CALL(btlevtcmd_AnimeChangePose, -2, 1, STRING("B_1"))
+    RETURN
+EVT_END()
+
+static EVT_BEGIN(damage_event)
+    SET_VALUE(LW(10), -2)
+    SET_VALUE(LW(11), 1)
+    CALL_CHILD(PTR(btldefaultevt_Damage))
     RETURN
 EVT_END()
 
@@ -222,6 +252,11 @@ static EVT_BEGIN(phase_event)
     RETURN
 EVT_END()
 
+static EVT_BEGIN(attack_event)
+    CALL(btlevtcmd_StartWaitEvent, -2)
+    RETURN
+EVT_END()
+
 static EVT_BEGIN(wait_event)
     CALL(btlevtcmd_AnimeChangePoseFromTable, -2, 1)
     LABEL(0)
@@ -237,6 +272,11 @@ static EVT_BEGIN(wait_event)
     ADD(LW(0), 45)
     WAIT_FRAMES(LW(0))
     GOTO(0)
+    RETURN
+EVT_END()
+
+static EVT_BEGIN(dead_event)
+    CALL(btlevtcmd_AfterReactionEntry, -2, 53)
     RETURN
 EVT_END()
 
@@ -296,29 +336,8 @@ static EVT_BEGIN(explosion_event)
     LABEL(99)
     CALL(btlevtcmd_KillUnit, -2, 0)
     RETURN
+#ifdef VERSION_G8ME01_DEMO
+EVT_END()
+#else
 EVT_END_PAD()
-
-static BattleDataEntry data_table[] = {
-    {49, dead_event},
-    {53, explosion_event},
-    {63, end_battle_evt},
-    {0, NULL},
-};
-
-static EVT_BEGIN(damage_event)
-    SET_VALUE(LW(10), -2)
-    SET_VALUE(LW(11), 1)
-    CALL_CHILD(PTR(btldefaultevt_Damage))
-    RETURN
-EVT_END()
-
-static EVT_BEGIN(attack_event)
-    CALL(btlevtcmd_StartWaitEvent, -2)
-    RETURN
-EVT_END()
-
-static EVT_BEGIN(dead_event)
-    CALL(btlevtcmd_AfterReactionEntry, -2, 53)
-    RETURN
-EVT_END()
-
+#endif

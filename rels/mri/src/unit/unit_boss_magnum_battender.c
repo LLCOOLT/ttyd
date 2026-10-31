@@ -91,7 +91,11 @@ static BattleUnitSetup entry_rocket_punch;
 static EvtWord init_event[92];
 static EvtWord waku_event[23];
 static EvtWord damage_event[111];
+#ifdef VERSION_G8ME01_DEMO
+static EvtWord dead_event[216];
+#else
 static EvtWord dead_event[234];
+#endif
 static EvtWord entry_event[78];
 static EvtWord attack_event[150];
 extern EvtWord stamp_attack_event[];
@@ -137,8 +141,13 @@ BattleUnitKind unit_boss_magnum_battender = {
     0.0f,
     0,
     0,
+#ifdef VERSION_G8ME01_DEMO
+    0.0f,
+    0.0f,
+#else
     30.0f,
     115.0f,
+#endif
     0.0f,
     60.0f,
     0.0f,
@@ -184,15 +193,24 @@ static BattleUnitDefense defence = {{1, 1, 1, 1, 1}};
 
 static BattleUnitDefenseAttr defence_attr = {{0, 0, 0, 0, 0}};
 
+#ifdef VERSION_G8ME01_DEMO
+static StatusVulnerability regist = {0, 50, 50, 0, 50, 0, 100, 30, 0, 0, 100, 0, 100, 50, 50, 0, 0, 100, 40, 0, 0, 0};
+#else
 static StatusVulnerability regist = {0, 50, 50, 0, 50, 0, 100, 30, 0, 0, 100, 0, 100, 90, 50, 0, 0, 100, 40, 0, 0, 0};
+#endif
 
 static PoseTableEntry pose_table[] = {
     {1, "MGN_S_1"},
     {2, "MGN_2D_1"},
     {9, "MGN_2D_1"},
     {5, "MGN_X_1"},
+#ifdef VERSION_G8ME01_DEMO
+    {4, "MGN_S_1"},
+    {3, "MGN_S_1"},
+#else
     {4, "MGN_X_1"},
     {3, "MGN_X_1"},
+#endif
     {28, "MGN_S_1"},
     {29, "MGN_Q_1"},
     {30, "MGN_Q_1"},
@@ -202,8 +220,13 @@ static PoseTableEntry pose_table[] = {
     {41, "MGN_W_2"},
     {56, "MGN_S_1"},
     {57, "MGN_S_1"},
+#ifdef VERSION_G8ME01_DEMO
+    {63, "MGN_T_1"},
+    {67, "MGN_S_1"},
+#else
     {65, "MGN_T_1"},
     {69, "MGN_S_1"},
+#endif
 };
 
 static PoseTableEntry pose_table_no_arm[] = {
@@ -211,8 +234,13 @@ static PoseTableEntry pose_table_no_arm[] = {
     {2, "MGN_2D_2"},
     {9, "MGN_2D_2"},
     {5, "MGN_X_2"},
+#ifdef VERSION_G8ME01_DEMO
+    {4, "MGN_S_2"},
+    {3, "MGN_S_2"},
+#else
     {4, "MGN_X_2"},
     {3, "MGN_X_2"},
+#endif
     {28, "MGN_S_2"},
     {29, "MGN_Q_2"},
     {30, "MGN_Q_2"},
@@ -221,8 +249,13 @@ static PoseTableEntry pose_table_no_arm[] = {
     {40, "MGN_W_3"},
     {56, "MGN_S_2"},
     {57, "MGN_S_2"},
+#ifdef VERSION_G8ME01_DEMO
+    {63, "MGN_T_2"},
+    {67, "MGN_S_2"},
+#else
     {65, "MGN_T_2"},
     {69, "MGN_S_2"},
+#endif
 };
 
 static BattleDataEntry data_table[] = {
@@ -440,8 +473,13 @@ static EVT_BEGIN(damage_event)
             SUBTRACT(LW(0), 20)
             CALL(evt_btl_camera_set_moveto, 1, LW(0), 160, 600, LW(0), 110, -100, 20, 11)
             WAIT_FRAMES(20)
+#ifdef VERSION_G8ME01_DEMO
+            CALL(btlevtcmd_SetTalkPoseType, -2, 63)
+            CALL(btlevtcmd_SetStayPoseType, -2, 67)
+#else
             CALL(btlevtcmd_SetTalkPoseType, -2, 65)
             CALL(btlevtcmd_SetStayPoseType, -2, 69)
+#endif
             CALL(evt_msg_print, 2, STRING("stg2_mri_e24_15"), 0, -2)
             CALL(evt_btl_camera_set_prilimit, 0)
             CALL(evt_btl_camera_set_mode, 0, 0)
@@ -506,8 +544,10 @@ static EVT_BEGIN(dead_event)
     WAIT_MS(500)
     CALL(arm_check, 0, LW(0))
     IF_INT_NOT_EQUAL(LW(0), -1)
+#ifndef VERSION_G8ME01_DEMO
         CALL(btlevtcmd_CheckDamageCode, LW(0), 512, LW(1))
         IF_INT_EQUAL(LW(1), 0)
+#endif
             SET_VALUE(LW(10), LW(0))
             BEGIN_INLINE_EVENT
                 CALL_CHILD(subsetevt_dead_core)
@@ -516,11 +556,15 @@ static EVT_BEGIN(dead_event)
                 CALL(btlevtcmd_OnPartsAttribute, LW(10), 1, 33554432)
             END_INLINE_EVENT
         END_IF
+#ifndef VERSION_G8ME01_DEMO
     END_IF
+#endif
     CALL(arm_check, 1, LW(0))
     IF_INT_NOT_EQUAL(LW(0), -1)
+#ifndef VERSION_G8ME01_DEMO
         CALL(btlevtcmd_CheckDamageCode, LW(0), 512, LW(1))
         IF_INT_EQUAL(LW(1), 0)
+#endif
             SET_VALUE(LW(10), LW(0))
             BEGIN_INLINE_EVENT
                 CALL_CHILD(subsetevt_dead_core)
@@ -528,7 +572,9 @@ static EVT_BEGIN(dead_event)
                 CALL(btlevtcmd_OnPartsAttribute, LW(10), 1, 16777216)
                 CALL(btlevtcmd_OnPartsAttribute, LW(10), 1, 33554432)
             END_INLINE_EVENT
+#ifndef VERSION_G8ME01_DEMO
         END_IF
+#endif
     END_IF
     SET_VALUE(LW(10), -2)
     CALL(btlevtcmd_snd_se, LW(10), STRING("SFX_BTL_ENEMY_DIE1_2"), -250000000, 0, -250000000)
@@ -797,7 +843,11 @@ static EVT_BEGIN(shake_attack_event)
         CALL(evt_btl_camera_shake_h, 0, 6, 0, 60, 0)
     END_SIBLING_EVENT
     WAIT_FRAMES(120)
+#ifdef VERSION_G8ME01_DEMO
+    CALL(btlevtcmd_AnimeChangePoseType, -2, 1, 67)
+#else
     CALL(btlevtcmd_AnimeChangePoseType, -2, 1, 69)
+#endif
     CALL(btlevtcmd_GetSelectEnemy, LW(3), LW(4))
     SET_VALUE(LW(6), 0)
     LABEL(10)
@@ -890,14 +940,26 @@ static EVT_BEGIN(arm_bunri_event)
     CALL(btlevtcmd_SetUnitWork, LW(3), 0, 0)
     CALL(btlevtcmd_SetUnitWork, LW(3), 1, 1)
     CALL(btlevtcmd_SetUnitWork, -2, 3, LW(3))
+#ifdef VERSION_G8ME01_DEMO
+    CALL(btlevtcmd_AnimeChangePoseType, LW(3), 1, 67)
+#else
     CALL(btlevtcmd_AnimeChangePoseType, LW(3), 1, 69)
+#endif
     CALL(btlevtcmd_SpawnUnit, LW(4), PTR(&entry_rocket_punch), 0)
     CALL(btlevtcmd_SetUnitWork, LW(4), 0, 1)
     CALL(btlevtcmd_SetUnitWork, LW(4), 1, 1)
     CALL(btlevtcmd_SetUnitWork, -2, 4, LW(4))
+#ifdef VERSION_G8ME01_DEMO
+    CALL(btlevtcmd_AnimeChangePoseType, LW(4), 1, 67)
+#else
     CALL(btlevtcmd_AnimeChangePoseType, LW(4), 1, 69)
+#endif
     CALL(btlevtcmd_AnimeSetPoseTable, -2, 1, PTR(pose_table_no_arm))
+#ifdef VERSION_G8ME01_DEMO
+    CALL(btlevtcmd_AnimeChangePoseType, -2, 1, 67)
+#else
     CALL(btlevtcmd_AnimeChangePoseType, -2, 1, 69)
+#endif
     WAIT_MS(1500)
     RETURN
 EVT_END()
@@ -909,11 +971,19 @@ static EVT_BEGIN(arm_return_event)
     CALL(btlevtcmd_SpawnUnit, LW(3), PTR(&entry_rocket_punch), 0)
     CALL(btlevtcmd_SetUnitWork, LW(3), 0, 2)
     CALL(btlevtcmd_SetUnitWork, -2, 3, LW(3))
+#ifdef VERSION_G8ME01_DEMO
+    CALL(btlevtcmd_AnimeChangePoseType, LW(3), 1, 67)
+#else
     CALL(btlevtcmd_AnimeChangePoseType, LW(3), 1, 69)
+#endif
     CALL(btlevtcmd_SpawnUnit, LW(4), PTR(&entry_rocket_punch), 0)
     CALL(btlevtcmd_SetUnitWork, LW(4), 0, 3)
     CALL(btlevtcmd_SetUnitWork, -2, 4, LW(4))
+#ifdef VERSION_G8ME01_DEMO
+    CALL(btlevtcmd_AnimeChangePoseType, LW(4), 1, 67)
+#else
     CALL(btlevtcmd_AnimeChangePoseType, LW(4), 1, 69)
+#endif
     CALL(btlevtcmd_snd_se, -2, STRING("SFX_BOSS_MBTN_PUNCH_FLY1"), -250000000, 0, -250000000)
     BEGIN_SIBLING_EVENT
         CALL(btlevtcmd_SetPos, LW(3), 300, 40, -100)
@@ -932,7 +1002,11 @@ static EVT_BEGIN(arm_return_event)
     CALL(btlevtcmd_AnimeChangePose, -2, 1, STRING("MGN_A1_8"))
     WAIT_MS(600)
     CALL(btlevtcmd_AnimeSetPoseTable, -2, 1, PTR(pose_table))
+#ifdef VERSION_G8ME01_DEMO
+    CALL(btlevtcmd_AnimeChangePoseType, -2, 1, 67)
+#else
     CALL(btlevtcmd_AnimeChangePoseType, -2, 1, 69)
+#endif
     WAIT_MS(500)
     RETURN
 EVT_END()
@@ -1012,7 +1086,11 @@ static BattleUnitDefense defence_r = {{0, 0, 0, 0, 0}};
 
 static BattleUnitDefenseAttr defence_attr_r = {{0, 0, 0, 0, 0}};
 
+#ifdef VERSION_G8ME01_DEMO
+static StatusVulnerability regist_r = {0, 80, 80, 80, 80, 80, 100, 80, 0, 0, 100, 0, 100, 80, 80, 0, 110, 100, 80, 0, 0, 0};
+#else
 static StatusVulnerability regist_r = {0, 80, 80, 100, 80, 100, 100, 80, 0, 0, 100, 0, 100, 95, 80, 0, 100, 100, 80, 0, 0, 0};
+#endif
 
 static PoseTableEntry pose_table_r[] = {
     {1, "MGN_A1_9"},
@@ -1028,7 +1106,11 @@ static PoseTableEntry pose_table_r[] = {
     {39, "MGN_A1_9"},
     {56, "MGN_A1_9"},
     {57, "MGN_A1_9"},
+#ifdef VERSION_G8ME01_DEMO
+    {67, "MGN_A1_9"},
+#else
     {69, "MGN_A1_9"},
+#endif
 };
 
 static BattleDataEntry data_table_r[] = {
@@ -1062,7 +1144,11 @@ static BattleWeapon weapon_batten_rocket_attack = {
     2, // reserved_6F
     NULL, // acHelpMsg
     0x87, // special
+#ifdef VERSION_G8ME01_DEMO
+    0x7FA, // counterResistFlags
+#else
     0x7FF, // counterResistFlags
+#endif
     0x2004, // targetWeightFlags
     0, 0, 0, 0, 0, 0, 0, 0, // sleepChance..poisonTime
     0, 0, 0, 0, 0, 0, 0, 0, // poisonStrength..burnChance

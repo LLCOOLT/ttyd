@@ -121,6 +121,9 @@ s32 battleAcMain_GaugeTiming2(BattleWork *work)
     {
       pressed = 1;
     }
+#ifdef VERSION_G8ME01_DEMO
+      if (gw->frame > gw->totalFrames)
+#else
       allDone = 1;
       for (i = 0; i < work->actionCommands.params[2]; i++)
     {
@@ -132,6 +135,7 @@ s32 battleAcMain_GaugeTiming2(BattleWork *work)
     }
 
       if ((gw->frame > gw->totalFrames) && allDone)
+#endif
     {
       if (((s32) work->actionCommands.outputParams[0]) > 0)
       {
@@ -198,6 +202,39 @@ s32 battleAcMain_GaugeTiming2(BattleWork *work)
     {
       sfxNg = "SFX_AC_COMMAND_NG1";
       sfxOk = "SFX_AC_COMMAND_OK1";
+#ifdef VERSION_G8ME01_DEMO
+      for (i4 = 0; i4 < work->actionCommands.params[2]; i4++)
+      {
+        if (!gw->state[i4])
+        {
+          f64 d = __fabs(gw->cursor - gw->targets[i4]);
+          if (d <= 6.0)
+          {
+            if ((!doAuto) && gw->flag[i4])
+            {
+              gw->state[i4] = -1;
+              psndSFXOn(sfxNg);
+            }
+            else
+            {
+              gw->state[i4] = 1;
+              work->actionCommands.outputParams[0]++;
+              psndSFXOn(sfxOk);
+            }
+          }
+          else
+            if (d < __fabs(gw->targets[1] - gw->targets[0]))
+          {
+            gw->flag[i4] = 1;
+            if (i4 == (work->actionCommands.params[2] - 1))
+            {
+              gw->state[i4] = -1;
+              psndSFXOn(sfxNg);
+            }
+          }
+        }
+      }
+#else
       found = 0;
       for (i4 = 0; i4 < work->actionCommands.params[2]; i4++)
       {
@@ -233,6 +270,7 @@ s32 battleAcMain_GaugeTiming2(BattleWork *work)
           }
         }
       }
+#endif
 
     }
       break;
@@ -391,7 +429,7 @@ static void actionCommandDisp(f32 x, f32 y) {
         d1 = (Vec){0.0f, 0.0f, 0.0f};
         pos.x = (- 288.0f + x) + ((f32)gw->width) * target / 100.0f;
         pos.y = y3;
-        ICON(&pos, 0x10, id, 0.75f);
+        ICON(&pos, ICON_DISP_2D, id, 0.75f);
     }
 
     pressedIcon = BattleACGetButtonIcon(0x100, 1);
@@ -407,7 +445,7 @@ static void actionCommandDisp(f32 x, f32 y) {
             Vec e1 = {0.0f, 0.0f, 0.0f};
             p.x = 28.0f + (-225.0f + x);
             p.y = 55.0f + y;
-            ICON(&p, 0x10, icon, 1.0f);
+            ICON(&p, ICON_DISP_2D, icon, 1.0f);
             break;
         }
         case 1000:
@@ -417,12 +455,12 @@ static void actionCommandDisp(f32 x, f32 y) {
                 Vec e1 = {0.0f, 0.0f, 0.0f};
                 p.x = 28.0f + (-225.0f + x);
                 p.y = 55.0f + y;
-                ICON(&p, 0x10, pressedIcon, 1.0f);
+                ICON(&p, ICON_DISP_2D, pressedIcon, 1.0f);
             } else {
                 Vec p = {0.0f, 0.0f, 0.0f};
                 p.x = 28.0f + (-225.0f + x);
                 p.y = 55.0f + y;
-                ICON(&p, 0x10, icon, 1.0f);
+                ICON(&p, ICON_DISP_2D, icon, 1.0f);
             }
             break;
     }

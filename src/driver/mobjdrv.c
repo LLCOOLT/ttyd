@@ -36,9 +36,11 @@ typedef struct CubeMesh {
 } CubeMesh;
 typedef struct CubeJoint { MapFileJoint joint; MapFileJointPart part; } CubeJoint;
 
+#ifndef VERSION_G8ME01_DEMO // small data in retail; in the demo's .data each sits before its joint
 CubeDrawMode cubeMSJ = {{0, 1, 0, 0, 0, (s32)0x80000000}, 0};
 
 CubeDrawMode front2MSJ = {{0, 1, 0, 0, 0, 0}, 0};
+#endif
 
 // static data from inlined header functions
 
@@ -237,6 +239,9 @@ u32 cubeDN[1230] = {
 
 CubeMesh cubeDP = {0, {0}, 0, 6, 0, cubeDDT, {cubeDN, &cubeDN[205], &cubeDN[410], &cubeDN[615], &cubeDN[820], &cubeDN[1025]}};
 
+#ifdef VERSION_G8ME01_DEMO
+CubeDrawMode cubeMSJ = {{0, 1, 0, 0, 0, (s32)0x80000000}, 0};
+#endif
 CubeJoint cubeDJ = {
     {NULL, NULL, NULL, NULL, NULL, NULL, {1.0f, 1.0f, 1.0f}, {0.0f, 0.0f, 0.0f}, {0.0f, 0.0f, 0.0f},
      {-0.5f, 0.0f, -0.5f}, {0.5f, 1.0f, 0.5f}, {0}, &cubeMSJ.mode, 1},
@@ -259,6 +264,9 @@ CubeJoint frontDJ = {
     {NULL, (MapFileMesh*)&frontDP},
 };
 
+#ifdef VERSION_G8ME01_DEMO
+CubeDrawMode front2MSJ = {{0, 1, 0, 0, 0, 0}, 0};
+#endif
 CubeMesh front2DP = {0, {0}, 0, 5, 0, cubeDDT, {cubeDN, &cubeDN[205], &cubeDN[410], &cubeDN[615], &cubeDN[820]}};
 
 CubeJoint front2DJ = {
@@ -280,7 +288,11 @@ static MapObjectWork work[MAX_MOBJ_WORK];
 
 #define mobjGetWorkFlag(flag) (flag ? &work[1] : &work[0])
 
+#ifdef VERSION_G8ME01_DEMO
+int mobjCheckKururingFloorItem(MapObjectEntry* entry);
+#else
 static inline int mobjCheckKururingFloorItem(MapObjectEntry* entry);
+#endif
 
 void mobjKoopaOn(void) {
     if (!koopaRunFlag) {
@@ -447,7 +459,9 @@ void mobjHitEntry(MapObjectEntry* entry, s32 type) {
             strcat(entry->hitObj[0].name, entry->name);
             *(char**)(entry->hitObj[0].jointData + 8) = entry->hitObj[0].name;
             entry->hitObj[0].hitObject = hitEntryMOBJ((MapFileJoint*)(entry->hitObj[0].jointData + 8), mtx);
+#ifndef VERSION_G8ME01_DEMO // the demo hit objects have no mobj back pointer
             entry->hitObj[0].hitObject->mobj = entry;
+#endif
             break;
         case 1:
             PSVECAdd(&entry->position, &entry->translation, &position);
@@ -468,7 +482,9 @@ void mobjHitEntry(MapObjectEntry* entry, s32 type) {
             strcat(entry->hitObj[0].name, entry->name);
             *(char**)(entry->hitObj[0].jointData + 8) = entry->hitObj[0].name;
             entry->hitObj[0].hitObject = hitEntryMOBJ((MapFileJoint*)(entry->hitObj[0].jointData + 8), mtx);
+#ifndef VERSION_G8ME01_DEMO // the demo hit objects have no mobj back pointer
             entry->hitObj[0].hitObject->mobj = entry;
+#endif
             break;
         case 2:
             PSVECAdd(&entry->position, &entry->translation, &position);
@@ -489,13 +505,17 @@ void mobjHitEntry(MapObjectEntry* entry, s32 type) {
             strcat(entry->hitObj[0].name, entry->name);
             *(char**)(entry->hitObj[0].jointData + 8) = entry->hitObj[0].name;
             entry->hitObj[0].hitObject = hitEntryMOBJ((MapFileJoint*)(entry->hitObj[0].jointData + 8), mtx);
+#ifndef VERSION_G8ME01_DEMO // the demo hit objects have no mobj back pointer
             entry->hitObj[0].hitObject->mobj = entry;
+#endif
             memcpy(entry->hitObj[1].jointData + 8, &front2DJ, sizeof(CubeJoint));
             strcpy(entry->hitObj[1].name, "MOBJ~");
             strcat(entry->hitObj[1].name, entry->name);
             *(char**)(entry->hitObj[1].jointData + 8) = entry->hitObj[1].name;
             entry->hitObj[1].hitObject = hitEntryMOBJ((MapFileJoint*)(entry->hitObj[1].jointData + 8), mtx);
+#ifndef VERSION_G8ME01_DEMO // the demo hit objects have no mobj back pointer
             entry->hitObj[1].hitObject->mobj = entry;
+#endif
             break;
     }
 }
@@ -694,9 +714,15 @@ void mobjMain(void) {
                 entry->position.y += entry->velocity.y;
                 entry->velocity.y -= entry->gravity;
             } else {
+#ifdef VERSION_G8ME01_DEMO
+                dist = 1.0f + (f32)__fabs(entry->velocity.y);
+                if (hitCheckFilter(NULL, &hx, &hy, &hz, &dist, &nx, &ny, &nz, entry->position.x,
+                                   10.0f + entry->position.y, entry->position.z, 0.0f, -10.0f, 0.0f) != NULL) {
+#else
                 dist = 10.0f + (1.0f + (f32)__fabs(entry->velocity.y));
                 if (hitCheckFilter(NULL, &hx, &hy, &hz, &dist, &nx, &ny, &nz, entry->position.x,
                                    10.0f + entry->position.y, entry->position.z, 0.0f, -1.0f, 0.0f) != NULL) {
+#endif
                     entry->position.y = hy;
                     entry->velocity.y = (-0.5f * entry->bounce) * entry->velocity.y;
                     if (__fabs(entry->velocity.y) <= 2.0) {
@@ -735,8 +761,13 @@ void mobjMain(void) {
                     hit = 1;
                     goto hitDone;
                 }
+#ifdef VERSION_G8ME01_DEMO
+                if ((entry->flags & 0x40000) && mario->hitobjFront == hitPtr &&
+                    (mario->buttonTrg & 0x100) && !partyFlag) {
+#else
                 if (marioFrontActionValidChk() && (entry->flags & 0x40000) && mario->hitobjFront == hitPtr &&
                     (mario->buttonTrg & 0x100) && !partyFlag) {
+#endif
                     entry->hitFlag = 0x40000;
                     hit = 1;
                     goto hitDone;
@@ -819,12 +850,14 @@ void mobjMain(void) {
         if ((u32)marioStGetSystemLevel() != 0) {
             entry->flags &= ~8;
         }
+#ifndef VERSION_G8ME01_DEMO
         {
             MarioMotion motion = marioGetPtr()->currMotionId;
             if (motion == 0x1f || motion == 0x20) {
                 entry->flags &= ~8;
             }
         }
+#endif
         if (entry->mainFunc != NULL) {
             if (entry->mainFunc(entry) == -1) {
                 continue;
@@ -925,6 +958,25 @@ MapObjectEntry* mobjNameToPtrNoAssert(const char* name) {
     return entry;
 }
 
+#ifdef VERSION_G8ME01_DEMO
+// the demo searches the mobj list for the entry whose first hit object is hitObj
+MapObjectEntry* mobjHitObjPtrToPtr(HitEntry* hitObj) {
+    int i;
+    s32 entryCount;
+    MapObjectEntry* entry;
+    MapObjectWork* wp = mobjGetWork();
+
+    entryCount = wp->count;
+    entry = wp->entries;
+    for (i = 0; i < entryCount; i++, entry++) {
+        if ((entry->flags & 1) && hitObj == entry->hitObj[0].hitObject) {
+            break;
+        }
+    }
+
+    return entry;
+}
+#else
 MapObjectEntry* mobjHitObjPtrToPtr(HitEntry* hitObj) {
     if (hitObj->attributes & (1 << 31)) {
         return hitObj->mobj;
@@ -932,6 +984,7 @@ MapObjectEntry* mobjHitObjPtrToPtr(HitEntry* hitObj) {
 
     return NULL;
 }
+#endif
 
 EventEntry* mobjRunEvent(MapObjectEntry* entry, EvtWord* eventCode) {
     EventEntry* event;
@@ -1013,9 +1066,11 @@ void mobjCalcMtx2(MapObjectEntry* entry) {
 }
 
 BOOL mobjGetHint(MapObjectEntry* entry) {
+#ifndef VERSION_G8ME01_DEMO
     if (entry == NULL) {
         return 0;
     }
+#endif
     return (entry->flags >> 5) & 1;
 }
 
@@ -1031,20 +1086,6 @@ BOOL mobjCheckExec() {
     return FALSE;
 }
 
-static inline int mobjCheckKururingFloorItem(MapObjectEntry* entry) { // was always inlined in retail but not in demo
-    if (!strcmp(entry->animName, kururinName)) {
-        ItemEntry* item = itemNameToPtr(entry->name);
-        if ((item != NULL && (item->flags & 1) && evtGetValue(0, entry->flagVar) == 0))
-            return 1;
-        else if ((evtGetValue(0, entry->flagVar) != 0))
-            return 1;
-        else
-            return 2;
-    } else {
-        return 0;
-    }
-}
-
 s32 mobjCheckItemboxOpen(MapObjectEntry* entry) {
     if (strcmp(entry->animName, "MOBJ_TreasureBox") == 0 || strcmp(entry->animName, "MOBJ_BigTreasureBox") == 0 ||
         strcmp(entry->animName, "MOBJ_GrayTreasureBox") == 0 || strcmp(entry->animName, "MOBJ_BlackTreasureBox") == 0) {
@@ -1057,6 +1098,57 @@ s32 mobjCheckItemboxOpen(MapObjectEntry* entry) {
     }
 }
 
+#ifdef VERSION_G8ME01_DEMO
+// FAKE: stand-in for the stripped function whose constants open the .sdata2 pool; the demo's fall code uses
+// 1 + |vy| and a -10 ray, so its constants come in this order (and its 2.0 opens the .rodata doubles)
+void mobjStrippedFallPool(MapObjectEntry* entry) {
+    entry->velocity.y = 0.0f;
+    entry->position.y = 1.0f;
+    entry->position.x = 10.0f;
+    entry->position.z = -10.0f;
+    entry->velocity.x = -0.5f;
+    if (__fabs(entry->velocity.y) <= 2.0) {
+        entry->velocity.z = 0.0f;
+    }
+}
+
+// demo only: the nearest active mobj within minMagnitude of (x, y, z)
+MapObjectEntry* mobjNearDistCheck(f32 x, f32 y, f32 z, f32 minMagnitude) {
+    int entryCount;
+    Vec pos;
+    Vec dist;
+    Vec _pos;
+    MapObjectEntry* entry;
+    MapObjectWork* wp = mobjGetWork();
+    MapObjectEntry* ret;
+    int i;
+    float mag;
+
+    entryCount = wp->count;
+    entry = wp->entries;
+    ret = NULL;
+
+    _pos = (Vec){ 0.0f, 0.0f, 0.0f };
+    _pos.x = x;
+    _pos.y = y;
+    _pos.z = z;
+    pos = _pos;
+
+    for (i = 0; i < entryCount; i++, entry++) {
+        if ((entry->flags & 1) == 0)
+            continue;
+
+        VECSubtract(&entry->position, &pos, &dist);
+        mag = VECMag(&dist);
+        if (mag < minMagnitude) {
+            minMagnitude = mag;
+            ret = entry;
+        }
+    }
+
+    return ret;
+}
+#endif
 
 MapObjectEntry* mobjNearDistCheck2(f32 x, f32 y, f32 z, f32 minMagnitude, char** names) {
     int entryCount;
@@ -1075,7 +1167,9 @@ MapObjectEntry* mobjNearDistCheck2(f32 x, f32 y, f32 z, f32 minMagnitude, char**
     entry = wp->entries;
     ret = NULL;
 
+#ifndef VERSION_G8ME01_DEMO
     unusedVec = (Vec){ 0.0f, 0.0f, 0.0f };
+#endif
     _pos = (Vec){ 0.0f, 0.0f, 0.0f };
     _pos.x = x;
     _pos.y = y;
@@ -1122,6 +1216,25 @@ MapObjectEntry* mobjNearDistCheck2(f32 x, f32 y, f32 z, f32 minMagnitude, char**
 
 const char kururinName[] = "MOBJ_KururinFloor";
 
+#ifdef VERSION_G8ME01_DEMO
+int mobjCheckKururingFloorItem(MapObjectEntry* entry) { // was always inlined in retail but not in demo
+#else
+static inline int mobjCheckKururingFloorItem(MapObjectEntry* entry) { // was always inlined in retail but not in demo
+#endif
+    if (!strcmp(entry->animName, kururinName)) {
+        ItemEntry* item = itemNameToPtr(entry->name);
+        if ((item != NULL && (item->flags & 1) && evtGetValue(0, entry->flagVar) == 0))
+            return 1;
+        else if ((evtGetValue(0, entry->flagVar) != 0))
+            return 1;
+        else
+            return 2;
+    } else {
+        return 0;
+    }
+}
+
+#ifndef VERSION_G8ME01_DEMO
 void mobjStrippedFallPool(MapObjectEntry* entry) {
     entry->velocity.y = 0.0f;
     entry->position.y = 10.0f;
@@ -1129,3 +1242,4 @@ void mobjStrippedFallPool(MapObjectEntry* entry) {
     entry->position.z = -1.0f;
     entry->velocity.x = -0.5f;
 }
+#endif

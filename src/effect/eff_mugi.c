@@ -46,6 +46,16 @@ inline f32 inline_fn(effMugiKemuriData *data) {
 	return 6.2831855f * reviseAngle(data->rot.y);
 }
 
+#ifdef VERSION_G8ME01_DEMO
+// The demo has one more entry function here. Nothing calls it, so the linker drops it, but its type
+// string stays at the end of the unit's .rodata.
+EffectEntry* effMugiEntry(void) {
+	EffectEntry* effect = effEntry();
+	effect->type = "Mugi";
+	return effect;
+}
+#endif
+
 EffectEntry* effMugiKemuriEntry(f32 x, f32 y, f32 z, f32 angle) {
 	EffectEntry* effect;
 	effMugiKemuriData* data;

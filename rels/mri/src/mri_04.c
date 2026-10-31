@@ -153,7 +153,11 @@ static EVT_BEGIN(chibitoge_talk)
     ADD(LW(0), 25)
     CALL(evt_npc_jump_position_nohit, STRING("me"), LW(0), LW(1), LW(2), 500, 30)
     WAIT_MS(1000)
+#ifdef VERSION_G8ME01_DEMO
+    CALL(evt_item_entry, STRING("chibitoge_item"), 148, 0, -1000, 0, 15, -1, 0)
+#else
     CALL(evt_item_entry, STRING("chibitoge_item"), 148, 0, -1000, 0, 16, -1, 0)
+#endif
     CALL(evt_item_get_item, STRING("chibitoge_item"))
     CALL(evt_npc_set_ry, STRING("me"), 90)
     WAIT_MS(200)
@@ -202,8 +206,10 @@ static USER_FUNC(evt_chuchu_back_loop) {
 static EVT_BEGIN(chuchurina_sogu)
     CALL(evt_mario_key_onoff, 0)
     CALL(evt_party_stop, 0)
+#ifndef VERSION_G8ME01_DEMO
     CALL(evt_seq_wait, 2)
     CALL(evt_bero_exec_onoff, 0, 2)
+#endif
     CALL(evt_mario_normalize)
     CALL(evt_npc_set_position, STRING("チュチュリーナ"), -75, 0, 30)
     CALL(evt_npc_set_ry, STRING("チュチュリーナ"), 90)
@@ -236,6 +242,9 @@ static EVT_BEGIN(chuchurina_sogu)
         CALL(evt_party_move_pos2, 0, 145, LW(2), FLOAT(120.0f))
     END_INLINE_EVENT
     BEGIN_INLINE_EVENT
+#ifdef VERSION_G8ME01_DEMO
+        CALL(evt_bero_exec_onoff, 0, 2)
+#endif
         CALL(evt_puni_wait_systemmode, 2)
         CALL(evt_puni_set_mode, 1, 30)
         CALL(evt_puni_set_position, 1, 0, -1000, 0)
@@ -248,6 +257,9 @@ static EVT_BEGIN(chuchurina_sogu)
         CALL(evt_puni_set_anim, 1, 0)
         CALL(evt_bero_exec_onoff, 1, 2)
     END_INLINE_EVENT
+#ifdef VERSION_G8ME01_DEMO
+    CALL(evt_seq_wait, 2)
+#endif
     CALL(evt_npc_set_anim, STRING("第三勢力部下"), STRING("D_2"))
     CALL(evt_bero_exec_wait, 65536)
     WAIT_MS(1500)
@@ -335,7 +347,11 @@ static EVT_BEGIN(chuchurina_sogu)
     CALL(evt_npc_set_anim, STRING("チュチュリーナ"), STRING("PCH_W_1"))
     CALL(evt_npc_get_position, STRING("チュチュリーナ"), LW(0), LW(1), LW(2))
     CALL(evt_snd_sfxon_3d, STRING("SFX_STG2_CHURINA_ESCAPE1"), LW(0), LW(1), LW(2), 0)
+#ifdef VERSION_G8ME01_DEMO
+    CALL(evt_npc_jump_position_nohit, STRING("チュチュリーナ"), -18, 68, -120, 300, 20)
+#else
     CALL(evt_npc_jump_position_nohit, STRING("チュチュリーナ"), -18, 135, -200, 300, 10)
+#endif
     CALL(evt_npc_flag_onoff, 1, STRING("チュチュリーナ"), 128)
     WAIT_MS(700)
     CALL(evt_snd_bgmoff, 513)
@@ -378,7 +394,9 @@ static EVT_BEGIN(chuchurina_sogu)
     CALL(evt_item_entry, STRING("item_key"), 16, 60, 0, 0, 4, GSWF(2839), 0)
     CALL(evt_puni_set_mode, 1, 1)
     SET_VALUE(GSW(0), 93)
+#ifndef VERSION_G8ME01_DEMO
     CALL(N_evt_bero_set_mario_bottomless_respawn_pos_to_current_mario_pos)
+#endif
     CALL(evt_party_run, 0)
     CALL(evt_mario_key_onoff, 1)
     RETURN
@@ -483,7 +501,11 @@ static KusaAccess ueki_access_data[] = {
 EVT_BEGIN(item_mri_04)
     CALL(evt_mario_key_onoff, 0)
     CALL(evt_mobj_get_position, STRING("mobj_box00"), LW(0), LW(1), LW(2))
+#ifdef VERSION_G8ME01_DEMO
+    CALL(evt_item_entry, STRING("item00"), 150, LW(0), LW(1), LW(2), 15, -1, 0)
+#else
     CALL(evt_item_entry, STRING("item00"), 150, LW(0), LW(1), LW(2), 16, -1, 0)
+#endif
     CALL(evt_item_flag_on, STRING("item00"), 2)
     CALL(evt_mobj_wait_animation_end, STRING("mobj_box00"))
     CALL(evt_item_get_item, STRING("item00"))
@@ -537,7 +559,11 @@ EVT_BEGIN(mri_04_init_evt)
         SPAWN_EVENT(PTR(chuchurina_sogu))
     END_IF
     IF_INT_GREATER_OR_EQUAL(GSW(0), 93)
+#ifdef VERSION_G8ME01_DEMO
+        CALL(evt_item_entry, STRING("item_key"), 16, 60, 0, 0, 13, GSWF(2839), 0)
+#else
         CALL(evt_item_entry, STRING("item_key"), 16, 60, 0, 0, 14, GSWF(2839), 0)
+#endif
     END_IF
     CALL(evt_mapobj_flag_onoff, 1, 0, STRING("S"), 2)
     RETURN

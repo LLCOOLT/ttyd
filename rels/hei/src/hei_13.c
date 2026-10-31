@@ -132,7 +132,11 @@ EVT_BEGIN(hei_13_init_evt)
     END_IF
     CALL(evt_sub_get_system_flag, LW(0))
     IF_BITS_CLEAR(LW(0), 4096)
+#ifdef VERSION_G8ME01_DEMO
+        CALL(evt_item_entry, STRING("i"), 292, 325, 200, -100, 0, GSWF(1798), 0)
+#else
         CALL(evt_item_entry, STRING("i"), 292, 325, 200, -100, 16, GSWF(1798), 0)
+#endif
     END_IF
     CALL(evt_mobj_brick, STRING("10m"), 325, 60, -100, 0, 3, 0, GSWF(1799))
     SET_VALUE(LW(0), PTR(ki_data))

@@ -407,7 +407,11 @@ EVT_BEGIN(elder_rescue)
     CALL(evt_snd_bgmoff, 26625)
     CALL(evt_fade_out, 1000)
     WAIT_MS(100)
+#ifdef VERSION_G8ME01_DEMO
+    CALL(evt_fade_entry, 10, 0, 0, 0, 0)
+#else
     CALL(evt_fade_entry, 12, 0, 0, 0, 0)
+#endif
     WAIT_MS(1000)
     CALL(evt_msg_toge, 1, 0, 0, 0)
     CALL(evt_msg_print, 0, STRING("stg2_mri_e14_06"), 0, 0)
@@ -421,7 +425,11 @@ EVT_BEGIN(elder_rescue)
     CALL(evt_mario_sleep_on)
     CALL(evt_party_sleep_on, 0)
     WAIT_MS(1000)
+#ifdef VERSION_G8ME01_DEMO
+    CALL(evt_fade_entry, 9, 0, 0, 0, 0)
+#else
     CALL(evt_fade_entry, 11, 0, 0, 0, 0)
+#endif
     CALL(evt_snd_bgmon, 161, 0)
     CALL(evt_fade_in, 1000)
     CALL(evt_msg_print, 0, STRING("stg2_mri_e14_07"), 0, STRING("プニ族長老"))
@@ -782,7 +790,11 @@ s32 key_table00[] = {
 EVT_BEGIN(evt_check00)
     CALL(evt_pouch_check_item, 16, LW(0))
     IF_INT_GREATER(LW(0), 0)
+#ifdef VERSION_G8ME01_DEMO
+        CALL(evt_win_item_select, PTR(key_table00), LW(0))
+#else
         CALL(evt_win_item_select, 0, PTR(key_table00), LW(0), 0)
+#endif
         IF_INT_EQUAL(LW(0), -1)
             CALL(evt_mobj_exec_cancel, STRING("me"))
         END_IF
@@ -845,7 +857,11 @@ s32 key_table01[] = {
 EVT_BEGIN(evt_check01)
     CALL(evt_win_item_maketable, PTR(key_table01), LW(10))
     IF_INT_NOT_EQUAL(LW(10), 0)
+#ifdef VERSION_G8ME01_DEMO
+        CALL(evt_win_item_select, LW(10), LW(0))
+#else
         CALL(evt_win_item_select, 0, LW(10), LW(0), 0)
+#endif
         SWITCH(LW(0))
             CASE_EQUAL(17)
             CASE_EQUAL(16)
@@ -935,7 +951,11 @@ EVT_BEGIN(bluejail_event)
     CALL(evt_msg_print, 0, STRING("stg2_mri_e19_00"), 0, STRING("プニ族"))
     CALL(evt_npc_get_position, STRING("ガイド妹"), LW(0), LW(1), LW(2))
     CALL(evt_snd_sfxon_3d, STRING("SFX_STG2_PUNIKO_KINOKO1"), LW(0), LW(1), LW(2), 0)
+#ifdef VERSION_G8ME01_DEMO
+    CALL(evt_item_entry, STRING("item00"), 152, LW(0), LW(1), LW(2), 15, -1, 0)
+#else
     CALL(evt_item_entry, STRING("item00"), 152, LW(0), LW(1), LW(2), 16, -1, 0)
+#endif
     CALL(evt_item_flag_on, STRING("item00"), 2)
     ADD(LW(0), 20)
     CALL(evt_item_move_3d_position, STRING("item00"), LW(0), LW(1), LW(2), 300, 0)
@@ -1258,7 +1278,11 @@ EVT_BEGIN(guide_sister)
     WAIT_MS(200)
     CALL(evt_npc_get_position, LW(11), LW(0), LW(1), LW(2))
     CALL(evt_snd_sfxon_3d, STRING("SFX_STG2_PUNIKO_KINOKO1"), LW(0), LW(1), LW(2), 0)
+#ifdef VERSION_G8ME01_DEMO
+    CALL(evt_item_entry, STRING("item00"), 152, LW(0), LW(1), LW(2), 15, -1, 0)
+#else
     CALL(evt_item_entry, STRING("item00"), 152, LW(0), LW(1), LW(2), 16, -1, 0)
+#endif
     CALL(evt_item_flag_on, STRING("item00"), 2)
     ADD(LW(0), 20)
     CALL(evt_item_move_3d_position, STRING("item00"), LW(0), LW(1), LW(2), 500, 0)
@@ -1360,7 +1384,9 @@ EVT_END()
 
 EVT_BEGIN(toraware_elder)
     CALL(evt_mario_key_onoff, 0)
+#ifndef VERSION_G8ME01_DEMO
     CALL(evt_puni_wait_systemmode, 2)
+#endif
     CALL(evt_bero_exec_wait, 65536)
     WAIT_WHILE(GF(0))
     BEGIN_INLINE_EVENT
@@ -1369,6 +1395,7 @@ EVT_BEGIN(toraware_elder)
     BEGIN_INLINE_EVENT
         CALL(evt_party_set_dir, 0, 270, 200)
     END_INLINE_EVENT
+#ifndef VERSION_G8ME01_DEMO
     CALL_CHILD(PTR(mri_guide_hagure_check))
     IF_INT_NOT_EQUAL(LW(1), 0)
         CALL(evt_puni_set_lsw_index, LSW(0), 0, 0, 0, 0, 0)
@@ -1379,6 +1406,7 @@ EVT_BEGIN(toraware_elder)
         CALL(evt_puni_move_position, 1, 240, 40, FLOAT(120.0f))
         CALL(evt_puni_set_mode, 1, 1)
     END_IF
+#endif
     CALL(evt_puni_flag_onoff, 1, 0, 262144)
     CALL(evt_puni_set_anim, 1, 0)
     CALL(evt_npc_flag_onoff, 1, STRING("ガイドsp"), 1073743392)

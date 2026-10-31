@@ -309,6 +309,7 @@ EVT_BEGIN(trap_main)
     RETURN
 EVT_END()
 
+#ifndef VERSION_G8ME01_DEMO
 EVT_BEGIN(trap_restore)
     CALL(evt_puni_wait_systemmode, 2)
     SET_VALUE(LW(10), 1)
@@ -330,6 +331,7 @@ EVT_BEGIN(trap_restore)
     END_LOOP
     RETURN
 EVT_END()
+#endif
 
 EVT_BEGIN(wana_kemuri)
     CALL(evt_eff, 0, STRING("kemuri_test"), 0, -18, 25, 76, FLOAT(1.0f), 0, 0, 0, 0, 0, 0, 0)
@@ -410,7 +412,9 @@ EVT_BEGIN(trap_event)
     CALL(evt_cam3d_evt_set, 80, 151, 555, 80, 56, 13, 500, 11)
     WAIT_MS(500)
     CALL_CHILD(PTR(wana_offscreen))
+#ifndef VERSION_G8ME01_DEMO
     CALL_CHILD(PTR(mri_guide_goryu))
+#endif
     CALL(evt_target_flag_onoff, 0, 1, 1)
     SET_VALUE(LW(10), 1)
     LOOP(0)
@@ -422,11 +426,19 @@ EVT_BEGIN(trap_event)
             BREAK_LOOP
         END_IF
     END_LOOP
+#ifdef VERSION_G8ME01_DEMO
+    CALL_CHILD(PTR(mri_guide_goryu))
+#endif
     CALL(evt_puni_flag_onoff, 1, 0, 262144)
+#ifndef VERSION_G8ME01_DEMO
     CALL(evt_puni_set_mode, 1, 30)
     CALL(evt_puni_get_position, 1, LW(0), LW(1), LW(2))
     CALL(evt_npc_set_position, STRING("ガイド"), LW(0), LW(1), LW(2))
     CALL(evt_npc_flag_onoff, 1, STRING("ガイド"), 1073743392)
+#endif
+#ifdef VERSION_G8ME01_DEMO
+    CALL(evt_npc_flag_onoff, 1, STRING("ガイド"), 1536)
+#endif
     CALL(evt_npc_set_ry, STRING("ガイド"), 270)
     SET_VALUE(LW(0), STRING("ガイド"))
     SPAWN_EVENT_GET_ID(PTR(mri_puni_walk_se), LW(9))
@@ -540,7 +552,9 @@ EVT_BEGIN(trap_event)
     CALL(evt_npc_get_position, STRING("ガイド"), LW(0), LW(1), LW(2))
     CALL(evt_puni_flag_onoff, 1, 1, 262144)
     CALL(evt_puni_set_position, 1, LW(0), LW(1), LW(2))
+#ifndef VERSION_G8ME01_DEMO
     CALL(evt_puni_set_mode, 1, 24)
+#endif
     SET_VALUE(GSW(0), 102)
     SET_VALUE(GF(1), 0)
     CALL(evt_cam3d_evt_off, 300, 11)
@@ -560,9 +574,11 @@ EVT_BEGIN(trap_event)
     CALL(evt_mario_normalize)
     CALL(evt_party_stop, 0)
     CALL(evt_msg_print_party, STRING("stg2_mri_e18_00_09"))
+#ifndef VERSION_G8ME01_DEMO
     CALL(evt_puni_get_position, 1, LW(0), LW(1), LW(2))
     ADD(LW(1), 20)
     CALL(evt_msg_toge, 2, LW(0), LW(1), LW(2))
+#endif
     CALL(evt_msg_print, 0, STRING("stg2_mri_e18_00_12"), 0, STRING("ガイド"))
     CALL(evt_party_run, 0)
     CALL(evt_mario_key_onoff, 1)
@@ -709,7 +725,13 @@ static EVT_BEGIN(breakyuka_main)
         CALL(evt_puni_get_trap_index, LW(10), LW(12))
         IF_INT_EQUAL(LW(12), 1)
             CALL(evt_puni_set_mode, LW(10), 16)
+#ifndef VERSION_G8ME01_DEMO
             CALL(evt_puni_flag_onoff, LW(10), 1, 2097152)
+#endif
+#ifdef VERSION_G8ME01_DEMO
+            CALL(evt_puni_flag_onoff, LW(10), 1, 0xA00000)
+            CALL(evt_puni_set_trap_index, LW(10), 0)
+#endif
         END_IF
         ADD(LW(10), 1)
         IF_INT_EQUAL(LW(10), 103)
@@ -751,9 +773,13 @@ EVT_BEGIN(switch_event)
     CALL(evt_cam_shake, 4, FLOAT(0.0146484375f), FLOAT(0.0f), 1000)
     CALL(evt_snd_sfxoff, LW(10))
     WAIT_MS(500)
+#ifndef VERSION_G8ME01_DEMO
     CALL(evt_party_stop, 0)
+#endif
     CALL(evt_msg_print_party, STRING("stg2_mri_e18_00_10"))
+#ifndef VERSION_G8ME01_DEMO
     CALL(evt_party_run, 0)
+#endif
     SET_VALUE(GSW(0), 103)
     CALL(evt_mario_key_onoff, 1)
     RETURN
@@ -799,7 +825,11 @@ EVT_BEGIN(mri_17_init_evt)
     IF_INT_LESS(GSW(0), 103)
         CALL(evt_mobj_switch_blue, 1, STRING("switch"), 60, -309, 53, PTR(switch_event), 0)
     END_IF
+#ifdef VERSION_G8ME01_DEMO
+    CALL(evt_item_entry, STRING("item_01"), 125, 168, -310, -44, 15, GSWF(5617), 0)
+#else
     CALL(evt_item_entry, STRING("item_01"), 125, 168, -310, -44, 16, GSWF(5617), 0)
+#endif
     SWITCH(GSW(0))
         CASE_LESS_OR_EQUAL(101)
         CALL(evt_mapobj_flag_onoff, 1, 1, STRING("S_hako"), 1)
@@ -811,9 +841,14 @@ EVT_BEGIN(mri_17_init_evt)
         SPAWN_EVENT(PTR(trap_check))
         CASE_BETWEEN(102, 105)
         SPAWN_EVENT(PTR(trap_main))
+#ifndef VERSION_G8ME01_DEMO
         CASE_BETWEEN(106, 107)
         SPAWN_EVENT(PTR(trap_restore))
         CASE_GREATER_OR_EQUAL(106)
+#endif
+#ifdef VERSION_G8ME01_DEMO
+        CASE_GREATER_OR_EQUAL(105)
+#endif
     END_SWITCH
     CALL(evt_mapobj_flag_onoff, 1, 0, STRING("S_hako_saku_mae"), 2)
     RETURN

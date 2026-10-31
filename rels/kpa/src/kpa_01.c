@@ -318,7 +318,9 @@ EVT_BEGIN(kpa_01_touzyo_evt)
     WAIT_MS(100)
     CALL(evt_msg_print, 0, STRING("kpa_stg1_001"), 0, STRING("トゲノコＡ"))
     SET_VALUE(GSW(0), 60)
+#ifndef VERSION_G8ME01_DEMO
     CALL(N_evt_bero_set_mario_bottomless_respawn_pos_to_current_mario_pos)
+#endif
     CALL(evt_mario_key_onoff, 1)
     CALL(evt_snd_bgm_scope, 0, 0)
     RETURN
@@ -791,9 +793,11 @@ EVT_BEGIN(kpa_01_syuppatu_evt)
             GOTO(10)
         END_IF
     END_INLINE_EVENT
+#ifndef VERSION_G8ME01_DEMO
     BEGIN_INLINE_EVENT
         CALL(evt_npc_kamek_kemuri2, STRING("ババ"), 1500, 1)
     END_INLINE_EVENT
+#endif
     SET_VALUE(GF(0), 0)
     BEGIN_INLINE_EVENT
         LOOP(0)
@@ -1148,7 +1152,11 @@ EVT_BEGIN(kpa_01_init_evt)
         END_IF
     END_SWITCH
     RETURN
+#ifdef VERSION_G8ME01_DEMO
+EVT_END()
+#else
 EVT_END_PAD()
+#endif
 
 static USER_FUNC(make_name) {
     EvtWord* args = event->args;

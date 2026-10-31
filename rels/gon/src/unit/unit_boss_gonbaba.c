@@ -56,8 +56,13 @@ BattleUnitKind unit_boss_gonbaba;
 static BattleUnitDefense defence;
 static BattleUnitDefenseAttr defence_attr;
 static StatusVulnerability regist;
+#ifdef VERSION_G8ME01_DEMO
+static PoseTableEntry pose_table[7];
+static PoseTableEntry pose_table_weak[7];
+#else
 static PoseTableEntry pose_table[9];
 static PoseTableEntry pose_table_weak[9];
+#endif
 static BattleDataEntry data_table[3];
 static BattleUnitKindPart parts[3];
 extern EvtWord negotiation_event[];
@@ -243,7 +248,11 @@ BattleUnitKind unit_boss_gonbaba = {
 #endif
     0.0f,
     0.0f,
+#ifdef VERSION_G8ME01_DEMO
+    250.0f,
+#else
     20.0f,
+#endif
     0.0f,
     250.0f,
     0.0f,
@@ -281,30 +290,54 @@ static BattleUnitDefense defence = {{1, 1, 1, 1, 1}};
 
 static BattleUnitDefenseAttr defence_attr = {{0, 0, 0, 0, 0}};
 
+#ifdef VERSION_G8ME01_DEMO
+static StatusVulnerability regist = {10, 0, 50, 0, 50, 10, 100, 0, 0, 0, 50, 0, 100, 0, 100, 0, 0, 100, 0, 0, 0, 0};
+#else
 static StatusVulnerability regist = {20, 0, 50, 0, 50, 10, 100, 0, 0, 0, 50, 0, 100, 0, 100, 0, 0, 100, 0, 0, 0, 0};
+#endif
 
 static PoseTableEntry pose_table[] = {
     {1, "GNB_N_1"},
     {5, "GNB_X_1"},
+#ifndef VERSION_G8ME01_DEMO
     {2, "GNB_Z_1"},
     {3, "GNB_X_1"},
+#endif
     {28, "GNB_S_3"},
+#ifdef VERSION_G8ME01_DEMO
+    {63, "GNB_T_3"},
+#else
     {65, "GNB_T_3"},
+#endif
     {31, "GNB_S_3"},
     {39, "GNB_D_1"},
+#ifdef VERSION_G8ME01_DEMO
+    {67, "GNB_S_3"},
+#else
     {69, "GNB_S_3"},
+#endif
 };
 
 static PoseTableEntry pose_table_weak[] = {
     {1, "GNB_N_1"},
     {5, "GNB_X_1"},
+#ifndef VERSION_G8ME01_DEMO
     {2, "GNB_N_1"},
     {3, "GNB_X_1"},
+#endif
     {28, "GNB_S_4"},
+#ifdef VERSION_G8ME01_DEMO
+    {63, "GNB_T_4"},
+#else
     {65, "GNB_T_4"},
+#endif
     {31, "GNB_S_4"},
     {39, "GNB_V_1"},
+#ifdef VERSION_G8ME01_DEMO
+    {67, "GNB_S_4"},
+#else
     {69, "GNB_S_4"},
+#endif
 };
 
 static BattleDataEntry data_table[] = {
@@ -641,8 +674,13 @@ EVT_BEGIN(negotiation_event)
         CALL(evt_btl_camera_noshake, 1)
         CALL(evt_btl_camera_shake_h, 1, 7, 0, 30, 12)
     END_INLINE_EVENT
+#ifdef VERSION_G8ME01_DEMO
+    CALL(evt_batstage_set_aud_dark, 0, 180, 0)
+    CALL(evt_batstage_set_aud_dark_base, 0, 180, 0)
+#else
     CALL(evt_batstage_set_aud_dark, 0, 24, 0)
     CALL(evt_batstage_set_aud_dark_base, 0, 24, 0)
+#endif
     BEGIN_INLINE_EVENT
         WAIT_FRAMES(40)
         CALL(btlevtcmd_AnimeChangePose, -3, 1, STRING("M_N_7"))
@@ -893,7 +931,11 @@ EVT_BEGIN(negotiation_event)
     CALL(btlevtcmd_GetBodyId, -3, LW(3))
     CALL(btlevtcmd_AnimeChangePose, -3, LW(3), STRING("M_I_Y"))
     CALL(btlevtcmd_GetBodyId, -4, LW(4))
+#ifdef VERSION_G8ME01_DEMO
+    CALL(btlevtcmd_AnimeChangePoseType, -4, LW(4), 67)
+#else
     CALL(btlevtcmd_AnimeChangePoseType, -4, LW(4), 69)
+#endif
     WAIT_FRAMES(30)
     CALL(btlevtcmd_reset_turn)
     CALL(evt_btl_camera_set_prilimit, 0)
@@ -1150,7 +1192,9 @@ EVT_BEGIN(gonbaba_damage_sub_event)
             RETURN
         END_IF
     END_IF
+#ifndef VERSION_G8ME01_DEMO
     CALL(btlevtcmd_WaitAttackEnd)
+#endif
     CALL(btlevtcmd_SetTalkPose, -2, STRING("GNB_T_4"))
     CALL(btlevtcmd_SetStayPose, -2, STRING("GNB_S_4"))
     CALL(evt_btl_camera_set_prilimit, 1)
@@ -1181,7 +1225,9 @@ EVT_BEGIN(gonbaba_damage_sub_event)
         RETURN
     END_IF
     CALL(btlevtcmd_SetUnitWork, -2, 2, 3)
+#ifndef VERSION_G8ME01_DEMO
     CALL(btlevtcmd_WaitAttackEnd)
+#endif
     CALL(btlevtcmd_SetTalkPose, -2, STRING("GNB_T_4"))
     CALL(btlevtcmd_SetStayPose, -2, STRING("GNB_S_4"))
     CALL(evt_btl_camera_set_prilimit, 1)
@@ -1320,7 +1366,11 @@ static EVT_BEGIN(init_event)
     CALL(evt_audience_flag_on, 35, 512)
     CALL(evt_audience_flag_on, 53, 512)
     CALL(evt_audience_flag_on, 54, 512)
+#ifdef VERSION_G8ME01_DEMO
+    CALL(evt_audience_base_flag_on, 32768)
+#else
     CALL(evt_audience_base_flag_on, 16384)
+#endif
     CALL(btlevtcmd_SetEventEntry, -2, PTR(battle_entry_event))
     CALL(btlevtcmd_SetBaseScale, -2, FLOAT(1.2998047f), FLOAT(1.2998047f), FLOAT(0.5f))
     CALL(btlevtcmd_SetUnitWork, -2, 3, 0)

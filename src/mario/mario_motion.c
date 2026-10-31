@@ -65,6 +65,9 @@ void mot_yoshi(void);
 void mot_yoshi_post(void);
 void mot_cloud(void);
 void cloudResetAt();
+#ifdef VERSION_G8ME01_DEMO
+void mot_cloud_post(void);
+#endif
 void mot_vivian(void);
 void mot_vivian_post(void);
 void mot_dokan(void);
@@ -177,7 +180,11 @@ MarioMotTblEntry marioMotTbl[] = {
 	{mot_plane, NULL, mot_plane_post},
 	{mot_ship, NULL, mot_ship_post},
 	{mot_yoshi, NULL, mot_yoshi_post},
+#ifdef VERSION_G8ME01_DEMO
+	{mot_cloud, NULL, mot_cloud_post},
+#else
 	{mot_cloud, NULL, cloudResetAt},
+#endif
 	{mot_vivian, NULL, mot_vivian_post},
 	{mot_dokan, NULL, NULL},
 	{mot_grasp, NULL, NULL},
@@ -206,10 +213,12 @@ void marioChgMoveMotion(void) {
 		mario_plane_cancel();
 		return;
 	}
+#ifndef VERSION_G8ME01_DEMO
 	if (mario->currMotionId == MARIO_MOTION_ROLL) {
 		allPartyForceRideOn();
 		return;
 	}
+#endif
 #ifdef VERSION_G8ME01
 	if ((u16)(mario->currMotionId - MARIO_MOTION_DAMAGE) <= 1) {
 		return;
@@ -265,12 +274,20 @@ void marioChgRollMotion(void) {
 
 void marioChgJumpStandMotion(f32 v) {
 	MarioWork* mario = marioGetPtr();
+#ifdef VERSION_G8ME01_DEMO
+	// The demo does not follow the camera up, and in status 0x10 only stores the height.
+	if (marioChkSts(0x10)) {
+		mario->mot.jump.standHeight = v;
+	} else
+#else
 	camFollowYOn();
 	if (marioChkSts(0x10)) {
 		mario->mot.jump.standHeight = v;
 		effKemuriEntry(0, mario->position.x, mario->position.y, mario->position.z, 0.0f);
 		marioChgMot(MARIO_MOTION_JUMP_STAND);
-	} else if (mario->currMotionId == MARIO_MOTION_YOSHI) {
+	} else
+#endif
+	if (mario->currMotionId == MARIO_MOTION_YOSHI) {
 		mario->mot.jump.standHeight = v;
 		yoshi_jumpStand();
 	} else {
@@ -415,11 +432,14 @@ void marioChgMotSub(MarioMotion id, s32 callPost) {
 		if (marioMotTbl[mario->prevMotionId].post) {
 			marioMotTbl[mario->prevMotionId].post();
 		}
-	} else if (mario->prevMotionId == MARIO_MOTION_JABARA) {
+	}
+#ifndef VERSION_G8ME01_DEMO
+	else if (mario->prevMotionId == MARIO_MOTION_JABARA) {
 		if (marioMotTbl[mario->prevMotionId].post) {
 			marioMotTbl[mario->prevMotionId].post();
 		}
 	}
+#endif
 	mario->trigFlags |= 1;
 }
 
@@ -680,7 +700,9 @@ void marioFall(void) {
 #else
 			if (marioPriCheckJabara() && a != -1 && rub >= 0) {
 #endif
+#ifndef VERSION_G8ME01_DEMO
 				camFollowYOn();
+#endif
 				marioChgMot(MARIO_MOTION_JABARA);
 				return;
 			}
@@ -775,7 +797,11 @@ void marioLandOn(void) {
 			return;
 		}
 		if (mario->flags & 0x100000) {
+#ifdef VERSION_G8ME01_DEMO
+			marioChgMotSub(MARIO_MOTION_STAY, FALSE); // the demo has no slit re-entry
+#else
 			marioSlitReenter();
+#endif
 			return;
 		}
 		if ((mario->dispFlags & 0x1000000) && !marioChkSlitEnd()) {
@@ -797,6 +823,10 @@ void marioLandOn(void) {
 			quake_kpaLandOn();
 			return;
 		}
+#ifdef VERSION_G8ME01_DEMO
+		marioChgMot(MARIO_MOTION_WALK); // the demo does not stay in the slit after landing
+		return;
+#else
 		if (!(mario->dispFlags & 0x1000000)) {
 #ifdef VERSION_G8ME01
 			if (marioPriCheckJabara()) {
@@ -815,6 +845,7 @@ void marioLandOn(void) {
 		}
 		N_marioSlitSetAfterLand();
 		return;
+#endif
 	}
 	flags = mario->flags;
 	if (flags & 0x1000000) {
@@ -835,13 +866,30 @@ void marioLandOn(void) {
 		return;
 	}
 	if (flags & 0x100000) {
+#ifdef VERSION_G8ME01_DEMO
+		marioChgMotSub(MARIO_MOTION_STAY, FALSE);
+#else
 		marioSlitReenter();
+#endif
 		return;
 	}
 	if ((mario->dispFlags & 0x1000000) && !marioChkSlitEnd()) {
 		motSlitCancel();
 	}
 }
+
+#ifdef VERSION_G8ME01_DEMO
+// FAKE: unreferenced stand-in (deadstripped by the linker) that only creates the demo's three stray
+// .rodata doubles 0.5, 3.0 and 0.0 between the mot_talk and earlier pools; the original function that used
+// them is not in the demo DOL. A file-scope const array or <math.h> constants place them at the start of
+// the section instead.
+static f32 marioDemoHalf(f32 x) {
+	if (x < 0.0) {
+		return x;
+	}
+	return 0.5 * x * (3.0 - x);
+}
+#endif
 
 void mot_talk(void) {
 	MarioWork* mario = marioGetPtr();
@@ -978,9 +1026,11 @@ BOOL marioChkTransform(void) {
 	if (!(mario->buttonTrg & 0x800)) {
 		return FALSE;
 	}
+#ifndef VERSION_G8ME01_DEMO
 	if (!(mario->trigFlags & 4) && mario->partyUseDelay) {
 		return FALSE;
 	}
+#endif
 	if (mario->currMotionId == MARIO_MOTION_YOSHI) {
 		return FALSE;
 	}
@@ -1023,6 +1073,9 @@ BOOL marioChkItemMotion(void) {
 }
 
 s32 L_marioChkRub(void) {
+#ifdef VERSION_G8ME01_DEMO
+	MarioWork* mario = marioGetPtr();
+#endif
 	return 0;
 }
 
@@ -1058,10 +1111,34 @@ s32 marioRollChgChk(void) {
 
 void marioChgMotJump2(void) {
 	MarioWork* mario = marioGetPtr();
+#ifdef VERSION_G8ME01_DEMO
+	if (kpaGetBodyStatus() != 2) {
+#else
 	if (kpaGetBodyStatus() != 2 && mario->currMotionId != MARIO_MOTION_ROLL) {
+#endif
 		marioChgMot(MARIO_MOTION_JUMP_NPC);
 	}
 }
+
+#ifdef VERSION_G8ME01_DEMO
+// In the demo the Flurrie motion lives here: party_cloud.c has no mot_cloud yet, and the motion's post
+// function resets the camera target.
+void mot_cloud(void) {
+	MarioWork* mario = marioGetPtr();
+
+	if (mario->trigFlags & 1) {
+		mario->trigFlags &= ~1;
+		mario->flags &= ~(MARIO_FLAG_HAS_INPUT_JUMP | MARIO_FLAG_IS_STEPPING | MARIO_FLAG_IS_FALLING | MARIO_FLAG_IS_JUMPING);
+		mario->multiTimer = 0;
+		mario->airTimer = 0;
+		mario->currSubMotionId = 0;
+	}
+}
+
+void mot_cloud_post(void) {
+	cloudResetAt();
+}
+#endif
 
 static inline BOOL marioChkBackAngle(f32 a) {
 	BOOL ret = FALSE;

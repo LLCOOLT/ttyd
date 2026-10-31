@@ -541,7 +541,11 @@ EVT_BEGIN(gonbaba_event)
     CALL(evt_cam3d_evt_set, 245, 75, 450, 245, 50, 200, 500, 11)
     WAIT_MS(500)
     CALL(evt_npc_set_anim, STRING("ノコタロウ父"), STRING("NKP_A_1"))
+#ifdef VERSION_G8ME01_DEMO
+    CALL(evt_item_entry, STRING("stone"), 114, 245, 45, 220, 16, -1, 0)
+#else
     CALL(evt_item_entry, STRING("stone"), 114, 245, 45, 220, 17, -1, 0)
+#endif
     WAIT_MS(500)
     CALL(evt_item_get_position, STRING("stone"), LW(0), LW(1), LW(2))
     SET_FLOAT_VALUE(LW(3), FLOAT(-1.0f))
@@ -596,9 +600,15 @@ EVT_BEGIN(gonbaba_event)
     WAIT_MS(2000)
     SET_VALUE(GSW(0), 55)
     SET_VALUE(GSW(0), 56)
+#ifdef VERSION_G8ME01_DEMO
+    CALL(evt_snd_bgmoff, 512)
+#else
     CALL(evt_snd_bgmoff_f, 512, 2000)
+#endif
     CALL(evt_snd_bgmoff, 513)
+#ifndef VERSION_G8ME01_DEMO
     CALL(evt_snd_envoff_f, 512, 2000)
+#endif
     SET_VALUE(LW(0), 1)
     SET_VALUE(LW(1), STRING("stone"))
     CALL_CHILD(PTR(evt_sub_starstone))
@@ -743,6 +753,11 @@ static USER_FUNC(evt_cloud_main) {
     if (party == NULL) {
         return EVT_RETURN_BLOCK;
     }
+#ifdef VERSION_G8ME01_DEMO
+    if (party->currentMemberId != 5) {
+        return EVT_RETURN_BLOCK;
+    }
+#endif
     hit0 = (HitEntry*)cloudGetHitBreathout(0);
     hit1 = (HitEntry*)cloudGetHitBreathout(1);
     hit2 = (HitEntry*)cloudGetHitBreathout(2);
@@ -771,7 +786,11 @@ static USER_FUNC(evt_cloud_main) {
             animPaperPoseEntry(wp->animName, group);
             offscreenEntry(wp->offscreenName);
             off = offscreenNameToPtr(wp->offscreenName);
+#ifdef VERSION_G8ME01_DEMO
+            off->texFmt = off->copyFmt = 6;
+#else
             off->texFmt = off->copyFmt = 4;
+#endif
             _mapsetofs_all(wp);
             wp->state++;
             break;
@@ -931,7 +950,11 @@ USER_FUNC(evt_iri_16_cloud_ent) {
 EVT_BEGIN(iri_16_box_evt)
     CALL(evt_mario_key_onoff, 0)
     CALL(evt_mobj_get_position, STRING("box"), LW(0), LW(1), LW(2))
+#ifdef VERSION_G8ME01_DEMO
+    CALL(evt_item_entry, STRING("mb"), 110, LW(0), LW(1), LW(2), 16, -1, 0)
+#else
     CALL(evt_item_entry, STRING("mb"), 110, LW(0), LW(1), LW(2), 17, -1, 0)
+#endif
     CALL(evt_mobj_wait_animation_end, STRING("box"))
     CALL(evt_item_get_item, STRING("mb"))
     CALL(evt_item_get_item_end_wait, STRING("mb"))
@@ -1004,9 +1027,11 @@ EVT_BEGIN(gon_11_init_evt)
     CALL(evt_light_charalight_all_onoff, 1)
     CALL(evt_light_npc_lighting_onoff, 1, STRING("ゴンババ"))
     CALL_CHILD(PTR(iri_16_init))
+#ifndef VERSION_G8ME01_DEMO
     IF_INT_GREATER_OR_EQUAL(GSW(0), 55)
         CALL(evt_npc_delete, STRING("ノコタロウ父"))
         CALL(evt_npc_delete, STRING("ゴンババ"))
     END_IF
+#endif
     RETURN
 EVT_END()

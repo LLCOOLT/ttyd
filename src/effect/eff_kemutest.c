@@ -59,6 +59,12 @@ static const KemuF3 kemu_h = { { 0.0f, 1.0f, 2.0f } };
 static const Vec kemu_pos = { 0.0f, 0.0f, 0.0f };
 static const Vec kemu_tmp = { 0.0f, 0.0f, 0.0f };
 
+#ifdef VERSION_G8ME01_DEMO
+// In the demo the burst tables are file-scope statics, first in .data.
+static f32 bom_dir[10] = { 10.0f, 40.0f, 80.0f, 170.0f, 140.0f, 100.0f, 25.0f, 155.0f, 60.0f, 120.0f };
+static f32 bom_spd[10] = { 2.2f, 2.7f, 3.0f, 2.2f, 2.7f, 3.0f, 1.9f, 1.9f, 1.5f, 1.5f };
+#endif
+
 void effKemuTestSetRxRz(EffectEntry* effect, f32 rx, f32 rz) {
     KemuTestWork* work = effect->userdata;
     work->rx = rx;
@@ -361,8 +367,10 @@ static void effKemuTestMain(EffectEntry* effect) {
 
 
 EffectEntry* effKemuTestEntry(s32 type, f32 x, f32 y, f32 z, f32 scale) {
+#ifndef VERSION_G8ME01_DEMO
     static f32 bom_dir[10] = { 10.0f, 40.0f, 80.0f, 170.0f, 140.0f, 100.0f, 25.0f, 155.0f, 60.0f, 120.0f };
     static f32 bom_spd[10] = { 2.2f, 2.7f, 3.0f, 2.2f, 2.7f, 3.0f, 1.9f, 1.9f, 1.5f, 1.5f };
+#endif
     EffectEntry* effect;
     KemuTestWork* work;
     s32 i;
@@ -757,7 +765,7 @@ EffectEntry* effKemuTestEntry(s32 type, f32 x, f32 y, f32 z, f32 scale) {
 
 
 static __declspec(section ".rodata") const u32 gap_04_802FDD34_rodata[1] = {0};
-#ifndef VERSION_G8ME01
+#if !defined(VERSION_G8ME01) && !defined(VERSION_G8ME01_DEMO)
 __declspec(section ".data") u8 gap_05_803AC064_data[28] = {0};
 #endif
 

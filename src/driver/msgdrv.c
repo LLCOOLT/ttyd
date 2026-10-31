@@ -27,6 +27,7 @@ const char R_no_messages_DU[] = "<col ff0000ff>No messages.[Dutch]<col>\012<key>
 #else
 const char R_no_messages_US[] = "<col ff0000ff>No messages.<col>\n<key>";
 #endif
+#ifndef VERSION_G8ME01_DEMO
 const char str_802C4E4C[12] = "\123\124\111\103\113\137\114\105\106\124";
 const char str_802C4E58[12] = "\102\125\124\124\117\116\137\114";
 const char str_802C4E64[12] = "\102\125\124\124\117\116\137\122";
@@ -45,6 +46,7 @@ const char str_802C4EF0[8] = "\120\115\137\106\137\063\102";
 const char str_802C4EF8[8] = "\120\115\137\103\137\061\102";
 const char str_802C4F00[8] = "\120\115\137\103\137\062\102";
 
+#endif
 #ifdef VERSION_G8ME01
 #endif
 // target .bss/.sbss pad (uninitialised objects are emitted in reverse order, so this sits last)
@@ -54,6 +56,13 @@ const char str_802C4F00[8] = "\120\115\137\103\137\062\102";
 
 #define MSG_CB(d) (*(void (**)(s32, smartEntry*))&(d)->callback)
 #define WIN_DATA(w) ((MsgWinData*)(w)->userdata->address)
+
+// the text of a loaded message file
+#ifdef VERSION_G8ME01_DEMO
+#define MSG_TEXT(e) ((const char*)(e)->address->address)
+#else
+#define MSG_TEXT(e) ((const char*)(e)->address)
+#endif
 void msgWindow_Disp(CameraId camId, void* param);
 void msgWindow_Main(WindowEntry* window);
 void msgWindow_Clear_Main(WindowEntry* window);
@@ -81,41 +90,56 @@ typedef struct MsgIcon {
 
 //.data
 #define STR(sym, lit) lit
+// the demo keeps these names as plain literals
+#ifdef VERSION_G8ME01_DEMO
+#define RSTR(sym, lit) lit
+#else
+#define RSTR(sym, lit) sym
+#endif
 MsgIcon msgIcon[] = {
 	{STR(str_8041A4B0, "PAD_A"), ICON_064},
 	{STR(str_8041A4B8, "PAD_B"), ICON_066},
-	{str_802C4E4C, ICON_078},
+	{RSTR(str_802C4E4C, "STICK_LEFT"), ICON_078},
 	{STR(str_8041A4C0, "STICK"), ICON_079},
 	{STR(str_8041A4C8, "AC_ON"), ICON_095},
-	{str_802C4E58, ICON_07E},
-	{str_802C4E64, ICON_080},
+	{RSTR(str_802C4E58, "BUTTON_L"), ICON_07E},
+	{RSTR(str_802C4E64, "BUTTON_R"), ICON_080},
 	{STR(str_8041A4D0, "HM"), ICON_19F},
 	{STR(str_8041A4D4, "PAD_X"), ICON_068},
-	{str_802C4E70, ICON_069},
+	{RSTR(str_802C4E70, "PAD_X_ON"), ICON_069},
 	{STR(str_8041A4DC, "PAD_Y"), ICON_06A},
-	{str_802C4E7C, ICON_06B},
-	{str_802C4E88, ICON_082},
-	{str_802C4E94, ICON_084},
-	{str_802C4EA0, ICON_130},
-	{str_802C4EAC, ICON_20B},
-	{str_802C4EB8, ICON_20C},
-	{str_802C4EC8, ICON_20D}
+	{RSTR(str_802C4E7C, "PAD_Y_ON"), ICON_06B},
+	{RSTR(str_802C4E88, "PAD_Z_OFF"), ICON_082},
+	{RSTR(str_802C4E94, "PAD_ST_OFF"), ICON_084},
+	{RSTR(str_802C4EA0, "black_key"), ICON_130},
+	{RSTR(str_802C4EAC, "ANM_PAD_A"), ICON_20B},
+	{RSTR(str_802C4EB8, "ANM_STICK_RIGHT"), ICON_20C},
+	{RSTR(str_802C4EC8, "ANM_PAD_START"), ICON_20D}
 };
 
+#ifndef VERSION_G8ME01_DEMO
 s32 msgWindowOpen_SE_Data[] = {
 	0x16, 0x17, 0x1A, 0x1B, 0x20, 0x21, 0x1C, 0x1D,
 	0x20, 0x21, 0x1C, 0x1D, 0x18, 0x19, 0x22, 0x23,
 	0x24, 0x25, 0x26, 0x27, 0x1E, 0x1F, -1, -1
 };
+#endif
 
 //.sbss
 MessageWork msgWork;
+#ifdef VERSION_G8ME01_DEMO
+static smartEntry msgEmptyText; // stands in for a message file that failed to load
+s32 msg_unused_sbss; // the demo has one more word here that nothing uses
+#endif
 BOOL msgSEflag; //msgSEInit and related functions are unused
 void* msgSortDvdData; //TODO: re-type
 u16 g5_active_s772;
 
 //.sdata
 MessageWork* msgw = &msgWork;
+#ifdef VERSION_G8ME01_DEMO
+static char msgEmptyString[] = ""; // the text of msgEmptyText
+#endif
 #ifdef VERSION_G8ME01
 const char* ErrMessage[7] = {R_no_messages_JP, R_no_messages_US, R_no_messages_DE, R_no_messages_FR,
                              R_no_messages_ES, R_no_messages_IT, R_no_messages_DU};
@@ -123,13 +147,22 @@ const char* ErrMessage[7] = {R_no_messages_JP, R_no_messages_US, R_no_messages_D
 const char* ErrMessage[2] = {R_no_messages_JP, R_no_messages_US};
 #endif
 const char* paperPoseTbl[6] = {
-	str_802C4ED8, str_802C4EE0, str_802C4EE8,
-	str_802C4EF0, str_802C4EF8, str_802C4F00
+	RSTR(str_802C4ED8, "PM_Y_1B"), RSTR(str_802C4EE0, "PM_Y_2B"), RSTR(str_802C4EE8, "PM_F_1B"),
+	RSTR(str_802C4EF0, "PM_F_3B"), RSTR(str_802C4EF8, "PM_C_1B"), RSTR(str_802C4F00, "PM_C_2B")
 };
 #ifdef VERSION_G8ME01
 const char* language_dir[7] = {"msg/JP", "msg/US", "msg/DE", "msg/FR", "msg/SP", "msg/IT", "msg/US"};
 #else
 const char* language_dir[2] = {STR(str_8041A4E4, "msg"), STR(str_8041A4E8, "emsg")};
+#endif
+
+#ifdef VERSION_G8ME01_DEMO
+// the demo's sound table follows the pose names in .data
+s32 msgWindowOpen_SE_Data[] = {
+	0x16, 0x17, 0x1A, 0x1B, 0x20, 0x21, 0x1C, 0x1D,
+	0x20, 0x21, 0x1C, 0x1D, 0x18, 0x19, 0x22, 0x23,
+	0x24, 0x25, 0x26, 0x27, 0x1E, 0x1F, -1, -1
+};
 #endif
 
 //local prototypes
@@ -149,6 +182,76 @@ void msgInit(void) {
 	msgLoad("global", 1);
 }
 
+#ifdef VERSION_G8ME01_DEMO
+// the demo loads the text into a smart heap block and points a missing file at an empty text
+void msgLoad(const char* filename, s32 index) {
+	MessageEntry* entry;
+	const char* str;
+	MsgLookupEntry* lookup;
+	const char* msgptr;
+	int i;
+	DVDEntry* dvd;
+	s32 msgcount;
+	u32 ofs;
+	char filepath[64];
+	char dvdpath[128];
+
+	entry = &msgw->entries[index];
+	sprintf(filepath, "./%s/%s.txt", language_dir[gp->language], filename);
+	if (entry->address) {
+		if (entry->address != &msgEmptyText) {
+			smartFree(entry->address);
+		}
+		entry->address = NULL;
+	}
+	entry->length = 0;
+	if (!entry->address) {
+		sprintf(dvdpath, STR(str_8041A6A4, "%s/%s"), getMarioStDvdRoot(), filepath);
+		dvd = DVDMgrOpen(dvdpath, 2, 0);
+		if (dvd) {
+			entry->length = DVDMgrGetLength(dvd);
+			entry->address = smartAlloc(OSRoundUp32B(entry->length), 0);
+			DVDMgrRead(dvd, entry->address->address, OSRoundUp32B(entry->length), 0);
+			DVDMgrClose(dvd);
+		}
+	}
+	if (!entry->address) {
+		entry->length = 0;
+		entry->address = &msgEmptyText;
+		msgEmptyText.address = msgEmptyString;
+	}
+	msgptr = MSG_TEXT(entry);
+	msgcount = 0;
+	while (*(s8*)msgptr) {
+		msgptr += strlen(msgptr) + 1;
+		msgcount++;
+	}
+	entry->count = msgcount / 2; //tag, message
+
+	if (!entry->count) {
+		entry->lookup = NULL;
+	}
+	else {
+		ofs = 0;
+		if (entry->lookup) {
+			smartFree(entry->lookup);
+		}
+		entry->lookup = smartAlloc(entry->count * sizeof(MsgLookupEntry), 0);
+		str = MSG_TEXT(entry);
+		lookup = entry->lookup->address;
+		for (i = 0; i < entry->count; i++, lookup++) {
+			lookup->startaddr = ofs;
+			ofs += strlen(str) + 1;
+			str += strlen(str) + 1;
+			lookup->endaddr = ofs;
+			ofs += strlen(str) + 1;
+			str += strlen(str) + 1;
+		}
+		msgSortDvdData = (void*)MSG_TEXT(entry);
+		qsort(entry->lookup->address, entry->count, sizeof(MsgLookupEntry), msg_compare);
+	}
+}
+#else
 void msgLoad(const char* filename, s32 index) {
 #ifdef VERSION_G8ME01
 	MessageEntry* entry;
@@ -276,6 +379,7 @@ void msgLoad(const char* filename, s32 index) {
 		qsort(entry->lookup->address, entry->count, sizeof(MsgLookupEntry), msg_compare);
 	}
 }
+#endif
 
 static inline void msgAddPage(smartEntry* smart, s32 y) {
 	MsgWinData* d = smart->address;
@@ -613,7 +717,7 @@ BOOL msgDisp(smartEntry* smart, u8 alpha, f32 x, f32 y) {
 					pos.x = EXT_LIT(float_28_8041a550, 20.0f) + (x + c->x);
 					pos.y = c->iconY + (c->y + (y + data->scrollPos) - 40.0f);
 					pos.z = EXT_LIT(float_0_8041a514, 0.0f);
-					iconDispGxAlpha(&pos, 0x10, (u16)c->value, a * al / 255, c->scale);
+					iconDispGxAlpha(&pos, ICON_FLAG_2D, (u16)c->value, a * al / 255, c->scale);
 					FontDrawStart_alpha(alpha);
 					FontDrawColor(col4);
 					break;
@@ -839,7 +943,9 @@ void msgAnalize(smartEntry* smart, char* msg) {
 	u16 ih;
 	f32 maxScale;
 	char* next;
+#ifndef VERSION_G8ME01_DEMO
 	BOOL isHM;
+#endif
 	s32 i;
 	s32 j;
 	s32 k;
@@ -900,6 +1006,11 @@ void msgAnalize(smartEntry* smart, char* msg) {
 	}
 
 	while (TRUE) {
+#ifdef VERSION_G8ME01_DEMO
+		// FAKE: dead guard (never runs) redefining y at the loop top; it gives y its own web there, so y is coloured
+		// before the other parse state as in the target (FAKES.md)
+		{ s32 gz = 0; if (gz != 0) { y = 0; } }
+#endif
 		check = *(( u8*)msg) ;
 #ifdef VERSION_G8ME01
 		if (_ismbblead((s8)check)) {
@@ -1215,20 +1326,27 @@ void msgAnalize(smartEntry* smart, char* msg) {
 				}
 #endif
 			} else if (strcmp(tag, "icon") == 0) {
+#ifndef VERSION_G8ME01_DEMO
 				isHM = FALSE;
+#endif
 				if ((( (s8) args [0] ) >= '0') && (((s8) args [0]) <= '9') ) {
 					sscanf(args, "%d%f%d%d%d", &iconId, &iconScale, &i38, &i34, &i30);
 				} else {
 					sscanf(args, "%s%f%d%d%d", name, &iconScale, &i38, &i34, &i30);
+#ifndef VERSION_G8ME01_DEMO
 					if (strcmp(name, "HM") == 0) {
 						isHM = TRUE;
 					}
+#endif
 					iconId = msgIconStr2ID(name);
 					if (iconId < 0) {
 						iconId = 0;
 					}
 				}
-				if (!isHM) {
+#ifndef VERSION_G8ME01_DEMO
+				if (!isHM)
+#endif
+				{
 					entry->value = iconId;
 					// FAKE: called through a u16-parameter cast (target passes clrlwi r5 with no extsh to the s16 parameter)
 					((void (*)(u16*, u16*, u16))iconGetWidthHight)(&iw, &ih, iconId);
@@ -1247,7 +1365,9 @@ void msgAnalize(smartEntry* smart, char* msg) {
 #endif
 					time += step;
 					data->charCount++;
-				} else {
+				}
+#ifndef VERSION_G8ME01_DEMO
+				else {
 #ifdef VERSION_G8ME01
 					if ((u32)gp->language == 0) {
 						glyph = kanjiSearch(0x94B5);
@@ -1288,6 +1408,7 @@ void msgAnalize(smartEntry* smart, char* msg) {
 					time += step;
 					data->charCount++;
 				}
+#endif
 			} else if (strcmp(tag, "anim") == 0) {
 				sscanf(args, "%s%s%d%d%f%d", anim1, anim2, &i28, &i24, &f1c, &i20);
 				entry->value = animPoseEntry(anim1, 2);
@@ -1482,9 +1603,9 @@ const char* msgSearch(const char* tag) {
 				if (index >= entry->count) {
 					break;
 				}
-				result = strcmp(tag, (const char*)entry->address + lookup[index].startaddr);
+				result = strcmp(tag, MSG_TEXT(entry) + lookup[index].startaddr);
 				if (!result) {
-					return (const char*)entry->address + lookup[index].endaddr;
+					return MSG_TEXT(entry) + lookup[index].endaddr;
 				}
 				if (result < 0) {
 					max = index - 1;
@@ -2062,6 +2183,7 @@ void msgWindow_Disp(CameraId camId, void* param) {
 			ret = msgDisp(window->userdata, window->alpha, EXT_LIT(float_62_8041a544, 62.0f) + window->x, window->y - 36.0f);
 		}
 		break;
+#ifndef VERSION_G8ME01_DEMO
 	case 2:
 	case 4:
 	case 10:
@@ -2069,6 +2191,12 @@ void msgWindow_Disp(CameraId camId, void* param) {
 		GXSetScissor(camera->scissor[0], ( EXT_LIT(float_240_8041a53c, 240.0f) - (window->y - 36.0f) ) - 2.0f, camera->scissor[2], 0x68);
 		ret = msgDisp(window->userdata, window->alpha, EXT_LIT(float_62_8041a544, 62.0f) + window->x, window->y - 36.0f);
 		break;
+#else
+	// the demo draws every signboard window the same way
+	case 2:
+	case 4:
+	case 10:
+#endif
 	case 7:
 		windowDispGX_Kanban(window->type, window->alpha, window->x, window->y, window->height, window->width);
 		GXSetScissor(camera->scissor[0], ( EXT_LIT(float_240_8041a53c, 240.0f) - (window->y - 36.0f) ) - 8.0f, camera->scissor[2], 0x7E);
@@ -2186,7 +2314,7 @@ void selectWindow_Disp(CameraId camId, void* param) {
 	data->cursorY += EXT_LIT(float_0p3_8041a528, 0.3f) * (window->y - (f32)(data->sel * 31 + 58) - data->cursorY);
 	pos.y = data->cursorY;
 	pos.z = EXT_LIT(float_0_8041a514, 0.0f);
-	iconDispGxAlpha(&pos, 0x14, ICON_1F0, window->alpha, EXT_LIT(float_1_8041a52c, 1.0f));
+	iconDispGxAlpha(&pos, ICON_FLAG_2D | ICON_FLAG_FLIP_X, ICON_1F0, window->alpha, EXT_LIT(float_1_8041a52c, 1.0f));
 }
 
 // target pad words (G5: section sizes must match or later DOL addresses shift)

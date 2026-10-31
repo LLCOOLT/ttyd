@@ -185,7 +185,11 @@ EVT_BEGIN(kpa_00_fly_evt)
     CALL_CHILD(PTR(evt_memcard_save))
 #endif
     CALL(evt_mario_set_mode, 0)
+#ifdef VERSION_G8ME01_DEMO
+    CALL(evt_fade_set_mapchange_type, 1, 57, 0, 56, 0)
+#else
     CALL(evt_fade_set_mapchange_type, 1, 59, 0, 58, 0)
+#endif
     CALL(evt_bero_mapchange, STRING("nok_01"), STRING("nokotarou"))
     RETURN
 EVT_END()

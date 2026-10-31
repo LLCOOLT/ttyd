@@ -6,6 +6,9 @@
 #undef LogoWork
 #endif
 #include "driver/arcdrv.h"
+#ifdef VERSION_G8ME01_DEMO
+#include "driver/animdrv.h"
+#endif
 #include "driver/effdrv.h"
 #include "driver/envdrv.h"
 #include "driver/fadedrv.h"
@@ -61,7 +64,26 @@ void progDisp(CameraId camId, void* param);
 static s32 logoAsyncFirst(void);
 #endif
 
-#ifndef VERSION_G8ME01
+#ifdef VERSION_G8ME01_DEMO
+// The demo always starts interlaced and preloads the E3 demo's models and textures.
+void seq_logoInit(SequenceWork* work) {
+	memset(wp, 0, sizeof(LogoWork));
+	wp->texture = fileAllocf(4, "%s/mariost.tpl", getMarioStDvdRoot());
+	wp->progressive = FALSE;
+	work->state = 0;
+	fileAsyncf(0, 0, "%s/b/first", getMarioStDvdRoot());
+	VIConfigure(&sRMObjHReso);
+	VIFlush();
+	VIWaitForRetrace();
+	animGroupBaseAsync("c_pkr", 0, NULL);
+	animGroupBaseAsync("c_pnk", 0, NULL);
+	animGroupBaseAsync("c_windy", 0, NULL);
+	animGroupBaseAsync("OFF_d_meku", 0, NULL);
+	animGroupBaseAsync("EFF_Mugi", 0, NULL);
+	fileAsyncf(4, 0, "%s/e3.tpl", getMarioStDvdRoot());
+}
+
+#elif !defined(VERSION_G8ME01)
 void seq_logoInit(SequenceWork* work) {
 	memset(wp, 0, sizeof(LogoWork));
 	wp->texture = fileAllocf(4, "%s/mariost.tpl", getMarioStDvdRoot());
@@ -182,6 +204,9 @@ void seq_logoExit(SequenceWork* work) {
 	effTexSetup();
 	marioPoseInit();
 	fileFree(wp->texture);
+#ifdef VERSION_G8ME01_DEMO
+	gp->flags |= 4;
+#endif
 }
 
 #ifndef VERSION_G8ME01
@@ -204,7 +229,10 @@ void seq_logoMain(SequenceWork* work) {
 			if (fadeIsFinish() && !wp->progressive) {
 				work->state++;
 				time = gp->renderTime;
+#ifndef VERSION_G8ME01_DEMO
+				// The demo sets this flag in seq_logoExit instead.
 				gp->flags |= 4;
+#endif
 			}
 			break;
 		
@@ -285,7 +313,11 @@ void seq_logoMain(SequenceWork* work) {
 		case 10:
 			VISetBlack(FALSE);
 			VIWaitForRetrace();
+#ifdef VERSION_G8ME01_DEMO
+			ret = fileAsyncf(0, 0, "%s/b/first", getMarioStDvdRoot());
+#else
 			ret = logoAsyncFirst();
+#endif
 			if (ret == 0U) {
 				ok = 0;
 			}
@@ -973,6 +1005,7 @@ void logoDisp(CameraId camId, void* param) {
 
 #ifndef VERSION_G8ME01
 //param is unused
+// The demo has this but loads the file directly in seq_logoInit and seq_logoMain.
 static s32 logoAsyncFirst(void) {
 	return fileAsyncf(0, 0, "%s/b/first", getMarioStDvdRoot());
 }
@@ -1106,7 +1139,9 @@ void progDisp(CameraId camId, void* param) {
 					wp->progressive = 0;
 					gp->flags &= ~8;
 				}
+#ifndef VERSION_G8ME01_DEMO
 				gp->flags |= 4;
+#endif
 				break;
 
 			case 4:

@@ -10,6 +10,9 @@
 #include "eff/eff_magic1_n64.h"
 
 
+u8 n_data[13] = {11, 11, 11, 11, 17, 11, 11, 21, 21, 21, 21, 21, 21};
+static u8 vx_data[13] = {20, 5, 20, 20, 10, 20, 20, 8, 8, 8, 1, 1, 1};
+
 static effN64Vtx size10x10_tex32x32_vtx[] = {
     {0, -5, 0, 0, 0, 0, 0, 0, 255},
     {10, -5, 0, 1024, 0, 0, 0, 0, 255},
@@ -85,9 +88,6 @@ static effN64Vtx size128x10_tex32x32_2_vtx[] = {
     {128, 5, 0, 0, 4096, 0, 0, 0, 255},
     {0, 5, 0, 1024, 4096, 0, 0, 0, 255},
 };
-u8 n_data[13] = {11, 11, 11, 11, 17, 11, 11, 21, 21, 21, 21, 21, 21};
-static u8 vx_data[13] = {20, 5, 20, 20, 10, 20, 20, 8, 8, 8, 1, 1, 1};
-
 void effPokopiPchargeMain(EffectEntry* effect);
 void effPokopiPchargeDisp(CameraId cameraId, EffectEntry* effect);
 

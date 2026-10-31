@@ -10,6 +10,13 @@
 #include "icon_ids.h"
 #include "pmario_sound.h"
 
+// The demo draws the action command icons with icon flag 4; retail uses 0x10.
+#ifdef VERSION_G8ME01_DEMO
+#define AC_ICON_FLAGS 4
+#else
+#define AC_ICON_FLAGS 0x10
+#endif
+
 #pragma optimize_for_size on
 
 typedef struct SklWork {
@@ -299,7 +306,7 @@ static void actionCommandDisp(f32 x, f32 y, s32 unused) {
             Vec p = {0.0f, 0.0f, 0.0f};
             p.x = -200.0f + x;
             p.y = 70.0f + y;
-            iconDispGx(&p, 0x10, ICON_079, 1.0f);
+            iconDispGx(&p, AC_ICON_FLAGS, ICON_079, 1.0f);
             break;
         }
         case 0x3E8:
@@ -307,12 +314,12 @@ static void actionCommandDisp(f32 x, f32 y, s32 unused) {
                 Vec p = {0.0f, 0.0f, 0.0f};
                 p.x = -200.0f + x;
                 p.y = 70.0f + y;
-                iconDispGx(&p, 0x10, ICON_078, 1.0f);
+                iconDispGx(&p, AC_ICON_FLAGS, ICON_078, 1.0f);
             } else {
                 Vec p = {0.0f, 0.0f, 0.0f};
                 p.x = -200.0f + x;
                 p.y = 70.0f + y;
-                iconDispGx(&p, 0x10, ICON_079, 1.0f);
+                iconDispGx(&p, AC_ICON_FLAGS, ICON_079, 1.0f);
             }
             break;
         default:
@@ -320,12 +327,12 @@ static void actionCommandDisp(f32 x, f32 y, s32 unused) {
                 Vec p = {0.0f, 0.0f, 0.0f};
                 p.x = -200.0f + x;
                 p.y = 70.0f + y;
-                iconDispGx(&p, 0x10, ICON_078, 1.0f);
+                iconDispGx(&p, AC_ICON_FLAGS, ICON_078, 1.0f);
             } else {
                 Vec p = {0.0f, 0.0f, 0.0f};
                 p.x = -200.0f + x;
                 p.y = 70.0f + y;
-                iconDispGx(&p, 0x10, ICON_079, 1.0f);
+                iconDispGx(&p, AC_ICON_FLAGS, ICON_079, 1.0f);
             }
             break;
     }
@@ -346,19 +353,19 @@ static void actionCommandDisp(f32 x, f32 y, s32 unused) {
         p.x = -288.0f + x;
         yy = 25.0f + y;
         p.y = yy;
-        iconDispGx(&p, 0x10, ICON_08F, 1.0f);
+        iconDispGx(&p, AC_ICON_FLAGS, ICON_08F, 1.0f);
     }
     for (i = 1; i < n; i++) {
         Vec p = {0.0f, 0.0f, 0.0f};
         p.x = x + (spacing * (f32)i + -288.0f);
         p.y = yy;
-        iconDispGx(&p, 0x10, ICON_08E, 1.0f);
+        iconDispGx(&p, AC_ICON_FLAGS, ICON_08E, 1.0f);
     }
     {
         Vec p = {0.0f, 0.0f, 0.0f};
         p.x = x + (spacing * (f32)i + -288.0f);
         p.y = yy;
-        iconDispGx(&p, 0x10, ICON_090, 1.0f);
+        iconDispGx(&p, AC_ICON_FLAGS, ICON_090, 1.0f);
     }
     stepX = 33.0f;
     if (ac->acFlags & 1) {
@@ -371,29 +378,29 @@ static void actionCommandDisp(f32 x, f32 y, s32 unused) {
                 Vec p = {0.0f, 0.0f, 0.0f};
                 p.x = x + (stepX * (f32)j + -258.0f);
                 p.y = yy;
-                iconDispGx(&p, 0x10, (u16)(ICON_092 + j), 1.0f);
+                iconDispGx(&p, AC_ICON_FLAGS, (u16)(ICON_092 + j), 1.0f);
             } else {
                 Vec p = {0.0f, 0.0f, 0.0f};
                 p.x = x + (stepX * (f32)j + -258.0f);
                 p.y = yy;
-                iconDispGx(&p, 0x10, ICON_094, 1.0f);
+                iconDispGx(&p, AC_ICON_FLAGS, ICON_094, 1.0f);
             }
         } else {
             Vec p = {0.0f, 0.0f, 0.0f};
             p.x = x + (stepX * (f32)j + -258.0f);
             p.y = yy;
-            iconDispGx(&p, 0x10, ICON_091, 0.5f);
+            iconDispGx(&p, AC_ICON_FLAGS, ICON_091, 0.5f);
         }
     }
     if (idx < count) {
         Vec p = {0.0f, 0.0f, 0.0f};
         p.x = x + (stepX * (f32)m + -250.0f);
         p.y = yy;
-        iconDispGx(&p, 0x10, ICON_091, 1.0f);
+        iconDispGx(&p, AC_ICON_FLAGS, ICON_091, 1.0f);
     } else {
         Vec p = {0.0f, 0.0f, 0.0f};
         p.x = x + (stepX * (f32)m + -250.0f);
         p.y = yy;
-        iconDispGx(&p, 0x10, ICON_095, 1.0f);
+        iconDispGx(&p, AC_ICON_FLAGS, ICON_095, 1.0f);
     }
 }

@@ -115,7 +115,11 @@ static USER_FUNC(evtflash) {
     }
     switch (event->userdata[2]) {
         case 0:
+#ifdef VERSION_G8ME01_DEMO
+            fadeEntry(8, 20, (GXColor){0xFF, 0xFF, 0xFF, 0xFF});
+#else
             fadeEntry(10, 20, (GXColor){0xFF, 0xFF, 0xFF, 0xFF});
+#endif
             event->userdata[2]++;
         case 1:
             if (fadeIsFinish() != TRUE) {
@@ -135,7 +139,11 @@ static USER_FUNC(evtflash) {
             event->userdata[2]++;
             return EVT_RETURN_BLOCK;
         case 3:
+#ifdef VERSION_G8ME01_DEMO
+            fadeEntry(7, 80, (GXColor){0xFF, 0xFF, 0xFF, 0xFF});
+#else
             fadeEntry(9, 80, (GXColor){0xFF, 0xFF, 0xFF, 0xFF});
+#endif
             event->userdata[2]++;
         case 4:
             if (fadeIsFinish() != TRUE) {
@@ -296,7 +304,11 @@ EVT_BEGIN(dai3_kanbu)
     SET_VALUE(GSW(0), 108)
     CALL(evt_snd_bgmoff, 513)
     CALL(evt_snd_bgmon, 288, 0)
+#ifdef VERSION_G8ME01_DEMO
+    CALL(evt_fade_set_mapchange_type, 0, 2, 500, 7, 500)
+#else
     CALL(evt_fade_set_mapchange_type, 0, 2, 500, 9, 500)
+#endif
     CALL(evt_bero_mapchange, STRING("mri_14"), STRING("w_bero"))
     RETURN
 EVT_END()
@@ -477,7 +489,9 @@ EVT_END()
 
 EVT_BEGIN(time_bomb)
     CALL(evt_mario_key_onoff, 0)
+#ifndef VERSION_G8ME01_DEMO
     CALL(evt_mario_normalize)
+#endif
     SET_VALUE(GF(10), 0)
     WAIT_WHILE(GF(15))
     WAIT_MS(1000)
@@ -541,11 +555,13 @@ EVT_BEGIN(time_bomb)
     CALL(evt_snd_sfxoff, LW(11))
     CALL(evt_cam3d_evt_set, 200, 305, -33, 0, 140, -338, 1000, 11)
     WAIT_MS(2000)
+#ifndef VERSION_G8ME01_DEMO
     CALL(evt_party_stop, 0)
     CALL(evt_mario_set_pos, 0, 0, -89)
     CALL(evt_mario_set_dir, 90, 0, 0)
     CALL(evt_party_set_pos, 0, -50, 0, -89)
     CALL(evt_party_set_dir, 0, 90, 0)
+#endif
     BEGIN_INLINE_EVENT
         CALL(evt_eff64, STRING("ripple00"), STRING("ripple_n64"), 0, 0, 150, -340, 0, 0, 0, 0, 0, 0, 0, 0)
         WAIT_MS(400)
@@ -555,7 +571,11 @@ EVT_BEGIN(time_bomb)
         WAIT_MS(400)
     END_INLINE_EVENT
     CALL(evt_snd_sfxon, STRING("SFX_STG2_STARSTONE_APPEAR1"), 0)
+#ifdef VERSION_G8ME01_DEMO
+    CALL(evt_item_entry, STRING("item00"), 115, 0, 120, -340, 15, -1, 0)
+#else
     CALL(evt_item_entry, STRING("item00"), 115, 0, 120, -340, 16, -1, 0)
+#endif
     CALL(evt_item_flag_on, STRING("item00"), 2)
     SET_VALUE(LW(0), STRING("item00"))
     SET_VALUE(GW(10), 0)
@@ -568,6 +588,13 @@ EVT_BEGIN(time_bomb)
     CALL(evt_item_move_3d_position, STRING("item00"), 0, 400, -340, 750, 0)
     CALL(evt_item_set_position, STRING("item00"), 0, -1000, 0)
     WAIT_MS(500)
+#ifdef VERSION_G8ME01_DEMO
+    CALL(evt_mario_get_pos, 0, LW(0), LW(1), LW(2))
+    ADD(LW(0), 30)
+    CALL(evt_party_set_pos, 0, LW(0), LW(1), LW(2))
+    CALL(evt_party_set_dir, 0, 270, -1)
+    CALL(evt_mario_set_dir, 270, 0, 0)
+#endif
     CALL(evt_puni_set_dir, 1, 270)
     CALL(evt_cam3d_evt_set, 200, 213, 91, 0, 60, -215, 500, 11)
     WAIT_MS(500)
@@ -687,6 +714,9 @@ EVT_BEGIN(time_bomb)
     CALL_CHILD(PTR(npc_dokan))
     WAIT_MS(2000)
     CALL(evt_cam3d_evt_set, 0, 105, 269, 0, 45, -76, 0, 11)
+#ifdef VERSION_G8ME01_DEMO
+    CALL(evt_party_set_dir, 0, 270, -1)
+#endif
     WAIT_MS(200)
     CALL(evt_msg_print_party, STRING("stg2_mri_e23_05"))
     CALL(evt_cam3d_evt_off, 300, 11)
@@ -700,7 +730,9 @@ EVT_BEGIN(time_bomb)
         END_IF
     END_LOOP
     SET_VALUE(GSW(0), 109)
+#ifndef VERSION_G8ME01_DEMO
     CALL(evt_party_run, 0)
+#endif
     CALL(evt_mario_key_onoff, 1)
     RETURN
 EVT_END()
@@ -828,6 +860,14 @@ static EVT_BEGIN(punipuni_ball00)
         SET_VALUE(GF(15), 1)
         CALL_CHILD(PTR(mri_punipuni_itemset))
         SET_VALUE(GF(15), 0)
+#ifdef VERSION_G8ME01_DEMO
+        IF_INT_EQUAL(GSW(0), 108)
+        CALL(evt_mario_key_onoff, 1)
+        SET_VALUE(GF(10), 1)
+        SPAWN_EVENT(PTR(punipuni_mario_halt))
+        RETURN
+        END_IF
+#endif
         ELSE
         SET_VALUE(GSWF(2863), 0)
         CALL(evt_mapobj_flag_onoff, 1, 1, STRING("S_sui_hikari"), 1)

@@ -265,30 +265,30 @@ static void actionCommandDisp(f32 x, f32 y, s32 n) {
         Vec pos = {0.0f, 0.0f, 0.0f};
         pos.x = -168.0f + x;
         pos.y = 70.0f + y;
-        iconDispGx(&pos, 0x10, ICON_071, 1.0f);
+        iconDispGx(&pos, ICON_DISP_2D, ICON_071, 1.0f);
     } else {
         Vec pos = {0.0f, 0.0f, 0.0f};
         pos.x = -168.0f + x;
         pos.y = 70.0f + y;
-        iconDispGx(&pos, 0x10, ICON_070, 1.0f);
+        iconDispGx(&pos, ICON_DISP_2D, ICON_070, 1.0f);
     }
     if (n < 3) {
         Vec pos = {0.0f, 0.0f, 0.0f};
         pos.x = -232.0f + x;
         pos.y = 70.0f + y;
-        iconDispGx(&pos, 0x10, ICON_078, 1.0f);
+        iconDispGx(&pos, ICON_DISP_2D, ICON_078, 1.0f);
     } else {
         Vec pos = {0.0f, 0.0f, 0.0f};
         pos.x = -232.0f + x;
         pos.y = 70.0f + y;
-        iconDispGx(&pos, 0x10, ICON_079, 1.0f);
+        iconDispGx(&pos, ICON_DISP_2D, ICON_079, 1.0f);
     }
     {
         Vec pos = {0.0f, 0.0f, 0.0f};
         pos.x = -200.0f + x;
         y = 25.0f + y;
         pos.y = y;
-        iconDispGx(&pos, 0x10, ICON_08E, 1.0f);
+        iconDispGx(&pos, ICON_DISP_2D, ICON_08E, 1.0f);
     }
     i = 0;
     off = 0;
@@ -297,24 +297,24 @@ static void actionCommandDisp(f32 x, f32 y, s32 n) {
             Vec pos = {0.0f, 0.0f, 0.0f};
             pos.x = x + (f32)(off - 0x102);
             pos.y = y;
-            iconDispGx(&pos, 0x10, ICON_092 + i, 1.0f);
+            iconDispGx(&pos, ICON_DISP_2D, ICON_092 + i, 1.0f);
         } else {
             Vec pos = {0.0f, 0.0f, 0.0f};
             pos.x = x + (f32)(off - 0x102);
             pos.y = y;
-            iconDispGx(&pos, 0x10, ICON_091, 0.5f);
+            iconDispGx(&pos, ICON_DISP_2D, ICON_091, 0.5f);
         }
     }
     if (n < 3) {
         Vec pos = {0.0f, 0.0f, 0.0f};
         pos.x = -151.0f + x;
         pos.y = y;
-        iconDispGx(&pos, 0x10, ICON_091, 1.0f);
+        iconDispGx(&pos, ICON_DISP_2D, ICON_091, 1.0f);
     } else {
         Vec pos = {0.0f, 0.0f, 0.0f};
         pos.x = -151.0f + x;
         pos.y = y;
-        iconDispGx(&pos, 0x10, ICON_095, 1.0f);
+        iconDispGx(&pos, ICON_DISP_2D, ICON_095, 1.0f);
     }
 }
 #pragma optimize_for_size reset

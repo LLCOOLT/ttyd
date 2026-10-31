@@ -28,18 +28,28 @@ typedef struct ChuchuParty {
     u8 state;                  // 0x39
     u8 pad3A;                  // 0x3A
     u8 moveMode;               // 0x3B
+#ifdef VERSION_G8ME01_DEMO
+    u8 pad3C[0x54 - 0x3C];     // 0x3C, the demo PartyEntry is 4 bytes shorter here
+#else
     u8 pad3C[0x58 - 0x3C];     // 0x3C
+#endif
     Vec position;              // 0x58
     u8 pad64[0x94 - 0x64];     // 0x64
     Vec target;                // 0x94
+#ifdef VERSION_G8ME01_DEMO
+    u8 padA0[0xD8 - 0x9C];     // 0xA0, the demo PartyEntry is 0x14 shorter here
+#else
     u8 padA0[0xF0 - 0xA0];     // 0xA0
+#endif
     f32 height;                // 0xF0
     f32 width;                 // 0xF4
     f32 camDir;                // 0xF8
     f32 moveDir;               // 0xFC
     f32 targetDir;             // 0x100
     f32 moveSpeed;             // 0x104
-    u8 pad108[0x10C - 0x108];  // 0x108
+#ifndef VERSION_G8ME01_DEMO
+    u8 pad108[0x10C - 0x108];  // 0x108, PartyEntry.targetSpeed (not in the demo)
+#endif
     f32 displayDirection;      // 0x10C
     f32 displayDirectionTarget;  // 0x110
     f32 velY;                  // 0x114
@@ -64,15 +74,22 @@ extern void partyUpdMoveSpd(PartyEntry* party);
 extern void* effFukidashiEntry(s32 a, s32 b, s32 c, f32 d, f32 e, f32 f, f32 g, f32 h, s32 frames);
 extern void* itemNearDistCheck(f32 x, f32 y, f32 z, f32 range);
 extern void* mobjNearDistCheck2(f32 x, f32 y, f32 z, f32 range, char** names);
+#ifdef VERSION_G8ME01_DEMO
+extern MapObjectEntry* mobjNearDistCheck(f32 x, f32 y, f32 z, f32 range);
+extern s32 mobjCheckKururingFloorItem(MapObjectEntry* mobj);
+extern s32 mobjCheckItemboxOpen(MapObjectEntry* mobj);
+#endif
 extern USER_FUNC(evt_msg_print);
 
 
 char* mobj_list[] = {
+#ifndef VERSION_G8ME01_DEMO
     "MOBJ_TreasureBox",
     "MOBJ_BigTreasureBox",
     "MOBJ_GrayTreasureBox",
     "MOBJ_BlackTreasureBox",
     "MOBJ_KururinFloor",
+#endif
     "MOBJ_HatenaBlock",
     "MOBJ_BadgeBlock",
     "MOBJ_10CountBlock",
@@ -101,6 +118,7 @@ EVT_BEGIN(msg_evt)
     RETURN
 EVT_END()
 
+#ifndef VERSION_G8ME01_DEMO
 ChuchuTreasure chuchu_treasure_tbl[] = {
     {"hei_00", 0xF840715E, -468, 139, -127},
     {"hei_00", 0xF8406272, -408, 139, -127},
@@ -144,6 +162,7 @@ ChuchuTreasure chuchu_treasure_tbl[] = {
     {"tou_05", 0xF8407179, 100, 0, -28},};
 
 static const Vec vecB = {0.0f, 0.0f, 0.0f};
+#endif
 
 USER_FUNC(search_result) {
     PartyEntry* party = partyGetPtr(marioGetPartyId());
@@ -152,12 +171,14 @@ USER_FUNC(search_result) {
         if ((u32)event->lwData[0] == 0 || event->lwData[1] == 0) {
             return EVT_RETURN_DONE;
         }
+#ifndef VERSION_G8ME01_DEMO
         if (event->lwData[1] == 1) {
             if (party) {
                 effFukidashiEntry(6, 0, -2, 0.0f, 18.0f, 0.0f, 0.0f, 0.0f, sysMsec2Frame(1500));
             }
             return EVT_RETURN_DONE;
         }
+#endif
         psndSFXOn_3D((const char*)0x945, &party->position);
         event->userdata3 = 42;
         partyChgPose(party, "PCH_Y_1");
@@ -172,6 +193,52 @@ USER_FUNC(search_result) {
     return EVT_RETURN_DONE;
 }
 
+#ifdef VERSION_G8ME01_DEMO
+// The demo stops at the first item or block in range and has no buried treasure table.
+USER_FUNC(set_msg) {
+    int pass;
+    ChuchuParty* cp = (ChuchuParty*)partyGetPtr(marioGetPartyId());
+    MarioWork* player = cp->player;
+    PartyEntry* party = (PartyEntry*)cp;
+    ItemEntry* item;
+    MapObjectEntry* mobj;
+    f32 range;
+
+    event->lwData[0] = 0;
+    event->lwData[1] = 0;
+    if (!party) {
+        return EVT_RETURN_DONE;
+    }
+    for (pass = 0; pass < 2; pass++) {
+        if (pass == 0) {
+            range = 150.0f;
+        } else {
+            range = 10000.0f;
+        }
+        item = itemNearDistCheck(player->position.x, player->position.y, player->position.z, range);
+        if (item) {
+            event->lwData[0] = (EvtWord)(pass == 0 ? "map_exist_near" : "map_exist_far");
+            event->lwData[1] = (pass == 0) + 1;
+            cp->displayDirectionTarget = (revise360(angleABf(cp->position.x, cp->position.z, item->position.x, item->position.z) - cp->camDir) <= 180.0f) ? 180.0f : 0.0f;
+            cp->moveDir = partyToMovedir(party, cp->displayDirectionTarget);
+            cp->targetDir = cp->moveDir;
+            return EVT_RETURN_DONE;
+        }
+        mobj = mobjNearDistCheck2(player->position.x, player->position.y, player->position.z, range, mobj_list);
+        if (mobj) {
+            event->lwData[0] = (EvtWord)(pass == 0 ? "map_exist_near" : "map_exist_far");
+            event->lwData[1] = (pass == 0) + 1;
+            cp->displayDirectionTarget = (revise360(angleABf(cp->position.x, cp->position.z, mobj->position.x, mobj->position.z) - cp->camDir) <= 180.0f) ? 180.0f : 0.0f;
+            cp->moveDir = partyToMovedir(party, cp->displayDirectionTarget);
+            cp->targetDir = cp->moveDir;
+            return EVT_RETURN_DONE;
+        }
+    }
+    event->lwData[0] = (EvtWord)"map_no_exist";
+    event->lwData[1] = 0;
+    return EVT_RETURN_DONE;
+}
+#else
 static inline int chuchu_findTreasure2(ChuchuParty* cpp, f32 range, Vec* bestPos) {
     u32 i;
     int found;
@@ -291,6 +358,7 @@ USER_FUNC(set_msg) {
     }
     return EVT_RETURN_DONE;
 }
+#endif
 
 USER_FUNC(post_msg) {
     PartyEntry* party = partyGetPtr(marioGetPartyId());
@@ -302,6 +370,33 @@ USER_FUNC(post_msg) {
     return EVT_RETURN_DONE;
 }
 
+#ifdef VERSION_G8ME01_DEMO
+BOOL chuchu_searchObject(void) {
+    char** name;
+    ChuchuParty* cp = (ChuchuParty*)partyGetPtr(marioGetPartyId());
+    MapObjectEntry* mobj;
+    MarioWork* player = cp->player;
+
+    if (itemNearDistCheck(player->position.x, player->position.y, player->position.z, 150.0f)) {
+        return TRUE;
+    }
+    mobj = mobjNearDistCheck(player->position.x, player->position.y, player->position.z, 150.0f);
+    if (mobj) {
+        if (mobjCheckItemboxOpen(mobj) == 1) {
+            return TRUE;
+        }
+        if (mobjCheckKururingFloorItem(mobj) == 2) {
+            return TRUE;
+        }
+        for (name = mobj_list; *name != NULL; name++) {
+            if (strcmp(mobj->animName, *name) == 0) {
+                return TRUE;
+            }
+        }
+    }
+    return FALSE;
+}
+#else
 static inline int chuchu_findTreasure(ChuchuParty* cpp, f32 range) {
     u32 i;
     int found;
@@ -349,6 +444,7 @@ BOOL chuchu_searchObject(void) {
     }
     return chuchu_findTreasure(cp, 150.0f) != 0;
 }
+#endif
 
 void chuchu_init(PartyEntry* party) {
     ChuchuParty* cp = (ChuchuParty*)party;
@@ -371,7 +467,9 @@ void chuchu_move(PartyEntry* party) {
         party->flags &= ~0x100;
         partyWalkInit(party, 1);
     }
+#ifndef VERSION_G8ME01_DEMO
     partyUpdMoveSpd(party);
+#endif
     partyWalkMain(party);
 }
 

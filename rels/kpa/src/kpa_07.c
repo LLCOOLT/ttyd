@@ -737,7 +737,11 @@ EVT_BEGIN(kpa_07_evt)
     SET_VALUE(LW(0), 18)
     CALL_CHILD(PTR(evt_memcard_save))
     CALL(evt_mario_set_mode, 0)
+#ifdef VERSION_G8ME01_DEMO
+    CALL(evt_fade_set_mapchange_type, 1, 57, 0, 56, 0)
+#else
     CALL(evt_fade_set_mapchange_type, 1, 59, 0, 58, 0)
+#endif
     CALL(evt_bero_mapchange, STRING("gor_04"), STRING("resha_return"))
     RETURN
 EVT_END()

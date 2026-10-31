@@ -1,4 +1,5 @@
 #pragma optimize_for_size on
+#include "driver/fadedrv.h"
 #include "eff/eff_starstone.h"
 #include "battle/battle.h"
 #include "driver/dispdrv.h"
@@ -21,6 +22,20 @@
 #include "party/party_motion.h"
 #include "battle/sac/sac_zubastar.h"
 #include "battle/battle_database_common.h"
+
+// The demo draws these icons with icon flag 4; retail uses 0x10.
+#ifdef VERSION_G8ME01_DEMO
+#define ICON_DISP_FLAGS 4
+#else
+#define ICON_DISP_FLAGS 0x10
+#endif
+
+// The fade types used here are two lower in the demo.
+#ifdef VERSION_G8ME01_DEMO
+#define FADE_TYPE(n) ((n) - 2)
+#else
+#define FADE_TYPE(n) (n)
+#endif
 
 void BattleAcDrawGauge(s32 x, s32 y, s32 icon, f32 ratio, s32 a, s32 b, s32 c, s32 d, s32 e);
 #define INTPL(m, c, n, a, b) ((f32 (*)(f32, f32, s32, s32, s32))intplGetValue)(a, b, m, c, n)
@@ -495,8 +510,13 @@ USER_FUNC(zubastar_main) {
 				n++;
 			}
 		}
+#ifdef VERSION_G8ME01_DEMO
+		top[n] = 364.0f;
+		bot[n] = 304.0f;
+#else
 		top[n] = 344.0f;
 		bot[n] = 264.0f;
+#endif
 		for (i = 0; i < n; i++) {
 			for (j = i + 1; j < n + 1; j++) {
 				if (top[i] > top[j]) {
@@ -644,7 +664,13 @@ USER_FUNC(zubastar_main) {
 		if (w->ltimer >= 15) {
 			w->cursor.timer = 27;
 			w->cursor.f4 = 0;
+#ifdef VERSION_G8ME01_DEMO
+			// The demo flashes the screen from here; retail leaves it to marioAttackEvent_ZubaStar.
+			fadeEntry(FADE_TYPE(17), 1, (GXColor){0xFF, 0xFF, 0xFF, 0xFF});
+			btl_camera_shake_h(0, 5.0f, 0.0f, 30, 0);
+#else
 			btl_camera_shake_h(0, 8.0f, 0.0f, 30, 0);
+#endif
 		}
 		break;
 	case 27:
@@ -653,6 +679,9 @@ USER_FUNC(zubastar_main) {
 		break;
 	case 28:
 		w->cursor.timer = 30;
+#ifdef VERSION_G8ME01_DEMO
+		fadeEntry(FADE_TYPE(16), 150, (GXColor){0xFF, 0xFF, 0xFF, 0xFF});
+#endif
 	case 30:
 		w->cursor.pos = (Vec){0.0f, -1000.0f, 0.0f};
 		break;
@@ -913,7 +942,7 @@ static inline void
 dispA(Mtx m, s32 i) {
 	GXColor ca = {0xff, 0xff, 0xff, 0};
 	ca.a = 0xff - (i + 1) * 50;
-	iconDispGxCol(m, 0x10, ICON_19D, ca);
+	iconDispGxCol(m, ICON_DISP_FLAGS, ICON_19D, ca);
 }
 
 void zubastar_disp2D(CameraId cam, void* param) {
@@ -926,7 +955,7 @@ void zubastar_disp2D(CameraId cam, void* param) {
 		Vec pos = {0.0f, 0.0f, 0.0f};
 		pos.x = w->gaugePos.x - 200.0f;
 		pos.y = 60.0f + w->gaugePos.y;
-		((void (*)(Vec*, s16, s32, f32))iconDispGx)(&pos, 0x10, icon, 1.0f);
+		((void (*)(Vec*, s16, s32, f32))iconDispGx)(&pos, ICON_DISP_FLAGS, icon, 1.0f);
 		BattleAcDrawGauge(w->gaugePos.x, w->gaugePos.y, 0xb1, 0.01f * w->gauge, 4, 0x1a, 0x34, 0x4e, 0);
 	}
 	GXSetCullMode(GX_CULL_NONE);
@@ -959,7 +988,7 @@ void zubastar_disp2D(CameraId cam, void* param) {
 			GXPosition3f32(l->x1, l->y1, 0.0f);
 		}
 	}
-	iconDispGx(&cur->pos, 0x10, ICON_19D, 1.0f);
+	iconDispGx(&cur->pos, ICON_DISP_FLAGS, ICON_19D, 1.0f);
 	if (cur->timer >= 25 && cur->timer < 30) {
 		for (i = 0; i < 4; i++) {
 			Mtx m;
@@ -1011,9 +1040,9 @@ EVT_BEGIN(marioAttackEvent_ZubaStar)
     CALL(sac_ac_help_off)
     CALL(sac_handbeat_end)
     BEGIN_SIBLING_EVENT
-        CALL(evt_fade_entry, 17, 1, 255, 255, 255)
+        CALL(evt_fade_entry, FADE_TYPE(17), 1, 255, 255, 255)
         WAIT_MS(100)
-        CALL(evt_fade_entry, 16, 250, 255, 255, 255)
+        CALL(evt_fade_entry, FADE_TYPE(16), 250, 255, 255, 255)
     END_SIBLING_EVENT
     BEGIN_INLINE_EVENT
         CALL(evt_btl_camera_shake_h, 0, 10, 0, 60, 0)

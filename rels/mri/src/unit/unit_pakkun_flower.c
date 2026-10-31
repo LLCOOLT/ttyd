@@ -100,7 +100,11 @@ static BattleUnitDefense defence = {0};
 
 static BattleUnitDefenseAttr defence_attr = {0};
 
+#ifdef VERSION_G8ME01_DEMO
+static StatusVulnerability regist = {80, 80, 60, 100, 75, 100, 100, 80, 100, 70, 100, 70, 100, 70, 70, 20, 30, 100, 70, 100, 100, 30};
+#else
 static StatusVulnerability regist = {100, 70, 40, 100, 80, 100, 100, 60, 100, 85, 100, 85, 100, 85, 70, 10, 30, 100, 70, 100, 100, 30};
+#endif
 
 static BattleUnitKindPart parts[] = {
     {
@@ -194,8 +198,13 @@ static PoseTableEntry pose_table[] = {
     {42, "PKF_S_1"},
     {56, "PKF_X_1"},
     {57, "PKF_X_1"},
+#ifdef VERSION_G8ME01_DEMO
+    {63, "PKF_T_1"},
+    {67, "PKF_S_1"},
+#else
     {65, "PKF_T_1"},
     {69, "PKF_S_1"},
+#endif
 };
 
 static PoseTableEntry pose_table_ceil[] = {
@@ -215,8 +224,13 @@ static PoseTableEntry pose_table_ceil[] = {
     {42, "PKF_S_3"},
     {56, "PKF_X_2"},
     {57, "PKF_X_2"},
+#ifdef VERSION_G8ME01_DEMO
+    {63, "PKF_S_3"},
+    {67, "PKF_S_3"},
+#else
     {65, "PKF_S_3"},
     {69, "PKF_S_3"},
+#endif
 };
 
 static BattleDataEntry data_table[] = {

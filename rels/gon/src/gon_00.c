@@ -90,7 +90,9 @@ static BeroEntry e3_bero[] = {
 };
 
 EVT_BEGIN(gon_00_init_evt)
+#ifndef VERSION_G8ME01_DEMO
     SET_VALUE(GSWF(255), 1)
+#endif
     SET_VALUE(LW(0), PTR(bero_entry_data))
     CALL(evt_bero_get_info)
     CALL_CHILD(PTR(evt_bero_info_run))

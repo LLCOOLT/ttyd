@@ -106,7 +106,9 @@ static USER_FUNC(senkaronFlagOffMesPushing);
 static USER_FUNC(senkaronFlagOnMesPushing);
 static USER_FUNC(senkaronGetMarioPushedFlag);
 static USER_FUNC(senkaronToEscape);
+#ifndef VERSION_G8ME01_DEMO
 USER_FUNC(leader_touch_check);
+#endif
 void nokotaro_callback(s32 type);
 static f32 randf(f32 min, f32 max);
 static void senkaron_ext_init(void);
@@ -467,8 +469,13 @@ static EVT_BEGIN(senkaron_event)
         END_SIBLING_EVENT
         LOOP(0)
             WAIT_FRAMES(1)
+#ifdef VERSION_G8ME01_DEMO
+            CALL(evt_mario_get_pos, 0, LW(0), LW(1), LW(2))
+            IF_INT_GREATER_OR_EQUAL(LW(0), 350)
+#else
             CALL(leader_touch_check)
             IF_INT_GREATER_OR_EQUAL(LW(0), 1)
+#endif
                 BREAK_LOOP
             END_IF
             CALL(evt_mario_get_pos, 0, LW(0), LW(1), LW(2))
@@ -502,7 +509,11 @@ static EVT_BEGIN(senkaron_event)
                 CALL(evt_mario_get_pos, 0, LW(0), LW(1), LW(2))
                 ADD(LW(1), 50)
                 CALL(evt_fade_set_spot_pos, LW(0), LW(1), LW(2))
+#ifdef VERSION_G8ME01_DEMO
+                CALL(evt_fade_set_mapchange_type, 0, 4, 500, 7, 300)
+#else
                 CALL(evt_fade_set_mapchange_type, 0, 4, 500, 9, 300)
+#endif
                 CALL(evt_bero_mapchange, STRING("gon_01"), STRING("e_bero"))
             END_IF
         END_LOOP
@@ -554,7 +565,11 @@ EVT_BEGIN(gon_03_init_evt)
         SPAWN_EVENT(PTR(tegami_event))
     END_IF
     IF_INT_LESS(GSW(0), 46)
+#ifdef VERSION_G8ME01_DEMO
+        CALL(evt_item_entry, STRING("key00"), 12, 200, 0, -200, 15, -1, PTR(key_get))
+#else
         CALL(evt_item_entry, STRING("key00"), 12, 200, 0, -200, 16, -1, PTR(key_get))
+#endif
     END_IF
     CALL(evt_npc_entry, STRING("\"カロン2\""), STRING("c_karon_g"))
     CALL(evt_npc_set_position, STRING("\"カロン2\""), -150, 0, 130)
@@ -735,6 +750,7 @@ void nokotaro_callback(s32 type) {
     }
 }
 
+#ifndef VERSION_G8ME01_DEMO
 USER_FUNC(leader_touch_check) {
     NpcEntry* npc = marioGetTouchNpcPtr();
     BOOL off = FALSE;
@@ -752,6 +768,7 @@ USER_FUNC(leader_touch_check) {
     }
     return EVT_RETURN_DONE;
 }
+#endif
 
 #pragma dont_inline on
 static f32 randf(f32 min, f32 max) {

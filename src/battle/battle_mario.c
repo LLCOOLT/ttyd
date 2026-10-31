@@ -47,7 +47,6 @@ f32 cosfd(f32);
 #include "battle/battle_database_common.h"
 static USER_FUNC(_get_mario_hammer_lv);
 
-
 USER_FUNC(_battle_majinai_effect);
 USER_FUNC(_majinai_powerup_check);
 USER_FUNC(btlevtcmd_ACSuccessEffect);
@@ -113,6 +112,13 @@ BattleWeapon marioWeapon_KururinJump2;
 BattleWeapon marioWeapon_JyabaraJump;
 BattleWeapon marioWeapon_JyabaraJumpFailed;
 BattleWeapon marioDefaultWeapon_FirstAttackKaitenHammer;
+// DEMO_PICK(demo, retail): the value in the 2004 demo, or the retail value.
+#ifdef VERSION_G8ME01_DEMO
+#define DEMO_PICK(demo, retail) (demo)
+#else
+#define DEMO_PICK(demo, retail) (retail)
+#endif
+
 BattleWeapon marioDefaultWeapon_FirstAttackUltraHammer;
 BattleWeapon marioDefaultWeapon_Hammer;
 BattleWeapon marioWeapon_KaitenHammer;
@@ -347,7 +353,6 @@ BattleWeapon marioWeapon_KururinJump = {
     {0, 0, 0, 100, 0, 2, 5, 1, 1, 0, 0, 0}, // stageEffectRates
 };
 #endif
-
 
 #ifdef VERSION_G8ME01
 BattleWeapon marioWeapon_KururinJump2 = {
@@ -629,7 +634,7 @@ BattleWeapon marioDefaultWeapon_FirstAttackUltraHammer = {
     1, // mBingoSlotChance
     1, // reserved_1B
     weaponGetPowerFromMarioHammerLv, // hpDamageFn
-    {1, 2, 2, 4, 3, 6, 0, 0}, // hpDamageWork
+    {1, 2, 2, 4, DEMO_PICK(4, 3), DEMO_PICK(8, 6), 0, 0}, // hpDamageWork
     NULL, // fpDamageFn
     {0}, // fpDamageWork
     0x1101260, // targetClassFlags
@@ -819,8 +824,8 @@ BattleWeapon marioWeapon_KaitenHammerInvolved = {
     {1, 0, 0, 0, 0, 0, 0, 0}, // hpDamageWork
     NULL, // fpDamageFn
     {0}, // fpDamageWork
-    0x2100060, // targetClassFlags
-    0x20102000, // targetPropertyFlags
+    DEMO_PICK(0x2100260, 0x2100060), // targetClassFlags
+    DEMO_PICK(0x20002000, 0x20102000), // targetPropertyFlags
     0, // element
     15, // damagePattern
     3, // acLevel
@@ -929,8 +934,8 @@ BattleWeapon marioWeapon_UltraHammerInvolved = {
     {3, 0, 0, 0, 0, 0, 0, 0}, // hpDamageWork
     NULL, // fpDamageFn
     {0}, // fpDamageWork
-    0x2100060, // targetClassFlags
-    0x20102000, // targetPropertyFlags
+    DEMO_PICK(0x2100260, 0x2100060), // targetClassFlags
+    DEMO_PICK(0x20002000, 0x20102000), // targetPropertyFlags
     0, // element
     17, // damagePattern
     3, // acLevel
@@ -1428,7 +1433,7 @@ BattleWeapon badgeWeapon_MiniminiFumi = {
     0, 0, 0, 0, 0, 0, 0, 0, // sleepChance..poisonTime
     0, 0, 0, 0, 0, 0, 0, 0, // poisonStrength..burnChance
     0, 0, 0, // burnTime..freezeTime
-    100, // sizeChangeChance
+    DEMO_PICK(95, 100), // sizeChangeChance
     3, // sizeChangeTime
     -2, // sizeChangeStrength
     0, 0, 0, 0, 0, 0, 0, 0, // atkChangeChance..allergicTime
@@ -1506,7 +1511,7 @@ BattleWeapon badgeWeapon_NemuraseFumi = {
     0x25807, // special
     0xC, // counterResistFlags
     0x80002004, // targetWeightFlags
-    100, // sleepChance
+    DEMO_PICK(95, 100), // sleepChance
     5, // sleepTime
     0, 0, 0, 0, 0, 0, 0, 0, // stopChance..confuseChance
     0, 0, 0, 0, 0, 0, 0, 0, // confuseTime..freezeChance
@@ -1592,7 +1597,7 @@ BattleWeapon badgeWeapon_FunyafunyaJump = {
     0, 0, 0, 0, 0, 0, 0, 0, // poisonStrength..burnChance
     0, 0, 0, 0, 0, 0, 0, 0, // burnTime..atkChangeTime
     0, // atkChangeStrength
-    100, // defChangeChance
+    DEMO_PICK(95, 100), // defChangeChance
     3, // defChangeTime
     -3, // defChangeStrength
     0, 0, 0, 0, 0, 0, 0, 0, // allergicChance..slowTime
@@ -1951,7 +1956,7 @@ BattleWeapon badgeWeapon_ConfuseHammer = {
     251, // itemId
     NULL, // description
     100, // baseAccuracy
-    2, // baseFpCost
+    DEMO_PICK(3, 2), // baseFpCost
     0, 0, // baseSpCost..superguardsAllowed
     1.0f, // reserved_14
     1, // mStylishCommandMultiplier
@@ -1973,7 +1978,7 @@ BattleWeapon badgeWeapon_ConfuseHammer = {
     0x80002004, // targetWeightFlags
     0, 0, 0, 0, 0, 0, 0, 0, // sleepChance..poisonTime
     0, // poisonStrength
-    100, // confuseChance
+    DEMO_PICK(90, 100), // confuseChance
     3, // confuseTime
     0, 0, 0, 0, 0, 0, 0, 0, // electricChance..freezeTime
     0, 0, 0, 0, 0, 0, 0, 0, // sizeChangeChance..defChangeTime
@@ -2033,7 +2038,7 @@ BattleWeapon badgeWeapon_FireNaguri = {
     252, // itemId
     NULL, // description
     100, // baseAccuracy
-    5, // baseFpCost
+    DEMO_PICK(6, 5), // baseFpCost
     0, 0, // baseSpCost..superguardsAllowed
     1.0f, // reserved_14
     2, // mStylishCommandMultiplier
@@ -2041,7 +2046,7 @@ BattleWeapon badgeWeapon_FireNaguri = {
     100, // mBingoSlotChance
     50, // reserved_1B
     weaponGetPowerOverlapHammer1, // hpDamageFn
-    {0xFFFFFFFF, 3, 0, 3, 1, 3, 252, 2}, // hpDamageWork
+    {0xFFFFFFFF, DEMO_PICK(0, 3), 0, DEMO_PICK(2, 3), 1, DEMO_PICK(4, 3), 252, 2}, // hpDamageWork
     NULL, // fpDamageFn
     {0}, // fpDamageWork
     0x2001260, // targetClassFlags
@@ -2056,7 +2061,7 @@ BattleWeapon badgeWeapon_FireNaguri = {
     0x80002004, // targetWeightFlags
     0, 0, 0, 0, 0, 0, 0, 0, // sleepChance..poisonTime
     0, 0, 0, 0, 0, 0, 0, // poisonStrength..dodgyTime
-    100, // burnChance
+    DEMO_PICK(95, 100), // burnChance
     3, // burnTime
     0, 0, 0, 0, 0, 0, 0, 0, // freezeChance..atkChangeStrength
     0, 0, 0, 0, 0, 0, 0, 0, // defChangeChance..fastChance
@@ -2115,7 +2120,7 @@ BattleWeapon badgeWeapon_FireNaguriFailed = {
     252, // itemId
     NULL, // description
     100, // baseAccuracy
-    5, // baseFpCost
+    DEMO_PICK(6, 5), // baseFpCost
     0, 0, // baseSpCost..superguardsAllowed
     1.0f, // reserved_14
     2, // mStylishCommandMultiplier
@@ -2123,7 +2128,7 @@ BattleWeapon badgeWeapon_FireNaguriFailed = {
     1, // mBingoSlotChance
     50, // reserved_1B
     weaponGetPowerFromMarioHammerLv, // hpDamageFn
-    {1, 5, 2, 5, 3, 5, 0, 0}, // hpDamageWork
+    {1, DEMO_PICK(2, 5), 2, DEMO_PICK(4, 5), 3, DEMO_PICK(6, 5), 0, 0}, // hpDamageWork
     NULL, // fpDamageFn
     {0}, // fpDamageWork
     0x2100160, // targetClassFlags
@@ -2138,7 +2143,7 @@ BattleWeapon badgeWeapon_FireNaguriFailed = {
     0x80002004, // targetWeightFlags
     0, 0, 0, 0, 0, 0, 0, 0, // sleepChance..poisonTime
     0, 0, 0, 0, 0, 0, 0, // poisonStrength..dodgyTime
-    100, // burnChance
+    DEMO_PICK(95, 100), // burnChance
     3, // burnTime
     0, 0, 0, 0, 0, 0, 0, 0, // freezeChance..atkChangeStrength
     0, 0, 0, 0, 0, 0, 0, 0, // defChangeChance..fastChance
@@ -2222,7 +2227,7 @@ BattleWeapon badgeWeapon_IceNaguri = {
     0, 0, 0, 0, 0, 0, 0, 0, // sleepChance..poisonTime
     0, 0, 0, 0, 0, 0, 0, 0, // poisonStrength..burnChance
     0, // burnTime
-    100, // freezeChance
+    DEMO_PICK(90, 100), // freezeChance
     2, // freezeTime
     0, 0, 0, 0, 0, 0, 0, 0, // sizeChangeChance..defChangeTime
     0, 0, 0, 0, 0, 0, 0, 0, // defChangeStrength..slowChance
@@ -2281,7 +2286,7 @@ BattleWeapon badgeWeapon_Charge = {
     256, // itemId
     "btl_hlp_cmd_operation_charge", // description
     100, // baseAccuracy
-    1, // baseFpCost
+    DEMO_PICK(0, 1), // baseFpCost
     0, 0, // baseSpCost..superguardsAllowed
     1.0f, // reserved_14
     1, // mStylishCommandMultiplier
@@ -2361,7 +2366,7 @@ BattleWeapon badgeWeapon_ChargeP = {
     257, // itemId
     "btl_hlp_cmd_operation_charge", // description
     100, // baseAccuracy
-    1, // baseFpCost
+    DEMO_PICK(0, 1), // baseFpCost
     0, 0, // baseSpCost..superguardsAllowed
     1.0f, // reserved_14
     1, // mStylishCommandMultiplier
@@ -2593,7 +2598,7 @@ BattleWeapon badgeWeapon_3KaiItem = {
     329, // itemId
     NULL, // description
     100, // baseAccuracy
-    8, // baseFpCost
+    DEMO_PICK(10, 8), // baseFpCost
     0, 0, 0.0f, 0, 0, 0, 0, NULL, // baseSpCost..hpDamageFn
     {0}, // hpDamageWork
     NULL, // fpDamageFn
@@ -2758,8 +2763,8 @@ BattleWeapon marioWeapon_BakuGame = {
     0x20088, // special
     0x7FF, // counterResistFlags
     0, 0, 0, // targetWeightFlags..sleepTime
-    100, // stopChance
-    1, // stopTime
+    DEMO_PICK(0, 100), // stopChance
+    DEMO_PICK(0, 1), // stopTime
     0, 0, 0, 0, 0, 0, 0, 0, // dizzyChance..electricChance
     0, 0, 0, 0, 0, 0, 0, 0, // electricTime..sizeChangeChance
     0, 0, 0, 0, 0, 0, 0, 0, // sizeChangeTime..defChangeStrength
@@ -3311,7 +3316,7 @@ BattleWeapon marioWeapon_Suki = {
     0, 0, 0, 0, 0, 0, 0, 0, // poisonTime..dodgyTime
     0, 0, 0, 0, 0, 0, 0, 0, // burnChance..atkChangeChance
     0, 0, 0, 0, 0, 0, 0, // atkChangeTime..allergicTime
-    100, // ohkoChance
+    DEMO_PICK(0, 100), // ohkoChance
     0, 0, 0, 0, 0, 0, 0, 0, // chargeStrength..paybackTime
     0, 0, 0, 0, 0, 0, 0, // holdFastTime..fpRegenStrength
     {0}, // pad_AE
@@ -5327,6 +5332,18 @@ EVT_BEGIN(marioAttackEvent_GatsuDokaJump)
 EVT_END()
 #endif
 
+EVT_BEGIN(marioAttackEvent_GatsunJump)
+    SET_VALUE(LW(12), PTR(&badgeWeapon_GatsunJump))
+    CALL_CHILD(PTR(marioAttackEvent_GatsuDokaJump))
+    RETURN
+EVT_END()
+
+EVT_BEGIN(marioAttackEvent_DokanJump)
+    SET_VALUE(LW(12), PTR(&badgeWeapon_DokanJump))
+    CALL_CHILD(PTR(marioAttackEvent_GatsuDokaJump))
+    RETURN
+EVT_END()
+
 #ifdef VERSION_G8ME01
 EVT_BEGIN(marioAttackEvent_TatsumakiJump)
     CALL(btlevtcmd_JumpSetting, -2, 20, FLOAT(0.0f), FLOAT(0.69921875f))
@@ -6081,7 +6098,9 @@ EVT_BEGIN(marioAttackEvent_TatsumakiJump)
                 IF_INT_LESS(LW(1), 90)
                     IF_INT_GREATER_OR_EQUAL(LW(0), 90)
                         CALL(btlevtcmd_AnimeChangePose, -2, 1, STRING("M_N_7"))
+#ifndef VERSION_G8ME01_DEMO
                         CALL(btlevtcmd_snd_se, -2, STRING("SFX_BTL_MARIO_FALL_CRUSH1"), -250000000, 0, -250000000)
+#endif
                     END_IF
                 END_IF
                 SET_VALUE(LW(1), LW(0))
@@ -6145,7 +6164,11 @@ EVT_BEGIN(marioAttackEvent_TatsumakiJump)
                 GOTO(59)
             END_IF
             IF_INT_EQUAL(LW(3), LW(6))
+#ifdef VERSION_G8ME01_DEMO
+                GOTO(59)
+#else
                 GOTO(58)
+#endif
             END_IF
             CALL(btlevtcmd_PreCheckDamage, -5, LW(3), LW(4), PTR(&badgeWeapon_TatsumakiJumpInvolved), 256, LW(5))
             SWITCH(LW(5))
@@ -6161,8 +6184,13 @@ EVT_BEGIN(marioAttackEvent_TatsumakiJump)
                 IF_BITS_SET(LW(0), 2)
                     CALL(btlevtcmd_CheckDamage, -5, LW(3), LW(4), PTR(&badgeWeapon_TatsumakiJumpInvolved), 131328, LW(5))
                     CALL(btlevtcmd_GetHitPos, LW(3), LW(4), LW(0), LW(1), LW(2))
+#ifdef VERSION_G8ME01_DEMO
+                    CALL(btlevtcmd_GetResultPrizeLv, LW(3), 1, LW(6))
+                    CALL(btlevtcmd_ACSuccessEffect, LW(6), LW(0), LW(1), LW(2))
+#else
                     CALL(btlevtcmd_GetResultPrizeLv, LW(3), 1, LW(7))
                     CALL(btlevtcmd_ACSuccessEffect, LW(7), LW(0), LW(1), LW(2))
+#endif
                 ELSE
                     CALL(btlevtcmd_CheckDamage, -5, LW(3), LW(4), PTR(&badgeWeapon_TatsumakiJumpInvolved), 256, LW(5))
                 END_IF
@@ -6324,6 +6352,21 @@ EVT_BEGIN(marioAttackEvent_TatsumakiJump)
     RETURN
 EVT_END()
 #endif
+
+EVT_BEGIN(marioAttackEvent_MiniminiFumi)
+    CALL_CHILD(PTR(marioAttackEvent_NormalJump))
+    RETURN
+EVT_END()
+
+EVT_BEGIN(marioAttackEvent_NemuraseFumi)
+    CALL_CHILD(PTR(marioAttackEvent_NormalJump))
+    RETURN
+EVT_END()
+
+EVT_BEGIN(marioAttackEvent_FunyafunyaJump)
+    CALL_CHILD(PTR(marioAttackEvent_NormalJump))
+    RETURN
+EVT_END()
 
 #ifdef VERSION_G8ME01
 EVT_BEGIN(marioAttackEvent_RenzokuJump)
@@ -7235,6 +7278,30 @@ EVT_BEGIN(marioAttackEvent_TugiTugiJump)
 EVT_END()
 #endif
 
+static EVT_BEGIN(marioAttackEvent_NormalHammer)
+    SET_VALUE(LW(14), 0)
+    CALL_CHILD(PTR(marioAttackEvent_NormalHammer_Core))
+    RETURN
+EVT_END()
+
+EVT_BEGIN(marioAttackEvent_GatsunHammer)
+    SET_VALUE(LW(14), 1)
+    CALL_CHILD(PTR(marioAttackEvent_NormalHammer_Core))
+    RETURN
+EVT_END()
+
+EVT_BEGIN(marioAttackEvent_IceNaguri)
+    SET_VALUE(LW(14), 0)
+    CALL_CHILD(PTR(marioAttackEvent_NormalHammer_Core))
+    RETURN
+EVT_END()
+
+EVT_BEGIN(marioAttackEvent_TsuranukiHammer)
+    SET_VALUE(LW(14), 1)
+    CALL_CHILD(PTR(marioAttackEvent_NormalHammer_Core))
+    RETURN
+EVT_END()
+
 #ifdef VERSION_G8ME01
 EVT_BEGIN(marioAttackEvent_NormalHammer_Core)
     CALL(btlevtcmd_check_battleflag, LW(0), 2)
@@ -7864,6 +7931,7 @@ EVT_BEGIN(marioAttackEvent_NormalHammer_Core)
     CALL(btlevtcmd_ACRStart, -2, 0, 15, 60, 0)
     CALL(btlevtcmd_ACRGetResult, LW(15), LW(13))
     IF_INT_EQUAL(LW(15), 1)
+#ifndef VERSION_G8ME01_DEMO
         GOTO(91)
     END_IF
     IF_INT_LESS_OR_EQUAL(LW(15), -1)
@@ -7871,6 +7939,7 @@ EVT_BEGIN(marioAttackEvent_NormalHammer_Core)
     END_IF
     GOTO(92)
     LABEL(91)
+#endif
     CALL(evt_audience_acrobat_notry)
     SET_VALUE(LW(0), 60)
     SUBTRACT(LW(0), LW(13))
@@ -7884,7 +7953,11 @@ EVT_BEGIN(marioAttackEvent_NormalHammer_Core)
     END_IF
     WAIT_FRAMES(10)
     GOTO(95)
+#ifdef VERSION_G8ME01_DEMO
+    END_IF
+#else
     LABEL(92)
+#endif
     IF_INT_NOT_EQUAL(LW(15), 0)
         CALL(evt_btl_camera_set_mode, 0, 0)
         CALL(evt_btl_camera_set_moveSpeedLv, 0, 1)
@@ -8753,13 +8826,13 @@ EVT_BEGIN(marioAttackEvent_JishinHammer)
     SWITCH(LW(0))
         CASE_EQUAL(2)
         CALL(evt_snd_sfxon, STRING("SFX_MARIO_HAMMER_SWING2"), 0)
-        SET_VALUE(LW(2), STRING("M_H_14"))
+        SET_VALUE(LW(2), STRING(DEMO_PICK("M_H_13", "M_H_14")))
         CASE_EQUAL(1)
         CALL(evt_snd_sfxon, STRING("SFX_MARIO_HAMMER_SWING1"), 0)
-        SET_VALUE(LW(2), STRING("M_H_13"))
+        SET_VALUE(LW(2), STRING(DEMO_PICK("M_H_15", "M_H_13")))
         CASE_DEFAULT
         CALL(evt_snd_sfxon, STRING("SFX_MARIO_HAMMER_SWING3"), 0)
-        SET_VALUE(LW(2), STRING("M_H_15"))
+        SET_VALUE(LW(2), STRING(DEMO_PICK("M_H_14", "M_H_15")))
     END_SWITCH
     CALL(btlevtcmd_AnimeChangePose, -2, 1, LW(2))
     CALL(evt_snd_sfxon, STRING("SFX_MARIO_ATTACK_ULTRAQUAKE1"), 0)
@@ -10083,6 +10156,18 @@ EVT_BEGIN(_NormalCharge_core)
     RETURN
 EVT_END()
 
+EVT_BEGIN(marioAttackEvent_NormalCharge)
+    SET_VALUE(LW(12), PTR(&badgeWeapon_Charge))
+    CALL_CHILD(PTR(_NormalCharge_core))
+    RETURN
+EVT_END()
+
+EVT_BEGIN(marioAttackEvent_NormalChargeP)
+    SET_VALUE(LW(12), PTR(&badgeWeapon_ChargeP))
+    CALL_CHILD(PTR(_NormalCharge_core))
+    RETURN
+EVT_END()
+
 EVT_BEGIN(_SuperCharge_core)
     CALL(btlevtcmd_GetUnitId, -2, LW(3))
     CALL(btlevtcmd_GetBodyId, -2, LW(4))
@@ -10112,69 +10197,6 @@ EVT_BEGIN(_SuperCharge_core)
     RETURN
 EVT_END()
 
-EVT_BEGIN(marioAttackEvent_GatsunJump)
-    SET_VALUE(LW(12), PTR(&badgeWeapon_GatsunJump))
-    CALL_CHILD(PTR(marioAttackEvent_GatsuDokaJump))
-    RETURN
-EVT_END()
-
-EVT_BEGIN(marioAttackEvent_DokanJump)
-    SET_VALUE(LW(12), PTR(&badgeWeapon_DokanJump))
-    CALL_CHILD(PTR(marioAttackEvent_GatsuDokaJump))
-    RETURN
-EVT_END()
-
-EVT_BEGIN(marioAttackEvent_MiniminiFumi)
-    CALL_CHILD(PTR(marioAttackEvent_NormalJump))
-    RETURN
-EVT_END()
-
-EVT_BEGIN(marioAttackEvent_NemuraseFumi)
-    CALL_CHILD(PTR(marioAttackEvent_NormalJump))
-    RETURN
-EVT_END()
-
-EVT_BEGIN(marioAttackEvent_FunyafunyaJump)
-    CALL_CHILD(PTR(marioAttackEvent_NormalJump))
-    RETURN
-EVT_END()
-
-static EVT_BEGIN(marioAttackEvent_NormalHammer)
-    SET_VALUE(LW(14), 0)
-    CALL_CHILD(PTR(marioAttackEvent_NormalHammer_Core))
-    RETURN
-EVT_END()
-
-EVT_BEGIN(marioAttackEvent_GatsunHammer)
-    SET_VALUE(LW(14), 1)
-    CALL_CHILD(PTR(marioAttackEvent_NormalHammer_Core))
-    RETURN
-EVT_END()
-
-EVT_BEGIN(marioAttackEvent_IceNaguri)
-    SET_VALUE(LW(14), 0)
-    CALL_CHILD(PTR(marioAttackEvent_NormalHammer_Core))
-    RETURN
-EVT_END()
-
-EVT_BEGIN(marioAttackEvent_TsuranukiHammer)
-    SET_VALUE(LW(14), 1)
-    CALL_CHILD(PTR(marioAttackEvent_NormalHammer_Core))
-    RETURN
-EVT_END()
-
-EVT_BEGIN(marioAttackEvent_NormalCharge)
-    SET_VALUE(LW(12), PTR(&badgeWeapon_Charge))
-    CALL_CHILD(PTR(_NormalCharge_core))
-    RETURN
-EVT_END()
-
-EVT_BEGIN(marioAttackEvent_NormalChargeP)
-    SET_VALUE(LW(12), PTR(&badgeWeapon_ChargeP))
-    CALL_CHILD(PTR(_NormalCharge_core))
-    RETURN
-EVT_END()
-
 EVT_BEGIN(marioAttackEvent_SuperCharge)
     SET_VALUE(LW(12), PTR(&badgeWeapon_SuperCharge))
     CALL_CHILD(PTR(_SuperCharge_core))
@@ -10187,7 +10209,7 @@ EVT_BEGIN(marioAttackEvent_SuperChargeP)
     RETURN
 EVT_END()
 
-static const Vec majinai_effect_pos = {0.0f, 10.0f, 0.0f};
+static const Vec majinai_effect_pos = {0.0f, DEMO_PICK(0.0f, 10.0f), 0.0f};
 
 #ifdef VERSION_G8ME01
 EVT_BEGIN(marioAttackEvent_MajinaiPowerUpCheck)
@@ -10299,22 +10321,6 @@ EVT_BEGIN(marioAttackEvent_MajinaiExpUp)
     RETURN
 EVT_END()
 #endif
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 static USER_FUNC(_get_mario_hammer_lv) {
     s32 ret = *event->args;
@@ -10615,7 +10621,6 @@ USER_FUNC(_fire_wave) {
     }
     return EVT_RETURN_DONE;
 }
-
 
 USER_FUNC(_majinai_powerup_check) {
     BattleWork* wp = _battleWorkPointer;

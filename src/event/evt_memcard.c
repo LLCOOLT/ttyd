@@ -30,6 +30,7 @@ USER_FUNC(memcard_code) {
     return EVT_RETURN_DONE;
 }
 
+#ifndef VERSION_G8ME01_DEMO // the demo has no insert watch or buffer reset
 USER_FUNC(memcard_buf_reset) {
     cardBufReset();
     return EVT_RETURN_DONE;
@@ -55,6 +56,7 @@ USER_FUNC(memcard_watch_end) {
     cardInsertWatchEnd();
     return EVT_RETURN_DONE;
 }
+#endif
 
 USER_FUNC(memcard_load) {
     if (isFirstCall) {
@@ -158,6 +160,7 @@ extern EvtWord evt_memcard_delete[];
 extern EvtWord evt_memcard_copy[];
 extern EvtWord evt_memcard_save[];
 
+#ifdef VERSION_G8ME01_DEMO
 EVT_BEGIN(evt_memcard_nosave)
     CALL(evt_msg_print_add, 0, STRING("msg_nosave_start"))
     CALL(evt_msg_select, 0, STRING("msg_mcard_yesno2"))
@@ -167,7 +170,116 @@ EVT_BEGIN(evt_memcard_nosave)
     END_IF
     RETURN
 EVT_END()
+#else
+EVT_BEGIN(evt_memcard_nosave)
+    CALL(evt_msg_print_add, 0, STRING("msg_nosave_start"))
+    CALL(evt_msg_select, 0, STRING("msg_mcard_yesno2"))
+    CALL(evt_msg_continue)
+    IF_INT_EQUAL(LW(0), 0)
+        SET_VALUE(GF(0), 1)
+    END_IF
+    RETURN
+EVT_END()
+#endif
 
+#ifdef VERSION_G8ME01_DEMO
+EVT_BEGIN(evt_memcard_check)
+    SET_VALUE(GF(0), 0)
+    LOOP(0)
+        CALL(evt_msg_print, 0, STRING("msg_mcard_fileload_warnning"), 0, 0)
+        CALL(memcard_load)
+        CALL(memcard_code, LW(0))
+        SWITCH(LW(0))
+        CASE_EQUAL(0)
+            CALL(evt_msg_print_add, 0, STRING("msg_mcard_lord_finish"))
+            SET_VALUE(GF(0), 1)
+        CASE_EQUAL(-3)
+            CALL(evt_msg_print_add, 0, STRING("msg_mcard_nocard"))
+            CALL_CHILD(evt_memcard_nosave)
+        CASE_EQUAL(-2)
+            CALL(evt_msg_print_add, 0, STRING("msg_mcard_different_card"))
+            CALL_CHILD(evt_memcard_nosave)
+        CASE_OR_EQUAL(-13)
+        CASE_OR_EQUAL(-6)
+            CALL(evt_msg_print_add, 1, STRING("<scrl_auto><once_stop>"))
+            CALL(evt_msg_print_add, 0, STRING("msg_mcard_format"))
+            CALL(evt_msg_select, 0, STRING("msg_mcard_yesno2"))
+            IF_INT_EQUAL(LW(0), 0)
+                CALL(evt_msg_print_add, 0, STRING("msg_mcard_format_alldelete"))
+                CALL(evt_msg_select, 0, STRING("msg_mcard_yesno2"))
+                IF_INT_EQUAL(LW(0), 0)
+                    CALL(evt_msg_print_add, 0, STRING("msg_mcard_format_warning"))
+                    CALL(memcard_format)
+                    CALL(memcard_code, LW(0))
+                    IF_INT_NOT_EQUAL(LW(0), 0)
+                        CALL(evt_msg_print_add, 0, STRING("msg_mcard_format_miss"))
+                        CALL_CHILD(evt_memcard_nosave)
+                    ELSE
+                        CALL(evt_msg_print_add, 0, STRING("msg_mcard_format_finish"))
+                        CALL(evt_msg_print_add, 0, STRING("msg_mcard_make_data"))
+                        CALL(evt_msg_select, 0, STRING("msg_mcard_yesno"))
+                        IF_INT_EQUAL(LW(0), 0)
+                            CALL(evt_msg_print_add, 0, STRING("msg_mcard_make_data_warning"))
+                            CALL(memcard_create)
+                            CALL(memcard_code, LW(0))
+                            IF_INT_NOT_EQUAL(LW(0), 0)
+                                CALL(evt_msg_print_add, 0, STRING("msg_mcard_make_data_miss"))
+                                CALL_CHILD(evt_memcard_nosave)
+                            ELSE
+                                CALL(evt_msg_print_add, 0, STRING("msg_mcard_make_data_finish"))
+                                CALL(evt_msg_continue)
+                                SET_VALUE(GF(0), 1)
+                            END_IF
+                        ELSE
+                            CALL_CHILD(evt_memcard_nosave)
+                        END_IF
+                    END_IF
+                ELSE
+                    CALL_CHILD(evt_memcard_nosave)
+                END_IF
+            ELSE
+                CALL_CHILD(evt_memcard_nosave)
+            END_IF
+        CASE_END
+        CASE_EQUAL(-4)
+            CALL(evt_msg_print_add, 0, STRING("msg_mcard_make_data"))
+            CALL(evt_msg_select, 0, STRING("msg_mcard_yesno"))
+            IF_INT_EQUAL(LW(0), 0)
+                CALL(evt_msg_print_add, 0, STRING("msg_mcard_make_data_warning"))
+                CALL(memcard_create)
+                CALL(memcard_code, LW(0))
+                IF_INT_NOT_EQUAL(LW(0), 0)
+                    CALL(evt_msg_print_add, 0, STRING("msg_mcard_make_data_miss"))
+                    CALL_CHILD(evt_memcard_nosave)
+                ELSE
+                    CALL(evt_msg_print_add, 0, STRING("msg_mcard_make_data_finish"))
+                    CALL(evt_msg_continue)
+                    SET_VALUE(GF(0), 1)
+                END_IF
+            ELSE
+                CALL_CHILD(evt_memcard_nosave)
+            END_IF
+        CASE_OR_EQUAL(-8)
+        CASE_OR_EQUAL(-9)
+            CALL(evt_msg_print_add, 1, STRING("<scrl_auto><once_stop>"))
+            CALL(evt_msg_print_add, 0, STRING("msg_mcard_nospace"))
+            CALL(evt_msg_print_add, 0, STRING("msg_gc_mcard_open"))
+            CALL(evt_msg_select, 0, STRING("msg_mcard_yesno2"))
+            IF_INT_EQUAL(LW(0), 0)
+                CALL(memcard_ipl)
+            ELSE
+                CALL_CHILD(evt_memcard_nosave)
+            END_IF
+        CASE_END
+        CASE_DEFAULT
+            CALL(evt_msg_print_add, 0, STRING("msg_mcard_damage"))
+            CALL_CHILD(evt_memcard_nosave)
+        END_SWITCH
+        BREAK_LOOP
+    END_LOOP
+    RETURN
+EVT_END()
+#else
 EVT_BEGIN(evt_memcard_check)
     SET_VALUE(GF(0), 0)
     SET_VALUE(LF(10), 0)
@@ -299,7 +411,23 @@ EVT_BEGIN(evt_memcard_check)
     END_LOOP
     RETURN
 EVT_END()
+#endif
 
+#ifdef VERSION_G8ME01_DEMO
+EVT_BEGIN(evt_memcard_start)
+    SET_VALUE(LW(10), LW(0))
+    ADD(LW(10), 1)
+    CALL(evt_msg_print_insert, 0, STRING("msg_savefile_start"), 0, 0, LW(10))
+    CALL(evt_msg_select, 0, STRING("msg_mcard_yesno"))
+    CALL(evt_msg_continue)
+    IF_INT_EQUAL(LW(0), 0)
+        SET_VALUE(GW(0), 1)
+    ELSE
+        SET_VALUE(GW(0), 0)
+    END_IF
+    RETURN
+EVT_END()
+#else
 EVT_BEGIN(evt_memcard_start)
     SET_VALUE(LW(10), LW(0))
     ADD(LW(10), 1)
@@ -313,7 +441,29 @@ EVT_BEGIN(evt_memcard_start)
     END_IF
     RETURN
 EVT_END()
+#endif
 
+#ifdef VERSION_G8ME01_DEMO
+EVT_BEGIN(evt_memcard_delete)
+    SET_VALUE(LW(10), LW(0))
+    ADD(LW(10), 1)
+    CALL(evt_msg_print_insert, 0, STRING("msg_savefile_delete"), 0, 0, LW(10))
+    CALL(evt_msg_select, 0, STRING("msg_mcard_yesno2"))
+    IF_INT_EQUAL(LW(0), 0)
+        CALL(evt_msg_print_add, 0, STRING("msg_savefile_delete_warnning"))
+        CALL(memcard_delete, LW(10))
+        CALL(memcard_code, LW(0))
+        IF_INT_NOT_EQUAL(LW(0), 0)
+            CALL(evt_msg_print_add, 0, STRING("msg_savefile_delete_copy_miss"))
+        ELSE
+            CALL(evt_msg_print_add_insert, 0, STRING("msg_savefile_delete_finish"), LW(10))
+        END_IF
+    ELSE
+        CALL(evt_msg_continue)
+    END_IF
+    RETURN
+EVT_END()
+#else
 EVT_BEGIN(evt_memcard_delete)
     SET_VALUE(GF(0), 0)
     SET_VALUE(LW(10), LW(0))
@@ -343,7 +493,43 @@ EVT_BEGIN(evt_memcard_delete)
     SET_VALUE(GF(0), 1)
     RETURN
 EVT_END()
+#endif
 
+#ifdef VERSION_G8ME01_DEMO
+EVT_BEGIN(evt_memcard_copy)
+    SET_VALUE(LW(10), LW(0))
+    SET_VALUE(LW(11), LW(1))
+    ADD(LW(10), 1)
+    ADD(LW(11), 1)
+    CALL(memcard_file_existance, LW(11), LW(0))
+    IF_INT_EQUAL(LW(0), 1)
+        CALL(evt_msg_print_insert, 0, STRING("msg_savefile_delete_copy_point"), 0, 0, LW(11))
+        CALL(evt_msg_select, 0, STRING("msg_mcard_yesno2"))
+        IF_INT_EQUAL(LW(0), 0)
+            CALL(evt_msg_print_add, 0, STRING("msg_savefile_copy_warnning"))
+            CALL(memcard_copy, LW(10), LW(11))
+            CALL(memcard_code, LW(0))
+            IF_INT_NOT_EQUAL(LW(0), 0)
+                CALL(evt_msg_print_add, 0, STRING("msg_savefile_delete_copy_miss"))
+            ELSE
+                CALL(evt_msg_print_add_insert, 0, STRING("msg_savefile_copy_finish"), LW(10), LW(11))
+            END_IF
+        ELSE
+            CALL(evt_msg_continue)
+        END_IF
+    ELSE
+        CALL(evt_msg_print, 0, STRING("msg_savefile_copy_warnning"), 0, 0)
+        CALL(memcard_copy, LW(10), LW(11))
+        CALL(memcard_code, LW(0))
+        IF_INT_NOT_EQUAL(LW(0), 0)
+            CALL(evt_msg_print_add, 0, STRING("msg_savefile_delete_copy_miss"))
+        ELSE
+            CALL(evt_msg_print_add_insert, 0, STRING("msg_savefile_copy_finish"), LW(10), LW(11))
+        END_IF
+    END_IF
+    RETURN
+EVT_END()
+#else
 EVT_BEGIN(evt_memcard_copy)
     SET_VALUE(GF(0), 0)
     SET_VALUE(LW(10), LW(0))
@@ -388,7 +574,167 @@ EVT_BEGIN(evt_memcard_copy)
     SET_VALUE(GF(0), 1)
     RETURN
 EVT_END()
+#endif
 
+#ifdef VERSION_G8ME01_DEMO
+EVT_BEGIN(evt_memcard_save)
+    SET_VALUE(LW(10), LW(0))
+    IF_INT_EQUAL(LW(10), 23)
+        GOTO(1)
+    END_IF
+    LABEL(0)
+    IF_INT_EQUAL(LF(10), 1)
+        CALL(evt_msg_print_add, 1, STRING("<scrl_auto><once_stop>"))
+        CALL(evt_msg_print_add, 0, STRING("msg_mcard_save_select"))
+        SET_VALUE(LF(10), 0)
+    ELSE
+        CALL(evt_msg_print, 0, STRING("msg_mcard_save_select"), 0, 0)
+    END_IF
+    CALL(evt_msg_select, 0, STRING("msg_mcard_yesno"))
+    IF_INT_NOT_EQUAL(LW(0), 0)
+        CALL(evt_msg_continue)
+        RETURN
+    END_IF
+    LABEL(1)
+    SET_VALUE(GSW(4), LW(10))
+    IF_INT_EQUAL(LW(10), 23)
+        CALL(evt_msg_print, 0, STRING("msg_savefile_first_warnning"), 0, 0)
+    ELSE
+        CALL(evt_msg_print_add, 0, STRING("msg_mcard_save_warnning"))
+    END_IF
+    CALL(memcard_header_write)
+    CALL(memcard_write)
+    CALL(memcard_code, LW(0))
+    SWITCH(LW(0))
+    CASE_EQUAL(0)
+        CALL(evt_msg_print_add, 0, STRING("msg_mcard_save_finish"))
+        RETURN
+    CASE_EQUAL(-3)
+        CALL(evt_msg_print_add, 1, STRING("<scrl_auto><once_stop>"))
+        CALL(evt_msg_print_add, 0, STRING("msg_mcard_nocard"))
+        CALL(evt_msg_print_add, 0, STRING("msg_mcard_save_miss"))
+    CASE_EQUAL(-2)
+        CALL(evt_msg_print_add, 1, STRING("<scrl_auto><once_stop>"))
+        CALL(evt_msg_print_add, 0, STRING("msg_mcard_different_card"))
+        CALL(evt_msg_print_add, 0, STRING("msg_mcard_save_miss"))
+    CASE_OR_EQUAL(-13)
+    CASE_OR_EQUAL(-6)
+        CALL(evt_msg_print_add, 1, STRING("<scrl_auto><once_stop>"))
+        CALL(evt_msg_print_add, 0, STRING("msg_mcard_format"))
+        CALL(evt_msg_select, 0, STRING("msg_mcard_yesno2"))
+        IF_INT_EQUAL(LW(0), 0)
+            CALL(evt_msg_print_add, 0, STRING("msg_mcard_format_alldelete"))
+            CALL(evt_msg_select, 0, STRING("msg_mcard_yesno2"))
+            IF_INT_EQUAL(LW(0), 0)
+                CALL(evt_msg_print_add, 0, STRING("msg_mcard_format_warning"))
+                CALL(memcard_format)
+                CALL(memcard_code, LW(0))
+                IF_INT_NOT_EQUAL(LW(0), 0)
+                    CALL(evt_msg_print_add, 0, STRING("msg_mcard_format_miss"))
+                    CALL(evt_msg_print_add, 0, STRING("msg_mcard_save_miss"))
+                ELSE
+                    CALL(evt_msg_print_add, 0, STRING("msg_mcard_format_finish"))
+                    CALL(evt_msg_print_add, 0, STRING("msg_mcard_make_data"))
+                    CALL(evt_msg_select, 0, STRING("msg_mcard_yesno"))
+                    IF_INT_EQUAL(LW(0), 0)
+                        CALL(evt_msg_print_add, 0, STRING("msg_mcard_make_data_warning"))
+                        CALL(memcard_create)
+                        CALL(memcard_code, LW(0))
+                        IF_INT_NOT_EQUAL(LW(0), 0)
+                            CALL(evt_msg_print_add, 0, STRING("msg_mcard_make_data_miss"))
+                            CALL(evt_msg_print_add, 0, STRING("msg_mcard_save_miss"))
+                        ELSE
+                            CALL(evt_msg_print_add, 0, STRING("msg_mcard_make_data_finish"))
+                            CALL(evt_msg_print_add, 0, STRING("msg_mcard_save_warnning"))
+                            CALL(memcard_write)
+                            CALL(memcard_code, LW(0))
+                            IF_INT_EQUAL(LW(0), 0)
+                                CALL(evt_msg_print_add, 0, STRING("msg_mcard_save_finish"))
+                                RETURN
+                            ELSE
+                                CALL(evt_msg_print_add, 0, STRING("msg_mcard_save_miss"))
+                            END_IF
+                        END_IF
+                    ELSE
+                        CALL(evt_msg_print_add, 0, STRING("msg_mcard_save_miss"))
+                    END_IF
+                END_IF
+            ELSE
+                CALL(evt_msg_print_add, 0, STRING("msg_mcard_save_miss"))
+            END_IF
+        ELSE
+            CALL(evt_msg_print_add, 0, STRING("msg_mcard_save_miss"))
+        END_IF
+    CASE_END
+    CASE_EQUAL(-4)
+        CALL(evt_msg_print_add, 0, STRING("msg_mcard_make_data"))
+        CALL(evt_msg_select, 0, STRING("msg_mcard_yesno"))
+        IF_INT_EQUAL(LW(0), 0)
+            CALL(evt_msg_print_add, 0, STRING("msg_mcard_make_data_warning"))
+            CALL(memcard_create)
+            CALL(memcard_code, LW(0))
+            IF_INT_NOT_EQUAL(LW(0), 0)
+                CALL(evt_msg_print_add, 0, STRING("msg_mcard_make_data_miss"))
+                CALL(evt_msg_print_add, 0, STRING("msg_mcard_save_miss"))
+            ELSE
+                CALL(evt_msg_print_add, 0, STRING("msg_mcard_make_data_finish"))
+                CALL(evt_msg_print_add, 0, STRING("msg_mcard_save_warnning"))
+                CALL(memcard_write)
+                CALL(memcard_code, LW(0))
+                IF_INT_EQUAL(LW(0), 0)
+                    CALL(evt_msg_print_add, 0, STRING("msg_mcard_save_finish"))
+                    RETURN
+                ELSE
+                    CALL(evt_msg_print_add, 0, STRING("msg_mcard_save_miss"))
+                END_IF
+            END_IF
+        ELSE
+            CALL(evt_msg_print_add, 0, STRING("msg_mcard_save_miss"))
+        END_IF
+    CASE_EQUAL(-10)
+        CALL(evt_msg_print_add, 0, STRING("msg_mcard_different_savedata"))
+        CALL(evt_msg_print_add, 0, STRING("msg_mcard_save_miss"))
+    CASE_OR_EQUAL(-8)
+    CASE_OR_EQUAL(-9)
+        CALL(evt_msg_print_add, 1, STRING("<scrl_auto><once_stop>"))
+        CALL(evt_msg_print_add, 0, STRING("msg_mcard_nospace"))
+        CALL(evt_msg_print_add, 0, STRING("msg_gc_mcard_open"))
+        CALL(evt_msg_select, 0, STRING("msg_mcard_yesno2"))
+        IF_INT_NOT_EQUAL(LW(0), 0)
+            CALL(evt_msg_print_add, 0, STRING("msg_mcard_save_miss"))
+        ELSE
+            CALL(evt_msg_print_add, 0, STRING("msg_gc_mcard_nosave"))
+            CALL(evt_msg_select, 0, STRING("msg_mcard_yesno2"))
+            IF_INT_NOT_EQUAL(LW(0), 0)
+                CALL(evt_msg_print_add, 0, STRING("msg_mcard_save_miss"))
+            ELSE
+                CALL(memcard_ipl)
+            END_IF
+        ELSE
+            CALL(evt_msg_print_add, 0, STRING("msg_mcard_save_miss"))
+        END_IF
+    CASE_END
+    CASE_DEFAULT
+        CALL(evt_msg_print_add, 0, STRING("msg_mcard_damage"))
+        CALL(evt_msg_print_add, 0, STRING("msg_mcard_save_miss"))
+    END_SWITCH
+    IF_INT_EQUAL(LW(10), 0)
+        CALL(evt_msg_continue)
+        RETURN
+    END_IF
+    IF_INT_EQUAL(LW(10), 23)
+        CALL(evt_msg_continue)
+        RETURN
+    END_IF
+    CALL(evt_msg_print_add, 0, STRING("msg_savefile_nosave_warnning"))
+    CALL(evt_msg_select, 0, STRING("msg_mcard_yesno3"))
+    IF_INT_EQUAL(LW(0), 0)
+        GOTO(1)
+    END_IF
+    CALL(evt_msg_continue)
+    RETURN
+EVT_END()
+#else
 EVT_BEGIN(evt_memcard_save)
     SET_VALUE(LW(10), LW(0))
     IF_INT_EQUAL(LW(10), 23)
@@ -587,6 +933,7 @@ EVT_BEGIN(evt_memcard_save)
     CALL(evt_msg_continue)
     RETURN
 EVT_END()
+#endif
 
 #ifdef VERSION_G8ME01
 EVT_BEGIN(evt_memcard_save_wrapper)

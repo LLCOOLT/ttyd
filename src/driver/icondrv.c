@@ -252,13 +252,13 @@ void iconMain(void) {
                 }
             }
             if (!(entry->uflags & 2)) {
-                if (entry->uflags & 0x10) {
+                if (entry->uflags & ICON_FLAG_2D) {
                     dispEntry(CAMERA_2D, 200.0f, 1, iconDisp, entry);
                 }
-                else if (entry->uflags & 0x100) {
+                else if (entry->uflags & ICON_FLAG_EFFECT_A) {
                     shadowEntry(entry->position.x, entry->position.y, entry->position.z, 10.0f);
                     dispEntry(CAMERA_3D_EFFECTA, dispCalcZ(&entry->position), 1, iconDisp, entry);
-                } else if (entry->uflags & 0x200) {
+                } else if (entry->uflags & ICON_FLAG_EFFECT_B) {
                     shadowEntry(entry->position.x, entry->position.y, entry->position.z, 10.0f);
                     dispEntry(CAMERA_3D_EFFECTB, dispCalcZ(&entry->position), 1, iconDisp, entry);
                 } else {
@@ -308,11 +308,15 @@ void iconEntry(const char* name, s16 iconId) {
     }
     entry->uflags |= 1;
     if (mapGetWork()->entries[0].flags & 2) {
+#ifdef VERSION_G8ME01_DEMO
+        entry->uflags |= ICON_FLAG_NO_MAP_BLEND;
+#else
         if (!strncmp(gp->currentMapName, "aji", 3) && evtGetValue(0, GSW(0)) == 0x178) {
-            entry->uflags &= ~0x40;
+            entry->uflags &= ~ICON_FLAG_NO_MAP_BLEND;
         } else {
-            entry->uflags |= 0x40;
+            entry->uflags |= ICON_FLAG_NO_MAP_BLEND;
         }
+#endif
     }
 }
 
@@ -348,7 +352,7 @@ void iconEntry2D(const char* name, s16 iconId) {
     } else {
         entry->uflags |= 0x2000;
     }
-    entry->uflags |= 0x11;
+    entry->uflags |= 1 | ICON_FLAG_2D;
 }
 
 void iconDelete(const char* name) {
@@ -591,10 +595,10 @@ void iconGX(Mtx mtx, IconEntry* entry) {
     pos.x = mtx[0][3];
     pos.y = mtx[1][3];
     pos.z = mtx[2][3];
-    MTXScale(scalemtx, (entry->uflags & 4) ? -1.0f : 1.0f, (entry->uflags & 8) ? -1.0f : 1.0f, 1.0f);
+    MTXScale(scalemtx, (entry->uflags & ICON_FLAG_FLIP_X) ? -1.0f : 1.0f, (entry->uflags & ICON_FLAG_FLIP_Y) ? -1.0f : 1.0f, 1.0f);
     MTXConcat(mtx, scalemtx, m);
     camera = camGetPtr(CAMERA_2D);
-    if (camGetCurPtr() != camera && (entry->uflags & 0x10)) {
+    if (camGetCurPtr() != camera && (entry->uflags & ICON_FLAG_2D)) {
         MTXScale(scalemtx, 1.0f, -1.0f, 1.0f);
         MTXConcat(m, scalemtx, m);
     }
@@ -610,7 +614,7 @@ void iconGX(Mtx mtx, IconEntry* entry) {
         }
     }
     GXLoadTexObj(&texObj, GX_TEXMAP0);
-    if (!(entry->uflags & 0x10)) {
+    if (!(entry->uflags & ICON_FLAG_2D)) {
         mapSetMaterialLight(4, pos);
     } else {
         GXSetNumChans(1);
@@ -655,8 +659,13 @@ void iconGX(Mtx mtx, IconEntry* entry) {
         GXSetTevAlphaOp(GX_TEVSTAGE1, GX_TEV_ADD, GX_TB_ZERO, GX_CS_SCALE_1, GX_TRUE, GX_TEVPREV);
         GXSetTevColorIn(GX_TEVSTAGE1, GX_CC_ZERO, GX_CC_C0, GX_CC_CPREV, GX_CC_ZERO);
         GXSetTevAlphaIn(GX_TEVSTAGE1, GX_CA_ZERO, GX_CA_A0, GX_CA_APREV, GX_CA_ZERO);
-        if (!(entry->uflags & 0x10) && !(entry->uflags & 0x40) && !(entry->uflags & 0x80) &&
+#ifdef VERSION_G8ME01_DEMO
+        if (!(entry->uflags & ICON_FLAG_2D) && !(entry->uflags & ICON_FLAG_NO_MAP_BLEND) &&
             (mapGetWork()->entries[0].flags & 2)) {
+#else
+        if (!(entry->uflags & ICON_FLAG_2D) && !(entry->uflags & ICON_FLAG_NO_MAP_BLEND) && !(entry->uflags & 0x80) &&
+            (mapGetWork()->entries[0].flags & 2)) {
+#endif
             GXColor blend;
             mapGetBlend(&blend);
             GXSetTevColor(GX_TEVREG1, blend);
@@ -670,7 +679,7 @@ void iconGX(Mtx mtx, IconEntry* entry) {
         GXSetNumTexGens(1);
         GXSetTexCoordGen2(GX_TEXCOORD0, GX_TG_MTX2x4, GX_TG_TEX0, GX_IDENTITY, GX_FALSE, GX_PTIDENTITY);
     }
-    if (!(entry->uflags & 0x10)) {
+    if (!(entry->uflags & ICON_FLAG_2D)) {
         mapSetMaterialFog();
     } else {
         GXSetFog(GX_FOG_NONE, 0.0f, 0.0f, 0.0f, 0.0f, (GXColor){ 0xFF, 0xFF, 0xFF, 0xFF });
@@ -686,12 +695,12 @@ void iconGX(Mtx mtx, IconEntry* entry) {
         GXSetAlphaCompare(GX_GEQUAL, 0x80, GX_AOP_OR, GX_NEVER, 0);
         GXSetZMode(GX_TRUE, GX_LEQUAL, GX_TRUE);
     }
-    if (entry->uflags & 0x10) {
+    if (entry->uflags & ICON_FLAG_2D) {
         GXSetZMode(GX_FALSE, GX_LEQUAL, GX_FALSE);
     }
-    if (entry->uflags & 0x400) {
+    if (entry->uflags & ICON_FLAG_CULL_BACK) {
         GXSetCullMode(GX_CULL_BACK);
-    } else if (entry->uflags & 0x800) {
+    } else if (entry->uflags & ICON_FLAG_CULL_FRONT) {
         GXSetCullMode(GX_CULL_FRONT);
     } else {
         GXSetCullMode(GX_CULL_NONE);
@@ -711,7 +720,7 @@ void iconGX(Mtx mtx, IconEntry* entry) {
     x = -w / 2.0f;
     y = h;
     hn = -h;
-    if (!(entry->uflags & 0x10)) {
+    if (!(entry->uflags & ICON_FLAG_2D)) {
         x *= 0.6f;
         y *= 0.6f;
         w *= 0.6f;
@@ -841,7 +850,7 @@ s32 iconNumberDispGx(Mtx mtx, s32 number, BOOL small, GXColor color) {
     for (dp = digits, i = 0; i < count; dp++, i++) {
         MTXTrans(m, (f32)-i * width, 0.0f, 0.0f);
         MTXConcat(mtx, m, m);
-        iconDispGxCol(m, 0x10, !small ? suuji[*dp] : suuji_s[*dp], color);
+        iconDispGxCol(m, ICON_FLAG_2D, !small ? suuji[*dp] : suuji_s[*dp], color);
         ret += width;
     }
     return ret;

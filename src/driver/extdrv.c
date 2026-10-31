@@ -428,7 +428,12 @@ static u8 shadow_dl[32] ATTRIBUTE_ALIGN(32) = {
     0x80, 0x00, 0x04, 0x00, 0x00, 0x01, 0x01, 0x02, 0x02, 0x03, 0x03,
 };
 
+// The retail builds place shadow_vtx in small data; the demo keeps it in .data
+#ifdef VERSION_G8ME01_DEMO
+static f32 shadow_vtx[16] = {
+#else
 __declspec(section ".sdata") static f32 shadow_vtx[16] = {
+#endif
     -1.2f, 0.0f, -1.2f,
     -1.2f, 0.0f, 1.2f,
     1.2f, 0.0f, 1.2f,

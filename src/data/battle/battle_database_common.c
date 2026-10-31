@@ -125,7 +125,7 @@ ItemDropData battle_item_champion[1];
 ItemDropData battle_item_kanbu1[1];
 ItemDropData battle_item_zonbaba[1];
 ItemDropData battle_item_default_param_list[1];
-#ifdef VERSION_G8MP01
+#if defined(VERSION_G8MP01) || defined(VERSION_G8ME01_DEMO)
 ItemDropData battle_item_test_killer_cannon[1];
 ItemDropData battle_item_test_yami_pata[1];
 ItemDropData battle_item_test_yami_noko[1];
@@ -445,7 +445,11 @@ ItemDropData battle_item_met[] = {
     {ITEM_POWER_PUNCH, 5, 5},
     {ITEM_MINI_MR_MINI, 5, 5},
     {ITEM_POWER_JUMP, 0, 2},
+#ifdef VERSION_G8ME01_DEMO
+    {ITEM_POWER_JUMP, 0, 2},
+#else
     {ITEM_POWER_SMASH, 0, 2},
+#endif
     {ITEM_SHRINK_STOMP, 0, 2},
     {0},
 };
@@ -458,7 +462,11 @@ ItemDropData battle_item_togemet[] = {
     {ITEM_POWER_PUNCH, 5, 5},
     {ITEM_REPEL_CAPE, 5, 5},
     {ITEM_POWER_JUMP, 0, 2},
+#ifdef VERSION_G8ME01_DEMO
+    {ITEM_POWER_JUMP, 0, 2},
+#else
     {ITEM_POWER_SMASH, 0, 2},
+#endif
     {ITEM_SHRINK_STOMP, 0, 2},
     {0},
 };
@@ -667,6 +675,102 @@ ItemDropData battle_item_pakkun_flower[] = {
     {0},
 };
 
+ItemDropData battle_item_NONE[] = {
+    {0},
+};
+
+ItemDropData battle_item_nokonoko_fighter[] = {
+    {0},
+};
+
+ItemDropData battle_item_patapata_fighter[] = {
+    {0},
+};
+
+ItemDropData battle_item_boomerang_bros[] = {
+    {0},
+};
+
+ItemDropData battle_item_fire_bros[] = {
+    {0},
+};
+
+ItemDropData battle_item_red_honenoko[] = {
+    {0},
+};
+
+ItemDropData battle_item_poison_pakkun[] = {
+    {0, 200, 300},
+    {ITEM_SUPER_SHROOM, 0, 5},
+    {ITEM_MAPLE_SYRUP, 0, 10},
+    {ITEM_FP_PLUS, 0, 1},
+    {0},
+};
+
+ItemDropData battle_item_ice_pakkun[] = {
+    {0, 200, 300},
+    {ITEM_SUPER_SHROOM, 0, 5},
+    {ITEM_MAPLE_SYRUP, 0, 10},
+    {ITEM_ICE_SMASH, 0, 1},
+    {0},
+};
+
+ItemDropData battle_item_monochrome__pakkun[] = {
+    {0, 200, 300},
+    {ITEM_MUSHROOM, 0, 5},
+    {ITEM_HONEY_SYRUP, 0, 10},
+    {ITEM_FP_PLUS, 0, 1},
+    {0},
+};
+
+ItemDropData battle_item_piders[] = {
+    {0, 200, 300},
+    {ITEM_SLOW_SHROOM, 0, 10},
+    {ITEM_GRADUAL_SYRUP, 0, 5},
+    {0},
+};
+
+ItemDropData battle_item_churantalar[] = {
+    {0, 200, 300},
+    {ITEM_SLOW_SHROOM, 0, 10},
+    {ITEM_GRADUAL_SYRUP, 0, 5},
+    {ITEM_PITY_FLOWER, 0, 2},
+    {ITEM_ALL_OR_NOTHING, 0, 2},
+    {0},
+};
+
+ItemDropData battle_item_barriern[] = {
+    {0},
+};
+
+ItemDropData battle_item_barriern_z[] = {
+    {0},
+};
+
+ItemDropData battle_item_barriern_custom[] = {
+    {0},
+};
+
+ItemDropData battle_item_iron_sinemon[] = {
+    {0},
+};
+
+ItemDropData battle_item_iron_sinemon2[] = {
+    {0},
+};
+
+ItemDropData battle_item_atmic_teresa[] = {
+    {0},
+};
+
+ItemDropData battle_item_killer[] = {
+    {0},
+};
+
+ItemDropData battle_item_super_killer[] = {
+    {0},
+};
+
 ItemDropData battle_item_monochrome_sinemon[] = {
     {0, 200, 300},
     {ITEM_MUSHROOM, 5, 5},
@@ -794,6 +898,42 @@ ItemDropData battle_item_sambo_mummy[] = {
     {ITEM_HP_DRAIN_ITEM, 5, 5},
     {ITEM_MR_SOFTENER, 5, 5},
     {ITEM_FP_PLUS, 0, 2},
+    {0},
+};
+
+ItemDropData battle_item_killer_cannon[] = {
+    {0, 200, 300},
+    {ITEM_MUSHROOM, 0, 5},
+    {ITEM_HONEY_SYRUP, 0, 5},
+    {ITEM_MONEY_MONEY, 0, 2},
+    {0},
+};
+
+ItemDropData battle_item_super_killer_cannon[] = {
+    {0, 200, 300},
+    {ITEM_SUPER_SHROOM, 0, 5},
+    {ITEM_MAPLE_SYRUP, 0, 5},
+    {ITEM_MONEY_MONEY, 0, 2},
+    {0},
+};
+
+ItemDropData battle_item_borodo_king[] = {
+    {0},
+};
+
+ItemDropData battle_item_monban[] = {
+    {0},
+};
+
+ItemDropData battle_item_gold_chorobon[] = {
+    {0},
+};
+
+ItemDropData battle_item_sinnosuke[] = {
+    {0},
+};
+
+ItemDropData battle_item_togedaruma[] = {
     {0},
 };
 
@@ -985,6 +1125,70 @@ ItemDropData battle_item_dark_keeper[] = {
     {ITEM_P_DOWN_D_UP, 2, 2},
     {ITEM_P_DOWN_D_UP_P, 2, 2},
     {ITEM_ALL_OR_NOTHING, 0, 1},
+    {0},
+};
+
+ItemDropData battle_item_yamitogedaruma[] = {
+    {0, 200, 300},
+    {ITEM_SUPER_SHROOM, 0, 10},
+    {ITEM_MAPLE_SYRUP, 0, 10},
+    {ITEM_HAMMERMAN, 0, 2},
+    {0},
+};
+
+ItemDropData battle_item_vivian1[] = {
+    {0},
+};
+
+ItemDropData battle_item_gesso[] = {
+    {0},
+};
+
+ItemDropData battle_item_gonbaba[] = {
+    {0},
+};
+
+ItemDropData battle_item_moamoa[] = {
+    {0},
+};
+
+ItemDropData battle_item_rampell[] = {
+    {0},
+};
+
+ItemDropData battle_item_faker_mario[] = {
+    {0},
+};
+
+ItemDropData battle_item_cortez[] = {
+    {0},
+};
+
+ItemDropData battle_item_kurikuri[] = {
+    {0},
+};
+
+ItemDropData battle_item_magnum_battender[] = {
+    {0},
+};
+
+ItemDropData battle_item_macho_gance[] = {
+    {0},
+};
+
+ItemDropData battle_item_champion[] = {
+    {0},
+};
+
+ItemDropData battle_item_kanbu1[] = {
+    {0},
+};
+
+ItemDropData battle_item_zonbaba[] = {
+    {0},
+};
+
+ItemDropData battle_item_default_param_list[] = {
     {0},
 };
 
@@ -1293,204 +1497,8 @@ PointDropData battle_flower_drop_param_default5[] = {
     {100, 30, 6, 40},
 };
 
-ItemDropData battle_item_NONE[] = {
-    {0},
-};
-
-ItemDropData battle_item_nokonoko_fighter[] = {
-    {0},
-};
-
-ItemDropData battle_item_patapata_fighter[] = {
-    {0},
-};
-
-ItemDropData battle_item_boomerang_bros[] = {
-    {0},
-};
-
-ItemDropData battle_item_fire_bros[] = {
-    {0},
-};
-
-ItemDropData battle_item_red_honenoko[] = {
-    {0},
-};
-
-ItemDropData battle_item_poison_pakkun[] = {
-    {0, 200, 300},
-    {ITEM_SUPER_SHROOM, 0, 5},
-    {ITEM_MAPLE_SYRUP, 0, 10},
-    {ITEM_FP_PLUS, 0, 1},
-    {0},
-};
-
-ItemDropData battle_item_ice_pakkun[] = {
-    {0, 200, 300},
-    {ITEM_SUPER_SHROOM, 0, 5},
-    {ITEM_MAPLE_SYRUP, 0, 10},
-    {ITEM_ICE_SMASH, 0, 1},
-    {0},
-};
-
-ItemDropData battle_item_monochrome__pakkun[] = {
-    {0, 200, 300},
-    {ITEM_MUSHROOM, 0, 5},
-    {ITEM_HONEY_SYRUP, 0, 10},
-    {ITEM_FP_PLUS, 0, 1},
-    {0},
-};
-
-ItemDropData battle_item_piders[] = {
-    {0, 200, 300},
-    {ITEM_SLOW_SHROOM, 0, 10},
-    {ITEM_GRADUAL_SYRUP, 0, 5},
-    {0},
-};
-
-ItemDropData battle_item_churantalar[] = {
-    {0, 200, 300},
-    {ITEM_SLOW_SHROOM, 0, 10},
-    {ITEM_GRADUAL_SYRUP, 0, 5},
-    {ITEM_PITY_FLOWER, 0, 2},
-    {ITEM_ALL_OR_NOTHING, 0, 2},
-    {0},
-};
-
-ItemDropData battle_item_barriern[] = {
-    {0},
-};
-
-ItemDropData battle_item_barriern_z[] = {
-    {0},
-};
-
-ItemDropData battle_item_barriern_custom[] = {
-    {0},
-};
-
-ItemDropData battle_item_iron_sinemon[] = {
-    {0},
-};
-
-ItemDropData battle_item_iron_sinemon2[] = {
-    {0},
-};
-
-ItemDropData battle_item_atmic_teresa[] = {
-    {0},
-};
-
-ItemDropData battle_item_killer[] = {
-    {0},
-};
-
-ItemDropData battle_item_super_killer[] = {
-    {0},
-};
-
-ItemDropData battle_item_killer_cannon[] = {
-    {0, 200, 300},
-    {ITEM_MUSHROOM, 0, 5},
-    {ITEM_HONEY_SYRUP, 0, 5},
-    {ITEM_MONEY_MONEY, 0, 2},
-    {0},
-};
-
-ItemDropData battle_item_super_killer_cannon[] = {
-    {0, 200, 300},
-    {ITEM_SUPER_SHROOM, 0, 5},
-    {ITEM_MAPLE_SYRUP, 0, 5},
-    {ITEM_MONEY_MONEY, 0, 2},
-    {0},
-};
-
-ItemDropData battle_item_borodo_king[] = {
-    {0},
-};
-
-ItemDropData battle_item_monban[] = {
-    {0},
-};
-
-ItemDropData battle_item_gold_chorobon[] = {
-    {0},
-};
-
-ItemDropData battle_item_sinnosuke[] = {
-    {0},
-};
-
-ItemDropData battle_item_togedaruma[] = {
-    {0},
-};
-
-ItemDropData battle_item_yamitogedaruma[] = {
-    {0, 200, 300},
-    {ITEM_SUPER_SHROOM, 0, 10},
-    {ITEM_MAPLE_SYRUP, 0, 10},
-    {ITEM_HAMMERMAN, 0, 2},
-    {0},
-};
-
-ItemDropData battle_item_vivian1[] = {
-    {0},
-};
-
-ItemDropData battle_item_gesso[] = {
-    {0},
-};
-
-ItemDropData battle_item_gonbaba[] = {
-    {0},
-};
-
-ItemDropData battle_item_moamoa[] = {
-    {0},
-};
-
-ItemDropData battle_item_rampell[] = {
-    {0},
-};
-
-ItemDropData battle_item_faker_mario[] = {
-    {0},
-};
-
-ItemDropData battle_item_cortez[] = {
-    {0},
-};
-
-ItemDropData battle_item_kurikuri[] = {
-    {0},
-};
-
-ItemDropData battle_item_magnum_battender[] = {
-    {0},
-};
-
-ItemDropData battle_item_macho_gance[] = {
-    {0},
-};
-
-ItemDropData battle_item_champion[] = {
-    {0},
-};
-
-ItemDropData battle_item_kanbu1[] = {
-    {0},
-};
-
-ItemDropData battle_item_zonbaba[] = {
-    {0},
-};
-
-ItemDropData battle_item_default_param_list[] = {
-    {0},
-};
-
-#ifdef VERSION_G8MP01
-// PAL only: empty drop tables of the tst.rel test battles (BTLNO_TEST_*); killer_cannon is shared by both cannons
+#if defined(VERSION_G8MP01) || defined(VERSION_G8ME01_DEMO)
+// PAL and the demo: empty drop tables of the tst.rel test battles (BTLNO_TEST_*); killer_cannon is shared by both cannons
 ItemDropData battle_item_test_killer_cannon[] = {
     {0},
 };

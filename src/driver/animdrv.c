@@ -216,6 +216,17 @@ u8 _vivihimoData[3][0x400] ATTRIBUTE_ALIGN(32) = {  // G5: target .data is 32-al
     0x3F, 0x80, 0x00, 0x00, 0x3F, 0x80, 0x00, 0x00, 0x3F, 0x80, 0x00, 0x00, 0x3F, 0x80, 0x00, 0x00,
 };
 
+#ifdef VERSION_G8ME01_DEMO
+// the demo's -sdata 8 puts these in .data, ahead of the chain table
+s32 vivihimoTailGroupNo[4] ATTRIBUTE_ALIGN(32) = { 0, 2, -1, -1 };  // G5: target .sdata is 32-aligned
+void* vivihimoData[4] = {
+    NULL,
+    _vivihimoData[0],
+    _vivihimoData[1],
+    _vivihimoData[2],
+};
+#endif
+
 typedef struct MoaChain {
     const char* a;
     const char* b;
@@ -272,11 +283,19 @@ MoaChain g_moamoa_chain_tbl[47] = {
 };
 
 //.bss
+#ifdef VERSION_G8ME01_DEMO
+// the demo defines these before animPoseDrawMtx, so its local static mtx is emitted first in .bss (target order mtx, g_modeling_mtx_stack, work, tanfTbl)
+f32 tanfTbl[0xB2];
+AnimationWork work;
+Mtx g_modeling_mtx_stack[32];
+#else
 extern Mtx g_modeling_mtx_stack[32];
 extern AnimationWork work;
 extern f32 tanfTbl[0xB2];
+#endif
 
 //.sdata
+#ifndef VERSION_G8ME01_DEMO
 s32 vivihimoTailGroupNo[4] ATTRIBUTE_ALIGN(32) = { 0, 2, -1, -1 };  // G5: target .sdata is 32-aligned
 void* vivihimoData[4] = {
     NULL,
@@ -284,6 +303,7 @@ void* vivihimoData[4] = {
     _vivihimoData[1],
     _vivihimoData[2],
 };
+#endif
 static AnimationWork* wp = &work;
 
 //.sbss
@@ -1036,6 +1056,366 @@ GXColor animPoseGetMaterialEvtColor(s32 poseId) {
 // FAKE: t3 = t * t2 through an inline so t3 is an inline return temp (numbered above the LICM temp of t2),
 // giving the target FPR order (t3 f7, t2 f8). Behaviour-identical.
 static inline f32 apmMul(f32 a, f32 b) { return a * b; }
+#ifdef VERSION_G8ME01_DEMO
+// the demo copies the frame buffers through small inline helpers
+static inline void apmCopy4(void* src, void* dst, s32 count, s32 size) {
+    if (count != 0) memcpy_as4(dst, src, count * size);
+}
+
+static inline void apmCopy(void* src, void* dst, s32 count) {
+    if (count != 0) memcpy(dst, src, count);
+}
+
+static inline void apmCopyTo(void* dst, void* src, s32 count, s32 size) {
+    if (count != 0) memcpy_as4(dst, src, count * size);
+}
+
+// the demo converts the s8 deltas with plain casts (no fast-cast setup) and walks the keyframes and deltas by index
+void animPoseMain(s32 poseId) {
+    s32 frame;
+    s32 nA;
+    s32 nB;
+    s32 nD;
+    s32 nextFrame;
+    s32 k;
+    AnimKeyframe* kf;
+    s32 i;
+    s32 j;
+    s32 n;
+    AnimationPoseData* file;
+    AnimData* anim;
+    AnimationPose* poses;
+    u8* grpB;
+    u8* grpA;
+    u8* q;
+    f32 key;
+    u8* v;
+    u8* d;
+    AnimTexDelta* td;
+    AnimationPose* pose;
+    s32 loop;
+    s32 cnt;
+    s32 b;
+    s32 nC;
+    s32 nE;
+    f32 t;
+    f32 f;
+    f32 cur;
+    f32 start;
+    f32 len;
+    f32 tm;
+    f32 dt;
+    f32 s;
+    f32 t2;
+    f32 t3;
+    s64 ms;
+    s32 paperId;
+
+    poses = wp->poses;
+    pose = &poses[poseId];
+    file = animPoseGetBaseData(pose);
+    anim = file->mpAnims[pose->animId].data;
+    if ((s32)wp->mbUseFloatScratch != 0) {
+        grpA = (u8*)wp->vtxArrayPos;
+        grpB = (u8*)wp->vtxArrayNrm;
+    } else {
+        grpA = (u8*)pose->mpVtxArrayPos;
+        grpB = (u8*)pose->mpVtxArrayNrm;
+    }
+    paperId = pose->paperId;
+    if (paperId != -1 && !(animPoseGetAnimPosePtr(paperId)->typeFlags & 2)) {
+        animPoseMain(paperId);
+    }
+    if (anim == NULL) return;
+    loop = *(s32*)anim->loopInfo;
+    if (pose->type == 0) {
+        ms = OSTicksToMilliseconds(gp->renderFieldTime);
+    } else {
+        ms = OSTicksToMilliseconds(gp->renderTime);
+    }
+    tm = (f32)(u64)(ms - pose->localTime);
+    pose->rawFrame = 60.0f * tm / 1000.0f;
+    pose->rawFrame *= pose->localTimeRate;
+    cur = pose->rawFrame;
+    f = anim->loopInfo[2];
+    start = anim->loopInfo[1];
+    len = f - start;
+    if (0.0f == len) {
+        pose->loopTime = cur - start;
+    } else if (loop != 0) {
+        tm = cur - start;
+        if (tm < 0.0f) {
+            pose->loopTime = 0.0f;
+        } else {
+            pose->loopTime = tm / len;
+            start = cur - (f32)(s32)pose->loopTime * len;
+        }
+    } else if (cur < start) {
+        pose->loopTime = 0.0f;
+    } else if (cur > f) {
+        pose->loopTime = (cur - start) / len;
+        start = f;
+    } else {
+        pose->loopTime = (cur - start) / len;
+        start = cur;
+    }
+    pose->localFrame = start;
+    key = pose->localFrame;
+    cnt = anim->keyframeCount;
+    q = (u8*)anim->keyframes;
+    for (i = 0; i < cnt; q += 0x2c, i++) {
+        if (*(f32*)q > key) break;
+    }
+    pose->keyframeIdx = i - 1;
+    pose->nextKeyframeIdx = pose->keyframeIdx + 1;
+    key = pose->localFrame;
+    q = (u8*)anim->valueKeys;
+    cnt = anim->valueKeyCount;
+    for (i = 0; i < cnt; q += 8, i++) {
+        if (*(f32*)q > key) break;
+    }
+    pose->valueKeyIdx = i - 1;
+    pose->nextValueKeyIdx = pose->valueKeyIdx + 1;
+    if (loop == 0) {
+        if (pose->nextKeyframeIdx >= anim->keyframeCount) pose->nextKeyframeIdx = pose->keyframeIdx;
+        if (pose->nextValueKeyIdx >= anim->valueKeyCount) pose->nextValueKeyIdx = pose->valueKeyIdx;
+    }
+    pose->curKeyValue = anim->valueKeys[pose->valueKeyIdx].value;
+    start = anim->keyframes[pose->keyframeIdx].time;
+    tm = pose->localFrame - start;
+    if (loop != 0) {
+        if (pose->nextKeyframeIdx >= anim->keyframeCount) {
+            pose->nextKeyframeIdx = 0;
+            len = anim->loopInfo[2] - anim->keyframes[pose->keyframeIdx].time;
+        } else {
+            len = anim->keyframes[pose->nextKeyframeIdx].time - start;
+        }
+    } else {
+        len = anim->keyframes[pose->nextKeyframeIdx].time - start;
+    }
+    if (0.0f == len) {
+        pose->keyframeBlend = 0.0f;
+    } else {
+        pose->keyframeBlend = tm / len;
+    }
+    frame = pose->keyframeIdx;
+    nextFrame = pose->nextKeyframeIdx;
+    t = pose->keyframeBlend;
+    nA = file->mBufferPosNum;
+    nB = file->mBufferNrmNum;
+    nC = file->mBufferVisibilityNum;
+    nD = file->mBufferNodeNum;
+    nE = file->mBufferTexAnimNum;
+    if (pose->lastFrameZero != frame) {
+        if (pose->lastFrameZero == -1 || pose->lastFrameZero > frame) {
+            apmCopy4((u8*)file->bufferVtxPos, (u8*)pose->mpBufferVtxPos, nA, sizeof(Vec));
+            apmCopy4((u8*)file->nrmVtxBuffer, (u8*)pose->mpBufferVtxNrm, nB, sizeof(Vec));
+            apmCopy(file->groupVisibility, pose->mpBufferGroupVisibility, nC);
+            apmCopy4((u8*)file->nodeData, (u8*)pose->mpBufferNode, nD, 4);
+            apmCopy4((u8*)file->texAnimEntries, (u8*)pose->mpBufferTexAnimEntries, nE, sizeof(AnimTexMtx));
+            if (pose->lastFrameZero == -1) pose->lastFrameZero = 0;
+            s = 0.0625f;
+            for (k = 0; k <= frame; k++) {
+                kf = &anim->keyframes[k];
+                {
+                    u8* d;
+                    u8* v;
+                    v = (u8*)pose->mpBufferVtxPos;
+                    d = anim->vtxPosDeltas + kf->vtxPosStart * 4;
+                    n = kf->vtxPosCount;
+                    for (j = 0; j < n; j++, d += 4) {
+                        v += d[0] * sizeof(Vec);
+                        ((Vec*)v)->x += s * (f32)(s8)d[1];
+                        ((Vec*)v)->y += s * (f32)(s8)d[2];
+                        ((Vec*)v)->z += s * (f32)(s8)d[3];
+                    }
+                }
+                {
+                    u8* d;
+                    u8* v;
+                    v = (u8*)pose->mpBufferVtxNrm;
+                    d = anim->vtxNrmDeltas + kf->vtxNrmStart * 4;
+                    n = kf->vtxNrmCount;
+                    for (j = 0; j < n; j++, d += 4) {
+                        v += d[0] * sizeof(Vec);
+                        ((Vec*)v)->x += s * (f32)(s8)d[1];
+                        ((Vec*)v)->y += s * (f32)(s8)d[2];
+                        ((Vec*)v)->z += s * (f32)(s8)d[3];
+                    }
+                }
+                {
+                    u8* d;
+                    u8* v;
+                    v = (u8*)pose->mpBufferGroupVisibility;
+                    d = anim->visDeltas + kf->visStart * 2;
+                    n = kf->visCount;
+                    for (j = 0; j < n; j++, d += 2) {
+                        v += d[0];
+                        v[0] += d[1];
+                    }
+                }
+                {
+                    u8* d;
+                    u8* v;
+                    v = (u8*)pose->mpBufferNode;
+                    d = anim->nodeDeltas + kf->nodeStart * 4;
+                    n = kf->nodeCount;
+                    for (j = 0; j < n; j++, d += 4) {
+                        v += d[0] * 4;
+                        *(f32*)v += s * (f32)(s8)d[1];
+                    }
+                }
+                {
+                    u8* v;
+                    v = (u8*)pose->mpBufferTexAnimEntries;
+                    td = &anim->texDeltas[kf->texStart];
+                    n = kf->texCount;
+                    for (j = 0; j < n; j++, td++) {
+                        v += td->step * sizeof(AnimTexMtx);
+                        v[0] = v[0] + td->bindAdd;
+                        ((AnimTexMtx*)v)->mTransS += td->transS;
+                        ((AnimTexMtx*)v)->mTransT += td->transT;
+                    }
+                }
+            }
+        } else if (pose->lastFrameZero < frame) {
+            s = 0.0625f;
+            for (k = pose->lastFrameZero + 1; k <= frame; k++) {
+                kf = &anim->keyframes[k];
+                {
+                    u8* d;
+                    u8* v;
+                    v = (u8*)pose->mpBufferVtxPos;
+                    d = anim->vtxPosDeltas + kf->vtxPosStart * 4;
+                    n = kf->vtxPosCount;
+                    for (j = 0; j < n; j++, d += 4) {
+                        v += d[0] * sizeof(Vec);
+                        ((Vec*)v)->x += s * (f32)(s8)d[1];
+                        ((Vec*)v)->y += s * (f32)(s8)d[2];
+                        ((Vec*)v)->z += s * (f32)(s8)d[3];
+                    }
+                }
+                {
+                    u8* d;
+                    u8* v;
+                    v = (u8*)pose->mpBufferVtxNrm;
+                    d = anim->vtxNrmDeltas + kf->vtxNrmStart * 4;
+                    n = kf->vtxNrmCount;
+                    for (j = 0; j < n; j++, d += 4) {
+                        v += d[0] * sizeof(Vec);
+                        ((Vec*)v)->x += s * (f32)(s8)d[1];
+                        ((Vec*)v)->y += s * (f32)(s8)d[2];
+                        ((Vec*)v)->z += s * (f32)(s8)d[3];
+                    }
+                }
+                {
+                    u8* d;
+                    u8* v;
+                    v = (u8*)pose->mpBufferGroupVisibility;
+                    d = anim->visDeltas + kf->visStart * 2;
+                    n = kf->visCount;
+                    for (j = 0; j < n; j++, d += 2) {
+                        v += d[0];
+                        v[0] += d[1];
+                    }
+                }
+                {
+                    u8* d;
+                    u8* v;
+                    v = (u8*)pose->mpBufferNode;
+                    d = anim->nodeDeltas + kf->nodeStart * 4;
+                    n = kf->nodeCount;
+                    for (j = 0; j < n; j++, d += 4) {
+                        v += d[0] * 4;
+                        *(f32*)v += s * (f32)(s8)d[1];
+                    }
+                }
+                {
+                    u8* v;
+                    v = (u8*)pose->mpBufferTexAnimEntries;
+                    td = &anim->texDeltas[kf->texStart];
+                    n = kf->texCount;
+                    for (j = 0; j < n; j++, td++) {
+                        v += td->step * sizeof(AnimTexMtx);
+                        v[0] = v[0] + td->bindAdd;
+                        ((AnimTexMtx*)v)->mTransS += td->transS;
+                        ((AnimTexMtx*)v)->mTransT += td->transT;
+                    }
+                }
+            }
+        }
+    } else {
+        if (pose->lastFrameTime > t) pose->lastFrameTime = 0.0f;
+    }
+    if (frame == nextFrame) {
+        apmCopyTo(grpA, (u8*)pose->mpBufferVtxPos, nA, sizeof(Vec));
+        apmCopyTo(grpB, (u8*)pose->mpBufferVtxNrm, nB, sizeof(Vec));
+        apmCopyTo((u8*)pose->mpNodes, (u8*)pose->mpBufferNode, nD, 4);
+    } else if (frame <= nextFrame) {
+        kf = &anim->keyframes[nextFrame];
+        s = 0.0625f * t;
+        d = anim->vtxPosDeltas + kf->vtxPosStart * 4;
+        v = (u8*)pose->mpBufferVtxPos;
+        n = kf->vtxPosCount;
+        apmCopyTo(grpA, v, nA, sizeof(Vec));
+        v = grpA;
+        for (j = 0; j < n; j++, d += 4) {
+            v += d[0] * sizeof(Vec);
+            ((Vec*)v)->x += (f32)(s8)d[1] * s;
+            ((Vec*)v)->y += (f32)(s8)d[2] * s;
+            ((Vec*)v)->z += (f32)(s8)d[3] * s;
+        }
+        d = anim->vtxNrmDeltas + kf->vtxNrmStart * 4;
+        v = (u8*)pose->mpBufferVtxNrm;
+        n = kf->vtxNrmCount;
+        apmCopyTo(grpB, v, nB, sizeof(Vec));
+        v = grpB;
+        for (j = 0; j < n; j++, d += 4) {
+            v += d[0] * sizeof(Vec);
+            ((Vec*)v)->x += (f32)(s8)d[1] * s;
+            ((Vec*)v)->y += (f32)(s8)d[2] * s;
+            ((Vec*)v)->z += (f32)(s8)d[3] * s;
+        }
+        d = anim->nodeDeltas + kf->nodeStart * 4;
+        v = (u8*)pose->mpBufferNode;
+        dt = anim->keyframes[nextFrame].time - anim->keyframes[frame].time;
+        n = kf->nodeCount;
+        apmCopyTo((u8*)pose->mpNodes, v, nD, 4);
+        v = (u8*)pose->mpNodes;
+        for (j = 0; j < n; j++, d += 4) {
+            b = (s8)d[3];
+            v += d[0] * 4;
+            if (b < 0x59 && b > -0x59) {
+                f32 hb;
+
+                t2 = t * t;
+                t3 = apmMul(t, t2);
+                hb = -2.0f * t3 + 3.0f * t2;
+                *(f32*)v = *(f32*)v + ((t + (t3 - 2.0f * t2)) * (dt * tanfTbl[(s8)d[2] + 0x59]) +
+                                hb * (0.0625f * (f32)(s8)d[1]) +
+                                (t3 - t2) * (dt * tanfTbl[b + 0x59]));
+            }
+        }
+    }
+    pose->lastFrameZero = frame;
+    pose->lastFrameTime = t;
+    if (pose->flags & 8) {
+        CameraEntry* cam = camGetPtr(CAMERA_3D);
+        f = 57.29579f * (f32)atan2(-(cam->cameraAt.x - cam->cameraPos.x), -(cam->cameraAt.z - cam->cameraPos.z));
+        while (f < -360.0f) f += 360.0f;
+        while (f >= 360.0f) f -= 360.0f;
+        if (f < 0.0f) f += 360.0f;
+        f -= pose->rotationY;
+        while (f < -360.0f) f += 360.0f;
+        while (f >= 360.0f) f -= 360.0f;
+        if ((f > 90.0f && f <= 270.0f) || (f < -90.0f && f >= -270.0f)) {
+            pose->scaleZFlip = -1.0f;
+        } else {
+            pose->scaleZFlip = 1.0f;
+        }
+    }
+}
+#else
 void animPoseMain(s32 poseId) {
     s32 frame;
     s32 nA;
@@ -1395,6 +1775,96 @@ void animPoseMain(s32 poseId) {
     }
 }
 
+#endif
+
+#ifdef VERSION_G8ME01_DEMO
+// the demo always builds every matrix and concatenates them all
+void pushGXModelMtx_TransformNode__(AnimPoseNode* node) {
+    Mtx trans, scale, rot, tmp;
+    Mtx sc1, sc2, sc3;
+    Mtx rc1, rc2, rc3;
+
+    PSMTXTrans(trans, node->mTranslation.x, node->mTranslation.y, node->mTranslation.z);
+    PSMTXScale(scale, node->mScale.x, node->mScale.y, node->mScale.z);
+    if (0.0f != node->mScaleCenter.x || 0.0f != node->mScaleCenter.y || 0.0f != node->mScaleCenter.z) {
+        PSMTXTrans(sc2, -node->mScaleCenter.x, -node->mScaleCenter.y, -node->mScaleCenter.z);
+        PSMTXTrans(sc1, node->mScaleCenter.x, node->mScaleCenter.y, node->mScaleCenter.z);
+        PSMTXTrans(sc3, node->mScaleTranslation.x, node->mScaleTranslation.y, node->mScaleTranslation.z);
+        PSMTXConcat(sc3, sc1, tmp);
+        PSMTXConcat(tmp, scale, tmp);
+        PSMTXConcat(tmp, sc2, scale);
+    }
+    PSMTXIdentity(rot);
+    if (2.0f * node->mRot1.z) {
+        PSMTXRotRad(tmp, 'z', 0.017453292f * (2.0f * node->mRot1.z));
+        PSMTXConcat(rot, tmp, rot);
+    }
+    if (2.0f * node->mRot1.y) {
+        PSMTXRotRad(tmp, 'y', 0.017453292f * (2.0f * node->mRot1.y));
+        PSMTXConcat(rot, tmp, rot);
+    }
+    if (2.0f * node->mRot1.x) {
+        PSMTXRotRad(tmp, 'x', 0.017453292f * (2.0f * node->mRot1.x));
+        PSMTXConcat(rot, tmp, rot);
+    }
+    if (0.0f != node->mRotationCenter.x || 0.0f != node->mRotationCenter.y || 0.0f != node->mRotationCenter.z) {
+        PSMTXTrans(rc2, -node->mRotationCenter.x, -node->mRotationCenter.y, -node->mRotationCenter.z);
+        PSMTXTrans(rc1, node->mRotationCenter.x, node->mRotationCenter.y, node->mRotationCenter.z);
+        PSMTXTrans(rc3, node->mRotationTranslation.x, node->mRotationTranslation.y, node->mRotationTranslation.z);
+        PSMTXConcat(rc3, rc1, tmp);
+        PSMTXConcat(tmp, rot, rot);
+        PSMTXConcat(rot, rc2, rot);
+    }
+    g_modeling_mtx_lv++;
+    g_modeling_mtx = &g_modeling_mtx_stack[g_modeling_mtx_lv];
+    PSMTXConcat(trans, rot, tmp);
+    PSMTXConcat(tmp, scale, trans);
+    PSMTXConcat(g_modeling_mtx_stack[g_modeling_mtx_lv - 1], trans, g_modeling_mtx_stack[g_modeling_mtx_lv]);
+}
+
+void pushGXModelMtx_JointNode__(AnimPoseNode* node, f32 sx, f32 sy, f32 sz) {
+    Mtx trans, scale, iscale, rot, tmp;
+
+    PSMTXTrans(trans, node->mTranslation.x, node->mTranslation.y, node->mTranslation.z);
+    if (sx && sy && sz) {
+        PSMTXScale(iscale, 1.0f / sx, 1.0f / sy, 1.0f / sz);
+    } else {
+        PSMTXScale(iscale, 1.0f, 1.0f, 1.0f);
+    }
+    PSMTXScale(scale, node->mScale.x, node->mScale.y, node->mScale.z);
+    PSMTXIdentity(rot);
+    if (node->mRot2.z) {
+        PSMTXRotRad(tmp, 'z', 0.017453292f * node->mRot2.z);
+        PSMTXConcat(rot, tmp, rot);
+    }
+    if (node->mRot2.y) {
+        PSMTXRotRad(tmp, 'y', 0.017453292f * node->mRot2.y);
+        PSMTXConcat(rot, tmp, rot);
+    }
+    if (node->mRot2.x) {
+        PSMTXRotRad(tmp, 'x', 0.017453292f * node->mRot2.x);
+        PSMTXConcat(rot, tmp, rot);
+    }
+    if (2.0f * node->mRot1.z) {
+        PSMTXRotRad(tmp, 'z', 0.017453292f * (2.0f * node->mRot1.z));
+        PSMTXConcat(rot, tmp, rot);
+    }
+    if (2.0f * node->mRot1.y) {
+        PSMTXRotRad(tmp, 'y', 0.017453292f * (2.0f * node->mRot1.y));
+        PSMTXConcat(rot, tmp, rot);
+    }
+    if (2.0f * node->mRot1.x) {
+        PSMTXRotRad(tmp, 'x', 0.017453292f * (2.0f * node->mRot1.x));
+        PSMTXConcat(rot, tmp, rot);
+    }
+    g_modeling_mtx_lv++;
+    g_modeling_mtx = &g_modeling_mtx_stack[g_modeling_mtx_lv];
+    PSMTXConcat(trans, iscale, tmp);
+    PSMTXConcat(tmp, rot, tmp);
+    PSMTXConcat(tmp, scale, trans);
+    PSMTXConcat(g_modeling_mtx_stack[g_modeling_mtx_lv - 1], trans, g_modeling_mtx_stack[g_modeling_mtx_lv]);
+}
+#else
 void pushGXModelMtx_TransformNode__(AnimPoseNode* node) {
     Mtx trans, scale, rot, tmp;
     Mtx sc1, sc2, sc3;
@@ -1612,10 +2082,170 @@ void pushGXModelMtx_JointNode__(AnimPoseNode* node, f32 sx, f32 sy, f32 sz) {
     }
     PSMTXConcat(g_modeling_mtx_stack[g_modeling_mtx_lv - 1], p, g_modeling_mtx_stack[g_modeling_mtx_lv]);
 }
+#endif
 
 #include "sdk/texPalette.h"
 
 void animSetMaterial_Texture(s32 texCount, s32 *texIdRemap, AnimPoseTexEntry *pTexEntries, AnimTexMtx *animEntries, s32 texBindsCapacity, AnimTexBind *texBinds, AnimationTextureFile *texFile);
+#ifdef VERSION_G8ME01_DEMO
+// the demo sets up each texture object, then builds the full texture matrix unless the animation is the identity.
+// The local declaration order is load-bearing: it decides the register colouring (wrapFlags r30, params r23-r29).
+void animSetMaterial_Texture(s32 texCount, s32 *texIdRemap, AnimPoseTexEntry *pTexEntries, AnimTexMtx *animEntries, s32 texBindsCapacity, AnimTexBind *texBinds, AnimationTextureFile *texFile)
+{
+  u32 mipmap;
+  u32 texId;
+  s32 id;
+  s32 wrapT;
+  TEXDescriptor *desc;
+  s32 bindId;
+  s32 wrapS;
+  s32 i;
+  GXTlutObj tlut;
+  TEXHeader *hdr;
+  GXTexObj obj;
+  s32 wrapFlags;
+  AnimPoseTexEntry *entry;
+  s32 tex2;
+  for (i = 0; i < texCount; i++)
+  {
+    id = texIdRemap[(u32) ((texCount - i) - 1)];
+    entry = &pTexEntries[id];
+    bindId = entry->bindId + animEntries[id].mTexBindIdx;
+    if ((bindId < 0) || (bindId >= texBindsCapacity))
+    {
+      bindId = 0;
+              printf("Error: dispSetTevMode: \203x\201[\203X\203\202\203f\203\213%s \203A\203j\203\201 %s \223\340\202\305 \203t\203\214\201[\203\200\203G\203N\203X\203e\203\223\203V\203\207\203\223\202\314\220\335\222\350\202\252\215s\202\355\202\352\202\304\202\242\202\334\202\267\202\252\201A\212Y\223\226\202\267\202\351\203e\203N\203X\203`\203\203\202\252\202\240\202\350\202\334\202\271\202\361 \nframeExt\224\324\215\206 %d? \202\252\226\263\202\242\202\346\202\244\202\305\202\267\201B\203\202\203f\203\213\202\334\202\275\202\315\203A\203j\203\201\202\311\217C\220\263\202\252\225K\227v\202\305\202\267\201BtextureIdx=%d\n",
+                   animPoseGetBaseData(wp->mpCurPose)->fileName,
+                   animPoseGetBaseData(wp->mpCurPose)->mpAnims[wp->mpCurPose->animId].name,
+                   animEntries[id].mTexBindIdx, entry->bindId);
+    }
+    wrapFlags = entry->wrapFlags;
+    texId = texBinds[bindId].texId;
+    if (texBinds[bindId].texType != 0)
+    {
+      continue;
+    }
+    tex2 = texId; // FAKE: s32 copy after the continue: texId loads into r4 for the first TEXGet, then mr r20,r4 as in the target
+    if (TEXGet(*((TEXPalette **) texFile->handle->data), texId)->CLUTHeader)
+    {
+      desc = TEXGet(*((TEXPalette **) texFile->handle->data), tex2);
+      hdr = desc->textureHeader;
+      wrapS = hdr->wrapS;
+      wrapT = hdr->wrapT;
+      if (wrapFlags >= 0)
+      {
+        if (wrapFlags & 4)
+        {
+          wrapS = GX_MIRROR;
+        }
+        else
+        {
+          wrapS = wrapFlags;
+          wrapS = wrapS & 1;
+        }
+        if (wrapFlags & 8)
+        {
+          wrapT = GX_MIRROR;
+        }
+        else
+        {
+          wrapT = (wrapFlags >> 1) & 1;
+        }
+      }
+      mipmap = hdr->minLOD != hdr->maxLOD;
+      GXInitTlutObj(&tlut, desc->CLUTHeader->data, desc->CLUTHeader->format, desc->CLUTHeader->numEntries);
+      GXInitTexObjCI(&obj, desc->textureHeader->data, desc->textureHeader->width, desc->textureHeader->height, (GXCITexFmt) desc->textureHeader->format, wrapS, wrapT, mipmap, 0);
+      hdr = desc->textureHeader;
+      GXInitTexObjLOD(&obj, hdr->minFilter, hdr->magFilter, hdr->minLOD, hdr->maxLOD, hdr->LODBias, (GXBool) 0, hdr->edgeLODEnable, GX_ANISO_1);
+      GXLoadTlut(&tlut, 0);
+      GXLoadTexObj(&obj, (GXTexMapID) i);
+    }
+    else
+    {
+      desc = TEXGet(*((TEXPalette **) texFile->handle->data), tex2);
+      hdr = desc->textureHeader;
+      wrapS = hdr->wrapS;
+      wrapT = hdr->wrapT;
+      if (wrapFlags >= 0)
+      {
+        if (wrapFlags & 4)
+        {
+          wrapS = GX_MIRROR;
+        }
+        else
+        {
+          // FAKE: `!= 0` (same value, wrapFlags & 1 is 0 or 1) leaves a temp beside wrapFlags that lifts it to r30; with the
+          // plain `wrapFlags & 1` the branch becomes a li/bne select, and the two-step form of the CI path keeps wrapFlags at r22
+          wrapS = (wrapFlags & 1) != 0;
+        }
+        if (wrapFlags & 8)
+        {
+          wrapT = GX_MIRROR;
+        }
+        else
+        {
+          wrapT = (wrapFlags >> 1) & 1;
+        }
+      }
+      GXInitTexObj(&obj, hdr->data, hdr->width, hdr->height, (GXTexFmt) hdr->format, wrapS, wrapT, hdr->minLOD != hdr->maxLOD);
+      hdr = desc->textureHeader;
+      GXInitTexObjLOD(&obj, hdr->minFilter, hdr->magFilter, hdr->minLOD, hdr->maxLOD, hdr->LODBias, (GXBool) 0, hdr->edgeLODEnable, GX_ANISO_1);
+      GXLoadTexObj(&obj, (GXTexMapID) i);
+    }
+  }
+  {
+    // FAKE: the texture-matrix pass is a block here rather than an inlined helper (as an inline its counter colours r21 not
+    // r22); j is a one-element array (an IRO temp, so j colours r20 and texMtx r21), and the dead gz guard keeps k = 0 from
+    // being propagated into j, giving the target's li r22,0 / mr r20,r22 (the guard leaves no code after RA)
+    s32 gz;
+    s32 texMtx;
+    f32 scaleS;
+    f32 scaleT;
+    f32 transS;
+    f32 transT;
+    Mtx m;
+    AnimTexMtx *anim;
+    f32 rotate;
+    Mtx tmp;
+    s32 j[1];
+    s32 k;
+    k = 0;
+    gz = 0;
+    if (gz != 0)
+    {
+      k = 0;
+    }
+    for (j[0] = k; k < texCount; k++, j[0] += 3)
+    {
+      anim = &animEntries[texIdRemap[(u32) ((texCount - k) - 1)]];
+      scaleS = anim->mScaleS;
+      scaleT = anim->mScaleT;
+      transS = anim->mTransS;
+      transT = anim->mTransT;
+      rotate = anim->mRotate;
+      if (scaleS == 1.0f && scaleT == 1.0f && transS == 0.0f && transT == 0.0f && rotate == 0.0f)
+      {
+        GXSetTexCoordGen2((GXTexCoordID) k, GX_TG_MTX2x4, (GXTexGenSrc) (GX_TG_TEX0 + k), GX_IDENTITY, (GXBool) 0, GX_PTIDENTITY);
+        continue;
+      }
+      PSMTXIdentity(m);
+      PSMTXTrans(tmp, 0.5f, 0.5f, 0.0f);
+      PSMTXConcat(m, tmp, m);
+      PSMTXRotRad(tmp, 'z', 0.017453292f * (-rotate));
+      PSMTXConcat(m, tmp, m);
+      PSMTXTrans(tmp, -0.5f, -0.5f, 0.0f);
+      PSMTXConcat(m, tmp, m);
+      PSMTXTrans(tmp, transS, (1.0f - transT) - scaleT, 0.0f);
+      PSMTXConcat(m, tmp, m);
+      PSMTXScale(tmp, scaleS, scaleT, 0.0f);
+      PSMTXConcat(m, tmp, m);
+      texMtx = GX_TEXMTX0 + j[0];
+      GXSetTexCoordGen2((GXTexCoordID) k, GX_TG_MTX2x4, (GXTexGenSrc) (GX_TG_TEX0 + k), texMtx, (GXBool) 0, GX_PTIDENTITY);
+      GXLoadTexMtxImm(m, texMtx, GX_MTX2x4);
+    }
+  }
+}
+#else
 void animSetMaterial_Texture(s32 texCount_, s32 *texIdRemap_, AnimPoseTexEntry *pTexEntries_, AnimTexMtx *animEntries, s32 texBindsCapacity, AnimTexBind *texBinds, AnimationTextureFile *texFile)
 {
   s32 texCount;
@@ -1827,6 +2457,7 @@ void animSetMaterial_Texture(s32 texCount_, s32 *texIdRemap_, AnimPoseTexEntry *
   }
 
 }
+#endif
 
 inline BOOL animSetMaterial_ChangeTexture(AnimationPoseData* data, AnimPoseShapeDraw* draw, AnimationPose* pose, GXTexObj* texObj, void** texData, Mtx mtx, s32 texType) {
     AnimTexBind* bind;
@@ -1890,17 +2521,21 @@ void materialProc(s32 shapeId, s32 xluStage)
   BOOL check1;
   s32 dispMode;
   AnimPoseShape *shape;
+#ifndef VERSION_G8ME01_DEMO
   Mtx camMtx;
   Mtx invCamMtx;
+#endif
   Vec lightPos;
   if (shapeId != (-1))
   {
+#ifndef VERSION_G8ME01_DEMO
     camera = camGetCurPtr();
     PSMTXConcat(camera->view, *g_modeling_mtx, camMtx);
     GXLoadPosMtxImm(camMtx, 0);
     PSMTXInvXpose(camMtx, invCamMtx);
     GXLoadNrmMtxImm(invCamMtx, 0);
     GXSetCurrentMtx(0);
+#endif
     shape = &wp->mpCurPoseData->shapes[shapeId];
     dispMode = shape->dispMode;
     drawCount = shape->shapeDrawCount;
@@ -2019,11 +2654,21 @@ void renderProc(s32 shapeId, s32 unused) {
         GXTexObj* texObj;
         CameraEntry* camera;
         s32 index;
+#ifdef VERSION_G8ME01_DEMO
+        Mtx* model = g_modeling_mtx;
+        camera = camGetCurPtr();
+        MTXConcat(camera->view, *model, camMtx);
+        GXLoadPosMtxImm(camMtx, 0);
+        MTXInverse(camMtx, invCamMtx);
+        MTXTranspose(invCamMtx, camMtx);
+        GXLoadNrmMtxImm(camMtx, 0);
+#else
         camera = camGetCurPtr();
         MTXConcat(camera->view, *g_modeling_mtx, camMtx);
         GXLoadPosMtxImm(camMtx, 0);
         MTXInvXpose(camMtx, invCamMtx);
         GXLoadNrmMtxImm(invCamMtx, 0);
+#endif
         GXSetCurrentMtx(0);
 
         data = wp->mpCurPoseData;
@@ -2301,6 +2946,20 @@ void dispProc(s32 parentId, s32 groupId, s32 xluStage, s32 nextKeyframe, f32 ble
             m = g_modeling_mtx;
             mat = pose->matrix;
             switch (type) {
+#ifdef VERSION_G8ME01_DEMO
+                case 1:
+                    offA = -2.0f;
+                    offB = 2.0f;
+                    break;
+                case 2:
+                    offA = -3.0f;
+                    offB = 1.0f;
+                    break;
+                case 3:
+                    offA = -1.0f;
+                    offB = 1.0f;
+                    break;
+#else
                 case 1:
                     offA = -2.0f;
                     offB = 0.5f;
@@ -2313,6 +2972,7 @@ void dispProc(s32 parentId, s32 groupId, s32 xluStage, s32 nextKeyframe, f32 ble
                     offA = -1.0f;
                     offB = 0.5f;
                     break;
+#endif
             }
             materialProc(group->shapeId, xluStage);
             vivihimo(*m, mat, speed[0], speed[1], offA, offB);
@@ -3381,6 +4041,8 @@ const char* animPoseGetGroupName(s32 poseId, s32 group) {
 
 // .bss definitions last, reverse target order: emitted g_modeling_mtx_stack, work, tanfTbl as in the target
 // (asm references alone would order them by first use)
+#ifndef VERSION_G8ME01_DEMO
 f32 tanfTbl[0xB2];
 AnimationWork work;
 Mtx g_modeling_mtx_stack[32];
+#endif

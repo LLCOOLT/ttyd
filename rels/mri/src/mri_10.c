@@ -53,7 +53,11 @@ static EVT_BEGIN(item_evt)
     CALL(evt_puni_puninum_onoff, 0)
     CALL(evt_mobj_get_position, STRING("mobj_box00"), LW(0), LW(1), LW(2))
     CALL(lect_juyoitem_rel_set, PTR(all_juyoitem_lecture_rel))
+#ifdef VERSION_G8ME01_DEMO
+    CALL(evt_item_entry, STRING("item00"), 7, LW(0), LW(1), LW(2), 16, -1, 0)
+#else
     CALL(evt_item_entry, STRING("item00"), 7, LW(0), LW(1), LW(2), 17, -1, 0)
+#endif
     CALL(evt_mobj_wait_animation_end, STRING("mobj_box00"))
     CALL(evt_item_get_important_item, STRING("item00"))
     CALL(evt_item_get_item, STRING("item00"))

@@ -324,14 +324,22 @@ void winBadgeDisp(s32 camId, void* param, s32 n) {
 #else
     winFontSet((Vec){x - 220.0f, yy = yy - 4.0f, 0.0f}, (Vec){0.8f, 0.8f, 0.8f}, black, "ＢＰ");
 #endif
+#ifdef VERSION_G8ME01_DEMO
+    winFontSet((Vec){x - 175.0f, yy, 0.0f}, (Vec){0.8f, 0.8f, 0.8f}, black, "%d", pouch->maximumBP);
+#else
     winFontSetR((Vec){(x - 175.0f) - 18.0f, yy, 0.0f}, (Vec){0.8f, 0.8f, 0.8f}, black, "%s", winZenkakuStr(pouch->maximumBP));
+#endif
 #ifdef VERSION_G8ME01
     tw = FontGetMessageWidth(msgSearch("msg_menu_badge_nokori")) * 0.5f + 60.0f;
     winFontSet((Vec){4.0f + (16.0f + ((x - 260.0f) + (150.0f - tw))), ((20.0f + (y - 108.0f)) - 18.0f) + (10 - Q) * 13, 0.0f}, (Vec){0.5f, 0.5f, 0.5f}, black, msgSearch("msg_menu_badge_nokori"));
 #else
     winFontSet((Vec){x - 180.0f, ((20.0f + (y - 108.0f)) - 18.0f) + (10 - Q) * 13, 0.0f}, (Vec){0.5f, 0.5f, 0.5f}, black, msgSearch("msg_menu_badge_nokori"));
 #endif
+#ifdef VERSION_G8ME01_DEMO
+    winFontSet((Vec){x - 145.0f, ((20.0f + (y - 102.0f)) - 18.0f) + (10 - Q) * 13, 0.0f}, (Vec){0.8f, 0.8f, 0.8f}, black, "%d", pouch->availableBP);
+#else
     winFontSetR((Vec){VERSION_PICK((x - 145.0f) - 16.0f, 4.0f + ((x - 145.0f) - 16.0f)), ((20.0f + (y - 102.0f)) - 18.0f) + (10 - Q) * 13, 0.0f}, (Vec){0.8f, 0.8f, 0.8f}, black, "%s", winZenkakuStr(pouch->availableBP));
+#endif
     winTexInit((TEXPalette*)*w->res->data);
     d = 28.0f + y;
     for (i = 0; i < pouch->availableBP; i++) {
@@ -349,10 +357,17 @@ void badge_disp(WindowWork* w, f32 xo, f32 yo) {
     ItemData* item;
     s8* cost;
     s32 j;
+#ifdef VERSION_G8ME01_DEMO
+    GXColor colA;
+    GXColor colB;
+    GXColor colU;
+    GXColor colD;
+#else
     GXColor colA = {255, 255, 255, 255};
     GXColor colB;
     GXColor colU;
     GXColor colD;
+#endif
     char buf[64];
     s32 cnt;
     s32 i;
@@ -363,6 +378,12 @@ void badge_disp(WindowWork* w, f32 xo, f32 yo) {
     f32 width;
     s32 tw;
 
+#ifdef VERSION_G8ME01_DEMO
+    colA = (GXColor){255, 255, 255, 255};
+    colB = (GXColor){0, 0, 0, 255};
+    colU = colA;
+    colD = colB;
+#endif
     if (w->badge.tab == 0) {
         cnt = pouchGetHaveBadgeCnt();
     } else {
@@ -389,8 +410,22 @@ void badge_disp(WindowWork* w, f32 xo, f32 yo) {
         }
         if (equipped) {
             winTexInit((TEXPalette*)*w->res->data);
+#ifdef VERSION_G8ME01_DEMO
+            winTexSet(0x1E, (Vec){82.0f + xo, (scroll + ((yo + 110.0f) - (f32)(i * 23))), 0.0f}, (Vec){44.0f, 1.0f, 1.0f}, colA);
+#else
             winTexSet(0x1E, (Vec){82.0f + xo, (scroll + ((yo + 110.0f) - (f32)(i * 23))), 0.0f}, (Vec){44.0f, 1.0f, 1.0f}, (GXColor){0xFF, 0xFF, 0xFF, 0xFF});
+#endif
         }
+#ifdef VERSION_G8ME01_DEMO
+        // The demo draws every badge in black, with a plain "%d" cost.
+        winIconInit();
+        winIconSet(itemDataTable[badge].icon_id, (Vec){xo - 75.0f, (scroll + ((yo + 110.0f) - (f32)(i * 23))), 0.0f}, (Vec){0.54f, 0.54f, 0.54f}, colA);
+        item = &itemDataTable[badge];
+        winFontInit();
+        winFontSet((Vec){xo - 55.0f, scroll + (12.0f + ((yo + 110.0f) - (f32)(i * 23))), 0.0f}, (Vec){0.9f, 0.9f, 0.9f}, colB, item->id);
+        cost = &item->bp_cost;
+        winFontSet((Vec){130.0f + xo, scroll + (12.0f + ((yo + 110.0f) - (f32)(i * 23))), 0.0f}, (Vec){0.9f, 0.9f, 0.9f}, colB, "%d", *cost);
+#else
         if (!equipped && itemDataTable[badge].bp_cost > pouchGetPtr()->availableBP) {
             colB = (GXColor){0x7F, 0x7F, 0x7F, 0xFF};
             gray = 1;
@@ -414,6 +449,7 @@ void badge_disp(WindowWork* w, f32 xo, f32 yo) {
         cost = &item->bp_cost;
         sprintf(buf, "%s", winZenkakuStr(*cost));
         winFontSet((Vec){(142.0f + xo) - (f32)(FontGetMessageWidth(buf) / 2), scroll + (12.0f + ((yo + 110.0f) - (f32)(i * 23))), 0.0f}, (Vec){0.9f, 0.9f, 0.9f}, colB, buf);
+#endif
         winTexInit((TEXPalette*)*w->res->data);
         for (j = 0; j < *cost; j++) {
             { s32 t; winTexSet((t = 0x1D, equipped ? t = 0x1C : 0, t), (Vec){(160.0f + xo) + j * 13, (scroll + ((yo + 110.0f) - (f32)(i * 23))), 0.0f}, (Vec){1.0f, 1.0f, 1.0f}, colA); }
@@ -422,8 +458,10 @@ void badge_disp(WindowWork* w, f32 xo, f32 yo) {
     GXSetScissor(0, 0, 0x260, 0x1E0);
     {
         f32 ax;
+#ifndef VERSION_G8ME01_DEMO
         colU = (GXColor){255, 255, 255, 255};
         colD = (GXColor){0, 0, 0, 255};
+#endif
 
         if (w->badge.page[w->badge.tab] > 0) {
             winTexInit((TEXPalette*)*w->res->data);

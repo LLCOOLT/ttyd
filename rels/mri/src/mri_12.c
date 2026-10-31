@@ -215,7 +215,11 @@ EVT_BEGIN(mri_12_init_evt)
     SPAWN_EVENT(PTR(punipuni_ball00_init))
     CALL(evt_run_case_evt, 9, 1, STRING("A_dai_mae"), 0, PTR(punipuni_ball00), 0)
     CALL(evt_npc_change_fbat_mode, 1)
+#ifdef VERSION_G8ME01_DEMO
+    CALL(evt_item_entry, STRING("item_00"), 125, -175, -310, -85, 15, GSWF(5615), 0)
+#else
     CALL(evt_item_entry, STRING("item_00"), 125, -175, -310, -85, 16, GSWF(5615), 0)
+#endif
     RETURN
 EVT_END()
 

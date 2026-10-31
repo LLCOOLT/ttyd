@@ -127,7 +127,12 @@ typedef struct MarioMotSlit {      // mot_slit.c (paper slit / side-step)
     s32 counter;                   // 0x04
     f32 pushDir;                   // 0x08, 0 or 180: slide direction relative to targetYaw while pushing a 0x2000 wall
     f32 lastY;                     // 0x0C, position.y last frame
+#ifdef VERSION_G8ME01_DEMO
+    s16 timer2;                    // 0x10, demo: slitTimer2 (US keeps it in MarioWork)
+    s16 resumeState;               // 0x12, demo: state marioSlitResume returns to
+#else
     u8 pad10[4];                   // 0x10
+#endif
     s16 timer;                     // 0x14
     s16 count;                     // 0x16
     s16 flags;                     // 0x18, bit 0
@@ -375,7 +380,9 @@ typedef struct MarioWork {
     f32 wallPushDir;               // 0x1CC, direction of that push
     s32 wallPushHold;              // 0x1D0, frames the push is held (14)
     void* touchNpc;                // 0x1D4, NpcEntry* (marioGetTouchNpcPtr)
+#ifndef VERSION_G8ME01_DEMO
     struct NpcEntry* targetNpc;    // 0x1D8, NPC in range for interaction (npcdrv)
+#endif
     void* hitobjFrontA;             // 0x1DC, wall in front found on an A press
     void* hitobjFront;              // 0x1E0
 	void* hitobjStandOn;           // 0x1E4, 0x1E8 US HitEntry
@@ -444,12 +451,14 @@ typedef struct MarioWork {
     s16 coinDropTimer;             // 0x2C0, set to 3 s by npcdrv (with muteki); marioMain drops a coin every 30 frames
     u8 pad_2C2[0x2C4 - 0x2C2];     // 0x2C2, never accessed
     f32 kpaSpeed;                  // 0x2C4, Bowser walk speed (koopa.c, koopa_motion.c)
+#ifndef VERSION_G8ME01_DEMO
     u32 bottomlessReload;          // 0x2C8, N_marioReloadMapOnBottomlessOn/Off; u32: marioBottomless tests it unsigned (cmplwi)
     Vec bottomlessResetPosition;   // 0x2CC JP, 0x2E4 US
     s16 slitState;                 // 0x2D8, mot_slit state machine
     s16 slitTimer2;                // 0x2DA
     s32 slitTimer;                 // 0x2DC
-} MarioWork;                       // size 0x2E0 JP, 0x2F8 US
+#endif
+} MarioWork;                       // size 0x2E0 JP, 0x2F8 US, 0x2C4 demo (no targetNpc, bottomless or slit fields)
 
 MarioWork* marioGetPtr(void);
 s32 marioGetColor(void);

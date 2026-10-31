@@ -207,7 +207,11 @@ static PoseTableEntry pose_table[] = {
     {4, "X_1"},
     {3, "X_1"},
     {28, "S_1"},
+#ifdef VERSION_G8ME01_DEMO
+    {63, "T_1"},
+#else
     {65, "T_1"},
+#endif
     {29, "Q_1"},
     {30, "Q_1"},
     {31, "S_1"},
@@ -216,8 +220,13 @@ static PoseTableEntry pose_table[] = {
     {40, "W_1"},
     {56, "X_1"},
     {57, "X_1"},
+#ifdef VERSION_G8ME01_DEMO
+    {63, "T_1"},
+    {67, "S_1"},
+#else
     {65, "T_1"},
     {69, "S_1"},
+#endif
 };
 
 static PoseTableEntry pose_table_guard[] = {
@@ -228,7 +237,11 @@ static PoseTableEntry pose_table_guard[] = {
     {4, "X_1"},
     {3, "X_1"},
     {28, "G_2"},
+#ifdef VERSION_G8ME01_DEMO
+    {63, "T_1"},
+#else
     {65, "T_1"},
+#endif
     {29, "Q_1"},
     {30, "Q_1"},
     {31, "G_2"},
@@ -237,8 +250,13 @@ static PoseTableEntry pose_table_guard[] = {
     {40, "W_1"},
     {56, "X_1"},
     {57, "X_1"},
+#ifdef VERSION_G8ME01_DEMO
+    {63, "T_1"},
+    {67, "G_2"},
+#else
     {65, "T_1"},
     {69, "G_2"},
+#endif
 };
 
 static EVT_BEGIN(normal_attack_event)

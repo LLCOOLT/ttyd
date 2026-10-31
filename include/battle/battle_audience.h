@@ -162,6 +162,14 @@ typedef struct BattleAudienceWindow {
     f32 count;              // 0x18, number to display for audience count
 } BattleAudienceWindow;
 
+// BattleAudience.flags bit, given as its retail value. The demo has one more flag below 0x400, so every bit from
+// 0x400 up sits one place higher there.
+#ifdef VERSION_G8ME01_DEMO
+#define AUDIENCE_FLAG(bit) ((bit) >= 0x400 ? (bit) << 1 : (bit))
+#else
+#define AUDIENCE_FLAG(bit) (bit)
+#endif
+
 typedef struct BattleAudience {
     s32 flags;                         // 0x0
     EventEntry* event;                 // 0x4
@@ -173,6 +181,45 @@ typedef struct BattleAudience {
     BattleAudienceMember members[200]; // 0x1BC
     BattleAudienceItem items[100];     // 0xF25C
     BattleAudienceStar starpower[100]; // 0x10E7C
+#ifdef VERSION_G8ME01_DEMO
+    // the demo keeps the counters before the sounds and window, with a few more of them
+    f32 mAudienceDeltaMultiplier;      // 0x133FC
+    f32 mTargetAudienceCount;          // 0x13400
+    f32 mAddedAudienceCount;           // 0x13404
+    s32 mCurrentAudienceIntCount;      // 0x13408
+    s32 mCurrentAudienceIntCountRight; // 0x1340C
+    s32 mCurrentAudienceIntCountLeft;  // 0x13410
+    s32 presentCount;                  // 0x13414, members that exist and are not in status 12 (BattleAudienceNumToTargetSub)
+    s32 mMaxAudience;                  // 0x13418
+    s32 typeWeights[12];               // 0x1341C
+    s32 starPowerGain;                 // 0x1344C
+    s32 mNumStylishCommandsThisAttack; // 0x13450
+    s32 stylishTotal;                  // 0x13454, stylish commands summed over the battle, capped at 100
+    s32 crowdPleasedStreak;            // 0x13458
+    s32 crowdDispleasedStreak;         // 0x1345C
+    s32 acStreak;                      // 0x13460, capped at 2, indexes the weapon's per-streak table
+    StarPowerInfo* impendingBonuses;   // 0x13464
+    u8 pad_13468[0x1346C - 0x13468];   // 0x13468, never accessed
+    s32 mCheckPhaseReactionState;      // 0x1346C
+    s32 phaseSub;                      // 0x13470
+    s32 joyLevel;                      // 0x13474
+    s32 presentItemNo;                 // 0x13478
+    s32 presentItemType;               // 0x1347C
+    s32 presentTargetUnitId;           // 0x13480
+    s32 itemThrowCount;                // 0x13484
+    s32 itemThrowMax;                  // 0x13488
+    s32 presentHitCount;               // 0x1348C
+    BattleWeapon presentWeapon;        // 0x13490
+    s32 mItemHolderId;                 // 0x13550
+    Vec mItemHolderPos;                // 0x13554
+    s32 phaseList[14];                 // 0x13560
+    s32 phaseListCount;                // 0x13598
+    s32 mTurnEndPhaseEventChance;      // 0x1359C
+    BattleAudienceSound sounds[24];    // 0x135A0
+    BattleAudienceWindow window;       // 0x13900
+    BOOL excited;                      // 0x1391C
+} BattleAudience;
+#else
     BattleAudienceSound sounds[24];    // 0x133FC
     BattleAudienceWindow window;       // 0x1375C
     f32 mAudienceDeltaMultiplier;      // 0x13778
@@ -206,6 +253,7 @@ typedef struct BattleAudience {
     s32 joyLevel;                      // 0x1390C, audience joy level
     BOOL excited;                      // 0x13910, if toads are cheering
 } BattleAudience;
+#endif
 
 BattleAudience* BattleAudienceBaseGetPtr(void);
 BattleAudienceMember* BattleAudienceGetPtr(s32 id);

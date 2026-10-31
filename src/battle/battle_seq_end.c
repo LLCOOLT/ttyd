@@ -39,6 +39,27 @@
 #include "battle/battle_camera.h"
 #include "battle/battle_seq.h"
 
+// The demo draws these icons with icon flag 4; retail uses 0x10.
+#ifdef VERSION_G8ME01_DEMO
+#define ICON_DISP_FLAGS 4
+#else
+#define ICON_DISP_FLAGS 0x10
+#endif
+
+// The demo stops gaining levels at 98.
+#ifdef VERSION_G8ME01_DEMO
+#define LEVEL_MAX 98
+#else
+#define LEVEL_MAX 99
+#endif
+
+// The fade types used here are two lower in the demo.
+#ifdef VERSION_G8ME01_DEMO
+#define FADE_TYPE(n) ((n) - 2)
+#else
+#define FADE_TYPE(n) (n)
+#endif
+
 #ifdef VERSION_G8ME01
 #define EXP_ICON 0x194
 #else
@@ -209,11 +230,8 @@ s32 fp_tex_tbl[6] = {56, 56, 57, 58, 58, 58};
 s32 bp_tex_tbl[6] = {59, 59, 60, 61, 62, 63};
 #endif
 
-EVT_BEGIN(_rank_up_event)
-    CALL(_get_rank_up_msg, LW(0))
-    CALL(evt_msg_print, 0, LW(0), 0, 0)
-    RETURN
-EVT_END()
+// Defined after _koura_delete_event, where the demo's .data places it (retail keeps it in .sdata).
+extern EvtWord _rank_up_event[];
 
 
 
@@ -349,7 +367,7 @@ void btlseqEnd(BattleWork* wp) {
         btl_camera_set_moveSpeedLv(0, 2);
         btl_camera_set_mode(0, 0x13);
         btl_camera_set_posoffset(0, 0.0f, 0.0f, 0.0f);
-        fadeEntry(10, 200, (GXColor){0, 0, 0, 255});
+        fadeEntry(FADE_TYPE(10), 200, (GXColor){0, 0, 0, 255});
         psndBGMOff(0x201);
         SS(0x7000002);
         break;
@@ -424,7 +442,7 @@ void btlseqEnd(BattleWork* wp) {
         if (wp->majinaiState == 3) {
             work->exp = work->exp * 2;
         }
-        if (pouch->level >= 99) {
+        if (pouch->level >= LEVEL_MAX) {
             work->exp = 0;
         }
         if (work->exp > 100) {
@@ -513,7 +531,7 @@ void btlseqEnd(BattleWork* wp) {
             if (pouch->mStarPoints < 100) break;
             pouch->mStarPoints = 0;
             work->levelUp = 1;
-            if (pouch->level + 1 < 99) break;
+            if (pouch->level + 1 < LEVEL_MAX) break;
             work->expDisp = 0;
             break;
         }
@@ -823,13 +841,15 @@ void btlseqEnd(BattleWork* wp) {
         NpcEntry* p;
         SS(0x700001D);
         BattleAudienceSoundSetVolAll(0, 30);
+#ifndef VERSION_G8ME01_DEMO
         fb = fbatGetPointer();
         p = fb->target;
         if (p) p->interruptFlags |= 0x100;
+#endif
         break;
     }
     case 0x700001D: {
-        fadeEntry(10, 200, (GXColor){0, 0, 0, 255});
+        fadeEntry(FADE_TYPE(10), 200, (GXColor){0, 0, 0, 255});
         SS(0x700001E);
         psndBGMOff(0x201);
     }
@@ -914,9 +934,11 @@ void btlseqEnd_DispMain(CameraId camId, void* param) {
         if (work->flags & 0x10) {
             dispEntry(camId, 900.0f, 1, _LvupParamConfirmDisp, wp);
         }
+#ifndef VERSION_G8ME01_DEMO
         if (work->flags & 0x20) {
             dispEntry(camId, 900.0f, 1, L__LvupParamHelpMsgDisp, wp);
         }
+#endif
     }
 }
 
@@ -935,7 +957,7 @@ void _MarioExpDisp(CameraId camId, void* param) {
         { u32 len = strlen(buf); width = 12.5f * len + 65.0f; }
         ((void (*)(f32, f32, f32, f32, f32, u16, GXColor))windowDispGX_Waku_col)(180.0f, -160.0f, width, 32.0f, 10.0f, 0, (GXColor){0xFF, 0xFF, 0xFF, 0xFF});
 
-        iconDispGx(&pos, 0x10, EXP_ICON, 1.0f);
+        iconDispGx(&pos, ICON_DISP_FLAGS, EXP_ICON, 1.0f);
         FontDrawStart();
         FontDrawString(225.0f, -163.0f, buf);
     }
@@ -955,9 +977,10 @@ void _LvupParamConfirmDisp(CameraId camId, void* param) {
     pos.x = -40.0f;
     pos.y = -50 - (*cursorPtr) * 25;
     pos.z = 0.0f;
-    iconDispGx(&pos, 0x10, EXP_ICON, 1.0f);
+    iconDispGx(&pos, ICON_DISP_FLAGS, EXP_ICON, 1.0f);
 }
 
+// The demo has this function but never calls it (the linker strips it; its strings stay).
 void L__LvupParamHelpMsgDisp(CameraId camId, void* param) {
     SeqEndWork* work = SEW((BattleWork*)param);
     PouchData* pouch;
@@ -1294,7 +1317,7 @@ EVT_BEGIN(_curtain_close_event)
         CALL(evt_batstage_set_stg_dark_base, 80, 30, 0)
     END_SIBLING_EVENT
     BEGIN_SIBLING_EVENT
-        CALL(evt_fade_entry, 24, 1000, 0, 0, 0)
+        CALL(evt_fade_entry, FADE_TYPE(24), 1000, 0, 0, 0)
         CALL(evt_fade_set_anim_ofs_pos, 0, 130)
         CALL(evt_fade_set_anim_virtual_pos, 0, 0, 80)
         CALL(evt_fade_end_wait)
@@ -1418,10 +1441,16 @@ EVT_BEGIN(_curtain_close_event)
         CALL(_lvup_obj_set_color, 0, 100, 128, 128, 255)
         CALL(_lvup_obj_set_color, 1, 100, 128, 128, 255)
         CALL(_lvup_obj_set_color, 2, 100, 128, 128, 255)
+#ifdef VERSION_G8ME01_DEMO
+        CALL(evt_fade_entry, FADE_TYPE(25), 1000, 0, 0, 0)
+        CALL(evt_fade_set_anim_ofs_pos, 0, 130)
+        CALL(evt_fade_set_anim_virtual_pos, 0, 0, LW(0))
+#else
         CALL(evt_batstage_set_aud_dark, 0, 60, 0)
         CALL(evt_fade_entry, 25, 1000, 0, 0, 0)
         CALL(evt_fade_set_anim_ofs_pos, 0, 130)
         CALL(evt_fade_set_anim_virtual_pos, 0, 0, 80)
+#endif
         CALL(evt_fade_end_wait)
     END_SIBLING_EVENT
     WAIT_MS(1000)
@@ -1536,6 +1565,12 @@ EVT_BEGIN(_koura_delete_event)
     RETURN
 EVT_END()
 
+EVT_BEGIN(_rank_up_event)
+    CALL(_get_rank_up_msg, LW(0))
+    CALL(evt_msg_print, 0, LW(0), 0, 0)
+    RETURN
+EVT_END()
+
 #ifdef VERSION_G8ME01
 USER_FUNC(N__set_initial_upgrade_cursor_position) {
     SEW(_battleWorkPointer)->selected = evtGetValue(event, event->args[0]);
@@ -1603,13 +1638,22 @@ USER_FUNC(_disable_enemy_unit_disp) {
         kind = unit->currentKind;
         if (kind == 0xDC) continue;
         if (kind == 0xDE) continue;
+#ifdef VERSION_G8ME01_DEMO
+        if (kind >= 0xE0 && kind < 0xE7 && unit->mAlliance == 0) continue;
+#else
         if (kind >= 0xE0 && kind < 0xE7 && unit->mAlliance == 0 && kind != 0xE5) continue;
+#endif
         data = BtlUnit_GetData(unit, 0x42);
         if (data) {
             evt = evtEntry(data, 10, 0);
             evt->unitId = unit->unitId;
-        } else if (unit->currentKind != 0xE5) {
-            unit->mAttributeFlags |= 0x21000000;
+        } else {
+#ifndef VERSION_G8ME01_DEMO
+            if (unit->currentKind != 0xE5)
+#endif
+            {
+                unit->mAttributeFlags |= 0x21000000;
+            }
         }
     }
     obj = BattleSearchObjectPtr("if_body");

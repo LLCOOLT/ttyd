@@ -97,10 +97,17 @@ void effIndirectDisp(CameraId cameraId, EffectEntry* effect) {
     Mtx scale;
     Mtx final;
     GXTexObj texObj;
+#ifdef VERSION_G8ME01_DEMO
+    void* indTex;
+    f32 indMtx[2][3];
+#endif
 
     camera = camGetPtr(CAMERA_2D);
     type = work->type;
     alpha = work->alpha;
+#ifdef VERSION_G8ME01_DEMO
+    indTex = work->work->address;
+#endif
     GXSetBlendMode(GX_BM_BLEND, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA, GX_LO_CLEAR);
     GXSetZCompLoc(GX_TRUE);
     GXSetAlphaCompare(GX_ALWAYS, 0, GX_AOP_AND, GX_ALWAYS, 0);
@@ -128,6 +135,11 @@ void effIndirectDisp(CameraId cameraId, EffectEntry* effect) {
     GXPixModeSync();
     GXInitTexObj(&texObj, buffer, 304, 240, GX_TF_RGB565, GX_CLAMP, GX_CLAMP, GX_FALSE);
     GXLoadTexObj(&texObj, GX_TEXMAP1);
+#ifdef VERSION_G8ME01_DEMO
+    // The demo still bends the screen copy through an indirect texture; retail draws it straight.
+    GXInitTexObj(&texObj, indTex, 64, 64, GX_TF_IA8, GX_CLAMP, GX_CLAMP, GX_FALSE);
+    GXLoadTexObj(&texObj, GX_TEXMAP2);
+#endif
 
     PSMTXTrans(mtx, work->position.x, work->position.y, work->position.z);
     PSMTXScale(scale, work->scale, work->scale, work->scale);
@@ -147,6 +159,15 @@ void effIndirectDisp(CameraId cameraId, EffectEntry* effect) {
     PSMTXConcat(mtx, camera->view, mtx);
     PSMTXConcat(mtx, final, mtx);
     GXLoadTexMtxImm(mtx, GX_TEXMTX0, GX_MTX3x4);
+#ifdef VERSION_G8ME01_DEMO
+    indMtx[0][0] = 0.5f;
+    indMtx[0][1] = 0.0f;
+    indMtx[0][2] = 0.0f;
+    indMtx[1][0] = 0.0f;
+    indMtx[1][1] = 0.5f;
+    indMtx[1][2] = 0.0f;
+    GXSetIndTexMtx(GX_ITM_0, indMtx, 1);
+#endif
     GXSetNumTevStages(2);
     GXSetTevOrder(GX_TEVSTAGE0, GX_TEXCOORD0, GX_TEXMAP0, GX_COLOR0A0);
     GXSetTevOp(GX_TEVSTAGE0, GX_MODULATE);
@@ -186,4 +207,8 @@ void effIndirectDisp(CameraId cameraId, EffectEntry* effect) {
     GXPosition3f32(-size / 2, -size / 2, 0.0f);
     GXTexCoord2f32(0.0f, v);
     GXEnd();
+#ifdef VERSION_G8ME01_DEMO
+    GXSetNumIndStages(0);
+    GXSetTevDirect(GX_TEVSTAGE1);
+#endif
 }

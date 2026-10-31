@@ -18,6 +18,7 @@ typedef struct EffHolographyN64Work {
     f32 scale;    // 0x28
 } EffHolographyN64Work;
 
+u8 xlu_data[16] = {255, 255, 220, 190, 160, 120, 80, 40, 0, 0, 40, 80, 120, 160, 190, 220};
 effN64Vtx ach_01_v[55][22] = {
     {
         {-639, 1280, 0, 0, 0, 0, 0, 120, 255},
@@ -1341,7 +1342,6 @@ effN64Vtx ach_01_v[55][22] = {
     },
 };
 
-u8 xlu_data[16] = {255, 255, 220, 190, 160, 120, 80, 40, 0, 0, 40, 80, 120, 160, 190, 220};
 
 
 void effHolographyMain(EffectEntry* effect);

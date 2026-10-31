@@ -22,7 +22,11 @@ void setupDataLoad(const char* mapName) {
 	u32 filesize;
 
 	ptr = NULL;
+#ifdef VERSION_G8ME01_DEMO
+	sprintf(path, "%s/setup/%s/setup.xml", getMarioStDvdRoot(), mapName);
+#else
 	sprintf(path, "%s/m/%s/s", getMarioStDvdRoot(), mapName);
+#endif
 	if (strcmp(mapName, "muj_20") || evtGetValue(NULL, (s32)0xF5DE0180) != 2) {
 		arcOpen(path, &ptr, &size);
 		if (!ptr) {

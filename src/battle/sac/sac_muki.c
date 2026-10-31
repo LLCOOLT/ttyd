@@ -142,6 +142,14 @@ static BattleWeapon weapon;
 extern EvtWord nice_event_pow[];
 extern EvtWord marioAttackEvent_Muki[];
 
+// the demo defines the event first
+#ifdef VERSION_G8ME01_DEMO
+EVT_BEGIN(nice_event_pow)
+    CALL(btlevtcmd_ACSuccessEffect, LW(0), -100, 175, 0)
+    RETURN
+EVT_END()
+#endif
+
 static BattleWeapon weapon = {
     "btl_wn_sac_mukimuki_body", // name
     ICON_19A, // icon
@@ -180,10 +188,12 @@ static BattleWeapon weapon = {
     {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // stageEffectRates
 };
 
+#ifndef VERSION_G8ME01_DEMO
 EVT_BEGIN(nice_event_pow)
     CALL(btlevtcmd_ACSuccessEffect, LW(0), -100, 175, 0)
     RETURN
 EVT_END()
+#endif
 
 
 USER_FUNC(main_muki) {
@@ -405,7 +415,11 @@ void main_cursor(void) {
             ob = w->o3d[w->idx].link;
             if (ob) {
                 ob->kind = 5;
+#ifdef VERSION_G8ME01_DEMO
+                effHitEntry(0, 0x20, ob->pos.x, ob->pos.y, ob->pos.z, 1.0f);
+#else
                 effHitEntry(0, 5, ob->pos.x, ob->pos.y, ob->pos.z, 1.0f);
+#endif
                 switch (ob->type) {
                 case 0:
                     prev = w->f14;
@@ -802,7 +816,7 @@ static void disp_2D(CameraId cam, void* param) {
             ((void (*)(Mtx, u32, GXColor, GXColor, GXColor, GXColor, s32))btlDispTexPlane3)(m, BTL_TEX(0x45), col[0], col[1], col[2], col[3], 0);
             PSMTXScale(m, 0.7f, 0.7f, 0.7f);
             PSMTXTransApply(m, m, x - 35.0f, y - 14.0f, 0.0f);
-            iconDispGx2(m, 0x10, ICON_1ED);
+            iconDispGx2(m, ICON_DISP_2D, ICON_1ED);
             PSMTXScale(m, 0.7f, 0.7f, 0.7f);
             PSMTXTransApply(m, m, x - 25.0f, y - 14.0f, 0.0f);
             iconNumberDispGx(m, (s32)w->f18, 0, (GXColor){0xFF, 0xFF, 0xFF, 0xFF});
@@ -849,7 +863,7 @@ static void disp_2D(CameraId cam, void* param) {
             ((void (*)(Mtx, u32, GXColor, GXColor, GXColor, GXColor, s32))btlDispTexPlane3)(m, BTL_TEX(0x45), col[0], col[1], col[2], col[3], 0);
             PSMTXScale(m, 0.7f, 0.7f, 0.7f);
             PSMTXTransApply(m, m, x - 35.0f, y - 14.0f, 0.0f);
-            iconDispGx2(m, 0x10, ICON_1ED);
+            iconDispGx2(m, ICON_DISP_2D, ICON_1ED);
             PSMTXScale(m, 0.7f, 0.7f, 0.7f);
             PSMTXTransApply(m, m, x - 25.0f, y - 14.0f, 0.0f);
             iconNumberDispGx(m, (s32)w->f20, 0, (GXColor){0xFF, 0xFF, 0xFF, 0xFF});

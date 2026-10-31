@@ -118,15 +118,22 @@ void BattleInformationSetDropMaterial(FieldBattleInfo* info) {
 	random = group->randomItemWeight;
 	none = group->noItemWeight;
 	type = 0;
+#ifndef VERSION_G8ME01_DEMO
 	if (evtGetValue(NULL, GSW(0)) <= 19) {
 		random = 0;
 		held = 0;
 		none = 100;
 	}
+#endif
 	n = pouchEquipCheckBadge(ITEM_ITEM_HOG);
 	if (n >= 1) {
+#ifdef VERSION_G8ME01_DEMO
+		held *= n * 2 + 2;
+		random *= n * 2 + 2;
+#else
 		held *= n + 1;
 		random *= n + 1;
+#endif
 	}
 	r = irand(random + held + none);
 	if ((r -= random) < 0) {

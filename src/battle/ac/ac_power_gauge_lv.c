@@ -8,6 +8,13 @@
 #include <string.h>
 #include "icon_ids.h"
 
+// The demo draws the action command icons with icon flag 4; retail uses 0x10.
+#ifdef VERSION_G8ME01_DEMO
+#define AC_ICON_FLAGS 4
+#else
+#define AC_ICON_FLAGS 0x10
+#endif
+
 #pragma optimize_for_size on
 
 typedef struct PowerGaugeWork {
@@ -183,7 +190,7 @@ static void actionCommandDisp(f32 x, f32 y) {
         Vec pos = {0.0f, 0.0f, 0.0f};
         pos.x = -200.0f + x;
         pos.y = 25.0f + y;
-        iconDispGx(&pos, 0x10, ICON_08C, 1.0f);
+        iconDispGx(&pos, AC_ICON_FLAGS, ICON_08C, 1.0f);
     }
     ratio = tw->gauge / 100.0f;
     if (ratio > 1.0f) {
@@ -203,12 +210,12 @@ static void actionCommandDisp(f32 x, f32 y) {
             y = 70.0f + y;
             pos.x = x;
             pos.y = y;
-            iconDispGx(&pos, 0x10, ICON_07E, 1.0f);
+            iconDispGx(&pos, AC_ICON_FLAGS, ICON_07E, 1.0f);
             {
 Vec pos2 = {0.0f, 0.0f, 0.0f};
             pos2.x = 56.0f + x;
             pos2.y = y;
-            iconDispGx(&pos2, 0x10, ICON_080, 1.0f);
+            iconDispGx(&pos2, AC_ICON_FLAGS, ICON_080, 1.0f);
             }
             break;
         }
@@ -219,12 +226,12 @@ Vec pos2 = {0.0f, 0.0f, 0.0f};
                 y = 70.0f + y;
                 pos.x = x;
                 pos.y = y;
-                iconDispGx(&pos, 0x10, ICON_07F, 1.0f);
+                iconDispGx(&pos, AC_ICON_FLAGS, ICON_07F, 1.0f);
                 {
 Vec pos2 = {0.0f, 0.0f, 0.0f};
                 pos2.x = 56.0f + x;
                 pos2.y = y;
-                iconDispGx(&pos2, 0x10, ICON_081, 1.0f);
+                iconDispGx(&pos2, AC_ICON_FLAGS, ICON_081, 1.0f);
                 }
             } else {
                 Vec pos = {0.0f, 0.0f, 0.0f};
@@ -232,12 +239,12 @@ Vec pos2 = {0.0f, 0.0f, 0.0f};
                 y = 70.0f + y;
                 pos.x = x;
                 pos.y = y;
-                iconDispGx(&pos, 0x10, ICON_07E, 1.0f);
+                iconDispGx(&pos, AC_ICON_FLAGS, ICON_07E, 1.0f);
                 {
 Vec pos2 = {0.0f, 0.0f, 0.0f};
                 pos2.x = 56.0f + x;
                 pos2.y = y;
-                iconDispGx(&pos2, 0x10, ICON_080, 1.0f);
+                iconDispGx(&pos2, AC_ICON_FLAGS, ICON_080, 1.0f);
                 }
             }
             break;

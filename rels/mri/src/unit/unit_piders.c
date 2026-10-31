@@ -89,8 +89,13 @@ static EvtWord dmg_first_attack_pos[19];
 static EvtWord yarn_event[44];
 static EvtWord entry_event[48];
 static EvtWord damage_event[10];
+#ifdef VERSION_G8ME01_DEMO
+static EvtWord dead_event[183];
+static EvtWord blow_dead_event[98];
+#else
 static EvtWord dead_event[189];
 static EvtWord blow_dead_event[104];
+#endif
 static EvtWord battle_end_event[7];
 static EvtWord unison_phase_event[120];
 static EvtWord attack_event[72];
@@ -99,7 +104,11 @@ static EvtWord renzoku_attack_event[149];
 static EvtWord renzoku_attack_event_sub[55];
 static EvtWord renzoku_attack_event_sub_no_last[10];
 static EvtWord renzoku_attack_event_sub_last[79];
+#ifdef VERSION_G8ME01_DEMO
+static EvtWord wait_event[6];
+#else
 static EvtWord wait_event[7];
+#endif
 
 static USER_FUNC(piders_yarn_init) {
     s32 id = BattleTransID(event, -2);
@@ -158,7 +167,11 @@ BattleUnitKind unit_piders = {
     0,
     0,
     2,
+#ifdef VERSION_G8ME01_DEMO
+    0,
+#else
     100,
+#endif
     0,
     0.0f,
     0.0f,
@@ -179,7 +192,11 @@ static BattleUnitDefense defence = {{0, 0, 0, 0, 0}};
 
 static BattleUnitDefenseAttr defence_attr = {{0, 0, 0, 0, 0}};
 
+#ifdef VERSION_G8ME01_DEMO
+static StatusVulnerability regist = {90, 100, 50, 100, 90, 100, 100, 90, 100, 90, 100, 90, 100, 90, 90, 100, 70, 100, 90, 100, 100, 95};
+#else
 static StatusVulnerability regist = {90, 90, 50, 100, 90, 100, 100, 90, 100, 90, 100, 90, 100, 95, 90, 100, 70, 100, 90, 100, 100, 95};
+#endif
 
 static PoseTableEntry pose_table[] = {
     {1, "PAI_N_1"},
@@ -198,8 +215,13 @@ static PoseTableEntry pose_table[] = {
     {42, "PAI_W_1"},
     {56, "PAI_X_1"},
     {57, "PAI_X_1"},
+#ifdef VERSION_G8ME01_DEMO
+    {63, "PAI_S_1"},
+    {67, "PAI_S_1"},
+#else
     {65, "PAI_S_1"},
     {69, "PAI_S_1"},
+#endif
 };
 
 static BattleDataEntry data_table[] = {
@@ -562,7 +584,9 @@ static EVT_BEGIN(dead_event)
     CALL(btlevtcmd_OnAttribute, LW(10), 268435456)
     CALL(btlevtcmd_SetMaxMoveCount, LW(10), 0)
     CALL(btlevtcmd_OnAttribute, LW(10), 33554432)
+#ifndef VERSION_G8ME01_DEMO
     CALL(btlevtcmd_SetPos, LW(10), 0, -1000, 0)
+#endif
     CALL(btlevtcmd_KillUnit, LW(10), 1)
     RETURN
 EVT_END()
@@ -591,7 +615,9 @@ static EVT_BEGIN(blow_dead_event)
     CALL(btlevtcmd_OnAttribute, LW(10), 268435456)
     CALL(btlevtcmd_SetMaxMoveCount, LW(10), 0)
     CALL(btlevtcmd_OnAttribute, LW(10), 33554432)
+#ifndef VERSION_G8ME01_DEMO
     CALL(btlevtcmd_SetPos, LW(10), 0, -1000, 0)
+#endif
     CALL(btlevtcmd_KillUnit, LW(10), 1)
     RETURN
 EVT_END()
@@ -832,10 +858,25 @@ static EVT_BEGIN(piders_attack_common_event1)
     CALL(btlevtcmd_AnimeChangePose, -2, 2, STRING("PAI_A_2a"))
     CALL(btlevtcmd_SetPartsPos, -2, 2, LW(0), LW(1), LW(2))
     CALL(btlevtcmd_OffPartsAttribute, -2, 2, 16777216)
+#ifndef VERSION_G8ME01_DEMO
     CALL(btlevtcmd_GetStatusMg, -2, LW(1))
     SET_FLOAT_VALUE(LW(0), FLOAT(30.0f))
     MULTIPLY_FLOAT(LW(0), LW(1))
     CALL(btlevtcmd_SetPartsRotateOffset, -2, 2, 0, LW(0), 0)
+#endif
+#ifdef VERSION_G8ME01_DEMO
+    CALL(btlevtcmd_CheckStatus, -2, 11, LW(0))
+    IF_INT_EQUAL(LW(0), 1)
+    CALL(btlevtcmd_SetPartsRotateOffset, -2, 2, 0, 20, 0)
+    ELSE
+    CALL(btlevtcmd_CheckStatus, -2, 10, LW(0))
+    IF_INT_EQUAL(LW(0), 1)
+    CALL(btlevtcmd_SetPartsRotateOffset, -2, 2, 0, 40, 0)
+    ELSE
+    CALL(btlevtcmd_SetPartsRotateOffset, -2, 2, 0, 30, 0)
+    END_IF
+    END_IF
+#endif
     CALL(btlevtcmd_snd_se, -2, STRING("SFX_ENM_PAIDA_ATTACK1"), -250000000, 0, -250000000)
     CALL(evt_sub_intpl_init, 4, 0, 110, 5)
     LOOP(5)
@@ -877,10 +918,24 @@ static EVT_BEGIN(piders_attack_common_event1_2)
     CALL(btlevtcmd_SetPartsPos, -2, 2, LW(0), LW(1), LW(2))
     CALL(btlevtcmd_OffPartsAttribute, -2, 2, 16777216)
     CALL(btlevtcmd_CheckStatus, -2, 11, LW(0))
+#ifndef VERSION_G8ME01_DEMO
     CALL(btlevtcmd_GetStatusMg, -2, LW(1))
     SET_FLOAT_VALUE(LW(0), FLOAT(30.0f))
     MULTIPLY_FLOAT(LW(0), LW(1))
     CALL(btlevtcmd_SetPartsRotateOffset, -2, 2, 0, LW(0), 0)
+#endif
+#ifdef VERSION_G8ME01_DEMO
+    IF_INT_EQUAL(LW(0), 1)
+    CALL(btlevtcmd_SetPartsRotateOffset, -2, 2, 0, 20, 0)
+    ELSE
+    CALL(btlevtcmd_CheckStatus, -2, 10, LW(0))
+    IF_INT_EQUAL(LW(0), 1)
+    CALL(btlevtcmd_SetPartsRotateOffset, -2, 2, 0, 40, 0)
+    ELSE
+    CALL(btlevtcmd_SetPartsRotateOffset, -2, 2, 0, 30, 0)
+    END_IF
+    END_IF
+#endif
     CALL(btlevtcmd_GetUnitWork, -2, 4, LW(0))
     CALL(btlevtcmd_snd_se, -2, STRING("SFX_ENM_PAIDA_ATTACK1"), -250000000, 0, -250000000)
     CALL(evt_sub_intpl_init, 4, LW(0), 100, 5)
@@ -1070,5 +1125,9 @@ EVT_END()
 static EVT_BEGIN(wait_event)
     CALL(btlevtcmd_AnimeChangePoseFromTable, -2, 1)
     RETURN
+#ifdef VERSION_G8ME01_DEMO
+EVT_END()
+#else
 EVT_END_PAD()
+#endif
 

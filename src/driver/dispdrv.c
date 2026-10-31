@@ -26,7 +26,9 @@
 f32 offset_tbl[] = {
 	400000.0f, 400000.0f, 600000.0f, 100000.0f, 100000.0f, 
 	300000.0f, 900000.0f, 1100000.0f, 1000000.0f, 500000.0f, 
+#ifndef VERSION_G8ME01_DEMO
 	700000.0f //700K new in retail
+#endif
 };
 
 //.sbss
@@ -62,8 +64,10 @@ void dispEntry(CameraId camId, f32 order, s32 renderMode, DispCallback callback,
 	switch (renderMode) {
 		case 2:
 		case 5:
+#ifndef VERSION_G8ME01_DEMO
 		case 9:
 		case 10:
+#endif
 			entry->order = offset_tbl[renderMode] + order;
 			break;
 		default:
@@ -140,8 +144,10 @@ void dispDraw(CameraId camId) {
 					break;
 				case 2:
 				case 5:
+#ifndef VERSION_G8ME01_DEMO
 				case 9:
 				case 10:
+#endif
 					GXSetBlendMode(GX_BM_BLEND, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA, GX_LO_CLEAR);
 					GXSetZCompLoc(GX_TRUE);
 					GXSetAlphaCompare(GX_ALWAYS, 0, GX_AOP_AND, GX_ALWAYS, 0);
@@ -175,6 +181,8 @@ f32 dispCalcZ(Vec* input) {
 DispEntry* dispGetCurWork(void) {
 	return currentWorkPtr;
 }
+#ifndef VERSION_G8ME01_DEMO
 #pragma force_active on
 u32 gap_07_8040F344_sdata[7] = {0, 0, 0, 0, 0, 0, 0};
 #pragma force_active reset
+#endif

@@ -113,7 +113,11 @@ void _btlSamplingEnemy(BattleWorkWeaponTargets* d) {
                 }
             }
             if (flags & 1) {
+#ifdef VERSION_G8ME01_DEMO
+                if (unit->currentKind == 0xDE) {
+#else
                 if (unit->currentKind == 0xDE || unit->currentKind == 0xDF) {
+#endif
                     { ok = FALSE; break; }
                 }
             }
@@ -239,9 +243,13 @@ void _btlSamplingEnemy(BattleWorkWeaponTargets* d) {
             }
             if (d->propFlags & 0x2000) {
                 if (part->attributes & 0x200000) {
+#ifdef VERSION_G8ME01_DEMO
+                    { ok = FALSE; break; }
+#else
                     if (!(d->propFlags & 0x100000) || d->unitId != unit->unitId) {
                         { ok = FALSE; break; }
                     }
+#endif
                 }
             }
             if (d->propFlags & 0x4000) {

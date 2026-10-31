@@ -96,7 +96,11 @@ static BattleUnitDefense defence = {0};
 
 static BattleUnitDefenseAttr defence_attr = {0};
 
+#ifdef VERSION_G8ME01_DEMO
+static StatusVulnerability regist = {100, 100, 110, 100, 90, 100, 100, 90, 100, 90, 100, 90, 100, 90, 90, 90, 110, 100, 90, 100, 100, 95};
+#else
 static StatusVulnerability regist = {95, 95, 105, 100, 90, 100, 100, 100, 100, 95, 100, 95, 100, 95, 80, 90, 105, 100, 90, 100, 100, 95};
+#endif
 
 static BattleUnitKindPart parts[] = {
     {
@@ -375,8 +379,13 @@ static PoseTableEntry pose_table[] = {
     {42, "R_1"},
     {56, "X_1"},
     {57, "X_1"},
+#ifdef VERSION_G8ME01_DEMO
+    {63, "T_1"},
+    {67, "S_1"},
+#else
     {65, "T_1"},
     {69, "S_1"},
+#endif
 };
 
 static BattleDataEntry data_table[] = {

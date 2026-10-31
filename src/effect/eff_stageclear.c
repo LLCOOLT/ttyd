@@ -33,20 +33,13 @@ void effStageClearMain(EffectEntry* effect);
 void effStageClearDisp(CameraId cameraId, EffectEntry* effect);
 
 #ifndef VERSION_G8ME01
+static s32 tex_jp[] = {0x9C, 0x9D, 0x9E, 0x9F, 0xA0, 0xA1, 0xA2, 0xA3};
+s32 tex_shadow_jp[] = {0xA4, 0xA5, 0xA6, 0xA7, 0xA8, 0xA9, 0xAA, 0xAB};
 static s32 tex_us[] = {0x9C, 0x9D, 0x9E, 0x9F, 0xA0, 0xA1, 0xA2, 0xA0, 0x9E, 0xA3, 0xA0, 0xA4, 0xA5};
 s32 tex_shadow_us[] = {0xA6, 0xA7, 0xA8, 0xA9, 0xAA, 0xAB, 0xAC, 0xAA, 0xA8, 0xAD, 0xAA, 0xAE, 0xAF};
+static s32* texid_tbl[] = {tex_jp, tex_shadow_jp, tex_us, tex_shadow_us};
+static u32 niji_tbl[] = {0xAC, 0xB0};
 #endif
-#ifndef VERSION_G8ME01
-static EVT_BEGIN(evt_shake)
-    IF_INT_EQUAL(4264967297, 0)
-        CALL(evt_cam_shake, 5, 4064967306, 4064967306, 50)
-    ELSE
-        CALL(evt_cam_shake, 5, 4064967316, 4064967316, 100)
-    END_IF
-    RETURN
-EVT_END()
-#endif
-
 #ifdef VERSION_G8ME01
 static s16 tex_jp[] = {128, 129, 130, 131, 132, 133, 134, 135};
 s16 tex_shadow_jp[] = {136, 137, 138, 139, 140, 141, 142, 143};
@@ -71,14 +64,19 @@ static EVT_BEGIN(evt_shake)
     END_IF
     RETURN
 EVT_END()
-#else
-static s32 tex_jp[] = {0x9C, 0x9D, 0x9E, 0x9F, 0xA0, 0xA1, 0xA2, 0xA3};
-s32 tex_shadow_jp[] = {0xA4, 0xA5, 0xA6, 0xA7, 0xA8, 0xA9, 0xAA, 0xAB};
-static s32* texid_tbl[] = {tex_jp, tex_shadow_jp, tex_us, tex_shadow_us};
-static u32 niji_tbl[] = {0xAC, 0xB0};
 #endif
 s32 shake_dt[] = {2, 6, 2, 0, -1};
 s32 shake_dt2[] = {12, 36, 12, 0, -1};
+#ifndef VERSION_G8ME01
+static EVT_BEGIN(evt_shake)
+    IF_INT_EQUAL(4264967297, 0)
+        CALL(evt_cam_shake, 5, 4064967306, 4064967306, 50)
+    ELSE
+        CALL(evt_cam_shake, 5, 4064967316, 4064967316, 100)
+    END_IF
+    RETURN
+EVT_END()
+#endif
 #ifdef VERSION_G8ME01
 static u8 scale_dt[] = {0x00, 0x00, 0x16, 0x2E, 0x47, 0x5D, 0x6E, 0x78, 0x77, 0x6E, 0x66}; /* US: trailing pad byte kept in the table */
 #else

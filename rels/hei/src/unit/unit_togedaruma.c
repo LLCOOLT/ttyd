@@ -110,7 +110,11 @@ static BattleUnitDefenseAttr defence_attr = {{0, 2, 0, 0, 0}};
 
 static BattleUnitDefense defence_turn = {0};
 
+#ifdef VERSION_G8ME01_DEMO
+static StatusVulnerability regist = {50, 90, 50, 100, 50, 100, 0, 70, 100, 70, 100, 70, 100, 70, 70, 50, 75, 100, 70, 100, 100, 95};
+#else
 static StatusVulnerability regist = {40, 100, 40, 100, 40, 100, 0, 60, 100, 60, 100, 60, 100, 100, 60, 50, 40, 100, 60, 100, 100, 95};
+#endif
 
 static PoseTableEntry pose_table[] = {
     {1, "TGD_N_1"},
@@ -129,8 +133,13 @@ static PoseTableEntry pose_table[] = {
     {42, "TGD_S_4"},
     {56, "TGD_X_1"},
     {57, "TGD_X_1"},
+#ifdef VERSION_G8ME01_DEMO
+    {63, "TGD_T_1"},
+    {67, "TGD_S_4"},
+#else
     {65, "TGD_T_1"},
     {69, "TGD_S_4"},
+#endif
 };
 
 static PoseTableEntry pose_table_turn[] = {
@@ -147,8 +156,13 @@ static PoseTableEntry pose_table_turn[] = {
     {39, "TGD_D_2"},
     {56, "TGD_X_2"},
     {57, "TGD_X_2"},
+#ifdef VERSION_G8ME01_DEMO
+    {63, "TGD_S_5"},
+    {67, "TGD_S_5"},
+#else
     {65, "TGD_S_5"},
     {69, "TGD_S_5"},
+#endif
 };
 
 static BattleDataEntry data_table[] = {

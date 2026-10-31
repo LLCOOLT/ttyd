@@ -71,6 +71,11 @@ static USER_FUNC(evt_cloud_main) {
     if (party == NULL) {
         return EVT_RETURN_BLOCK;
     }
+#ifdef VERSION_G8ME01_DEMO
+    if (party->currentMemberId != PARTY_MEMBER_FLURRIE) {
+        return EVT_RETURN_BLOCK;
+    }
+#endif
     hit0 = cloudGetHitBreathout(0);
     hit1 = cloudGetHitBreathout(1);
     hit2 = cloudGetHitBreathout(2);
@@ -135,12 +140,21 @@ static USER_FUNC(evt_cloud_main) {
                 if (y < 0) {
                     y = 0;
                 }
+#ifdef VERSION_G8ME01_DEMO
+                if (w > gp->fbWidth) {
+                    w = gp->fbWidth;
+                }
+                if (h > gp->efbHeight) {
+                    h = gp->efbHeight;
+                }
+#else
                 if (w > gp->fbWidth - x) {
                     w = gp->fbWidth - x;
                 }
                 if (h > gp->efbHeight - y) {
                     h = gp->efbHeight - y;
                 }
+#endif
             } else {
                 h = 0;
                 w = 0;

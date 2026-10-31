@@ -334,7 +334,11 @@ MapEntryAnimData* mapSearchAnmObj(const char* animName);
 void mapCheckAnimation(const char* animName, BOOL* valid, f32* a3);
 // more animation functions?
 void mapUnLoad(void);
+#ifdef VERSION_G8ME01_DEMO
+BOOL mapPreLoad(const char* map);
+#else
 BOOL mapPreLoad(void);
+#endif
 void mapLoad(const char* map);
 
 void mapMain(void);

@@ -123,7 +123,9 @@ static EVT_BEGIN(init_0)
 EVT_END()
 
 static EVT_BEGIN(main_0)
+#ifndef VERSION_G8ME01_DEMO
     SET_TYPE(239)
+#endif
     CALL(evt_mobj_hitevt_onoff, STRING("me"), 0)
     IF_INT_NOT_EQUAL(1, 0)
         SET_VALUE(LW(10), 0)
@@ -377,7 +379,11 @@ EVT_BEGIN(gon_09_init_evt)
     CALL(evt_npc_flag_onoff, 1, STRING("\"カロン03\""), 33554432)
     CALL(evt_npc_set_width, STRING("\"カロン03\""), 30)
     CALL(evt_npc_set_height, STRING("\"カロン03\""), 7)
+#ifdef VERSION_G8ME01_DEMO
+    CALL(evt_item_entry, STRING("piece00"), 125, 575, 200, -110, 15, GSWF(5607), 0)
+#else
     CALL(evt_item_entry, STRING("piece00"), 125, 575, 200, -110, 16, GSWF(5607), 0)
+#endif
     CALL(evt_mobj_float_blk, STRING("blk_0"), 325, -50, 75, 2, 1, 0, LSWF(1))
     CALL_CHILD(PTR(init_0))
     CALL(evt_mobj_switch_float_blk, STRING("sw_0"), 588, -50, 138, STRING("blk_0"), 2, PTR(main_0), LSWF(1))

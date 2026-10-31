@@ -114,7 +114,11 @@ static BattleUnitDefenseAttr defence_attr = {{0, 2, 0, 0, 0}};
 
 static BattleUnitDefense defence_turn = {0};
 
+#ifdef VERSION_G8ME01_DEMO
+static StatusVulnerability regist = {50, 90, 50, 100, 50, 100, 0, 70, 100, 70, 100, 70, 100, 80, 80, 50, 70, 100, 80, 100, 100, 95};
+#else
 static StatusVulnerability regist = {50, 100, 50, 100, 50, 100, 0, 70, 100, 70, 100, 70, 100, 100, 70, 50, 70, 100, 70, 100, 100, 95};
+#endif
 
 static BattleUnitKindPart parts[] = {
     {1, "btl_un_monochrome_sinemon", "c_sinemon_w", 0.0f, 0.0f, 0.0f, 0.0f, 25.0f, 0.0f, 0.0f, 30.0f, 0.0f, 20, 30, 255, &defence, &defence_attr, 0x2009, 0x1, pose_table},
@@ -173,8 +177,13 @@ static PoseTableEntry pose_table[] = {
     {42, "SIN_R_1"},
     {56, "SIN_I_1"},
     {57, "SIN_I_1"},
+#ifdef VERSION_G8ME01_DEMO
+    {63, "SIN_T_1"},
+    {67, "SIN_S_1"},
+#else
     {65, "SIN_T_1"},
     {69, "SIN_S_1"},
+#endif
 };
 
 static PoseTableEntry pose_table_turn[] = {
@@ -191,8 +200,13 @@ static PoseTableEntry pose_table_turn[] = {
     {39, "SIN_D_2"},
     {56, "SIN_K_2"},
     {57, "SIN_K_2"},
+#ifdef VERSION_G8ME01_DEMO
+    {63, "SIN_D_2"},
+    {67, "SIN_D_2"},
+#else
     {65, "SIN_D_2"},
     {69, "SIN_D_2"},
+#endif
 };
 
 static BattleDataEntry data_table[] = {

@@ -25,6 +25,12 @@
 #include "manager/fontmgr.h"
 #include "driver/msgdrv.h"
 #include "driver/windowdrv.h"
+#ifdef VERSION_G8ME01_DEMO
+#include "evt/evt_cmd.h"
+#include "evt/evt_sub.h"
+#include "manager/evtmgr.h"
+#include "manager/evtmgr_cmd.h"
+#endif
 
 // TODO: move all this into other TUs
 typedef enum winTexMode {
@@ -60,7 +66,15 @@ seq_e3_entry e3_tbl[3] = {
     { 96, 0.0f, -100.0f },
 };
 #endif
-#ifndef VERSION_G8ME01
+#ifdef VERSION_G8ME01_DEMO
+// The demo's title screen shows four characters: {anim group, walk, stay, action} for each.
+char* anim_tbl[4 * 4] = {
+    "b_mario", "M_W_1", "M_S_1", "M_N_8",
+    "c_pkr", "PKR_W_1", "PKR_S_1", "PKR_A_2A",
+    "c_pnk", "PNK_W_1", "PNK_S_1", "PNK_O_1",
+    "c_windy", "PWD_W_1", "PWD_S_1", "PWD_A_7",
+};
+#elif !defined(VERSION_G8ME01)
 char* anim_tbl[] = { "b_mario", "PKR_W_1", "PKR_S_1", "PKR_A_2A", "PNK_W_1", "PNK_S_1",
                      "PNK_O_1", "c_windy", "PWD_W_1", "PWD_S_1",  "PWD_A_7" };
 #endif
@@ -83,21 +97,115 @@ const char e3_anim_str10[] = "PWD_A_7";
 // Forward Declarations
 void e3Disp(CameraId cameraId, void* param);
 void e3DispOffscreen(CameraId cameraId, void* param);
+#ifdef VERSION_G8ME01_DEMO
+static void e3DispShadow(f32 x, f32 y, f32 z);
+static f32 e3BlinkTime(void);
+#else
 #ifdef VERSION_G8ME01
 static
 #endif
 void pressStartGX(s32 alpha, f32 x, f32 y);
+#endif
+
+#ifdef VERSION_G8ME01_DEMO
+// Sets every character to the given column of anim_tbl.
+USER_FUNC(e3PoseSetAnim) {
+    s32 col = evtGetValue(event, event->args[0]);
+    s32 i;
+
+    for (i = 0; i < 4; i++) {
+        animPoseSetAnim(wp->poseIds[i], anim_tbl[i * 4 + col], FALSE);
+    }
+    return EVT_RETURN_DONE;
+}
+
+// Starts the action animation on the first call, then waits until every character has played it once.
+USER_FUNC(e3PoseWaitAction) {
+    s32 i;
+
+    if (isFirstCall) {
+        for (i = 0; i < 4; i++) {
+            animPoseSetAnim(wp->poseIds[i], anim_tbl[i * 4 + 3], FALSE);
+        }
+    }
+    for (i = 0; i < 4; i++) {
+        if (animPoseGetLoopTimes(wp->poseIds[i]) < 1.0f) {
+            return EVT_RETURN_BLOCK;
+        }
+    }
+    return EVT_RETURN_DONE;
+}
+
+// Turns the characters to the given angle.
+USER_FUNC(e3PoseSetRotY) {
+    wp->poseRotY = evtGetFloat(event, event->args[0]);
+    return EVT_RETURN_DONE;
+}
+
+EVT_BEGIN(e3_pose_evt)
+    LOOP(0)
+        CALL(e3PoseSetAnim, 1)
+        CALL(evt_sub_random, 10000, LW(0))
+        ADD(LW(0), 5000)
+        WAIT_MS(LW(0))
+        CALL(e3PoseWaitAction)
+        CALL(e3PoseSetAnim, 2)
+        WAIT_MS(200)
+        CALL(e3PoseSetAnim, 2)
+        CALL(e3PoseSetRotY, 90)
+        WAIT_MS(600)
+        CALL(e3PoseWaitAction)
+        CALL(e3PoseSetAnim, 2)
+        WAIT_MS(200)
+        CALL(e3PoseSetRotY, 270)
+        WAIT_MS(600)
+    END_LOOP
+    RETURN
+EVT_END()
+#endif
 
 void alarm_handler(OSAlarm* alarm, OSContext* context) {
     gp->flags |= 0x2000;
 }
 
+#ifdef VERSION_G8ME01_DEMO
+void seq_e3Init(SequenceWork* seq) {
+    s32 type = gp->inBattle != 0;
+    s32 i;
+
+    for (i = 0; i < 4; i++) {
+        wp->poseIds[i] = animPoseEntry(anim_tbl[i * 4 + 0], type);
+        animPoseSetAnim(wp->poseIds[i], anim_tbl[i * 4 + 1], TRUE);
+        animPosePeraOn(wp->poseIds[i]);
+        animPoseGetAnimPosePtr(wp->poseIds[i])->flags |= 0x100;
+    }
+    wp->animEvt = evtEntry(e3_pose_evt, 0, 0);
+    wp->handle = fileAllocf(4, "%s/e3.tpl", getMarioStDvdRoot());
+    wp->curScreen = 0;
+    wp->nextScreen = 0;
+    wp->scenario = 0;
+    wp->poseRotY = 270.0f;
+    // The demo starts the timeout when a scenario is picked.
+    OSCancelAlarm(&wp->alarm);
+    wp->initTime = 0;
+    gp->flags &= ~2;
+    gp->flags |= 0x20;
+    gp->flags |= 0x1000;
+    gp->flags &= ~0x2000;
+    fadeEntry(FADE_IN_BLACK, 200, (GXColor){ 0x00, 0x00, 0x00, 0xFF });
+    fadeReset(1);
+    psndStopAllFadeOut();
+    psndBGMOn(0x200, "BGM_FILE_MENU1");
+    seq->state = 0;
+    animGroupBaseAsync("OFF_d_meku", 0, NULL);
+}
+#else
 void seq_e3Init(SequenceWork* seq) {
     wp->handle = fileAllocf(4, "%s/monthry.tpl", getMarioStDvdRoot());
     wp->curScreen = 0;
     wp->nextScreen = 0;
     wp->scenario = 0;
-    wp->reserved_64 = 270.0f;
+    wp->poseRotY = 270.0f;
     OSCreateAlarm(&wp->alarm);
 #if defined(VERSION_G8ME01) && !defined(VERSION_G8MP01)
     OSSetAlarm(&wp->alarm, (OSTime)OS_TIMER_CLOCK * 300, alarm_handler);
@@ -116,8 +224,17 @@ void seq_e3Init(SequenceWork* seq) {
     seq->state = 0;
     animGroupBaseAsync("OFF_d_meku", 0, NULL);
 }
+#endif
 
 void seq_e3Exit(SequenceWork* seq) {
+#ifdef VERSION_G8ME01_DEMO
+    s32 i;
+
+    for (i = 0; i < 4; i++) {
+        animPoseRelease(wp->poseIds[i]);
+    }
+    evtDelete(wp->animEvt);
+#endif
     fileFree(wp->handle);
     psndStopAllFadeOut();
 }
@@ -368,6 +485,11 @@ void seq_e3Main(SequenceWork* seq) {
             pouchReviseMarioParam();
             pouchRevisePartyParam();
             statusWinForceUpdate();
+#ifdef VERSION_G8ME01_DEMO
+            OSCreateAlarm(&wp->alarm);
+            OSSetAlarm(&wp->alarm, (OSTime)OS_TIMER_CLOCK * 600, alarm_handler);
+            wp->initTime = OSGetTime();
+#endif
         } break;
     }
 
@@ -386,6 +508,12 @@ void seq_e3Main(SequenceWork* seq) {
 #define E3_TEX_CURSOR0 MODE_5
 #define E3_TEX_CURSOR1 MODE_6
 #define E3_TEX_BOX 7
+#elif defined(VERSION_G8ME01_DEMO)
+// The demo's e3.tpl
+#define E3_TEX_TILE 4
+#define E3_TEX_CURSOR0 MODE_5
+#define E3_TEX_CURSOR1 MODE_6
+#define E3_TEX_BOX 1
 #else
 #define E3_TEX_TILE MODE_5
 #define E3_TEX_CURSOR0 MODE_6
@@ -395,6 +523,10 @@ void seq_e3Main(SequenceWork* seq) {
 
 void e3Disp(CameraId cameraId, void* param) {
     CameraEntry* camera = camGetPtr(CAMERA_2D);
+#ifdef VERSION_G8ME01_DEMO
+    Mtx poseMtx;
+    Mtx poseScale;
+#endif
     Mtx mtx;
     Mtx mtxScale;
     f32 projBackup[GX_PROJECTION_SZ];
@@ -430,6 +562,43 @@ void e3Disp(CameraId cameraId, void* param) {
                   camera->viewport[4], camera->viewport[5]);
 
     if (active == 0) {
+#ifdef VERSION_G8ME01_DEMO
+        // Title screen: background tiles, the four characters and the title textures
+        mode = (s32)((f32)sin(e3BlinkTime()) * 459.0f);
+        if (mode < 0) {
+            mode = 0;
+        }
+        if (mode > 255) {
+            mode = 255;
+        }
+
+        winTexInit(*wp->handle->data);
+        for (row = 0, py = -304; row < 6; row++, py += 128) {
+            for (col = 0, px = 0; col < 9; col++, px += 64) {
+                winTexSet(8, (Vec){ (f32)py, (f32)(240 - px), 0.0f }, (Vec){ 1.0f, 1.0f, 1.0f },
+                                 (GXColor){ 0xFF, 0xFF, 0xFF, 0xFF });
+            }
+        }
+
+        for (row = 0; row < 4; row++) {
+
+            t = 180.0f - 120.0f * (f32)row;
+            e3DispShadow(t, -150.0f, 0.0f);
+            MTXTrans(poseMtx, t, -150.0f, 0.0f);
+            MTXScale(poseScale, 3.0f, 3.0f, 3.0f);
+            MTXConcat(poseMtx, poseScale, poseMtx);
+            animPoseMain(wp->poseIds[row]);
+            animPoseDrawMtx(wp->poseIds[row], poseMtx, 1, wp->poseRotY, 2.0f);
+            animPoseDrawMtx(wp->poseIds[row], poseMtx, 2, wp->poseRotY, 2.0f);
+            animPoseDrawMtx(wp->poseIds[row], poseMtx, 3, wp->poseRotY, 2.0f);
+            animPoseGetAnimPosePtr(wp->poseIds[row])->flags &= ~0x100;
+        }
+
+        winTexInit(*wp->handle->data);
+        winTexSet(0, (Vec){ 0.0f, 90.0f, 0.0f }, (Vec){ 1.0f, 1.0f, 1.0f }, (GXColor){ 0xFF, 0xFF, 0xFF, 0xFE });
+        winTexSet(7, (Vec){ 0.0f, -20.0f, 0.0f }, (Vec){ 1.0f, 1.0f, 1.0f }, (GXColor){ 0xFF, 0xFF, 0xFF, mode });
+        winTexSet(10, (Vec){ 0.0f, -170.0f, 0.0f }, (Vec){ 1.0f, 1.0f, 1.0f }, (GXColor){ 0xFF, 0xFF, 0xFF, 0xFF });
+#else
         // 'Press Start' overlay with alpha pulsing
         alpha = (s32)((f32)sin((f64)((f32)gp->retraceCount / 30.0f)) * 459.0f);
 #ifdef VERSION_G8MP01
@@ -456,8 +625,19 @@ void e3Disp(CameraId cameraId, void* param) {
 #ifdef VERSION_G8MP01
         }
 #endif
+#endif
     } else {
         // Tiled background fill (40 x 32 quads)
+#ifdef VERSION_G8ME01_DEMO
+        // Same fill as below; the demo compiles it with the counters held in these variables.
+        winTexInit(*wp->handle->data);
+        for (col = 0, py = -304; col < 40; col++, py += 16) {
+            for (px = 0, row = 0; px < 32; px++, row += 16) {
+                winTexSet(E3_TEX_TILE, (Vec){ (f32)py, (f32)(240 - row), 0.0f }, (Vec){ 1.0f, 1.0f, 1.0f },
+                          (GXColor){ 0xFF, 0xFF, 0xFF, 0xFF });
+            }
+        }
+#else
         winTexInit(*wp->handle->data);
         for (row = 0, py = -304; row < 40; row++, py += 16) {
             for (col = 0, px = 0; col < 32; col++, px += 16) {
@@ -465,6 +645,7 @@ void e3Disp(CameraId cameraId, void* param) {
                           (GXColor){ 0xFF, 0xFF, 0xFF, 0xFF });
             }
         }
+#endif
 
 #ifdef VERSION_G8ME01
         for (i = 0; i < 4; i++) {
@@ -540,10 +721,12 @@ void e3Disp(CameraId cameraId, void* param) {
                   viewportBackup[5]);
 }
 
+#ifndef VERSION_G8ME01_DEMO
 // JP and US both pool 30.0f via this dead-stripped stand-in
 f32 forceSdata(void) {
     return 30.0f;
 }
+#endif
 
 void e3DispOffscreen(CameraId cameraId, void* param) {
     u16 left, top, right, bottom;
@@ -557,6 +740,61 @@ void e3DispOffscreen(CameraId cameraId, void* param) {
     offscreenAddBoundingBox(offscreenNameToId("fOff_peron"), left, top, right, bottom);
 }
 
+#ifdef VERSION_G8ME01_DEMO
+static f32 e3BlinkTime(void) {
+    return (f32)gp->retraceCount / 15.0f;
+}
+
+// Draws the shadow under a character on the demo's title screen.
+static void e3DispShadow(f32 x, f32 y, f32 z) {
+    Mtx mtx;
+    Mtx trans;
+    Mtx scale;
+    Mtx rot;
+    GXTexObj tex;
+
+    GXSetFog(GX_FOG_NONE, 0.0f, 0.0f, 0.0f, 0.0f, (GXColor){ 0xFF, 0xFF, 0xFF, 0xFF });
+    GXSetBlendMode(GX_BM_BLEND, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA, GX_LO_CLEAR);
+    GXSetZCompLoc(GX_TRUE);
+    GXSetAlphaCompare(GX_ALWAYS, 0, GX_AOP_AND, GX_ALWAYS, 0);
+    GXSetZMode(GX_DISABLE, GX_ALWAYS, GX_DISABLE);
+    GXSetNumChans(1);
+    GXSetChanCtrl(GX_COLOR0A0, GX_DISABLE, GX_SRC_REG, GX_SRC_REG, GX_LIGHT_NULL, GX_DF_NONE, GX_AF_NONE);
+    GXSetChanMatColor(GX_COLOR0A0, (GXColor){ 0x00, 0x00, 0x00, 0x80 });
+    GXSetNumTevStages(1);
+    GXSetTevOrder(GX_TEVSTAGE0, GX_TEXCOORD0, GX_TEXMAP0, GX_COLOR0A0);
+    GXSetTevOp(GX_TEVSTAGE0, GX_MODULATE);
+    GXSetTevSwapMode(GX_TEVSTAGE0, GX_TEV_SWAP0, GX_TEV_SWAP0);
+    GXSetNumTexGens(1);
+    GXSetTexCoordGen2(GX_TEXCOORD0, GX_TG_MTX2x4, GX_TG_TEX0, GX_IDENTITY, GX_FALSE, GX_PTIDENTITY);
+    TEXGetGXTexObjFromPalette(*wp->handle->data, &tex, 9);
+    GXInitTexObjLOD(&tex, GX_LINEAR, GX_LINEAR, 0.0f, 0.0f, 0.0f, GX_FALSE, GX_FALSE, GX_ANISO_1);
+    GXLoadTexObj(&tex, GX_TEXMAP0);
+    MTXTrans(trans, x, y, z);
+    MTXScale(scale, 2.0f * GXGetTexObjWidth(&tex), 2.0f * GXGetTexObjHeight(&tex), 1.0f);
+    MTXRotRad(rot, 'x', -1.3962634f);
+    MTXConcat(trans, rot, mtx);
+    MTXConcat(mtx, scale, mtx);
+    MTXConcat(camGetCurPtr()->view, mtx, mtx);
+    GXLoadPosMtxImm(mtx, 0);
+    GXSetCurrentMtx(0);
+    GXSetCullMode(GX_CULL_NONE);
+    GXClearVtxDesc();
+    GXSetVtxDesc(GX_VA_POS, GX_DIRECT);
+    GXSetVtxDesc(GX_VA_TEX0, GX_DIRECT);
+    GXSetVtxAttrFmt(GX_VTXFMT0, GX_VA_POS, GX_POS_XYZ, GX_F32, 0);
+    GXSetVtxAttrFmt(GX_VTXFMT0, GX_VA_TEX0, GX_TEX_ST, GX_F32, 0);
+    GXBegin(GX_QUADS, GX_VTXFMT0, 4);
+    GXPosition3f32(-0.5f, 0.5f, 0.0f);
+    GXTexCoord2f32(0.0f, 0.0f);
+    GXPosition3f32(-0.5f, -0.5f, 0.0f);
+    GXTexCoord2f32(0.0f, 1.0f);
+    GXPosition3f32(0.5f, -0.5f, 0.0f);
+    GXTexCoord2f32(1.0f, 1.0f);
+    GXPosition3f32(0.5f, 0.5f, 0.0f);
+    GXTexCoord2f32(1.0f, 0.0f);
+}
+#else
 #ifdef VERSION_G8ME01 // US: local here, seq_title has the global copy
 static
 #endif
@@ -626,3 +864,4 @@ void pressStartGX(s32 alpha, f32 x, f32 y) {
     GXTexCoord2f32(0.0f, 0.0f);
     GXSetTevSwapModeTable(GX_TEV_SWAP1, GX_CH_RED, GX_CH_GREEN, GX_CH_BLUE, GX_CH_ALPHA);
 }
+#endif

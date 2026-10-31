@@ -96,10 +96,12 @@ void countDownMain(void) {
             }
             break;
         case 1:
+#ifndef VERSION_G8ME01_DEMO
             if ((wp->flags & 2) != 0) {
                 psndSFXOff(wp->sfxId);
                 wp->sfxId = -1;
             }
+#endif
             break;
         case 2:
             if (++wp->counter < 30) {
@@ -125,6 +127,13 @@ void countDownMain(void) {
         dispEntry(CAMERA_2D, 1000.0f, 0, countDownDisp, NULL);
     }
 }
+
+// The demo draws the countdown icons with icon flag 0x4, retail with 0x10.
+#ifdef VERSION_G8ME01_DEMO
+#define CD_ICON_FLAGS 0x4
+#else
+#define CD_ICON_FLAGS 0x10
+#endif
 
 static void countDownDisp(CameraId cameraId, void* param) {
     GXColor white = sWhite;
@@ -154,7 +163,7 @@ static void countDownDisp(CameraId cameraId, void* param) {
         PSMTXConcat(base, scale, mtx);
         {
             GXColor shadow = sShadow;
-            iconDispGxCol(mtx, 0x10, 0x1f6 + CD_ICON_OFS, shadow);
+            iconDispGxCol(mtx, CD_ICON_FLAGS, 0x1f6 + CD_ICON_OFS, shadow);
         }
         digits[0] = sec / 100;
         sec %= 100;
@@ -163,11 +172,11 @@ static void countDownDisp(CameraId cameraId, void* param) {
         for (i = 0; i < 3; i++) {
             PSMTXTrans(mtx, i * 30 - 50, 8.0f, 0.0f);
             PSMTXConcat(base, mtx, mtx);
-            iconDispGxCol(mtx, 0x10, (u16)(digits[i] + 0x1f7 + CD_ICON_OFS), white2);
+            iconDispGxCol(mtx, CD_ICON_FLAGS, (u16)(digits[i] + 0x1f7 + CD_ICON_OFS), white2);
         }
         PSMTXTrans(mtx, 28.0f, 10.0f, 0.0f);
         PSMTXConcat(base, mtx, mtx);
-        iconDispGxCol(mtx, 0x10, 0x201 + CD_ICON_OFS, white3);
+        iconDispGxCol(mtx, CD_ICON_FLAGS, 0x201 + CD_ICON_OFS, white3);
         digits[0] = msec / 100;
         digits[1] = (msec % 100) / 10;
         for (i = 0; i < 2; i++) {
@@ -175,7 +184,7 @@ static void countDownDisp(CameraId cameraId, void* param) {
             PSMTXScale(scale, 0.5f, 0.5f, 0.5f);
             PSMTXConcat(mtx, scale, mtx);
             PSMTXConcat(base, mtx, mtx);
-            iconDispGxCol(mtx, 0x10, (u16)(digits[i] + 0x1f7 + CD_ICON_OFS), white2);
+            iconDispGxCol(mtx, CD_ICON_FLAGS, (u16)(digits[i] + 0x1f7 + CD_ICON_OFS), white2);
         }
     }
 }

@@ -49,7 +49,11 @@ static void twoddisp_disp(CameraId camera, void* param) {
                 pos.y = p->baseY + p->y;
                 pos.z = 0.0f;
                 GXSetFog(GX_FOG_NONE, 0.0f, 0.0f, 0.0f, 0.0f, fogi);
+#ifdef VERSION_G8ME01_DEMO
+                iconDispGx(&pos, 4, (u16)p->id, p->scale);
+#else
                 iconDispGx(&pos, 0x10, (u16)p->id, p->scale);
+#endif
             } else {
                 FontDrawStart();
                 FontDrawScale(p->scale);

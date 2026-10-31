@@ -122,7 +122,11 @@ static BattleUnitDefense defence_patakuri = {{0, 0, 0, 0, 0}};
 
 static BattleUnitDefenseAttr defence_patakuri_attr = {{0, 0, 0, 0, 0}};
 
+#ifdef VERSION_G8ME01_DEMO
+static StatusVulnerability regist_patakuri = {100, 120, 120, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 120, 150, 100, 100, 100, 100, 150};
+#else
 static StatusVulnerability regist_patakuri = {100, 110, 120, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 110, 110, 100, 100, 100, 100, 150};
+#endif
 
 static BattleWeapon weapon_patakuri_attack = {
     NULL, 0, // name..icon
@@ -182,8 +186,13 @@ static PoseTableEntry pose_table_patakuri[] = {
     {40, "PTK_W_1"},
     {56, "PTK_I_1"},
     {57, "PTK_I_1"},
+#ifdef VERSION_G8ME01_DEMO
+    {63, "PTK_T_1"},
+    {67, "PTK_S_1"},
+#else
     {65, "PTK_T_1"},
     {69, "PTK_S_1"},
+#endif
 };
 
 static BattleDataEntry data_table_patakuri[] = {
@@ -321,7 +330,11 @@ static EVT_BEGIN(attack_event_patakuri)
     CALL(btlevtcmd_FaceDirectionSub, LW(3), LW(0), 50)
     SUBTRACT(LW(1), 10)
     CALL(btlevtcmd_DivePosition, -2, LW(0), LW(1), LW(2), 0, -20, 1, 0, 0)
+#ifdef VERSION_G8ME01_DEMO
+    CALL(btlevtcmd_AnimeChangePoseType, -2, 1, 67)
+#else
     CALL(btlevtcmd_AnimeChangePoseType, -2, 1, 69)
+#endif
     WAIT_MS(500)
     GOTO(98)
     LABEL(91)
@@ -376,8 +389,13 @@ static PoseTableEntry pose_table[] = {
     {40, "KUR_W_1"},
     {56, "KUR_I_1"},
     {57, "KUR_I_1"},
+#ifdef VERSION_G8ME01_DEMO
+    {63, "KUR_T_1"},
+    {67, "KUR_S_1"},
+#else
     {65, "KUR_T_1"},
     {69, "KUR_S_1"},
+#endif
 };
 
 static BattleDataEntry data_table[] = {
@@ -389,7 +407,11 @@ static BattleUnitDefense defence = {0};
 
 static BattleUnitDefenseAttr defence_attr = {0};
 
+#ifdef VERSION_G8ME01_DEMO
+static StatusVulnerability regist = {100, 120, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 120, 120, 100, 100, 100, 100, 150};
+#else
 static StatusVulnerability regist = {100, 110, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 110, 100, 100, 100, 100, 100, 150};
+#endif
 
 static BattleUnitKindPart parts[] = {
     {
@@ -579,7 +601,11 @@ static EVT_BEGIN(attack_event)
     LABEL(90)
     CALL(btlevtcmd_JumpContinue, -2)
     CALL(btlevtcmd_SetRotate, -2, 0, 0, 0)
+#ifdef VERSION_G8ME01_DEMO
+    SET_VALUE(LW(15), 67)
+#else
     SET_VALUE(LW(15), 69)
+#endif
     CALL(btlevtcmd_AnimeChangePoseType, -2, 1, LW(15))
     CALL(btlevtcmd_GetPos, -2, LW(0), LW(1), LW(2))
     CALL(btlevtcmd_MoveDirectionAdd, -2, LW(0), 30)
@@ -596,7 +622,11 @@ static EVT_BEGIN(attack_event)
     CALL(btlevtcmd_ResultACDefence, LW(3), PTR(&weapon_kuriboo_attack))
     CALL(btlevtcmd_CheckDamage, -2, LW(3), LW(4), PTR(&weapon_kuriboo_attack), 256, LW(5))
     CALL(btlevtcmd_SetRotate, -2, 0, 0, 0)
+#ifdef VERSION_G8ME01_DEMO
+    SET_VALUE(LW(15), 67)
+#else
     SET_VALUE(LW(15), 69)
+#endif
     CALL(btlevtcmd_AnimeChangePoseType, -2, 1, LW(15))
     CALL(btlevtcmd_GetPos, -2, LW(0), LW(1), LW(2))
     SET_VALUE(LW(1), 0)

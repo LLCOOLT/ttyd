@@ -4748,7 +4748,6 @@ monte_evt_door_close = .data:0x0003A2D4; // type:object size:0x40 scope:global
 monte_evt_door_entry = .data:0x0003A314; // type:object size:0x124 scope:global
 gor_03_init_evt = .data:0x0003A438; // type:object size:0xAA4 scope:global
 @1851 = .data:0x0003AEDC; // type:object size:0x30 scope:local
-lbl_10_data_3AF0C = .data:0x0003AF0C; // type:object size:0x4
 negone_one$42 = .data:0x0003AF10; // type:object size:0x8 scope:local
 neg_one$44 = .data:0x0003AF18; // type:object size:0x4 scope:local
 __local_PI$45 = .data:0x0003AF1C; // type:object size:0x4 scope:local

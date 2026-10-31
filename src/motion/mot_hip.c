@@ -235,7 +235,11 @@ void mot_hip(void) {
             break;
         }
         fall = marioGetFallSpd();
+#ifdef VERSION_G8ME01_DEMO
+        hit = marioChkLandon(&y, fall);
+#else
         hit = marioSearchGround(&y, &tmp1, &tmp2, fall, fall);
+#endif
         if (fall < -100.0f) {
             fall = -100.0f;
             mario->jumpSnapY = 0.0f;
@@ -254,16 +258,20 @@ void mot_hip(void) {
             mario->rotOfs.y = 0.0f;
             mario->airTimer = 0;
             mario->jumpPeakAirTime = 0;
+#ifndef VERSION_G8ME01_DEMO
             mario->dispOfs2.y = 0.0f;
+#endif
             marioChgPose("M_A_1B");
             attr = hitGetAttr(hit);
             if (attr & 0x200) {
                 set_damage_root_ypos(mario->position.y);
+#ifndef VERSION_G8ME01_DEMO
                 d = -0.4f;
                 mario->jumpVelocityY = d;
                 mario->jumpAccelerationY = d;
                 mario->jumpJerkY = 0.0f;
                 mario->jumpSnapY = 0.0f;
+#endif
                 marioChgMot(MARIO_MOTION_DAMAGE);
                 return;
             }
@@ -278,7 +286,11 @@ void mot_hip(void) {
                 return;
             }
             psndSFXOn_3D((char*)0x159, &mario->position);
+#ifdef VERSION_G8ME01_DEMO
+            evtEntry(marioBgmodeChk() == 0 ? quake_evt : quake_bgmode_evt, 0, 0);
+#else
             evtEntryType(marioBgmodeChk() == 0 ? quake_evt : quake_bgmode_evt, 0, 0, 0);
+#endif
         } else {
             mario->position.y += fall;
         }
@@ -318,7 +330,9 @@ void mot_hip(void) {
     }
 }
 
+#ifndef VERSION_G8ME01_DEMO
 #pragma dont_inline on
+#endif
 s32 U_chkground(void) {
     MarioWork* mario;
     HitEntry* hit;
@@ -349,11 +363,13 @@ s32 U_chkground(void) {
         attr = hitGetAttr(hit);
         if (attr & 0x200) {
             set_damage_root_ypos(mario->position.y);
+#ifndef VERSION_G8ME01_DEMO
             v = -0.4f;
             mario->jumpVelocityY = v;
             mario->jumpAccelerationY = v;
             mario->jumpJerkY = 0.0f;
             mario->jumpSnapY = 0.0f;
+#endif
             marioChgMot(MARIO_MOTION_DAMAGE);
             return 1;
         }
@@ -367,7 +383,9 @@ s32 U_chkground(void) {
     return 0;
 }
 
+#ifndef VERSION_G8ME01_DEMO
 #pragma dont_inline reset
+#endif
 
 #ifdef VERSION_G8ME01
 void mot_hip_post(void) {

@@ -179,12 +179,14 @@ USER_FUNC(main_deka) {
         w->unitId = evtGetValue(event, args[0]);
         yuka_init();
     }
+#ifndef VERSION_G8ME01_DEMO
     if (w->tex->address == NULL) {
         return 2;
     }
     if (w->mesh->address == NULL) {
         return 2;
     }
+#endif
     main_base();
     main_gauge();
     for (i = 0; i < 8; i++) {
@@ -328,9 +330,13 @@ USER_FUNC(yuka_end) {
     DekaWork* w = get_ptr();
 
     smartFree(w->tex);
+#ifndef VERSION_G8ME01_DEMO
     w->tex->address = NULL;
+#endif
     smartFree(w->mesh);
+#ifndef VERSION_G8ME01_DEMO
     w->mesh->address = NULL;
+#endif
     mapGrpFlagOff("stg_b_yuka", 0x400001);
     return 2;
 }
@@ -890,7 +896,7 @@ static void disp_2D(CameraId cam, void* param) {
                 PSMTXScale(sc, 0.75f, 0.75f, 0.75f);
                 PSMTXTrans(tr, x, 40.0f + (w->offsetY + (w->gaugePos.y - 18.0f + t->off.y)), w->gaugePos.z + t->off.z);
                 PSMTXConcat(tr, sc, m);
-                iconDispGxCol(m, 0x10, ICON_095, col);
+                iconDispGxCol(m, ICON_DISP_2D, ICON_095, col);
             } else if (t->type == 2) {
                 PSMTXScale(sc, 1.0f, 1.0f, 1.0f);
                 PSMTXTrans(tr, x, 40.0f + (w->offsetY + (w->gaugePos.y + t->off.y)), w->gaugePos.z + t->off.z);
@@ -916,7 +922,7 @@ static void disp_2D(CameraId cam, void* param) {
                         } else {
                             id = ICON_091;
                         }
-                        iconDispGxCol(m, 0x10, id, col);
+                        iconDispGxCol(m, ICON_DISP_2D, id, col);
                     }
                 } else {
                     PSMTXScale(sc, 1.0f, 1.0f, 1.0f);
@@ -1097,15 +1103,23 @@ EVT_BEGIN(marioAttackEvent_Deka)
     END_SIBLING_EVENT
     WAIT_FRAMES(30)
     CALL(evt_btl_camera_set_mode, 0, 0)
+#ifdef VERSION_G8ME01_DEMO
+    CALL(yuka_end)
     CALL(btlevtcmd_SacBgsetMove, 1)
+    CALL(end_deka)
+#else
+    CALL(btlevtcmd_SacBgsetMove, 1)
+#endif
     IF_INT_NOT_EQUAL(LW(14), -1)
         CALL(btlevtcmd_GetUnitKind, -4, LW(0))
         IF_INT_EQUAL(LW(0), 228)
             CALL(btlevtcmd_SetUnitWork, LW(14), 3, 0)
         END_IF
     END_IF
+#ifndef VERSION_G8ME01_DEMO
     CALL(yuka_end)
     CALL(end_deka)
+#endif
     LABEL(99)
     CALL(btlevtcmd_StartWaitEvent, -2)
     RETURN
@@ -1174,9 +1188,15 @@ void yuka_disp(CameraId cam, void* param) {
 
     w = get_ptr();
     camera = camGetPtr(cam);
+#ifdef VERSION_G8ME01_DEMO
+    {
+        m = w->mesh->address;
+        {
+#else
     if (w->tex->address != NULL) {
         m = w->mesh->address;
         if (m != NULL) {
+#endif
             GXSetCullMode(0);
             GXClearVtxDesc();
             GXSetVtxDesc(9, 1);

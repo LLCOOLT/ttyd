@@ -36,6 +36,15 @@ s32 charspace[2] = {4, 2};
 const char* fontname[2] = {"papermarioset_JPN", "popjoyB22"};
 #endif
 
+// The demo draws message icons with display flag 4 (retail 0x10) and keeps the fonts under font/
+#ifdef VERSION_G8ME01_DEMO
+#define FONT_ICON_FLAGS 4
+#define FONT_DIR "font"
+#else
+#define FONT_ICON_FLAGS 0x10
+#define FONT_DIR "f"
+#endif
+
 //.sbss
 Vec fontScale;
 GXColor fontColor;
@@ -102,6 +111,8 @@ void fontmgrInit(void) {
 void fontmgrTexSetup(void) {
 #ifdef VERSION_G8ME01
 	JUTFontSetup(gp->language);
+#elif defined(VERSION_G8ME01_DEMO)
+	JUTFontSetup(1);
 #else
 	JUTFontSetup(0);
 #endif
@@ -614,7 +625,7 @@ void FontDrawMessage(s32 x, s32 y, const char* msg) {
 						pos.x = d1 + (cx + 0.5f * w * scale);
 						pos.y = d2 + (cy - h * scale);
 						pos.z = 0.0f;
-						iconDispGxAlpha(&pos, 0x10, id, fontAlpha, scale);
+						iconDispGxAlpha(&pos, FONT_ICON_FLAGS, id, fontAlpha, scale);
 						FontDrawStart_alpha(fontAlpha);
 						FontDrawColor(fontColor);
 						cx += w * scale + d3;
@@ -698,7 +709,7 @@ void FontDrawMessageMtx(Mtx mtx, const char* msg) {
 						pos.z = 0.0f;
 						PSMTXMultVec(mtx, &pos, &pos);
 						scale = scale;
-						iconDispGxAlpha(&pos, 0x10, id, fontAlpha, scale);
+						iconDispGxAlpha(&pos, FONT_ICON_FLAGS, id, fontAlpha, scale);
 						FontDrawStart_alpha(fontAlpha);
 						FontDrawColor(fontColor);
 						cx += w * scale + d3;
@@ -888,7 +899,7 @@ void JUTFontSetup(u16 font) {
 		DVDMgrClose(dvd);
 #else
 	if (!pfh) {
-		sprintf(path, "%s/f/%s.bfn", getMarioStDvdRoot(), fontname[font]);
+		sprintf(path, "%s/" FONT_DIR "/%s.bfn", getMarioStDvdRoot(), fontname[font]);
 		dvd = DVDMgrOpen(path, 2, 0);
 		size = DVDMgrGetLength(dvd);
 		pfh = __memAlloc(HEAP_DEFAULT, size = OSRoundUp32B(size));

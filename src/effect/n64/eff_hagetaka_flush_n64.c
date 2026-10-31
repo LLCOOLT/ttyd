@@ -19,6 +19,15 @@ typedef struct EffHagetakaFlushN64Work {
     f32 scale;     // 0x2C
 } EffHagetakaFlushN64Work;
 
+#ifdef VERSION_G8ME01_DEMO
+// The demo defines the colours first
+static u8 color_rotation_data[] = {
+    0xFF, 0xFF, 0x52, 0xFF, 0xFF, 0x52, 0xB5, 0x94,
+    0x00, 0xB5, 0x94, 0x00, 0xFF, 0xFF, 0xD6, 0xFF,
+    0xFF, 0xD6, 0xB5, 0x94, 0x00, 0xB5, 0x94, 0x00,
+};
+#endif
+
 static effN64Vtx size16x16_tex64x64_vtx[] = {
     {-8, -8, 0, 0, 1024, 0, 0, 0, 255},
     {8, -8, 0, 2048, 1024, 0, 0, 0, 255},
@@ -26,11 +35,13 @@ static effN64Vtx size16x16_tex64x64_vtx[] = {
     {-8, 8, 0, 0, 3072, 0, 0, 0, 255},
 };
 
+#ifndef VERSION_G8ME01_DEMO
 static u8 color_rotation_data[] = {
     0xFF, 0xFF, 0x52, 0xFF, 0xFF, 0x52, 0xB5, 0x94,
     0x00, 0xB5, 0x94, 0x00, 0xFF, 0xFF, 0xD6, 0xFF,
     0xFF, 0xD6, 0xB5, 0x94, 0x00, 0xB5, 0x94, 0x00,
 };
+#endif
 
 void effHagetakaFlushMain(EffectEntry* effect);
 void effHagetakaFlushDisp(CameraId cameraId, EffectEntry* effect);

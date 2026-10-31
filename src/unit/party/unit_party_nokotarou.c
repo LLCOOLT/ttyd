@@ -79,7 +79,11 @@ static void __makeTechMenuFunc(BattleCommand* command, s32* count);
 
 PoseTableEntry pose_table_nokotarou_stay[26];
 PoseTableEntry pose_table_nokotarou_turn[12];
+#ifdef VERSION_G8ME01_DEMO
+static BattleDataEntry data_table[11];
+#else
 static BattleDataEntry data_table[12];
+#endif
 BattleUnitKindPart unitpartsdata_Party_Nokotarou[1];
 BattleUnitKind unitdata_Party_Nokotarou;
 static EvtWord init_event[78];
@@ -99,7 +103,9 @@ extern EvtWord partyNokotarouAttack_TsuranukiKoura[];
 extern EvtWord nokotarou_appeal_event[];
 static EvtWord party_win_reaction[16];
 static EvtWord attack_audience_event[263];
+#ifndef VERSION_G8ME01_DEMO
 extern EvtWord nokotarou_revive_event[];
+#endif
 static BattleUnitDefense defence;
 static BattleUnitDefenseAttr defence_attr;
 static BattleUnitDefense defence_turn;
@@ -116,6 +122,14 @@ BattleUnitSetup entry_koura;
 
 
 
+
+static BattleUnitDefense defence = {{1, 1, 1, 1, 1}};
+
+static BattleUnitDefenseAttr defence_attr = {{0, 0, 0, 0, 0}};
+
+static BattleUnitDefense defence_turn = {0};
+
+static StatusVulnerability regist = {100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100};
 
 PoseTableEntry pose_table_nokotarou_stay[] = {
     {9, "PNK_D_5"},
@@ -134,6 +148,18 @@ PoseTableEntry pose_table_nokotarou_stay[] = {
     {50, "PNK_A_1"},
     {57, "PNK_D_2"},
     {56, "PNK_D_2"},
+#ifdef VERSION_G8ME01_DEMO
+    {58, "PNK_D_4"},
+    {59, "PNK_X_1"},
+    {63, "PNK_T_1"},
+    {52, "PNK_I_1"},
+    {65, "PNK_C_1"},
+    {64, "PNK_O_1"},
+    {62, "PNK_X_1"},
+    {49, "PNK_A_1"},
+    {45, "PNK_G_1"},
+    {67, "PNK_S_1"},
+#else
     {60, "PNK_D_4"},
     {61, "PNK_X_1"},
     {65, "PNK_T_1"},
@@ -144,6 +170,7 @@ PoseTableEntry pose_table_nokotarou_stay[] = {
     {49, "PNK_A_1"},
     {45, "PNK_G_1"},
     {69, "PNK_S_1"},
+#endif
 };
 
 PoseTableEntry pose_table_nokotarou_turn[] = {
@@ -156,9 +183,15 @@ PoseTableEntry pose_table_nokotarou_turn[] = {
     {39, "PNK_D_1"},
     {57, "PNK_H_1"},
     {56, "PNK_H_1"},
+#ifdef VERSION_G8ME01_DEMO
+    {62, "PNK_H_1"},
+    {45, "PNK_H_1"},
+    {67, "PNK_H_1"},
+#else
     {64, "PNK_H_1"},
     {45, "PNK_H_1"},
     {69, "PNK_H_1"},
+#endif
 };
 
 static BattleDataEntry data_table[] = {
@@ -171,7 +204,9 @@ static BattleDataEntry data_table[] = {
     {48, btldefaultevt_Dummy},
     {64, party_win_reaction},
     {7, subset_attack_ready_jump_event},
+#ifndef VERSION_G8ME01_DEMO
     {67, nokotarou_revive_event},
+#endif
     {47, btldefaultevt_avoid_counter_event},
     {0, NULL},
 };
@@ -279,6 +314,13 @@ static EVT_BEGIN(init_event)
     RETURN
 EVT_END()
 
+static EVT_BEGIN(damage_event)
+    SET_VALUE(LW(10), -2)
+    SET_VALUE(LW(11), 1)
+    CALL_CHILD(PTR(btldefaultevt_Damage))
+    RETURN
+EVT_END()
+
 EVT_BEGIN(change_party_spawn_init_event)
     CALL(btlevtcmd_GetOverTurnCount, -4, LW(0))
     IF_INT_GREATER_OR_EQUAL(LW(0), 1)
@@ -325,6 +367,15 @@ static EVT_BEGIN(wakeup_event)
     CALL(btlevtcmd_GetPos, -2, LW(0), LW(1), LW(2))
     CALL(btlevtcmd_JumpPosition, -2, LW(0), LW(1), LW(2), 12, -1)
     CALL(btlevtcmd_StartWaitEvent, -2)
+    RETURN
+EVT_END()
+
+static EVT_BEGIN(attack_event)
+    RETURN
+EVT_END()
+
+static EVT_BEGIN(wait_event)
+    CALL(btlevtcmd_AnimeChangePoseFromTable, -2, 1)
     RETURN
 EVT_END()
 
@@ -1090,12 +1141,14 @@ EVT_BEGIN(partyNokotarouAttack_NormalAttack)
         GOTO(99)
     END_IF
     CALL(evt_btl_camera_set_mode, 0, 0)
+#ifndef VERSION_G8ME01_DEMO
     CALL(btlevtcmd_CommandPreCheckCounter, -2, LW(3), LW(4), 256, LW(0))
     IF_INT_NOT_EQUAL(LW(0), 0)
         CALL(btlevtcmd_SetUnitWork, -2, 1, 0)
         CALL(btlevtcmd_SetRotate, -2, 0, 0, 0)
         CALL_CHILD(_koura_rotate_stop)
     END_IF
+#endif
     CALL(btlevtcmd_GetResultAC, LW(0))
     IF_BITS_SET(LW(0), 2)
         CALL(btlevtcmd_CommandCheckDamage, -2, LW(3), LW(4), 131328, LW(5))
@@ -1456,7 +1509,11 @@ EVT_BEGIN(partyNokotarouAttack_SyubibinKoura)
         SET_VALUE(LW(0), 100)
         SET_VALUE(LW(1), 30)
     END_SWITCH
+#ifdef VERSION_G8ME01_DEMO
+    CALL(btlevtcmd_AcSetParamAll, 2, LW(0), 1, 90, LW(1), -250000000, -250000000, -250000000)
+#else
     CALL(btlevtcmd_AcSetParamAll, 2, LW(0), 1, 95, LW(1), -250000000, -250000000, -250000000)
+#endif
     CALL(btlevtcmd_AcSetFlag, 3)
     CALL(btlevtcmd_SetupAC, -2, 19, 1, 60)
     WAIT_FRAMES(22)
@@ -1519,12 +1576,14 @@ EVT_BEGIN(partyNokotarouAttack_SyubibinKoura)
     END_IF
     CALL(evt_btl_camera_set_mode, 0, 0)
     CALL(evt_btl_camera_set_moveSpeedLv, 0, 0)
+#ifndef VERSION_G8ME01_DEMO
     CALL(btlevtcmd_CommandPreCheckCounter, -2, LW(3), LW(4), 256, LW(0))
     IF_INT_NOT_EQUAL(LW(0), 0)
         CALL(btlevtcmd_SetUnitWork, -2, 1, 0)
         CALL(btlevtcmd_SetRotate, -2, 0, 0, 0)
         CALL_CHILD(_koura_rotate_stop)
     END_IF
+#endif
     CALL(btlevtcmd_GetResultAC, LW(0))
     IF_BITS_SET(LW(0), 2)
         CALL(btlevtcmd_CommandCheckDamage, -2, LW(3), LW(4), 131328, LW(5))
@@ -1610,6 +1669,17 @@ EVT_BEGIN(partyNokotarouAttack_SyubibinKoura)
     RETURN
 EVT_END()
 #endif
+
+BattleUnitSetup entry_koura = {
+    &unit_koura, // mUnitKindParams
+    0, // alliance
+    {0}, // pad_05
+    0x4000001, // attackPhase
+    {1000.0f, 0.0f, 1000.0f}, // position
+    0, // hitOffsetX
+    {0}, // unitWork
+    NULL, // itemDropTable
+};
 
 EVT_BEGIN(partyNokotarouAttack_KouraGuard)
     CALL(btlevtcmd_GetSelectEnemy, LW(3), LW(4))
@@ -1789,7 +1859,9 @@ EVT_BEGIN(partyNokotarouAttack_KouraGuard)
         CALL(btlevtcmd_AnimeChangePoseType, LW(10), 1, 43)
         CALL(btlevtcmd_OnPartsAttribute, LW(3), 1, 16777216)
         CALL(btlevtcmd_OnAttribute, LW(3), 96)
+#ifndef VERSION_G8ME01_DEMO
         CALL(btlevtcmd_StartWaitEvent, LW(3))
+#endif
         CALL(_check_mario_move_count, LW(0))
         IF_INT_GREATER_OR_EQUAL(LW(0), 1)
             CALL(evt_btl_camera_set_mode, 0, 0)
@@ -2307,6 +2379,7 @@ EVT_BEGIN(partyNokotarouAttack_TsuranukiKoura)
     END_IF
     CALL(evt_btl_camera_set_mode, 0, 0)
     CALL(evt_btl_camera_set_moveSpeedLv, 0, 0)
+#ifndef VERSION_G8ME01_DEMO
     CALL(btlevtcmd_CommandPreCheckCounter, -2, LW(3), LW(4), 256, LW(0))
     IF_INT_NOT_EQUAL(LW(0), 0)
         CALL(btlevtcmd_SetPartsWork, -2, 1, 2, 1)
@@ -2314,6 +2387,7 @@ EVT_BEGIN(partyNokotarouAttack_TsuranukiKoura)
         CALL(btlevtcmd_SetRotate, -2, 0, 0, 0)
         CALL_CHILD(_koura_rotate_stop)
     END_IF
+#endif
     CALL(btlevtcmd_GetResultAC, LW(0))
     IF_BITS_SET(LW(0), 2)
         CALL(btlevtcmd_CommandCheckDamage, -2, LW(3), LW(4), 131328, LW(5))
@@ -2413,7 +2487,11 @@ EVT_END()
 
 EVT_BEGIN(nokotarou_appeal_event)
     CALL(btlevtcmd_RunDataEventChild, -2, 7)
+#ifdef VERSION_G8ME01_DEMO
+    CALL(btlevtcmd_AnimeChangePoseType, -2, 1, 64)
+#else
     CALL(btlevtcmd_AnimeChangePoseType, -2, 1, 66)
+#endif
     CALL(btlevtcmd_GetPos, -2, LW(0), LW(1), LW(2))
     CALL(evt_snd_sfxon_3d, STRING("SFX_MARIO_APPEAL1"), LW(0), LW(1), LW(2), 0)
     WAIT_FRAMES(58)
@@ -2464,7 +2542,11 @@ static EVT_BEGIN(attack_audience_event)
     CALL(evt_snd_sfxon, STRING("SFX_BTL_NOKO_ATTACK2"), 0)
     CALL(btlevtcmd_SetMoveSpeed, -2, FLOAT(8.0f))
     CALL(btlevtcmd_FaceDirectionSub, -2, LW(0), 15)
+#ifdef VERSION_G8ME01_DEMO
+    CALL(btlevtcmd_MovePosition, -2, LW(0), LW(1), LW(2), 0, -1, 0)
+#else
     CALL(btlevtcmd_MovePosition, -2, LW(0), LW(1), LW(2), 0, 0, 0)
+#endif
     CALL(_attack_aud, LW(3), 0)
     CALL(evt_btl_camera_set_mode, 0, 3)
     BEGIN_SIBLING_EVENT_GET_ID(LW(15))
@@ -2494,47 +2576,14 @@ static EVT_BEGIN(attack_audience_event)
     RETURN
 EVT_END()
 
+#ifndef VERSION_G8ME01_DEMO
 EVT_BEGIN(nokotarou_revive_event)
     CALL(btlevtcmd_SetPartsDefenceTable, LW(10), LW(11), PTR(&defence))
     CALL(btlevtcmd_OffStatusFlag, LW(10), 1)
     CALL(btlevtcmd_AnimeSetPoseTable, LW(10), LW(11), PTR(pose_table_nokotarou_stay))
     RETURN
 EVT_END()
-
-static BattleUnitDefense defence = {{1, 1, 1, 1, 1}};
-
-static BattleUnitDefenseAttr defence_attr = {{0, 0, 0, 0, 0}};
-
-static BattleUnitDefense defence_turn = {0};
-
-static StatusVulnerability regist = {100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100};
-
-static EVT_BEGIN(damage_event)
-    SET_VALUE(LW(10), -2)
-    SET_VALUE(LW(11), 1)
-    CALL_CHILD(PTR(btldefaultevt_Damage))
-    RETURN
-EVT_END()
-
-static EVT_BEGIN(attack_event)
-    RETURN
-EVT_END()
-
-static EVT_BEGIN(wait_event)
-    CALL(btlevtcmd_AnimeChangePoseFromTable, -2, 1)
-    RETURN
-EVT_END()
-
-BattleUnitSetup entry_koura = {
-    &unit_koura, // mUnitKindParams
-    0, // alliance
-    {0}, // pad_05
-    0x4000001, // attackPhase
-    {1000.0f, 0.0f, 1000.0f}, // position
-    0, // hitOffsetX
-    {0}, // unitWork
-    NULL, // itemDropTable
-};
+#endif
 
 static void __makeTechMenuFunc(BattleCommand* command, s32* count) {
     s32 techLv;

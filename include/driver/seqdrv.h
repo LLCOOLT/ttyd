@@ -13,7 +13,12 @@ typedef enum SequenceType {
 	SEQ_BATTLE = 4,
 	SEQ_GAME_OVER = 5,
 	SEQ_LOAD = 6,
+#ifdef VERSION_G8ME01_DEMO
+	// The demo has one more sequence before SEQ_E3.
+	SEQ_E3 = 8
+#else
 	SEQ_E3 = 7
+#endif
 } SequenceType;
 
 typedef struct SequenceWork {

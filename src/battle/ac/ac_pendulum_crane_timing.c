@@ -14,6 +14,13 @@ f32 sinfd(f32 degrees);
 #include <stdlib.h>
 #include "icon_ids.h"
 
+// The demo draws the action command icons with icon flag 4; retail uses 0x10.
+#ifdef VERSION_G8ME01_DEMO
+#define AC_ICON_FLAGS 4
+#else
+#define AC_ICON_FLAGS 0x10
+#endif
+
 typedef struct PendulumParams {
     u8 header[0x3C - 0x0]; // 0x0, BattleActions header up to params[1]
     s32 unitId;    // 0x3C
@@ -38,8 +45,10 @@ typedef struct PendulumWork {
     s32 flag;     // 0x3C
     s32 rate;     // 0x40
     s32 sfxId;    // 0x44
+#ifndef VERSION_G8ME01_DEMO
     s32 zone;     // 0x48
-    s32 endTimer; // 0x4C
+#endif
+    s32 endTimer; // 0x4C (0x48 in the demo)
 } PendulumWork;
 
 #define CALC_DIR(d)                                   \
@@ -69,7 +78,9 @@ s32 battleAcMain_PendulumCraneTiming(BattleWork* work) {
     u8* stick;
     f32 accel;
     f32 mag;
+#ifndef VERSION_G8ME01_DEMO
     s32 zone;
+#endif
     s32 rate;
 
     ac = &work->actionCommands;
@@ -93,7 +104,9 @@ s32 battleAcMain_PendulumCraneTiming(BattleWork* work) {
             cw->cur = PC_PARAMS(work)->period;
             cw->vel = 0;
             cw->force = 3.0f;
+#ifndef VERSION_G8ME01_DEMO
             cw->zone = -1;
+#endif
             cw->button = 0x100;
             work->actionCommands.outputParams[0] = 0;
             work->actionCommands.outputParams[1] = _get_angle_hp(50);
@@ -157,6 +170,12 @@ s32 battleAcMain_PendulumCraneTiming(BattleWork* work) {
             work->actionCommands.outputParams[1] = _get_angle_hp(rate);
             cw->rate = rate;
             rate = _get_angle_rate(cw->angle);
+#ifdef VERSION_G8ME01_DEMO
+            // The demo ticks only at the exact ends of the gauge.
+            if (rate == 0 || rate == 100) {
+                psndSFXOn("SFX_AC_GAUGE_MOVE1");
+            }
+#else
             zone = -1;
             if (rate <= 5) {
                 zone = 0;
@@ -167,6 +186,7 @@ s32 battleAcMain_PendulumCraneTiming(BattleWork* work) {
                 psndSFXOn("SFX_AC_GAUGE_MOVE1");
                 cw->zone = zone;
             }
+#endif
             inRange = FALSE;
             if (autoCommand && (s32)work->actionCommands.outputParams[1] >= _get_angle_hp(50)) {
                 inRange = TRUE;
@@ -264,7 +284,7 @@ static void actionCommandDisp(f32 x, f32 y) {
         Vec pos = {0.0f, 0.0f, 0.0f};
         pos.x = px = -200.0f + x;
         pos.y = 25.0f + y;
-        iconDispGx(&pos, 0x10, ICON_08C, 1.0f);
+        iconDispGx(&pos, AC_ICON_FLAGS, ICON_08C, 1.0f);
     }
     cam = camGetPtr(8);
     btlDispGXInit2DRasta();
@@ -280,7 +300,7 @@ static void actionCommandDisp(f32 x, f32 y) {
         Vec pos2 = {0.0f, 0.0f, 0.0f};
         pos2.x = (-288.0f + x) + (f32)(((PendulumWork*)work->actionCommands.work)->rate * 176) / 100.0f;
         pos2.y = 45.0f + y;
-        iconDispGx(&pos2, 0x10, ICON_096, 1.0f);
+        iconDispGx(&pos2, AC_ICON_FLAGS, ICON_096, 1.0f);
     }
 }
 

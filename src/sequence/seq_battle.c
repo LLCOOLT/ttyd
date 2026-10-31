@@ -56,6 +56,292 @@ static inline BOOL loadTpl(const char* path) {
 }
 #define GSW0 (-170000000)
 
+#ifdef VERSION_G8ME01_DEMO
+#include "data/mapdata.h"
+
+// demo mapdrv: start loading the battle maps (both names may be NULL); TRUE once both are in
+BOOL bmapPreLoad(const char* map, const char* map2);
+
+static const char bti01[7];
+static const char bti02[7];
+static const char bti03[7];
+static const char bti04[7];
+static const char gon11[7];
+
+void seq_battleInit(BattleSeqWork* work) {
+    FieldBattleData* fbat;
+    NpcEntry* npc;
+    MapData* map;
+
+    debug_battle_flag = gp->debugBattle;
+    fbatGetPointer();
+    switch (pouchGetPtr()->rank) {
+        case 0:
+            map = mapDataPtr(bti01);
+            break;
+        case 1:
+            map = mapDataPtr(bti02);
+            break;
+        case 2:
+            map = mapDataPtr(bti03);
+            break;
+        case 3:
+        default:
+            map = mapDataPtr(bti04);
+            break;
+    }
+    bmapPreLoad(map->mapName, NULL);
+    fbat = fbatGetPointer();
+    npc = fbat->target;
+    if (evtGetValue(NULL, GSW0) < 109 || evtGetValue(NULL, GSW0) >= 111) {
+        if (evtGetValue(NULL, GSW0) != 402) {
+            psndBGMOff(0x400);
+            psndBGMOn(1, (char*)npc->battleInfo.bgmName);
+        }
+    }
+    psndENVOff(0x400);
+    padRumbleOff(0);
+    evtStopAll(4);
+    psndSetFlag(0x80);
+}
+
+void seq_battleExit(BattleSeqWork* work) {
+    battle_exit();
+}
+
+void seq_battleMain(BattleSeqWork* work) {
+    switch (work->state) {
+        case 0: {
+            GXColor color = {0, 0, 0, 255};
+            fadeEntry(0x14, 1000, color);
+            work->state++;
+            work->counter = 0;
+            break;
+        }
+        case 1:
+            if (!loadTpl("battle/audience/audience_normal.tpl")) {
+                break;
+            }
+            if (!loadTpl("battle/audience/audience_luigi.tpl")) {
+                break;
+            }
+            work->counter++;
+            if (fadeIsFinish()) {
+                work->state++;
+            }
+            break;
+        case 2:
+            battle_init();
+            work->state++;
+        case 3: {
+            Vec pos;
+            if (battleSeqEndCheck()) {
+                work->counter = 0;
+                work->state++;
+                if (gp->debugBattle) {
+                    work->state = 11;
+                }
+            }
+            marioGetPtr();
+            camGetPtr(4);
+            pos.x = 0.0f;
+            pos.y = 0.0f;
+            pos.z = 400.0f;
+            if (_battleWorkPointer->flags & 0x100) {
+                pos.z += 200.0f;
+            }
+            psndSetPosDirListener(&pos, camGetPtr(4)->viewYaw);
+            break;
+        }
+        case 4:
+            if (++work->counter > 30) {
+                if ((gp->flags & 0x1000) && (gp->flags & 0x2000)) {
+                    seqSetSeq(5, (const char*)1, NULL);
+                } else {
+                    seqSetSeq(2, (const char*)1, NULL);
+                }
+            }
+            break;
+        case 10: {
+            GXColor color = {0, 0, 0, 255};
+            fadeEntry(0x14, 200, color);
+            work->state++;
+            break;
+        }
+        case 11:
+            if (fadeIsFinish()) {
+                gp->debugBattle = 0;
+                seqSetSeq(5, (const char*)1, NULL);
+            }
+            break;
+    }
+}
+
+void battle_init(void) {
+    FieldBattleData* fbat;
+    NpcEntry* npc;
+    PouchData* pouch;
+    MapData* map;
+    MapData* map2;
+    BattleStageData* stage;
+    FieldBattleInfo* info;
+    PartyEntry* party;
+
+    fbat = fbatGetPointer();
+    npc = fbat->target;
+    stage = npc->battleInfo.stageData;
+    pouch = pouchGetPtr();
+    if (debug_battle_flag == 0) {
+        marioCtrlOff();
+        partyCtrlOff();
+        marioGetPtr()->flags &= ~1;
+        padRumbleOff(0);
+    }
+    switch (pouch->rank) {
+        case 0:
+            map = mapDataPtr(bti01);
+            break;
+        case 1:
+            map = mapDataPtr(bti02);
+            break;
+        case 2:
+            map = mapDataPtr(bti03);
+            break;
+        case 3:
+        default:
+            map = mapDataPtr(bti04);
+            break;
+    }
+    map2 = NULL;
+    if (stage->mSpecificStageDataDir) {
+        map2 = mapDataPtr(stage->mSpecificStageDataDir);
+    }
+    bmapLoad(map->mapName, stage->mSpecificStageDataDir);
+    camSetMode(4, 2);
+    if (gp->debugBattle) {
+        const char* msg = DbgBtlSel_GetMsgDataPtr();
+        if (msg) {
+            msgLoad(msg, 0);
+        } else {
+            msgLoad(gon11, 0);
+        }
+    }
+    memClear(4);
+    smartAutoFree(2);
+    _battleWorkPointer = NULL;
+    animPoseBattleInit();
+    npcReleaseFieldNpc();
+    gp->inBattle = 1;
+    evtmgrReInit();
+    if (map && map->eventAddr) {
+        evtEntry(map->eventAddr, 0, 0);
+    }
+    if (map2 && map2->eventAddr) {
+        evtEntry(map2->eventAddr, 0, 0);
+    }
+    psndSetFlag(0x10);
+    info = &fbat->info;
+    BattleInformationInit(info);
+    BattleInformationSetMode(info, 0);
+    party = partyGetPtr(marioGetPartyId());
+    if (party) {
+        s32 id = party->currentMemberId;
+        BattleUnitType kind = BattleTransPartyIdToUnitKind(id);
+        if (!(pouch->partyData[id].flags & 2)) {
+            BattleInformationSetParty(info, kind);
+        }
+    }
+    if (fbat->firstAttackFlags & 1) {
+        BattleInformationSetFirstAttack(info, 0);
+    } else {
+        switch (fbat->hitKind) {
+            case 0x20000:
+                BattleInformationSetFirstAttack(info, 1);
+                break;
+            case 0x40000:
+                BattleInformationSetFirstAttack(info, 2);
+                break;
+            case 0x80000:
+                BattleInformationSetFirstAttack(info, 3);
+                break;
+            case 0x100000:
+                BattleInformationSetFirstAttack(info, 4);
+                break;
+            case 0x200000:
+                BattleInformationSetFirstAttack(info, 5);
+                break;
+            case 0x400000:
+                BattleInformationSetFirstAttack(info, 6);
+                break;
+            case 0x800000:
+                BattleInformationSetFirstAttack(info, 7);
+                break;
+            case 0x1000000:
+                BattleInformationSetFirstAttack(info, 8);
+                break;
+            case 0x10000000:
+                BattleInformationSetFirstAttack(info, fbat->firstAttackParam);
+                break;
+            default:
+                BattleInformationSetFirstAttack(info, 0);
+                break;
+        }
+    }
+    BattleInfomationSetBattleSetupInfo(info, &npc->battleInfo);
+    info->ruleType = npc->battleInfo.battleRule[0];
+    info->ruleParam = npc->battleInfo.battleRule[1];
+    info->ruleParam2 = npc->battleInfo.battleRule[2];
+    BattleInit(info);
+}
+
+void battle_exit(void) {
+    LightEntry* light;
+    Mtx mtx;
+
+    BattleEnd();
+    itemReInit();
+    iconReInit();
+    extReset();
+    bmapUnLoad();
+    if (camGetPtr(4)->flags & 4) {
+        camSetMode(4, 1);
+    } else {
+        camSetMode(4, 3);
+    }
+    npcReset(TRUE);
+    mobjReset(TRUE);
+    offscreenReset(TRUE);
+    imgAutoRelease(1);
+    effAutoRelease(TRUE);
+    animPoseAutoRelease(TRUE);
+    evtmgrReInit();
+    npcRecoveryFieldNpc();
+    gp->inBattle = 0;
+    memClear(4);
+    evtStartAll(4);
+    if (debug_battle_flag == 0) {
+        marioCtrlOn();
+        partyCtrlOn();
+        marioGetPtr()->flags |= 1;
+    }
+    psndClearFlag(0x10);
+    psndClearFlag(0x80);
+    light = lightGetPaperCraft();
+    { Vec v = {-200.0f, 100.0f, 100.0f}; light->position = v; }
+    PSMTXScale(mtx, 3.0f, 3.0f, 3.0f);
+    PSMTXMultVec(mtx, &light->position, &light->position);
+    if ((evtGetValue(NULL, GSW0) < 109 || evtGetValue(NULL, GSW0) >= 111) && evtGetValue(NULL, GSW0) != 402 && seqGetNextSeq() != 5) {
+        psndBGMOn(0x120, NULL);
+        psndENVOn(0x120, NULL);
+    }
+}
+
+static const char bti01[] = "bti_01";
+static const char bti02[] = "bti_02";
+static const char bti03[] = "bti_03";
+static const char bti04[] = "bti_04";
+static const char gon11[] = "gon_11";
+#else
 void seq_battleInit(BattleSeqWork* work) {
     FieldBattleData* fbat;
     NpcEntry* npc;
@@ -376,3 +662,4 @@ static const char bti01[] = "bti_01";
 static const char bti02[] = "bti_02";
 static const char bti03[] = "bti_03";
 static const char bti04[] = "bti_04";
+#endif

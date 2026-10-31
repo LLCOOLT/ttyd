@@ -81,7 +81,11 @@ static BattleUnitKindPart parts[1];
 BattleWeapon weapon_chorobon_gundan_attack;
 extern EvtWord chorogun_dead_reward[];
 static EvtWord init_event[26];
+#ifdef VERSION_G8ME01_DEMO
+static EvtWord damage_event[80];
+#else
 static EvtWord damage_event[59];
+#endif
 static EvtWord attack_event[217];
 static EvtWord wait_event[6];
 ExtTexInfo chorogun_ext_entry_data[21];
@@ -159,7 +163,11 @@ BattleUnitKind unit_chorobon_gundan = {
     "SFX_BTL_DAMAGE_FIRE1",
     "SFX_BTL_DAMAGE_ICE1",
     "SFX_BTL_DAMAGE_BIRIBIRI1",
+#ifdef VERSION_G8ME01_DEMO
+    0x2240000,
+#else
     0x240000,
+#endif
     &regist.v,
     1,
     parts,
@@ -188,7 +196,11 @@ static PoseTableEntry pose_table[] = {
     {50, "CBN_A_1"},
     {42, "CBN_R_1"},
     {40, "CBN_W_1"},
+#ifdef VERSION_G8ME01_DEMO
+    {67, "CBN_S_1"},
+#else
     {69, "CBN_S_1"},
+#endif
 };
 
 static BattleDataEntry data_table[] = {
@@ -236,6 +248,7 @@ BattleWeapon weapon_chorobon_gundan_attack = {
     {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // stageEffectRates
 };
 
+#ifndef VERSION_G8ME01_DEMO
 EVT_BEGIN(chorogun_dead_reward)
     CALL(btlevtcmd_snd_se, LW(10), STRING("SFX_BTL_ENEMY_DIE1_2"), -250000000, 0, -250000000)
     CALL(btlevtcmd_GetPos, LW(10), LW(0), LW(1), LW(2))
@@ -255,6 +268,7 @@ EVT_BEGIN(chorogun_dead_reward)
     END_IF
     RETURN
 EVT_END()
+#endif
 
 static EVT_BEGIN(init_event)
     CALL(btlevtcmd_SetEventWait, -2, PTR(wait_event))
@@ -285,6 +299,15 @@ static EVT_BEGIN(damage_event)
     IF_INT_EQUAL(LW(0), 0)
         GOTO(99)
     END_IF
+#ifdef VERSION_G8ME01_DEMO
+    CALL(btlevtcmd_GetUnitWork, -2, 0, LW(0))
+    IF_INT_EQUAL(LW(0), 1)
+    CALL(evt_btl_camera_set_mode, 0, 0)
+    CALL(chorogun_escape)
+    CALL(btlevtcmd_KillUnit, -2, 0)
+    GOTO(99)
+    END_IF
+#endif
     CALL(chorogun_get_alive_num, LW(0))
     IF_INT_LESS_OR_EQUAL(LW(0), 500)
         CALL_CHILD(PTR(escape_chorogun_event))

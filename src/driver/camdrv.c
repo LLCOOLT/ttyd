@@ -637,7 +637,9 @@ void camEffMain(CameraEntry* camera) {
     camera->cameraAt = camera3D->cameraAt;
     camera->viewDistance = VECDistance(&camera->cameraPos, &camera->cameraAt);
     camera->viewYaw = angleABf(camera->cameraPos.x, camera->cameraPos.z, camera->cameraAt.x, camera->cameraAt.z);
+#ifndef VERSION_G8ME01_DEMO
     MTXPerspective(camera->projection, camera->fovY, camera->aspect, camera->near, camera->far);
+#endif
 }
 
 void camSetMode(CameraId cameraId, u16 mode) {

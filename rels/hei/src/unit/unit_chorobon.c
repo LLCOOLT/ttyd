@@ -112,7 +112,11 @@ static BattleUnitDefense defence = {{0, 0, 0, 0, 0}};
 
 static BattleUnitDefenseAttr defence_attr = {{0, 0, 0, 0, 0}};
 
+#ifdef VERSION_G8ME01_DEMO
+static StatusVulnerability regist = {100, 100, 90, 100, 90, 100, 100, 75, 100, 80, 100, 80, 100, 75, 75, 95, 95, 100, 75, 100, 100, 100};
+#else
 static StatusVulnerability regist = {95, 95, 90, 100, 95, 100, 100, 80, 100, 90, 100, 90, 100, 95, 70, 95, 90, 100, 90, 100, 100, 100};
+#endif
 
 static BattleUnitKindPart parts[] = {
     {1, "btl_un_chorobon", "c_chorobon", 0.0f, 0.0f, 0.0f, 0.0f, 25.0f, 0.0f, 0.0f, 30.0f, 0.0f, 20, 30, 255, &defence, &defence_attr, 0x9, 0, pose_table},
@@ -216,8 +220,13 @@ static PoseTableEntry pose_table[] = {
     {40, "CBN_W_1"},
     {56, "CBN_X_1"},
     {57, "CBN_X_1"},
+#ifdef VERSION_G8ME01_DEMO
+    {63, "CBN_T_1"},
+    {67, "CBN_S_1"},
+#else
     {65, "CBN_T_1"},
     {69, "CBN_S_1"},
+#endif
 };
 
 static BattleDataEntry data_table[] = {

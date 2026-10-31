@@ -498,7 +498,11 @@ EVT_BEGIN(a_sekizou_1)
         CALL(evt_cam3d_evt_off, 500, 11)
         CALL(evt_mario_key_onoff, 1)
         CALL(evt_snd_bgmon, 512, STRING("BGM_STG1_HEI1"))
+#ifdef VERSION_G8ME01_DEMO
+        CALL(evt_snd_bgmoff, 6144)
+#else
         CALL(evt_snd_bgmoff, 6208)
+#endif
         RETURN
     END_IF
     SET_VALUE(LW(0), STRING("anm_kaiten1"))
@@ -615,7 +619,11 @@ EVT_BEGIN(a_sekizou_1)
                 CALL(evt_cam3d_evt_off, 500, 11)
                 CALL(evt_mario_key_onoff, 1)
                 CALL(evt_snd_bgmon, 512, STRING("BGM_STG1_HEI1"))
+#ifdef VERSION_G8ME01_DEMO
+                CALL(evt_snd_bgmoff, 6144)
+#else
                 CALL(evt_snd_bgmoff, 6208)
+#endif
                 SET_VALUE(GSW(0), 31)
                 CALL(evt_exit_case_evt)
                 RETURN

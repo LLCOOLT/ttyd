@@ -4,6 +4,11 @@
  *
  * Function: part of the backend for various shops
  */
+#ifdef VERSION_G8ME01_DEMO
+// the demo unit is built without the main precompiled header: only the dtrigf constants lead its data
+#define DTRIGF_WITH_INITIAL_VALUES
+#include <dtrigf.h>
+#endif
 #include "evt/evt_badgeshop.h"
 #include "manager/evtmgr.h"
 #include "manager/evtmgr_cmd.h"
@@ -11,22 +16,7 @@
 #include "system.h"
 #include <string.h>
 
-//.data
-s32 badge_starmaniac_table[] = { //Dazzle
-	ITEM_ATTACK_FX_Y, ITEM_CHILL_OUT, ITEM_PRETTY_LUCKY, ITEM_HAPPY_HEART,
-	ITEM_HAPPY_FLOWER, ITEM_HAPPY_HEART_P, ITEM_ITEM_HOG, ITEM_HEART_FINDER,
-	ITEM_FLOWER_FINDER, ITEM_PEEKABOO, ITEM_QUICK_CHANGE, ITEM_FLOWER_SAVER,
-	ITEM_FLOWER_SAVER_P, ITEM_POWER_PLUS, ITEM_POWER_PLUS_P, ITEM_NULL
-};
-
-s32 badge_bottakuru_table[] = { //Charlieton Rogueport
-	ITEM_SHOOTING_STAR, ITEM_EARTH_QUAKE, ITEM_BOOS_SHEET, ITEM_REPEL_CAPE,
-	ITEM_STOPWATCH, ITEM_ULTRA_SHROOM, ITEM_JAMMIN_JELLY, ITEM_DRIED_SHROOM,
-	ITEM_DOUBLE_PAIN, ITEM_JUMPMAN, ITEM_HAMMERMAN, ITEM_ATTACK_FX_G,
-	ITEM_SLOW_GO, ITEM_MEGA_RUSH, ITEM_TIMING_TUTOR, ITEM_W_EMBLEM, ITEM_NULL
-};
-
-//.sdata
+// tables (retail: .sdata, except badge_starmaniac_table and badge_bottakuru_table in .data; demo: all .data)
 s32 badge_special_table[] = { //Lovely Howz of Badges
 	ITEM_PIERCING_BLOW, ITEM_POWER_JUMP, ITEM_SIMPLIFIER, ITEM_UNSIMPLIFIER,
 	ITEM_FP_DRAIN, ITEM_LAST_STAND, ITEM_LAST_STAND_P, ITEM_HAPPY_FLOWER,
@@ -55,6 +45,21 @@ s32 badge_special_table_stage_5_clear[] = { //Keelhaul Key
 
 s32 badge_special_table_stage_6_clear[] = { //Poshley Heights
 	ITEM_SIMPLIFIER, ITEM_UNSIMPLIFIER, ITEM_ATTACK_FX_P, ITEM_NULL
+};
+
+// (defined after the specials: the demo's .data has this order)
+s32 badge_starmaniac_table[] = { //Dazzle
+	ITEM_ATTACK_FX_Y, ITEM_CHILL_OUT, ITEM_PRETTY_LUCKY, ITEM_HAPPY_HEART,
+	ITEM_HAPPY_FLOWER, ITEM_HAPPY_HEART_P, ITEM_ITEM_HOG, ITEM_HEART_FINDER,
+	ITEM_FLOWER_FINDER, ITEM_PEEKABOO, ITEM_QUICK_CHANGE, ITEM_FLOWER_SAVER,
+	ITEM_FLOWER_SAVER_P, ITEM_POWER_PLUS, ITEM_POWER_PLUS_P, ITEM_NULL
+};
+
+s32 badge_bottakuru_table[] = { //Charlieton Rogueport
+	ITEM_SHOOTING_STAR, ITEM_EARTH_QUAKE, ITEM_BOOS_SHEET, ITEM_REPEL_CAPE,
+	ITEM_STOPWATCH, ITEM_ULTRA_SHROOM, ITEM_JAMMIN_JELLY, ITEM_DRIED_SHROOM,
+	ITEM_DOUBLE_PAIN, ITEM_JUMPMAN, ITEM_HAMMERMAN, ITEM_ATTACK_FX_G,
+	ITEM_SLOW_GO, ITEM_MEGA_RUSH, ITEM_TIMING_TUTOR, ITEM_W_EMBLEM, ITEM_NULL
 };
 
 s32 badge_bottakuru100_table[] = { //Charlieton Pit of 100 Trials
@@ -94,6 +99,17 @@ s32 badge_bteresa_table_card_platinum[] = { //Pianta Parlor Platinum Card
 	ITEM_QUAKE_HAMMER, ITEM_MONEY_MONEY, ITEM_ULTRA_SHROOM, ITEM_JAMMIN_JELLY, ITEM_NULL
 };
 
+#ifdef VERSION_G8ME01_DEMO
+// demo only: not referenced in the demo dol (four rows of four decreasing values, then 0)
+s32 badge_bteresa_value_table[] = {
+	400, 200, 100, 50,
+	800, 600, 400, 200,
+	1600, 900, 500, 300,
+	9999, 999, 599, 399,
+	0
+};
+#endif
+
 //.bss
 BadgeShopWork badgeshopwork;
 
@@ -121,6 +137,7 @@ s32 getBadgeBteresaTableMaxCount(void) {
 
 void badgeShop_init(void) {
 	s32* ptr;
+	s32* p2;
 
 	bdsw = &badgeshopwork;
 	memset(bdsw->special_table, 0, sizeof(bdsw->special_table));
@@ -142,8 +159,8 @@ void badgeShop_init(void) {
 
 	badgeShop_bottakuruGeneration();
 
-	for (ptr = badge_bteresa_table; *ptr; ++ptr) {
-		badgeShop_add(bdsw->bteresa_table, (s16)*ptr, 1);
+	for (p2 = badge_bteresa_table; *p2; ++p2) {
+		badgeShop_add(bdsw->bteresa_table, (s16)*p2, 1);
 	}
 }
 
@@ -202,6 +219,7 @@ void badgeShop_bottakuruGeneration(void) {
 
 void badgeShop_bteresaGeneration(void) {
 	s32* ptr;
+	s32* p2;
 	s32 has;
 
 	has = pouchCheckItem(ITEM_SPECIAL_CARD);
@@ -238,8 +256,8 @@ void badgeShop_bteresaGeneration(void) {
 	if (has) {
 		if (!evtGetValue(NULL, GSWF(249))) {
 			evtSetValue(NULL, GSWF(249), 1);
-			for (ptr = badge_bteresa_table_card_platinum; *ptr; ptr++) {
-				badgeShop_add(bdsw->bteresa_table, (s16)*ptr, 1);
+			for (p2 = badge_bteresa_table_card_platinum; *p2; p2++) {
+				badgeShop_add(bdsw->bteresa_table, (s16)*p2, 1);
 			}
 		}
 	}
@@ -562,15 +580,35 @@ USER_FUNC(evt_badgeShop_bottakuru_dec) {
 }
 
 #pragma opt_common_subs reset
+#ifdef VERSION_G8ME01_DEMO
+// the demo counts the thrown badges through an inline copy of badgeShop_ThrowCheck
+static inline s32 badgeShop_ThrowCount(s32 itemId) {
+	int i;
+	s32 count;
+
+	for (count = 0, i = 0; i < bdsw->bargainNum; i++) {
+		if (itemId == bdsw->bargainBadges[i + bdsw->bargainNum]) {
+			count++;
+		}
+	}
+	return count;
+}
+#endif
+
 USER_FUNC(evt_badgeShop_throw_get_kind_cnt) {
 	EvtWord* args = event->args;
 	s16 badge;
 	s32 count;
-	int i;
+	long i;
 
 	for (count = 0, i = 0; i < 99; i++) {
+#ifdef VERSION_G8ME01_DEMO
+		// the demo leaves out the badges already picked for the bargain list
+		if ((badge = badgeShop_get(bdsw->bargain_table, (s16)(i + BADGE_MIN))) - badgeShop_ThrowCount(i + BADGE_MIN) > 0) {
+#else
 		badge = badgeShop_get(bdsw->bargain_table, (s16)(i + BADGE_MIN)); //inline
 		if (badge > 0) {
+#endif
 			count++;
 		}
 	}
@@ -608,6 +646,7 @@ USER_FUNC(evt_badgeShop_bottakuru_get_kind_cnt) {
 	return EVT_RETURN_DONE;
 }
 
+#ifndef VERSION_G8ME01_DEMO
 USER_FUNC(U_evt_badgeShop_get_special_zaiko) {
 	EvtWord* args = event->args;
 	s16 badge;
@@ -623,6 +662,7 @@ USER_FUNC(U_evt_badgeShop_get_special_zaiko) {
 	evtSetValue(event, *args, count);
 	return EVT_RETURN_DONE;
 }
+#endif
 
 USER_FUNC(evt_badgeShop_bteresa_get_kind_cnt) {
 	EvtWord* args = event->args;
@@ -640,6 +680,14 @@ USER_FUNC(evt_badgeShop_bteresa_get_kind_cnt) {
 	return EVT_RETURN_DONE;
 }
 
+#ifdef VERSION_G8ME01_DEMO
+// demo only: TRUE once word 6 of the block in LW(0) reaches the bargain count (no caller in the demo dol)
+USER_FUNC(evt_badgeShop_bargain_index_check) {
+	evtSetValue(event, event->args[0], !(((s32*)event->lwData[0])[6] < bdsw->bargainNum));
+	return EVT_RETURN_DONE;
+}
+#endif
+
 s32 badgeShop_ThrowCheck(s32 itemId) {
 	int i;
 	s32 count;
@@ -652,6 +700,7 @@ s32 badgeShop_ThrowCheck(s32 itemId) {
 	return count;
 }
 
+#ifndef VERSION_G8ME01_DEMO
 s32 U_badgeShop_SpecialCheck(void) {
 	s32 count;
 	int i;
@@ -663,4 +712,5 @@ s32 U_badgeShop_SpecialCheck(void) {
 	}
 	return count;
 }
+#endif
 

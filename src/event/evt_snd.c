@@ -16,6 +16,14 @@ BOOL N_pouchUnEquipBadgeID(s32 badgeId);
 
 void seq_gameOverInit(SequenceWork* work) {
     winReInit();
+#ifdef VERSION_G8ME01_DEMO
+    psndStopAllFadeOut();
+    psndSetReverb(0);
+    psndClearFlag(0x10);
+    psndClearFlag(0x80);
+    psndClearFlag(0x20);
+    psndClearFlag(0x40);
+#else
     camDispOn(4);
     psndStopAllFadeOut();
     psndSetReverb(0);
@@ -24,6 +32,7 @@ void seq_gameOverInit(SequenceWork* work) {
     psndClearFlag(0x20);
     psndClearFlag(0x40);
     N_pouchUnEquipBadgeID(0x143);
+#endif
     marioStSystemLevel(4);
 }
 

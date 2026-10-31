@@ -40,10 +40,12 @@ static inline void crCheck(BOOL b) {}
 // (MarioSt.MAP) names the original: the strings are @2397/@2398, numbered between calcCurrentCamState and
 // camRoadSetup, where the map lists the stripped camRoadDraw (0x8b8 bytes, UNUSED in the demo as well), so
 // no build contains its code.
+#ifndef VERSION_G8ME01_DEMO
 static void camRoadStrippedReport(const char* p, s32 a, s32 b) {
     OSReport("%scam = %d\n", p, a);
     OSReport("%scurve = %d\n", p, b);
 }
+#endif
 
 s32 camRoadSetup(const char* name) {
     char path[128];
@@ -98,6 +100,13 @@ s32 camRoadSetup(const char* name) {
     }
     return 1;
 }
+#ifdef VERSION_G8ME01_DEMO
+// The demo pools the two strings ahead of camRoadSetup's, so the stand-in follows camRoadSetup.
+static void camRoadStrippedReport(const char* p, s32 a, s32 b) {
+    OSReport("%scam = %d\n", p, a);
+    OSReport("%scurve = %d\n", p, b);
+}
+#endif
 void calcCurrentCamState(CameraParams* out) {
     Mtx m;
     Vec v;

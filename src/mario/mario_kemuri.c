@@ -22,7 +22,11 @@ extern EffectEntry* effKemuri2Entry(s32 type, f32 x, f32 y, f32 z, f32 s, f32 c)
 #endif
 void kemuri(void);
 void kemuri_mugi(void);
+#ifdef VERSION_G8ME01_DEMO
+static inline void mario_kemuri_landon(void);
+#else
 void mario_kemuri_landon(void);
+#endif
 
 #define kemuriEntry ((EffectEntry * (*)(s32, f32, f32, f32, f32))effKemuriEntry)
 
@@ -119,6 +123,14 @@ void mario_land_kemuri(void) {
     }
 }
 
+#ifdef VERSION_G8ME01_DEMO
+// The demo has no mri_05 splash type, and the function is inlined into its two callers.
+static inline void mario_kemuri_landon(void) {
+    static s32 cnt = 0;
+    static s32 cnt2 = 10;
+    MarioWork* mario = marioGetPtr();
+    s32 type = 0;
+#else
 void mario_kemuri_landon(void) {
     static s32 cnt = 0;
     static s32 cnt2 = 10;
@@ -128,6 +140,7 @@ void mario_kemuri_landon(void) {
     if (strcmp(gp->currentMapName, "mri_05") == 0) {
         type = 10;
     }
+#endif
     if (mario->currMotionId == 3 && mario->airTimer == 1 && cnt2 == 10) {
         effWaterDamageN64Entry(type + 5, 30, mario->position.x, mario->position.y, mario->position.z, 1.0f);
         cnt2 = 0;

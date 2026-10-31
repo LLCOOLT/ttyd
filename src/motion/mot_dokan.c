@@ -30,6 +30,7 @@ static void _partyEntry(s32 flag) {
 	if (mario->flags & MARIO_FLAG_BG_MODE) {
 		return;
 	}
+#ifndef VERSION_G8ME01_DEMO
 	count = 0;
 	if (partyGetPtr(mario->currPartySlotId[0]) != NULL) {
 		count = 1;
@@ -37,6 +38,7 @@ static void _partyEntry(s32 flag) {
 	if (partyGetPtr(mario->currPartySlotId[1]) != NULL) {
 		count++;
 	}
+#endif
 	for (i = 0; i < 2; i++) {
 		if (mario->currPartySlotId[i] < 0) {
 			prev = mario->prevPartyMemberId[i];
@@ -63,6 +65,10 @@ static void _partyEntry(s32 flag) {
 			}
 			party->flags |= 0x4000000;
 			party->flags |= 0x2000000;
+#ifdef VERSION_G8ME01_DEMO
+			party->flags2 &= ~1;
+			party->displayDirectionTarget = revise360(180.0f + mario->displayDirection);
+#else
 			if (count == 1) {
 				off = 180.0f;
 			} else {
@@ -70,6 +76,7 @@ static void _partyEntry(s32 flag) {
 			}
 			party->flags2 &= ~1;
 			party->displayDirectionTarget = revise360(mario->displayDirection + off);
+#endif
 			party->displayDirection = mario->displayDirection;
 			party->moveDir = mario->moveDirection;
 		} else {
@@ -81,6 +88,10 @@ static void _partyEntry(s32 flag) {
 			}
 			party->flags |= 0x4000000;
 			party->flags |= 0x2000000;
+#ifdef VERSION_G8ME01_DEMO
+			party->flags2 &= ~1;
+			party->displayDirectionTarget = revise360(180.0f + mario->displayDirection);
+#else
 			if (count == 1) {
 				off = 180.0f;
 			} else {
@@ -88,6 +99,7 @@ static void _partyEntry(s32 flag) {
 			}
 			party->flags2 &= ~1;
 			party->displayDirectionTarget = revise360(mario->displayDirection + off);
+#endif
 			party->displayDirection = mario->displayDirection;
 			party->moveDir = mario->moveDirection;
 		}

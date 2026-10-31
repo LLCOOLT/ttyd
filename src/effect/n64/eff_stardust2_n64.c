@@ -25,6 +25,16 @@ typedef struct EffStardust2N64Work {
 void effStardust2Main(EffectEntry* effect);
 void effStardust2Disp(CameraId cameraId, EffectEntry* effect);
 
+static u8 color_rotation_data[] = {
+    0xFE, 0xAC, 0xAC, 0xFE, 0xAC, 0xD5, 0xFE, 0xB4, 0x9A, 0xD5, 0xB4, 0xFE,
+    0xB4, 0xB4, 0xFE, 0xB4, 0xDD, 0xFE, 0xB4, 0xFE, 0xFE, 0xB4, 0xFE, 0xD5,
+    0xB4, 0xFE, 0xB4, 0xD5, 0xFE, 0xB4, 0xFE, 0xFE, 0xB4, 0xFE, 0xD5, 0xAC,
+};
+
+static u8 speed_data[] = {0x1E, 0x3C, 0x5A, 0x64, 0x68, 0x6A, 0x6C, 0x6E, 0x70, 0x71, 0x71, 0x6E, 0x6B, 0x67};
+
+static u8 scale_data[] = {0x1E, 0x3C, 0x5A, 0x64, 0x68, 0x6A, 0x6C, 0x6E, 0x70, 0x71, 0x71, 0x6E, 0x6B, 0x67};
+
 static effN64Vtx size8x8_tex22x22_vtx[] = {
     {-8, -8, 0, 0, 0, 0, 0, 0, 0xFF},
     {8, -8, 0, 704, 0, 0, 0, 0, 0xFF},
@@ -60,16 +70,6 @@ static effN64Vtx size8x8_tex22x22_vtx[] = {
     {-8, 8, 0, 4928, 704, 0, 0, 0, 0xFF},
 
 };
-
-static u8 color_rotation_data[] = {
-    0xFE, 0xAC, 0xAC, 0xFE, 0xAC, 0xD5, 0xFE, 0xB4, 0x9A, 0xD5, 0xB4, 0xFE,
-    0xB4, 0xB4, 0xFE, 0xB4, 0xDD, 0xFE, 0xB4, 0xFE, 0xFE, 0xB4, 0xFE, 0xD5,
-    0xB4, 0xFE, 0xB4, 0xD5, 0xFE, 0xB4, 0xFE, 0xFE, 0xB4, 0xFE, 0xD5, 0xAC,
-};
-
-static u8 speed_data[] = {0x1E, 0x3C, 0x5A, 0x64, 0x68, 0x6A, 0x6C, 0x6E, 0x70, 0x71, 0x71, 0x6E, 0x6B, 0x67};
-
-static u8 scale_data[] = {0x1E, 0x3C, 0x5A, 0x64, 0x68, 0x6A, 0x6C, 0x6E, 0x70, 0x71, 0x71, 0x6E, 0x6B, 0x67};
 
 EffectEntry* effStardust2N64Entry(s32 type, s32 count, s32 camera, f32 x, f32 y, f32 z, f32 vx, f32 vy) {
     s32 n;
@@ -198,12 +198,20 @@ void effStardust2Main(EffectEntry* effect) {
         case 1:
             w->color = (frame + i) & 7;
             w->velocity.z += -0.02f;
+#ifdef VERSION_G8ME01_DEMO
+            if (frame - 1 < 14) {
+                s = 0.01f * (f32)speed_data[frame - 1];
+                w->position.x = w->velocity.x * s;
+                w->position.y = w->velocity.y * s + w->velocity.z;
+                w->scale = 0.01f * (f32)scale_data[frame - 1];
+#else
             idx = frame - 1;
             if (idx < 14) {
                 s = 0.01f * (f32)speed_data[idx];
                 w->position.x = w->velocity.x * s;
                 w->position.y = w->velocity.y * s + w->velocity.z;
                 w->scale = 0.01f * (f32)scale_data[idx];
+#endif
             } else {
                 f32 one = 1.0f;
                 f32 base = 360.0f / (f32)(effect->count - 1) * (f32)i + 60.0f;
@@ -229,9 +237,14 @@ void effStardust2Main(EffectEntry* effect) {
             break;
         case 3:
             w->color = (frame + i + i) & 7;
+#ifdef VERSION_G8ME01_DEMO
+            if (frame - 1 < 14) {
+                w->scale = 0.01f * (f32)scale_data[frame - 1];
+#else
             idx = frame - 1;
             if (idx < 14) {
                 w->scale = 0.01f * (f32)scale_data[idx];
+#endif
             } else {
                 w->type = 30;
             }
@@ -251,9 +264,14 @@ void effStardust2Main(EffectEntry* effect) {
             }
             w->frame++;
             frame = w->frame;
+#ifdef VERSION_G8ME01_DEMO
+            if (frame - 1 < 14) {
+                w->scale = 0.01f * (f32)scale_data[frame - 1];
+#else
             idx = frame - 1;
             if (idx < 14) {
                 w->scale = 0.01f * (f32)scale_data[idx];
+#endif
                 if (type == 5) {
                     w->velocity.y += w->velocity.z;
                     w->position.y += w->velocity.y;

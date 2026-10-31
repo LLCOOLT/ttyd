@@ -404,7 +404,11 @@ static EVT_BEGIN(guide_talk)
         SPAWN_EVENT(PTR(seal_bigtree2))
         CASE_EQUAL(88)
         CALL(evt_msg_print, 0, STRING("stg2_mri_e10_05"), 0, STRING("me"))
+#ifdef VERSION_G8ME01_DEMO
+        CASE_EQUAL(118)
+#else
         CASE_GREATER_OR_EQUAL(118)
+#endif
         CALL(evt_msg_print, 0, STRING("stg2_mri_e26_00_07"), 0, STRING("me"))
     END_SWITCH
     RETURN
@@ -825,6 +829,11 @@ static USER_FUNC(evt_cloud_main) {
     if (party == NULL) {
         return EVT_RETURN_BLOCK;
     }
+#ifdef VERSION_G8ME01_DEMO
+    if (party->currentMemberId != 5) {
+        return EVT_RETURN_BLOCK;
+    }
+#endif
     hit0 = (HitEntry*)cloudGetHitBreathout(0);
     hit1 = (HitEntry*)cloudGetHitBreathout(1);
     hit2 = (HitEntry*)cloudGetHitBreathout(2);
@@ -1179,7 +1188,9 @@ EVT_BEGIN(mario_see_you)
     WAIT_MS(1000)
     CALL(evt_cam3d_evt_off, 1000, 11)
     SET_VALUE(GSW(0), 118)
+#ifndef VERSION_G8ME01_DEMO
     CALL(N_evt_bero_set_mario_bottomless_respawn_pos_to_current_mario_pos)
+#endif
     CALL(evt_party_run, 0)
     CALL(evt_mario_key_onoff, 1)
     RETURN
@@ -1384,6 +1395,7 @@ static EVT_BEGIN(sekai_yami_evt)
     SPAWN_EVENT(PTR(sekai_yami_puni))
     SET_VALUE(LW(0), 64)
     SPAWN_EVENT(PTR(sekai_yami_puni))
+#ifndef VERSION_G8ME01_DEMO
     BEGIN_INLINE_EVENT
         WAIT_MS(3000)
         CALL(evt_sub_intpl_msec_init, 11, 255, 0, 1000)
@@ -1397,6 +1409,7 @@ static EVT_BEGIN(sekai_yami_evt)
         END_LOOP
         CALL(evt_mapobj_flag_onoff, 1, 1, STRING("S_yuka_hika_02"), 1)
     END_INLINE_EVENT
+#endif
     CALL(evt_snd_sfxon, STRING("SFX_STG8_WORLD_DARK1"), 0)
     CALL(evt_sub_intpl_msec_init, 11, -800, 800, 5000)
     LOOP(0)
@@ -1422,7 +1435,11 @@ static EVT_BEGIN(sekai_yami_evt)
     WAIT_MS(500)
     CALL(evt_msg_print, 0, STRING("stg8_dark_02_01"), 0, STRING("ガイド"))
     WAIT_MS(1000)
+#ifdef VERSION_G8ME01_DEMO
+    CALL(evt_fade_set_mapchange_type, 1, 8, 300, 7, 300)
+#else
     CALL(evt_fade_set_mapchange_type, 1, 10, 300, 9, 300)
+#endif
     CALL(evt_bero_mapchange, STRING("tou_01"), STRING("sekai_yami1"))
     CALL(evt_mario_key_onoff, 1)
     RETURN
@@ -1444,7 +1461,9 @@ static EVT_BEGIN(minnnanokoe_evt)
     CALL(evt_npc_set_ry, STRING("プニ族長老"), 270)
     CALL(evt_npc_set_position, STRING("ライバル"), -100, 0, 225)
     CALL(evt_npc_set_ry, STRING("ライバル"), 270)
+#ifndef VERSION_G8ME01_DEMO
     CALL(evt_mapobj_flag_onoff, 1, 1, STRING("S_yuka_hika_02"), 1)
+#endif
     CALL(evt_map_set_tevcallback, 1, PTR(envSetYami))
     CALL(evt_mapobj_flag_onoff, 1, 1, STRING("S"), 16777216)
     CALL(evt_mapobj_flag_onoff, 1, 0, STRING("S"), 256)
@@ -1592,7 +1611,11 @@ static EVT_BEGIN(minnnanokoe_evt)
         END_LOOP
     END_SIBLING_EVENT
     WAIT_MS(4000)
+#ifdef VERSION_G8ME01_DEMO
+    CALL(evt_fade_set_mapchange_type, 1, 8, 300, 7, 300)
+#else
     CALL(evt_fade_set_mapchange_type, 1, 10, 300, 9, 300)
+#endif
     CALL(evt_bero_mapchange, STRING("tou_01"), STRING("minnnanokoe"))
     RETURN
 EVT_END()
@@ -1608,7 +1631,11 @@ EVT_END()
 static USER_FUNC(sysflag) {
     if (gp->flags & 1) {
         gp->flags &= ~1;
+#ifdef VERSION_G8ME01_DEMO
+        fadeEntry(0x1A, 0, (GXColor){0, 0, 0, 0});
+#else
         fadeEntry(0x1C, 0, (GXColor){0, 0, 0, 0});
+#endif
     }
     return EVT_RETURN_DONE;
 }
@@ -1644,15 +1671,22 @@ EVT_BEGIN(mri_00_init_evt)
 #endif
         SPAWN_EVENT(PTR(mario_see_you))
     END_IF
+#ifndef VERSION_G8ME01_DEMO
     SWITCH(GSW(0))
         CASE_GREATER_OR_EQUAL(117)
         IF_INT_EQUAL(GSWF(2884), 0)
+#endif
+#ifdef VERSION_G8ME01_DEMO
+        IF_INT_EQUAL(GSW(0), 118)
+#endif
             BEGIN_INLINE_EVENT
                 CALL(evt_puni_wait_systemmode, 2)
                 SPAWN_EVENT(PTR(mario_see_you_init))
             END_INLINE_EVENT
         END_IF
+#ifndef VERSION_G8ME01_DEMO
     END_SWITCH
+#endif
     CALL(evt_map_playanim, STRING("hikari_01"), 1, 0)
     CALL(evt_map_playanim, STRING("kawa_sibu_01"), 1, 0)
     CALL(evt_map_playanim, STRING("kawa_01"), 1, 0)

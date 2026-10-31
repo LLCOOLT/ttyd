@@ -87,6 +87,12 @@ static EvtWord wait_event[6];
 
 
 
+static BattleUnitDefense defence = {{0, 0, 0, 0, 0}};
+
+static BattleUnitDefenseAttr defence_attr = {{0, 0, 0, 0, 0}};
+
+static StatusVulnerability regist = {100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100};
+
 PoseTableEntry pose_table_christine_stay[] = {
     {9, "PKR_D_5"},
     {2, "PKR_D_5"},
@@ -103,6 +109,27 @@ PoseTableEntry pose_table_christine_stay[] = {
     {42, "PKR_R_1"},
     {57, "PKR_D_2"},
     {56, "PKR_D_2"},
+#ifdef VERSION_G8ME01_DEMO
+    {58, "PKR_D_4"},
+    {59, "PKR_D_2"},
+    {63, "PKR_T_1"},
+    {52, "PKR_I_1"},
+    {65, "PKR_C_1"},
+    {64, "PKR_O_1"},
+    {62, "PKR_X_1"},
+    {49, "PKR_A_1"},
+    {45, "PKR_G_1"},
+    {67, "PKR_S_1"},
+};
+
+// demo only: not referenced by the demo's own data
+PoseTableEntry pose_table_christine_zyo[] = {
+    {28, "ZYO_Z_1"},
+    {31, "ZYO_Z_1"},
+    {39, "ZYO_Z_1"},
+    {67, "ZYO_Z_1"},
+};
+#else
     {60, "PKR_D_4"},
     {61, "PKR_D_2"},
     {65, "PKR_T_1"},
@@ -114,6 +141,7 @@ PoseTableEntry pose_table_christine_stay[] = {
     {45, "PKR_G_1"},
     {69, "PKR_S_1"},
 };
+#endif
 
 static BattleDataEntry data_table[] = {
     {5, christine_appeal_event},
@@ -229,6 +257,15 @@ static EVT_BEGIN(damage_event)
     SET_VALUE(LW(10), -2)
     SET_VALUE(LW(11), 1)
     CALL_CHILD(PTR(btldefaultevt_Damage))
+    RETURN
+EVT_END()
+
+static EVT_BEGIN(attack_event)
+    RETURN
+EVT_END()
+
+static EVT_BEGIN(wait_event)
+    CALL(btlevtcmd_AnimeChangePoseFromTable, -2, 1)
     RETURN
 EVT_END()
 
@@ -1872,15 +1909,42 @@ EVT_BEGIN(partyChristineAttack_Kiss)
     CALL(evt_btl_camera_set_zoom, 0, 250)
     CALL(btlevtcmd_CalculateFaceDirection, -2, -1, LW(3), LW(4), 16, LW(15))
     CALL(btlevtcmd_ChangeFaceDirection, -2, LW(15))
+#ifndef VERSION_G8ME01_DEMO
     CALL_CHILD(subsetevt_check_target_movable)
     IF_INT_NOT_EQUAL(LW(0), 0)
         CALL(btlevtcmd_CalculateFaceDirection, LW(3), LW(4), -2, -1, 16, LW(15))
         CALL(btlevtcmd_ChangeFaceDirection, LW(3), LW(15))
     END_IF
+#endif
     CALL(btlevtcmd_CommandGetWeaponActionLv, LW(0))
     CALL(btlevtcmd_AcSetDifficulty, -2, LW(0))
     CALL(btlevtcmd_AcGetDifficulty, LW(0))
     SUBTRACT(LW(0), 3)
+#ifdef VERSION_G8ME01_DEMO
+    SWITCH(LW(0))
+        CASE_LESS_OR_EQUAL(-3)
+        SET_VALUE(LW(0), 30)
+        SET_VALUE(LW(1), 10)
+        CASE_EQUAL(-2)
+        SET_VALUE(LW(0), 27)
+        SET_VALUE(LW(1), 27)
+        CASE_EQUAL(-1)
+        SET_VALUE(LW(0), 25)
+        SET_VALUE(LW(1), 30)
+        CASE_EQUAL(0)
+        SET_VALUE(LW(0), 23)
+        SET_VALUE(LW(1), 30)
+        CASE_EQUAL(1)
+        SET_VALUE(LW(0), 20)
+        SET_VALUE(LW(1), 30)
+        CASE_EQUAL(2)
+        SET_VALUE(LW(0), 20)
+        SET_VALUE(LW(1), 32)
+        CASE_DEFAULT
+        SET_VALUE(LW(0), 20)
+        SET_VALUE(LW(1), 35)
+    END_SWITCH
+#else
     SWITCH(LW(0))
         CASE_LESS_OR_EQUAL(-3)
         SET_VALUE(LW(0), 27)
@@ -1904,11 +1968,13 @@ EVT_BEGIN(partyChristineAttack_Kiss)
         SET_VALUE(LW(0), 23)
         SET_VALUE(LW(1), 32)
     END_SWITCH
+#endif
     CALL(btlevtcmd_AcSetParamAll, 16, 220, 70, 0, 0, LW(0), LW(1), 0)
     CALL(btlevtcmd_AcSetFlag, 0)
     CALL(btlevtcmd_SetupAC, -2, 5, 3, 60)
     WAIT_FRAMES(22)
     CALL(btlevtcmd_StartAC, 1)
+#ifndef VERSION_G8ME01_DEMO
     CALL(btlevtcmd_GetStatusMg, -2, LW(6))
     MULTIPLY_FLOAT(LW(6), 12)
     CALL(btlevtcmd_GetPos, LW(3), LW(0), LW(1), LW(2))
@@ -1917,6 +1983,7 @@ EVT_BEGIN(partyChristineAttack_Kiss)
     MULTIPLY_FLOAT(LW(6), 12)
     CALL(btlevtcmd_FaceDirectionAdd, LW(3), LW(0), LW(6))
     CALL(btlevtcmd_MovePosition, -2, LW(0), LW(1), LW(2), 200, -1, 0)
+#endif
     CALL(btlevtcmd_ResultAC)
     CALL(btlevtcmd_GetResultAC, LW(0))
     IF_BITS_SET(LW(0), 2)
@@ -1944,10 +2011,12 @@ EVT_BEGIN(partyChristineAttack_Kiss)
     CALL(evt_eff, STRING(""), STRING("kiss"), 1, LW(0), LW(1), LW(2), LW(14), 0, 0, 0, 0, 0, 0, 0)
     BEGIN_INLINE_EVENT_GET_ID(LW(15))
         IF_BITS_SET(LW(6), 2)
+#ifndef VERSION_G8ME01_DEMO
             CALL_CHILD(subsetevt_check_target_movable)
             IF_INT_NOT_EQUAL(LW(0), 0)
                 CALL(btlevtcmd_AnimeChangePoseType, LW(3), LW(4), 58)
             END_IF
+#endif
             CALL(btlevtcmd_GetPos, LW(3), LW(0), LW(1), LW(2))
             ADD(LW(2), 15)
             CALL(btlevtcmd_GetHeight, LW(3), LW(15))
@@ -1993,6 +2062,7 @@ EVT_BEGIN(partyChristineAttack_Kiss)
     CALL(btlevtcmd_ResetFaceDirection, -2)
     CALL(evt_audience_ap_recovery)
     CALL(btlevtcmd_InviteApInfoReport)
+#ifndef VERSION_G8ME01_DEMO
     CALL_CHILD(subsetevt_check_target_movable)
     IF_INT_NOT_EQUAL(LW(0), 0)
         CALL(btlevtcmd_ResetFaceDirection, LW(3))
@@ -2002,6 +2072,7 @@ EVT_BEGIN(partyChristineAttack_Kiss)
     CALL(btlevtcmd_AnimeChangePoseType, -2, 1, 40)
     CALL(btlevtcmd_GetHomePos, -2, LW(0), LW(1), LW(2))
     CALL(btlevtcmd_MovePosition, -2, LW(0), LW(1), LW(2), 0, -1, 0)
+#endif
     CALL(btlevtcmd_StartWaitEvent, -2)
     RETURN
 EVT_END()
@@ -2028,7 +2099,11 @@ EVT_END()
 #else
 EVT_BEGIN(christine_appeal_event)
     CALL(btlevtcmd_RunDataEventChild, -2, 7)
+#ifdef VERSION_G8ME01_DEMO
+    CALL(btlevtcmd_AnimeChangePoseType, -2, 1, 64)
+#else
     CALL(btlevtcmd_AnimeChangePoseType, -2, 1, 66)
+#endif
     CALL(btlevtcmd_GetPos, -2, LW(0), LW(1), LW(2))
     CALL(btlevtcmd_snd_se, -2, STRING("SFX_MARIO_APPEAL1"), -250000000, 0, -250000000)
     CALL(btlevtcmd_GetPos, -2, LW(0), LW(1), LW(2))
@@ -2248,21 +2323,6 @@ static EVT_BEGIN(attack_audience_event)
 EVT_END()
 #endif
 
-static BattleUnitDefense defence = {{0, 0, 0, 0, 0}};
-
-static BattleUnitDefenseAttr defence_attr = {{0, 0, 0, 0, 0}};
-
-static StatusVulnerability regist = {100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100};
-
-static EVT_BEGIN(attack_event)
-    RETURN
-EVT_END()
-
-static EVT_BEGIN(wait_event)
-    CALL(btlevtcmd_AnimeChangePoseFromTable, -2, 1)
-    RETURN
-EVT_END()
-
 static USER_FUNC(krb_get_dir) {
     EvtWord* args = event->args;
     f32 x1, y1, x2, y2;
@@ -2408,6 +2468,10 @@ USER_FUNC(_set_hustle) {
         if (unit->movesRemaining <= 0) {
             unit->movesRemaining++;
             unit->moveState = 0;
+#ifdef VERSION_G8ME01_DEMO
+            unit->activeTurns = 0;
+            unit->mMoveColorLv = 0xFF;
+#else
             unit->mMoveColorLv = 0xFF;
             if (unit->maxMovesThisTurn <= 0) {
                 unit->maxMovesThisTurn = 1;
@@ -2415,6 +2479,7 @@ USER_FUNC(_set_hustle) {
                     unit->mTokenFlags |= 0x2000;
                 }
             }
+#endif
         } else {
             BtlUnit_OnStatusFlag(unit, 0x2000000);
         }

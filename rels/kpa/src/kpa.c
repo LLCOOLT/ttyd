@@ -230,7 +230,11 @@ EVT_BEGIN(kpa_read_item)
         END_IF
         CALL(kpa_make_item_name, LW(2))
         READ_INT2(LW(3), LW(4))
+#ifdef VERSION_G8ME01_DEMO
+        CALL(evt_item_entry, LW(2), 121, LW(3), LW(4), 0, 15, -1, PTR(kpa_coin_evt))
+#else
         CALL(evt_item_entry, LW(2), 121, LW(3), LW(4), 0, 16, -1, PTR(kpa_coin_evt))
+#endif
         CALL(evt_item_flag_on, LW(2), 4)
     END_LOOP
     RETURN
@@ -310,7 +314,9 @@ EVT_BEGIN(kpa_dead)
     SET_VALUE(LSWF(3), 1)
     CALL(evt_cam_letter_box_disable, 1)
     CALL(evt_cam_letter_box_onoff, 0, 0)
+#ifndef VERSION_G8ME01_DEMO
     CALL(kpa_fire_off)
+#endif
     CALL(evt_mario_key_onoff, 0)
     CALL(evt_mario_cont_onoff, 0)
     CALL(evt_mario_adjust_dir)
@@ -398,10 +404,12 @@ USER_FUNC(kpa_nohitenemy_ct_clear) {
     return EVT_RETURN_DONE;
 }
 
+#ifndef VERSION_G8ME01_DEMO
 USER_FUNC(kpa_fire_off) {
     kpaFireDelete();
     return EVT_RETURN_DONE;
 }
+#endif
 
 USER_FUNC(kpa_set_scale) {
     f32 scale = evtGetFloat(event, event->args[0]);
@@ -631,6 +639,12 @@ USER_FUNC(kpa_muteki_check) {
 #define KPA_ICON_OFS 0
 #endif
 
+#ifdef VERSION_G8ME01_DEMO
+#define KPA_ICON_FLAGS 4
+#else
+#define KPA_ICON_FLAGS 0x10
+#endif
+
 void kpa_status_disp(CameraId camera, void* param) {
     Vec pos;
     s32 digit[6];
@@ -640,23 +654,23 @@ void kpa_status_disp(CameraId camera, void* param) {
     pos.x = -210.0f;
     pos.y = 160.0f;
 #ifdef VERSION_G8ME01
-    iconDispGx(1.0f, &pos, 0x10, kpa_status_icon_tbl[gp->language][0]);
+    iconDispGx(1.0f, &pos, KPA_ICON_FLAGS, kpa_status_icon_tbl[gp->language][0]);
 #else
-    iconDispGx(1.0f, &pos, 0x10, (u32)gp->language ? 0x210 : 0x206);
+    iconDispGx(1.0f, &pos, KPA_ICON_FLAGS, (u32)gp->language ? 0x210 : 0x206);
 #endif
     pos.x = 50.0f;
     pos.y = 160.0f;
 #ifdef VERSION_G8ME01
-    iconDispGx(1.0f, &pos, 0x10, kpa_status_icon_tbl[gp->language][1]);
+    iconDispGx(1.0f, &pos, KPA_ICON_FLAGS, kpa_status_icon_tbl[gp->language][1]);
 #else
-    iconDispGx(1.0f, &pos, 0x10, 0x208);
+    iconDispGx(1.0f, &pos, KPA_ICON_FLAGS, 0x208);
 #endif
     pos.x = 220.0f;
     pos.y = 160.0f;
 #ifdef VERSION_G8ME01
-    iconDispGx(1.0f, &pos, 0x10, kpa_status_icon_tbl[gp->language][2]);
+    iconDispGx(1.0f, &pos, KPA_ICON_FLAGS, kpa_status_icon_tbl[gp->language][2]);
 #else
-    iconDispGx(1.0f, &pos, 0x10, 0x207);
+    iconDispGx(1.0f, &pos, KPA_ICON_FLAGS, 0x207);
 #endif
 
     n = pouchGetKpaScore();
@@ -673,34 +687,34 @@ void kpa_status_disp(CameraId camera, void* param) {
     digit[4] = n / 10;
     digit[5] = n % 10;
     for (i = 0; i < 6; i++) {
-        iconDispGx(1.0f, &pos, 0x10, NUMERIC_ID[digit[i]]);
+        iconDispGx(1.0f, &pos, KPA_ICON_FLAGS, NUMERIC_ID[digit[i]]);
         pos.x += 20.0f;
     }
     pos.x += 20.0f;
-    iconDispGx(0.7f, &pos, 0x10, 0x18B + KPA_ICON_OFS);
+    iconDispGx(0.7f, &pos, KPA_ICON_FLAGS, 0x18B + KPA_ICON_OFS);
     pos.x += 30.0f;
-    iconDispGx(1.0f, &pos, 0x10, 0x1D5 + KPA_ICON_OFS);
+    iconDispGx(1.0f, &pos, KPA_ICON_FLAGS, 0x1D5 + KPA_ICON_OFS);
 
     n = pouchGetKpaCoin();
     digit[0] = n / 10;
     digit[1] = n % 10;
     pos.x += 20.0f;
     for (i = 0; i < 2; i++) {
-        iconDispGx(1.0f, &pos, 0x10, NUMERIC_ID[digit[i]]);
+        iconDispGx(1.0f, &pos, KPA_ICON_FLAGS, NUMERIC_ID[digit[i]]);
         pos.x += 20.0f;
     }
 
     pos.x = 50.0f;
-    iconDispGx(1.0f, &pos, 0x10, NUMERIC_ID[kwp->stage]);
+    iconDispGx(1.0f, &pos, KPA_ICON_FLAGS, NUMERIC_ID[kwp->stage]);
     pos.x += 20.0f;
-    iconDispGx(1.0f, &pos, 0x10, 0x1EE + KPA_ICON_OFS);
+    iconDispGx(1.0f, &pos, KPA_ICON_FLAGS, 0x1EE + KPA_ICON_OFS);
 
     n = kwp->lives;
     digit[0] = n / 10;
     digit[1] = n % 10;
     pos.x += 20.0f;
     for (i = digit[0] == 0; i < 2; i++) {
-        iconDispGx(1.0f, &pos, 0x10, NUMERIC_ID[digit[i]]);
+        iconDispGx(1.0f, &pos, KPA_ICON_FLAGS, NUMERIC_ID[digit[i]]);
         pos.x += 20.0f;
     }
 
@@ -711,7 +725,7 @@ void kpa_status_disp(CameraId camera, void* param) {
     digit[1] = n / 10;
     digit[2] = n % 10;
     for (i = 0; i < 3; i++) {
-        iconDispGx(1.0f, &pos, 0x10, NUMERIC_ID[digit[i]]);
+        iconDispGx(1.0f, &pos, KPA_ICON_FLAGS, NUMERIC_ID[digit[i]]);
         pos.x += 20.0f;
     }
 }

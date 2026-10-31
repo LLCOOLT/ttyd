@@ -26,6 +26,9 @@ USER_FUNC(evt_mario_set_dispdir);
 USER_FUNC(evt_mario_set_pos);
 USER_FUNC(evt_mario_set_pose);
 USER_FUNC(evt_msg_print);
+#ifdef VERSION_G8ME01_DEMO
+USER_FUNC(evt_msg_print_party);
+#endif
 USER_FUNC(evt_party_cont_onoff);
 USER_FUNC(evt_party_get_pos);
 USER_FUNC(evt_party_move_pos2);
@@ -348,6 +351,9 @@ EVT_BEGIN(gon_01_GATEEVENT_evt)
     CALL(evt_mario_mov_pos2, -300, 0, FLOAT(120.0f))
     CALL(evt_party_stop, 0)
     WAIT_MS(500)
+#ifdef VERSION_G8ME01_DEMO
+    CALL(evt_msg_print_party, STRING("E3_stg1_gon_00"))
+#else
     CALL(evt_mario_get_party, LW(0))
     SWITCH(LW(0))
         CASE_EQUAL(1)
@@ -355,6 +361,7 @@ EVT_BEGIN(gon_01_GATEEVENT_evt)
         CASE_EQUAL(2)
         CALL(evt_msg_print, 0, STRING("stg1_gon_01"), 0, STRING("party"))
     END_SWITCH
+#endif
     CALL(evt_snd_bgmoff, 513)
     CALL(evt_snd_bgmon, 288, 0)
     CALL(evt_snd_envoff, 513)
@@ -404,7 +411,11 @@ EVT_BEGIN(gon_01_init_evt)
             SPAWN_EVENT(PTR(gon_01_GATEEVENT_evt))
         END_IF
     END_IF
+#ifdef VERSION_G8ME01_DEMO
+    CALL(evt_item_entry, STRING("item00"), 278, 330, -150, 0, 15, GSWF(1501), 0)
+#else
     CALL(evt_item_entry, STRING("item00"), 278, 330, -150, 0, 16, GSWF(1501), 0)
+#endif
     CALL(evt_hit_damage_return_set, PTR(hitDmgRetPoints))
     CALL_CHILD(PTR(evt_gazigazi_entry))
     CALL(evt_map_playanim, STRING("m_mizu01"), 1, 0)

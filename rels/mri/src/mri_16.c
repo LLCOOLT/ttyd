@@ -7,6 +7,9 @@
 #include "evt/evt_damage.h"
 #include "mri.h"
 #include "driver/hitdrv.h"
+#ifdef VERSION_G8ME01_DEMO
+USER_FUNC(evt_mario_normalize);
+#endif
 
 static s32 ssf;
 PuniData* puniGetPunidat(void);
@@ -226,10 +229,15 @@ EVT_END()
 
 EVT_BEGIN(water_shikake)
     CALL(evt_mario_key_onoff, 0)
+#ifndef VERSION_G8ME01_DEMO
     BEGIN_INLINE_EVENT
         CALL(evt_mario_wait_landon)
         CALL(evt_mario_set_mov_spd, FLOAT(0.0f))
     END_INLINE_EVENT
+#endif
+#ifdef VERSION_G8ME01_DEMO
+    CALL(evt_mario_normalize)
+#endif
     CALL(evt_snd_bgmoff, 14336)
     SET_VALUE(LW(10), 1)
     LOOP(0)
@@ -380,8 +388,13 @@ static HitDamageReturn hitDmgRetPoints[] = {
 static EVT_BEGIN(mobj_box00)
     CALL(evt_mario_key_onoff, 0)
     CALL(evt_mobj_get_position, STRING("mobj_box00"), LW(0), LW(1), LW(2))
+#ifdef VERSION_G8ME01_DEMO
+    CALL(evt_item_entry, STRING("item00"), 244, LW(0), LW(1), LW(2), 15, -1, 0)
+    CALL(evt_item_flag_on, STRING("item00"), 2)
+#else
     CALL(evt_item_entry, STRING("item00"), 244, LW(0), LW(1), LW(2), 16, -1, 0)
     CALL(evt_item_flag_on, STRING("item00"), 258)
+#endif
     CALL(evt_mobj_wait_animation_end, STRING("mobj_box00"))
     CALL(evt_item_get_item, STRING("item00"))
     CALL(evt_mario_key_onoff, 1)

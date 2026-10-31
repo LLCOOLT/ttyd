@@ -124,10 +124,12 @@ EVT_BEGIN(hei_08_init_evt)
         CALL(evt_npc_change_fbat_mode, 7)
         ELSE
         CALL(evt_npc_change_fbat_mode, 1)
+#ifndef VERSION_G8ME01_DEMO
         CALL(evt_npc_check, STRING("チョロボン"), LW(0))
         IF_INT_EQUAL(LW(0), 1)
             CALL(evt_npc_set_battle_info, STRING("チョロボン"), 16)
         END_IF
+#endif
     END_IF
     IF_INT_EQUAL(GSWF(1775), 0)
         CALL(evt_item_entry, STRING("moon_st"), 61, 0, 0, 0, 0, -1, PTR(evt_chorobon))

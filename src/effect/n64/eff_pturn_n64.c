@@ -34,6 +34,8 @@ typedef struct PturnElem {
 } PturnElem;
 
 
+f32 scale_dat[9] = {5.0f, 4.5f, 4.0f, 3.0f, 2.0f, 1.0f, 0.7f, 1.2f, 1.0f};
+
 effN64Vtx size48x48_tex32x32_pturn_vtx[] = {
     {-24, -24, 0, -512, 512, 255, 255, 255, 255},
     {24, -24, 0, 512, -512, 255, 255, 255, 255},
@@ -61,8 +63,6 @@ effN64Vtx size16x24_tex32x32_r_pturn_vtx[] = {
     {16, 12, 0, 1024, 1024, 250, 250, 0, 255},
     {-4, 12, 0, 0, 1024, 250, 250, 0, 255},
 };
-
-f32 scale_dat[9] = {5.0f, 4.5f, 4.0f, 3.0f, 2.0f, 1.0f, 0.7f, 1.2f, 1.0f};
 
 void effPturnMain(EffectEntry* effect);
 void effPturnDisp(CameraId cameraId, EffectEntry* effect);

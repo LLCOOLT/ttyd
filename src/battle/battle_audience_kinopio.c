@@ -70,6 +70,10 @@ void BattleAudienceCtrlProcessKinopioShell();
 void BattleAudienceCtrlProcessKinopioIgnite(s32 index, s32 front);
 void BattleAudienceCtrlProcessKinopioFire(s32 index, s32 front);
 void BattleAudienceCtrlProcessKinopioEat();
+#ifdef VERSION_G8ME01_DEMO
+void BattleAudienceCtrlProcessKinopioStatus21(s32 index, s32 front);
+void BattleAudienceCtrlProcessKinopioStatus22(s32 index, s32 front);
+#endif
 void BattleAudienceCtrlProcessKinopioSingSub(s32 index);
 void BattleAudienceCtrlProcessKinopioFireSub(s32 index);
 
@@ -140,6 +144,14 @@ void BattleAudienceCtrlProcessKinopio(s32 index) {
     case 20:
         BattleAudienceCtrlProcessKinopioEat(index, front);
         break;
+#ifdef VERSION_G8ME01_DEMO
+    case 21:
+        BattleAudienceCtrlProcessKinopioStatus21(index, front);
+        break;
+    case 22:
+        BattleAudienceCtrlProcessKinopioStatus22(index, front);
+        break;
+#endif
     }
     m->position.x += m->velocity.x;
     m->velocity.x += m->accel.x;
@@ -534,7 +546,7 @@ void BattleAudienceCtrlProcessKinopioItemOn(s32 index, s32 front) {
         }
     } else if (!(m->flags & 0x20) && (bw->flags & 0x80)) {
         item = BattleAudienceItemGetPtr(m->itemId);
-        if (!(base->flags & 0x40000)) {
+        if (!(base->flags & AUDIENCE_FLAG(0x40000))) {
             item->timer--;
             if ((item->flags & 1) && item->timer <= 0 && item->state == 1) {
                 BattleAudience_ChangeStatus(index, 8);
@@ -1469,3 +1481,12 @@ void BattleAudienceCtrlProcessKinopioEat(s32 index) {
         break;
     }
 }
+
+#ifdef VERSION_G8ME01_DEMO
+// statuses 21 and 22 have no toad handler yet in the demo; retail drops the cases
+void BattleAudienceCtrlProcessKinopioStatus21(s32 index, s32 front) {
+}
+
+void BattleAudienceCtrlProcessKinopioStatus22(s32 index, s32 front) {
+}
+#endif

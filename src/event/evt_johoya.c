@@ -108,8 +108,10 @@ USER_FUNC(johoya_keti_newjoho_check) {
 
 USER_FUNC(johoya_keti_newjoho_makelabel) {
     EvtWord* args = event->args;
+#ifndef VERSION_G8ME01_DEMO
     char tmp[64];
     const char* msg;
+#endif
     s32 target = evtGetValue(event, args[0]);
     InformantWork* wp = &_jdt;
     u8* table = wp->readFlags.ketiRead;
@@ -120,11 +122,17 @@ USER_FUNC(johoya_keti_newjoho_makelabel) {
         if (johoya_get(table, wp->info[i].storyId) == 0) {
             if (target == n) {
                 sprintf((char*)wp->infoEnd, "%s_%04d", wp->prefix, wp->info[i].storyId);
+#ifdef VERSION_G8ME01_DEMO
+                evtSetValue(event, args[1], (EvtWord)wp->infoEnd);
+                evtSetValue(event, args[2], (EvtWord)wp->info[i].initEndPos);
+                evtSetValue(event, args[3], wp->info[i].tagEndPos);
+#else
                 sprintf(tmp, "jketi_title_%04d", wp->info[i].storyId);
                 msg = msgSearch(tmp);
                 evtSetValue(event, args[1], (EvtWord)wp->infoEnd);
                 evtSetValue(event, args[2], (EvtWord)msg);
                 evtSetValue(event, args[3], strlen(msg));
+#endif
                 evtSetValue(event, args[4], wp->info[i].cost);
                 wp->curIndex = i;
                 return 2;

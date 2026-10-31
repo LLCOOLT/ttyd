@@ -23,6 +23,13 @@
 #include "evt/evt_paper.h"
 #include "party/party_motion.h"
 
+// The demo draws these icons with icon flag 4; retail uses 0x10.
+#ifdef VERSION_G8ME01_DEMO
+#define ICON_DISP_FLAGS 4
+#else
+#define ICON_DISP_FLAGS 0x10
+#endif
+
 double sqrt(double);
 double fabs(double);
 double __fabs(double);
@@ -799,7 +806,7 @@ void star_disp2D_sub(s32 idx, s32 alpha) {
     PSMTXConcat(rotX, rotMtx, rotMtx);
     PSMTXConcat(scaleMtx, rotMtx, rotMtx);
     PSMTXConcat(transMtx, rotMtx, rotMtx);
-    iconDispGxCol(rotMtx, 0x10, ICON_19C, col);
+    iconDispGxCol(rotMtx, ICON_DISP_FLAGS, ICON_19C, col);
 }
 #pragma dont_inline reset
 
@@ -975,7 +982,11 @@ s32 scissor_damage(EventEntry* evt, BOOL first) {
             BattleUnitPart* part = BtlUnit_GetPartsPtr(unit, BtlUnit_GetBodyPartsId(unit));
             s32 res;
             if (BtlUnit_CheckStatus(unit, 0x1B) != 1 && !(part->attributes & 0x4000) && !(part->attributes & 0x20000000) &&
+#ifdef VERSION_G8ME01_DEMO
+                !(part->attributes & 0x10000) && *(s8*)part->defenseAttr != 4) {
+#else
                 !(part->attributes & 0x10000) && *(s8*)part->defenseAttr != 4 && *(s8*)part->defenseAttr != 2) {
+#endif
                 scissor_damage_sub(unit, &res);
                 w->unitIds[n] = i;
                 w->power[n] = res;
@@ -1124,6 +1135,18 @@ void scissor_disp_control(CameraId camera, void* param) {
     ScissorWork* w = GetScissorPtr();
     f32* pts = (f32*)w->buf114;
     s32 i;
+#ifdef VERSION_G8ME01_DEMO
+    BattleWork* wp;
+    BattleUnit* unit;
+    Vec pos;
+    Vec a;
+    Vec b;
+    f32 width;
+    f32 height;
+    f32 hw;
+    f32 hh;
+    f32 sign;
+#endif
     w->blinkTimer = w->blinkTimer + 1;
     if (w->blinkTimer >= 60) {
         w->blinkTimer -= 60;
@@ -1156,6 +1179,74 @@ void scissor_disp_control(CameraId camera, void* param) {
         GXPosition3f32(pts[i * 2], pts[i * 2 + 1], 0.0f);
         GXPosition3f32(pts[i * 2 + 2], pts[i * 2 + 3], 0.0f);
     }
+#ifdef VERSION_G8ME01_DEMO
+    // The demo outlines each enemy's cut box in red (scissor_damage's box).
+    wp = _battleWorkPointer;
+    GXSetChanMatColor(4, (GXColor){0xFF, 0x00, 0x00, 0xFF});
+    for (i = 0; i < 64; i++) {
+        unit = BattleGetUnitPtr(wp, i);
+        if (unit == NULL) continue;
+        if (BtlUnit_GetBelong(unit) != 1) continue;
+        if (BtlUnit_CheckStatus(unit, STATUS_INSTANT_KILL)) continue;
+        if (BtlUnit_GetPartsPtr(unit, BtlUnit_GetBodyPartsId(unit))->attributes & kNotTargetable) continue;
+        if (unit->mAttributeFlags & 2) {
+            sign = -1.0f;
+        } else {
+            sign = 1.0f;
+        }
+        width = unit->cutWidth * unit->mSizeMultiplier;
+        height = unit->cutHeight * unit->mSizeMultiplier;
+        BtlUnit_GetPos(unit, &pos.x, &pos.y, &pos.z);
+        pos.x = unit->cutBaseOffset.x * unit->mSizeMultiplier + pos.x;
+        hw = 0.5f * width;
+        hh = 0.5f * height;
+        pos.y = sign * (unit->cutBaseOffset.y * unit->mSizeMultiplier) + pos.y;
+        a.x = pos.x - hw;
+        a.y = pos.y + hh;
+        a.z = pos.z;
+        btlGetScreenPoint(&a, &a);
+        b.x = pos.x + hw;
+        b.y = pos.y + hh;
+        b.z = pos.z;
+        btlGetScreenPoint(&b, &b);
+        GXBegin(0xA8, 0, 2);
+        GXPosition3f32(a.x, a.y, 0.0f);
+        GXPosition3f32(b.x, b.y, 0.0f);
+        a.x = pos.x + hw;
+        a.y = pos.y + hh;
+        a.z = pos.z;
+        btlGetScreenPoint(&a, &a);
+        b.x = pos.x + hw;
+        b.y = pos.y - hh;
+        b.z = pos.z;
+        btlGetScreenPoint(&b, &b);
+        GXBegin(0xA8, 0, 2);
+        GXPosition3f32(a.x, a.y, 0.0f);
+        GXPosition3f32(b.x, b.y, 0.0f);
+        a.x = pos.x + hw;
+        a.y = pos.y - hh;
+        a.z = pos.z;
+        btlGetScreenPoint(&a, &a);
+        b.x = pos.x - hw;
+        b.y = pos.y - hh;
+        b.z = pos.z;
+        btlGetScreenPoint(&b, &b);
+        GXBegin(0xA8, 0, 2);
+        GXPosition3f32(a.x, a.y, 0.0f);
+        GXPosition3f32(b.x, b.y, 0.0f);
+        a.x = pos.x - hw;
+        a.y = pos.y - hh;
+        a.z = pos.z;
+        btlGetScreenPoint(&a, &a);
+        b.x = pos.x - hw;
+        b.y = pos.y + hh;
+        b.z = pos.z;
+        btlGetScreenPoint(&b, &b);
+        GXBegin(0xA8, 0, 2);
+        GXPosition3f32(a.x, a.y, 0.0f);
+        GXPosition3f32(b.x, b.y, 0.0f);
+    }
+#endif
 }
 
 s32 scissor_offscreen(void) {
@@ -1278,7 +1369,11 @@ EVT_BEGIN(marioAttackEvent_Scissor)
     BEGIN_SIBLING_EVENT
         WAIT_FRAMES(30)
         CALL(evt_btl_camera_set_mode, 0, 3)
+#ifdef VERSION_G8ME01_DEMO
+        CALL(evt_btl_camera_set_moveto, 0, 75, 120, 600, 75, 70, 0, 30, 0)
+#else
         CALL(evt_btl_camera_set_moveto, 0, 75, 105, 600, 75, 55, 0, 30, 0)
+#endif
     END_SIBLING_EVENT
     CALL(wait_star_standby)
     BEGIN_SIBLING_EVENT

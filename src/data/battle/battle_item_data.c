@@ -22,6 +22,13 @@
 #include "evt/evt_audience.h"
 #include "evt/evt_mobj.h"
 
+// stand pose after using an item; the demo's pose types from 58 up are 2 lower
+#ifdef VERSION_G8ME01_DEMO
+#define POSE_TYPE_ITEM_STAND 67
+#else
+#define POSE_TYPE_ITEM_STAND 69
+#endif
+
 extern ItemData itemDataTable[];
 void BattleSamplingEnemy(BattleWorkWeaponTargets* targets, BattleWeapon* weapon, s32 unitId, s8 belong, u32 classFlags, u32 propFlags, s8 direction);
 void BattleStatusWindowSystemOn(void);
@@ -321,7 +328,7 @@ EVT_BEGIN(ItemEvent_Recovery)
     CALL(btlevtcmd_GetBodyId, -2, LW(9))
     CALL(btlevtcmd_AnimeChangePoseType, -2, LW(9), 52)
     CALL(btlevtcmd_CommandFlyItem, -2, 60)
-    CALL(btlevtcmd_AnimeChangePoseType, -2, LW(9), 69)
+    CALL(btlevtcmd_AnimeChangePoseType, -2, LW(9), POSE_TYPE_ITEM_STAND)
     CALL(btlevtcmd_ConsumeItem, -2)
     CALL(btlevtcmd_CommandGetWeaponItemId, LW(9), LW(8))
     IF_INT_EQUAL(LW(9), 0)
@@ -348,7 +355,7 @@ EVT_BEGIN(ItemEvent_Support_Sub_UseDeclere)
     END_IF
     CALL(btlevtcmd_AnimeChangePoseType, -2, LW(9), 52)
     CALL(btlevtcmd_CommandFlyItem, -2, 40)
-    CALL(btlevtcmd_AnimeChangePoseType, -2, LW(9), 69)
+    CALL(btlevtcmd_AnimeChangePoseType, -2, LW(9), POSE_TYPE_ITEM_STAND)
     CALL(btlevtcmd_ConsumeItem, -2)
     CALL(evt_btl_camera_set_mode, 0, 0)
     CALL(evt_btl_camera_set_moveSpeedLv, 0, 1)
@@ -827,7 +834,7 @@ EVT_BEGIN(ItemEvent_Pow_Block)
     CALL(btlevtcmd_GetBodyId, -2, LW(9))
     CALL(btlevtcmd_AnimeChangePoseType, -2, LW(9), 52)
     CALL(btlevtcmd_CommandFlyItem, -2, 40)
-    CALL(btlevtcmd_AnimeChangePoseType, -2, LW(9), 69)
+    CALL(btlevtcmd_AnimeChangePoseType, -2, LW(9), POSE_TYPE_ITEM_STAND)
     CALL(btlevtcmd_ConsumeItem, -2)
     CALL(btlevtcmd_CheckCommandUnit, -2, LW(0))
     IF_INT_NOT_EQUAL(LW(0), 0)
@@ -855,7 +862,7 @@ EVT_BEGIN(ItemEvent_Pow_Block)
         WAIT_MS(2050)
         CALL(evt_eff, STRING(""), STRING("kemuri_test"), 2, LW(0), LW(1), LW(2), FLOAT(1.0f), 0, 0, 0, 0, 0, 0, 0)
     END_INLINE_EVENT
-    CALL(btlevtcmd_AnimeChangePoseType, -2, LW(9), 69)
+    CALL(btlevtcmd_AnimeChangePoseType, -2, LW(9), POSE_TYPE_ITEM_STAND)
     WAIT_FRAMES(5)
     CALL(evt_btl_camera_set_mode, 0, 0)
     CALL(evt_btl_camera_set_moveSpeedLv, 0, 1)
@@ -1151,9 +1158,15 @@ EVT_BEGIN(ItemEvent_Kaminari)
     CALL(btlevtcmd_GetBodyId, -2, LW(9))
     CALL(btlevtcmd_AnimeChangePoseType, -2, LW(9), 52)
     CALL(btlevtcmd_CommandFlyItem, -2, 40)
-    CALL(btlevtcmd_AnimeChangePoseType, -2, LW(9), 69)
+    CALL(btlevtcmd_AnimeChangePoseType, -2, LW(9), POSE_TYPE_ITEM_STAND)
     CALL(btlevtcmd_ConsumeItem, -2)
     CALL_CHILD(PTR(ItemEvent_Kaminari_Core))
+    RETURN
+EVT_END()
+
+EVT_BEGIN(ItemEvent_Kaminari_Dokkan)
+    SET_VALUE(LW(12), PTR(&ItemWeaponData_Kaminari_Dokkan))
+    CALL_CHILD(PTR(ItemEvent_Kaminari))
     RETURN
 EVT_END()
 
@@ -1193,6 +1206,12 @@ BattleWeapon ItemWeaponData_Kaminari_Dokkan = {
     ItemEvent_Kaminari_Dokkan, // mAttackEvtScript
     {0, 0, 0, 100, 0, 5, 5, 5, 5, 0, 0, 0}, // stageEffectRates
 };
+
+EVT_BEGIN(ItemEvent_Kaminari_Gorogoro)
+    SET_VALUE(LW(12), PTR(&ItemWeaponData_Kaminari_Gorogoro))
+    CALL_CHILD(PTR(ItemEvent_Kaminari))
+    RETURN
+EVT_END()
 
 BattleWeapon ItemWeaponData_Kaminari_Gorogoro = {
     NULL, 0, // name..icon
@@ -1437,7 +1456,7 @@ EVT_BEGIN(ItemEvent_Koorino_Ibuki)
     CALL(btlevtcmd_GetBodyId, -2, LW(9))
     CALL(btlevtcmd_AnimeChangePoseType, -2, LW(9), 52)
     CALL(btlevtcmd_CommandFlyItem, -2, 40)
-    CALL(btlevtcmd_AnimeChangePoseType, -2, LW(9), 69)
+    CALL(btlevtcmd_AnimeChangePoseType, -2, LW(9), POSE_TYPE_ITEM_STAND)
     CALL(btlevtcmd_ConsumeItem, -2)
     CALL(evt_btl_camera_set_mode, 0, 0)
     CALL(evt_btl_camera_set_moveSpeedLv, 0, 1)
@@ -1536,7 +1555,11 @@ BattleWeapon ItemWeaponData_Koorino_Ibuki = {
     0, 0, 0, 0, 0, 0, 0, 0, // sleepChance..poisonTime
     0, 0, 0, 0, 0, 0, 0, 0, // poisonStrength..burnChance
     0, // burnTime
+#ifdef VERSION_G8ME01_DEMO
+    100, // freezeChance
+#else
     95, // freezeChance
+#endif
     2, // freezeTime
     0, 0, 0, 0, 0, 0, 0, 0, // sizeChangeChance..defChangeTime
     0, 0, 0, 0, 0, 0, 0, 0, // defChangeStrength..slowChance
@@ -1566,7 +1589,7 @@ EVT_BEGIN(ItemEvent_Yurayura_Jishin)
     CALL(btlevtcmd_GetBodyId, -2, LW(9))
     CALL(btlevtcmd_AnimeChangePoseType, -2, LW(9), 52)
     CALL(btlevtcmd_CommandFlyItem, -2, 40)
-    CALL(btlevtcmd_AnimeChangePoseType, -2, LW(9), 69)
+    CALL(btlevtcmd_AnimeChangePoseType, -2, LW(9), POSE_TYPE_ITEM_STAND)
     CALL(btlevtcmd_ConsumeItem, -2)
     CALL(evt_btl_camera_set_mode, 0, 0)
     CALL(evt_btl_camera_set_moveSpeedLv, 0, 1)
@@ -1693,7 +1716,7 @@ EVT_BEGIN(ItemEvent_Teresano_Fuku)
     CALL(btlevtcmd_GetBodyId, -2, LW(9))
     CALL(btlevtcmd_AnimeChangePoseType, -2, LW(9), 52)
     CALL(btlevtcmd_CommandFlyItem, -2, 40)
-    CALL(btlevtcmd_AnimeChangePoseType, -2, LW(9), 69)
+    CALL(btlevtcmd_AnimeChangePoseType, -2, LW(9), POSE_TYPE_ITEM_STAND)
     CALL(btlevtcmd_ConsumeItem, -2)
     CALL(evt_btl_camera_set_mode, 0, 0)
     CALL(evt_btl_camera_set_moveSpeedLv, 0, 1)
@@ -1899,6 +1922,12 @@ BattleWeapon ItemWeaponData_Teki_Yokeeru = {
     {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // stageEffectRates
 };
 
+EVT_BEGIN(ItemEvent_Madowaseno_Kona)
+    SET_VALUE(LW(12), PTR(&ItemWeaponData_Madowaseno_Kona))
+    CALL_CHILD(PTR(ItemEvent_Support_NoEffect))
+    RETURN
+EVT_END()
+
 BattleWeapon ItemWeaponData_Madowaseno_Kona = {
     NULL, 0, // name..icon
     {0}, // pad_06
@@ -2008,7 +2037,11 @@ BattleWeapon ItemWeaponData_Nemure_Yoikoyo = {
     0x30000, // special
     0x7FF, // counterResistFlags
     0x80000000, // targetWeightFlags
+#ifdef VERSION_G8ME01_DEMO
+    100, // sleepChance
+#else
     95, // sleepChance
+#endif
     5, // sleepTime
     0, 0, 0, 0, 0, 0, 0, 0, // stopChance..confuseChance
     0, 0, 0, 0, 0, 0, 0, 0, // confuseTime..freezeChance
@@ -2028,7 +2061,11 @@ EVT_BEGIN(ItemEvent_Stop_Watch_Core)
     CALL(evt_snd_sfxon, STRING("SFX_ITEM_STOP_WATCH1"), 0)
     CALL(btlevtcmd_check_battleflag, LW(0), 256)
     IF_INT_EQUAL(LW(0), 0)
+#ifdef VERSION_G8ME01_DEMO
+        CALL(evt_eff64, 0, STRING("timestamp_n64"), 0, 0, 0, 0, FLOAT(1.0f), 200, 0, 0, 0, 0, 0, 0)
+#else
         CALL(evt_eff64, 0, STRING("timestamp_n64"), 0, 0, 0, 103, FLOAT(1.0f), 200, 0, 0, 0, 0, 0, 0)
+#endif
         ELSE
         CALL(btlevtcmd_GetPos, -2, LW(0), LW(1), LW(2))
         ADD(LW(2), 30)
@@ -2081,7 +2118,7 @@ EVT_BEGIN(ItemEvent_Stop_Watch)
     CALL(btlevtcmd_GetBodyId, -2, LW(9))
     CALL(btlevtcmd_AnimeChangePoseType, -2, LW(9), 52)
     CALL(btlevtcmd_CommandFlyItem, -2, 40)
-    CALL(btlevtcmd_AnimeChangePoseType, -2, LW(9), 69)
+    CALL(btlevtcmd_AnimeChangePoseType, -2, LW(9), POSE_TYPE_ITEM_STAND)
     CALL(btlevtcmd_ConsumeItem, -2)
     CALL_CHILD(PTR(ItemEvent_Stop_Watch_Core))
     RETURN
@@ -2113,7 +2150,11 @@ BattleWeapon ItemWeaponData_Stop_Watch = {
     0x7FF, // counterResistFlags
     0x80000000, // targetWeightFlags
     0, 0, // sleepChance..sleepTime
+#ifdef VERSION_G8ME01_DEMO
+    100, // stopChance
+#else
     95, // stopChance
+#endif
     3, // stopTime
     0, 0, 0, 0, 0, 0, 0, 0, // dizzyChance..electricChance
     0, 0, 0, 0, 0, 0, 0, 0, // electricTime..sizeChangeChance
@@ -2182,6 +2223,12 @@ BattleWeapon ItemWeaponData_Guruguru_Memawashi = {
     {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // stageEffectRates
 };
 
+EVT_BEGIN(ItemEvent_Dekadeka_Drink)
+    SET_VALUE(LW(12), PTR(&ItemWeaponData_Dekadeka_Drink))
+    CALL_CHILD(PTR(ItemEvent_Support_NoEffect))
+    RETURN
+EVT_END()
+
 BattleWeapon ItemWeaponData_Dekadeka_Drink = {
     NULL, 0, // name..icon
     {0}, // pad_06
@@ -2220,6 +2267,12 @@ BattleWeapon ItemWeaponData_Dekadeka_Drink = {
     ItemEvent_Dekadeka_Drink, // mAttackEvtScript
     {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // stageEffectRates
 };
+
+EVT_BEGIN(ItemEvent_Katikati_Koura)
+    SET_VALUE(LW(12), PTR(&ItemWeaponData_Katikati_Koura))
+    CALL_CHILD(PTR(ItemEvent_Support_NoEffect))
+    RETURN
+EVT_END()
 
 BattleWeapon ItemWeaponData_Katikati_Koura = {
     NULL, 0, // name..icon
@@ -2280,7 +2333,7 @@ EVT_BEGIN(ItemEvent_Suitooru)
     CALL(btlevtcmd_GetBodyId, -2, LW(9))
     CALL(btlevtcmd_AnimeChangePoseType, -2, LW(9), 52)
     CALL(btlevtcmd_CommandFlyItem, -2, 40)
-    CALL(btlevtcmd_AnimeChangePoseType, -2, LW(9), 69)
+    CALL(btlevtcmd_AnimeChangePoseType, -2, LW(9), POSE_TYPE_ITEM_STAND)
     CALL(btlevtcmd_ConsumeItem, -2)
     CALL(evt_btl_camera_set_mode, 0, 0)
     CALL(evt_btl_camera_set_moveSpeedLv, 0, 1)
@@ -2399,7 +2452,7 @@ EVT_BEGIN(ItemEvent_Teki_Kyouka)
     CALL(btlevtcmd_GetBodyId, -2, LW(9))
     CALL(btlevtcmd_AnimeChangePoseType, -2, LW(9), 52)
     CALL(btlevtcmd_CommandFlyItem, -2, 40)
-    CALL(btlevtcmd_AnimeChangePoseType, -2, LW(9), 69)
+    CALL(btlevtcmd_AnimeChangePoseType, -2, LW(9), POSE_TYPE_ITEM_STAND)
     CALL(btlevtcmd_ConsumeItem, -2)
     CALL(evt_btl_camera_set_mode, 0, 0)
     CALL(evt_btl_camera_set_moveSpeedLv, 0, 1)
@@ -2485,6 +2538,12 @@ BattleWeapon ItemWeaponData_Teki_Kyouka = {
     {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // stageEffectRates
 };
 
+EVT_BEGIN(ItemEvent_Minimini_Kun)
+    SET_VALUE(LW(12), PTR(&ItemWeaponData_Minimini_Kun))
+    CALL_CHILD(PTR(ItemEvent_Support_NoEffect))
+    RETURN
+EVT_END()
+
 BattleWeapon ItemWeaponData_Minimini_Kun = {
     NULL, 0, // name..icon
     {0}, // pad_06
@@ -2523,6 +2582,12 @@ BattleWeapon ItemWeaponData_Minimini_Kun = {
     ItemEvent_Minimini_Kun, // mAttackEvtScript
     {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // stageEffectRates
 };
+
+EVT_BEGIN(ItemEvent_Funyafunya_Kun)
+    SET_VALUE(LW(12), PTR(&ItemWeaponData_Funyafunya_Kun))
+    CALL_CHILD(PTR(ItemEvent_Support_NoEffect))
+    RETURN
+EVT_END()
 
 BattleWeapon ItemWeaponData_Funyafunya_Kun = {
     NULL, 0, // name..icon
@@ -2563,6 +2628,12 @@ BattleWeapon ItemWeaponData_Funyafunya_Kun = {
     ItemEvent_Funyafunya_Kun, // mAttackEvtScript
     {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // stageEffectRates
 };
+
+EVT_BEGIN(ItemEvent_Sukkiri_Drink)
+    SET_VALUE(LW(12), PTR(&ItemWeaponData_Sukkiri_Drink))
+    CALL_CHILD(PTR(ItemEvent_Support_RefreshEffect))
+    RETURN
+EVT_END()
 
 BattleWeapon ItemWeaponData_Sukkiri_Drink = {
     NULL, 0, // name..icon
@@ -2827,6 +2898,13 @@ EVT_BEGIN(ItemEvent_Attiike_Shisshi)
         CALL(btlevtcmd_snd_se, -2, STRING("SFX_ITEM_HORROR2"), -250000000, 0, -250000000)
     END_SIBLING_EVENT
     CALL(btlevtcmd_GetPos, -2, LW(0), LW(1), LW(2))
+#ifdef VERSION_G8ME01_DEMO
+    CALL(evt_eff64, STRING(""), STRING("holography_n64"), 0, LW(0), LW(1), LW(2), FLOAT(1.0f), 120, 0, 0, 0, 0, 0, 0)
+    WAIT_FRAMES(120)
+    CALL_CHILD(ItemEvent_Support_Sub_Effect)
+    CALL(evt_audience_ap_recovery)
+    WAIT_FRAMES(150)
+#else
     CALL(evt_eff64, 0, STRING("holography_n64"), 0, LW(0), LW(1), LW(2), FLOAT(1.0f), 120, 0, 0, 0, 0, 0, 0)
     BEGIN_SIBLING_EVENT
         WAIT_MS(400)
@@ -2854,6 +2932,7 @@ EVT_BEGIN(ItemEvent_Attiike_Shisshi)
     CALL_CHILD(ItemEvent_Support_Sub_Effect)
     CALL(evt_audience_ap_recovery)
     WAIT_MS(2500)
+#endif
     CALL_CHILD(_return_home_event)
     CALL(btlevtcmd_StartWaitEvent, -2)
     RETURN
@@ -3027,6 +3106,12 @@ s32 R_mystery_item_table[] = {
     152, 129, 132, 130, 140, 0,
 };
 
+EVT_BEGIN(ItemEvent_Shikaeshino_Kona)
+    SET_VALUE(LW(12), PTR(&ItemWeaponData_Shikaeshino_Kona))
+    CALL_CHILD(PTR(ItemEvent_Support_NoEffect))
+    RETURN
+EVT_END()
+
 BattleWeapon ItemWeaponData_Shikaeshino_Kona = {
     NULL, 0, // name..icon
     {0}, // pad_06
@@ -3063,6 +3148,12 @@ BattleWeapon ItemWeaponData_Shikaeshino_Kona = {
     ItemEvent_Shikaeshino_Kona, // mAttackEvtScript
     {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // stageEffectRates
 };
+
+EVT_BEGIN(ItemEvent_Kameno_Noroi)
+    SET_VALUE(LW(12), PTR(&ItemWeaponData_Kameno_Noroi))
+    CALL_CHILD(PTR(ItemEvent_Support_NoEffect))
+    RETURN
+EVT_END()
 
 BattleWeapon ItemWeaponData_Kameno_Noroi = {
     NULL, 0, // name..icon
@@ -3130,7 +3221,7 @@ EVT_BEGIN(ItemEvent_RecoveryAndStatus)
     CALL(btlevtcmd_GetBodyId, -2, LW(9))
     CALL(btlevtcmd_AnimeChangePoseType, -2, LW(9), 52)
     CALL(btlevtcmd_CommandFlyItem, -2, 60)
-    CALL(btlevtcmd_AnimeChangePoseType, -2, LW(9), 69)
+    CALL(btlevtcmd_AnimeChangePoseType, -2, LW(9), POSE_TYPE_ITEM_STAND)
     CALL(btlevtcmd_ConsumeItem, -2)
     CALL(btlevtcmd_CommandGetWeaponItemId, LW(9), LW(8))
     IF_INT_EQUAL(LW(9), 0)
@@ -3948,6 +4039,45 @@ BattleWeapon ItemWeaponData_FutarideForever = {
     {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // stageEffectRates
 };
 
+#ifdef VERSION_G8ME01_DEMO
+// demo only: Fire Candy (item 228) still had battle data
+BattleWeapon ItemWeaponData_FireCandy = {
+    NULL, 0, // name..icon
+    {0}, // pad_06
+    228, // itemId
+    NULL, // description
+    100, // baseAccuracy
+    0, 0, 0, // baseFpCost..superguardsAllowed
+    1.0f, // reserved_14
+    1, // mStylishCommandMultiplier
+    1, // reserved_19
+    1, // mBingoSlotChance
+    1, // reserved_1B
+    weaponGetPowerDefault, // hpDamageFn
+    {1, 0, 0, 0, 0, 0, 0, 0}, // hpDamageWork
+    NULL, // fpDamageFn
+    {0}, // fpDamageWork
+    0x1100160, // targetClassFlags
+    0x10000000, // targetPropertyFlags
+    1, 0, // element..damagePattern
+    3, // acLevel
+    2, // reserved_6F
+    NULL, // acHelpMsg
+    0x30048, // special
+    0x7FF, // counterResistFlags
+    0x80000000, // targetWeightFlags
+    0, 0, 0, 0, 0, 0, 0, 0, // sleepChance..poisonTime
+    0, 0, 0, 0, 0, 0, 0, 0, // poisonStrength..burnChance
+    0, 0, 0, 0, 0, 0, 0, 0, // burnTime..atkChangeTime
+    0, 0, 0, 0, 0, 0, 0, 0, // atkChangeStrength..chargeStrength
+    0, 0, 0, 0, 0, 0, 0, 0, // fastChance..holdFastTime
+    0, 0, 0, 0, 0, 0, // invisibleChance..fpRegenStrength
+    {0}, // pad_AE
+    ItemEvent_RecoveryAndStatus, // mAttackEvtScript
+    {0, 0, 0, 100, 0, 5, 5, 5, 5, 0, 0, 0}, // stageEffectRates
+};
+
+#endif
 EVT_BEGIN(ItemEvent_ThrowAttack)
     CALL(btlevtcmd_CommandGetWeaponAddress, -2, LW(12))
     CALL(evt_btl_camera_set_mode, 0, 7)
@@ -3966,7 +4096,7 @@ EVT_BEGIN(ItemEvent_ThrowAttack)
     CALL(btlevtcmd_GetBodyId, -2, LW(9))
     CALL(btlevtcmd_AnimeChangePoseType, -2, LW(9), 52)
     CALL(btlevtcmd_CommandFlyItem, -2, 40)
-    CALL(btlevtcmd_AnimeChangePoseType, -2, LW(9), 69)
+    CALL(btlevtcmd_AnimeChangePoseType, -2, LW(9), POSE_TYPE_ITEM_STAND)
     CALL(btlevtcmd_CommandGetWeaponItemId, LW(9), LW(12))
     IF_INT_EQUAL(LW(9), 0)
         CALL(btlevtcmd_GetConsumeItem, LW(9))
@@ -4384,11 +4514,15 @@ USER_FUNC(_hpfp_change_declare_2) {
 
     if (unit) {
         if (unit->currentKind == 0xDE) {
+#ifndef VERSION_G8ME01_DEMO
             N_statusClearBlink();
+#endif
             statusMarioHPBlink(120);
             statusFPBlink(120);
         } else if (unit->currentKind >= 0xE0 && unit->currentKind < 0xE7) {
+#ifndef VERSION_G8ME01_DEMO
             N_statusClearBlink();
+#endif
             statusPartyHPBlink(120);
             statusFPBlink(120);
         }
@@ -4424,6 +4558,7 @@ USER_FUNC(_naniga_okorukana_check) {
         event->userdata[0] = (EvtWord)effNanigaEntry(0, R_mystery_item_table, item, pos.x, pos.y, pos.z);
         effSetName((EffectEntry*)event->userdata[0], "effNaniga");
         evtSetValue(event, out, item);
+#ifndef VERSION_G8ME01_DEMO
         if (unit->currentKind == 0xDE) {
             a = &wp->actRecord.marioAttackItems;
             b = &wp->actRecord.marioSupportItems;
@@ -4445,8 +4580,11 @@ USER_FUNC(_naniga_okorukana_check) {
                 (*b)++;
                 break;
         }
+#endif
     }
+#ifndef VERSION_G8ME01_DEMO
 end:
+#endif
     if (effNameToPtr("effNaniga")) {
         return EVT_RETURN_BLOCK;
     }
@@ -4626,6 +4764,17 @@ EVT_BEGIN(ItemEvent_LastDinner)
     CALL(btlevtcmd_SetFp, LW(10), 0)
     CALL(_full_ap_recover, LW(10))
     CALL(btlevtcmd_StatusWindowOnOff, 2)
+#ifdef VERSION_G8ME01_DEMO
+    CALL(evt_snd_sfxon_3d, STRING("SFX_ITEM_COOK_LAST3"), LW(0), LW(1), LW(2), 0)
+    CALL(evt_eff, 0, STRING("indirect"), 0, LW(0), LW(1), LW(2), 60, 0, 0, 0, 0, 0, 0, 0)
+    CALL(evt_eff, 0, STRING("hit"), 0, LW(0), LW(1), LW(2), FLOAT(1.0f), 3, 0, 0, 0, 0, 0, 0)
+    WAIT_MS(250)
+    CALL(evt_eff, 0, STRING("hit"), 1, LW(0), LW(1), LW(2), FLOAT(1.0f), 3, 0, 0, 0, 0, 0, 0)
+    WAIT_MS(250)
+    CALL(evt_eff, 0, STRING("hit"), 2, LW(0), LW(1), LW(2), FLOAT(1.0f), 3, 0, 0, 0, 0, 0, 0)
+    WAIT_MS(250)
+    CALL(evt_eff, 0, STRING("hit"), 3, LW(0), LW(1), LW(2), FLOAT(1.0f), 3, 0, 0, 0, 0, 0, 0)
+#else
     CALL(evt_eff, 0, STRING("indirect"), 0, LW(0), LW(1), LW(2), 60, 0, 0, 0, 0, 0, 0, 0)
     CALL(evt_eff, 0, STRING("hit"), 0, LW(0), LW(1), LW(2), FLOAT(1.0f), 3, 0, 0, 0, 0, 0, 0)
     CALL(evt_snd_sfxon_3d, STRING("SFX_ITEM_COOK_LAST3"), LW(0), LW(1), LW(2), 0)
@@ -4638,6 +4787,7 @@ EVT_BEGIN(ItemEvent_LastDinner)
     WAIT_MS(250)
     CALL(evt_eff, 0, STRING("hit"), 3, LW(0), LW(1), LW(2), FLOAT(1.0f), 3, 0, 0, 0, 0, 0, 0)
     CALL(evt_snd_sfxon_3d, STRING("SFX_ITEM_COOK_LAST3"), LW(0), LW(1), LW(2), 0)
+#endif
     WAIT_MS(1750)
     CALL(evt_audience_ap_recovery)
     CALL_CHILD(PTR(_return_home_event))
@@ -4680,66 +4830,6 @@ BattleWeapon ItemWeaponData_LastDinner = {
     ItemEvent_LastDinner, // mAttackEvtScript
     {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // stageEffectRates
 };
-
-EVT_BEGIN(ItemEvent_Kaminari_Dokkan)
-    SET_VALUE(LW(12), PTR(&ItemWeaponData_Kaminari_Dokkan))
-    CALL_CHILD(PTR(ItemEvent_Kaminari))
-    RETURN
-EVT_END()
-
-EVT_BEGIN(ItemEvent_Kaminari_Gorogoro)
-    SET_VALUE(LW(12), PTR(&ItemWeaponData_Kaminari_Gorogoro))
-    CALL_CHILD(PTR(ItemEvent_Kaminari))
-    RETURN
-EVT_END()
-
-EVT_BEGIN(ItemEvent_Madowaseno_Kona)
-    SET_VALUE(LW(12), PTR(&ItemWeaponData_Madowaseno_Kona))
-    CALL_CHILD(PTR(ItemEvent_Support_NoEffect))
-    RETURN
-EVT_END()
-
-EVT_BEGIN(ItemEvent_Dekadeka_Drink)
-    SET_VALUE(LW(12), PTR(&ItemWeaponData_Dekadeka_Drink))
-    CALL_CHILD(PTR(ItemEvent_Support_NoEffect))
-    RETURN
-EVT_END()
-
-EVT_BEGIN(ItemEvent_Katikati_Koura)
-    SET_VALUE(LW(12), PTR(&ItemWeaponData_Katikati_Koura))
-    CALL_CHILD(PTR(ItemEvent_Support_NoEffect))
-    RETURN
-EVT_END()
-
-EVT_BEGIN(ItemEvent_Minimini_Kun)
-    SET_VALUE(LW(12), PTR(&ItemWeaponData_Minimini_Kun))
-    CALL_CHILD(PTR(ItemEvent_Support_NoEffect))
-    RETURN
-EVT_END()
-
-EVT_BEGIN(ItemEvent_Funyafunya_Kun)
-    SET_VALUE(LW(12), PTR(&ItemWeaponData_Funyafunya_Kun))
-    CALL_CHILD(PTR(ItemEvent_Support_NoEffect))
-    RETURN
-EVT_END()
-
-EVT_BEGIN(ItemEvent_Sukkiri_Drink)
-    SET_VALUE(LW(12), PTR(&ItemWeaponData_Sukkiri_Drink))
-    CALL_CHILD(PTR(ItemEvent_Support_RefreshEffect))
-    RETURN
-EVT_END()
-
-EVT_BEGIN(ItemEvent_Shikaeshino_Kona)
-    SET_VALUE(LW(12), PTR(&ItemWeaponData_Shikaeshino_Kona))
-    CALL_CHILD(PTR(ItemEvent_Support_NoEffect))
-    RETURN
-EVT_END()
-
-EVT_BEGIN(ItemEvent_Kameno_Noroi)
-    SET_VALUE(LW(12), PTR(&ItemWeaponData_Kameno_Noroi))
-    CALL_CHILD(PTR(ItemEvent_Support_NoEffect))
-    RETURN
-EVT_END()
 
 
 

@@ -71,7 +71,11 @@ static ShopItem goods_list[] = {
 };
 
 static ShopDb trade_list[] = {
+#ifdef VERSION_G8ME01_DEMO
+    {ITEM_HP_DRAIN_BADGE, 5, 0},
+#else
     {ITEM_HP_DRAIN_ITEM, 5, 0},
+#endif
     {ITEM_ICE_STORM, 7, 0},
     {ITEM_MYSTERY, 1, 0},
     {ITEM_MINI_MR_MINI, 4, 0},
@@ -105,7 +109,9 @@ EVT_BEGIN(chibitoge_nakama)
     CALL(evt_msg_print, 0, STRING("stg2_mri_f01_01"), 0, STRING("プニ店員"))
     CALL(evt_cam3d_evt_off, 0, 11)
     WAIT_FRAMES(1)
+#ifndef VERSION_G8ME01_DEMO
     CALL(evt_party_stop, 0)
+#endif
     CALL(evt_msg_print_party, STRING("stg2_mri_f01_02"))
     CALL(evt_msg_select, 0, STRING("stg2_mri_f01_yesno"))
     CALL(evt_msg_continue)
@@ -149,7 +155,9 @@ EVT_BEGIN(chibitoge_nakama)
     CALL(evt_puni_flag_onoff, 1, 1, 262144)
     CALL(evt_puni_set_mode, 1, 1)
     CALL(evt_npc_flag_onoff, 0, STRING("ガイドsp"), 1536)
+#ifndef VERSION_G8ME01_DEMO
     CALL(evt_party_run, 0)
+#endif
     RETURN
 EVT_END()
 

@@ -175,6 +175,12 @@ void BattleDamageDirect(s32 unitId, BattleUnit* target, BattleUnitPart* part, s3
     }
 
     if (!(result & 0x2000) && damage > 0) {
+#ifdef VERSION_G8ME01_DEMO
+        s32 i = target->badgesEquipped.PityFlower;
+        for (; i > 0; i--) {
+            irand(100);
+        }
+#else
         s32 n = 0;
         s32 i = target->badgesEquipped.PityFlower;
         for (; i > 0; i--) {
@@ -189,17 +195,27 @@ void BattleDamageDirect(s32 unitId, BattleUnit* target, BattleUnitPart* part, s3
             y += target->mSizeMultiplier * BtlUnit_GetHeight(target) + 5.0f;
             effRecoveryEntry(1, n, x, y, z);
         }
+#endif
     }
 
     if (pattern != 0x13 && pattern != 0x1b) {
         if (result & 0x1000000) {
             psndSFXOn_3D("SFX_MARIO_HAMMER_PIKKYO_R1", &pos);
+#ifdef VERSION_G8ME01_DEMO
+        } else if (result & 0x2000000) {
+            psndSFXOn_3D("SFX_MARIO_HAMMER_PIKKYO_B1", &pos);
+        } else if (result & 0x4000000) {
+            psndSFXOn_3D("SFX_MARIO_HAMMER_PIKKYO_G1", &pos);
+        } else if (result & 0x8000000) {
+            psndSFXOn_3D("SFX_MARIO_HAMMER_PIKKYO_Y1", &pos);
+#else
         } else if (result & 0x2000000) {
             psndSFXOn_3D("SFX_MARIO_HAMMER_PIKKYO_Y1", &pos);
         } else if (result & 0x4000000) {
             psndSFXOn_3D("SFX_MARIO_HAMMER_PIKKYO_B1", &pos);
         } else if (result & 0x8000000) {
             psndSFXOn_3D("SFX_MARIO_HAMMER_PIKKYO_G1", &pos);
+#endif
         } else if (result & 0x10000000) {
             psndSFXOn_3D("SFX_MARIO_HAMMER_PIKKYO_P1", &pos);
         } else if (BtlUnit_GetBelong(target) == 0 && (result & 0x40000)) {
@@ -464,6 +480,9 @@ s32 BattleCalculateDamage(BattleUnit* attacker, BattleUnit* target, BattleUnitPa
         if (attacker->currentHp <= attacker->mKindParams->mPerilHP && attacker->badgesEquipped.MegaRush) {
             damage += attacker->badgesEquipped.MegaRush * 5;
         }
+#ifdef VERSION_G8ME01_DEMO
+        else
+#endif
         if (attacker->currentHp <= attacker->mKindParams->mDangerHP && attacker->badgesEquipped.PowerRush) {
             damage += attacker->badgesEquipped.PowerRush * 2;
         }
@@ -545,6 +564,11 @@ skip:
         if (target->badgesEquipped.DamageDodge && (flags & 0x40000)) {
             defense += target->badgesEquipped.DamageDodge;
         }
+#ifdef VERSION_G8ME01_DEMO
+        if (element == 1 && target->badgesEquipped.IcePower) {
+            defense += target->badgesEquipped.IcePower;
+        }
+#endif
         if (BtlUnit_CheckStatusFlag(target, 0x1000000)) {
             defense++;
         }
@@ -586,15 +610,21 @@ skip:
     if (flags & 0x40000) {
         damage--;
     }
+#ifndef VERSION_G8ME01_DEMO
     if (element == 1 && target->badgesEquipped.IcePower) {
         damage -= target->badgesEquipped.IcePower;
     }
+#endif
     damage -= target->badgesEquipped.PDownDUp;
     if (target->badgesEquipped.DoublePain) {
         damage *= target->badgesEquipped.DoublePain + 1;
     }
     if (target->badgesEquipped.LastStand && target->currentHp <= target->mKindParams->mDangerHP) {
+#ifdef VERSION_G8ME01_DEMO
+        n = target->badgesEquipped.LastStand;
+#else
         n = target->badgesEquipped.LastStand + 1;
+#endif
         damage = (damage + n - 1) / n;
     }
     switch (defenseAttr) {
@@ -718,8 +748,13 @@ s32 _getSickStatusRate(BattleWeapon* weapon, s32 type) {
         case 18: return w->invisibleChance;
         case 23: return w->hpRegenTime > 0 ? 100 : 0;
         case 24: return w->fpRegenTime > 0 ? 100 : 0;
+#ifdef VERSION_G8ME01_DEMO
+        case 16: return w->chargeStrength > 0 ? 100 : 0;
+        case 21: return w->paybackTime > 0 ? 100 : 0;
+#else
         case 16: return w->chargeStrength != 0 ? 100 : 0;
         case 21: return w->paybackTime != 0 ? 100 : 0;
+#endif
         case 22: return w->holdFastTime > 0 ? 100 : 0;
         case 17: return 0;
     }
@@ -915,9 +950,11 @@ void _getSickStatusParam(BattleUnit* unit, BattleWeapon* weapon, u32 type, s8* o
                 strength += (n - 1) * 2;
             }
         }
+#ifndef VERSION_G8ME01_DEMO
         if (strength >= 10) {
             strength = 9;
         }
+#endif
     }
     *outTime = time;
     *outStrength = strength;
@@ -978,6 +1015,9 @@ s32 BattleSetStatusDamage(u32* result, BattleUnit* unit, BattleUnitPart* part, u
     s8 curTurns;
     s8 curStrength;
 
+#ifdef VERSION_G8ME01_DEMO
+    BtlUnit_GetStatus(unit, 0x10, NULL, &prevStrength);
+#else
     ok = 0;
     BtlUnit_GetStatus(unit, 0x10, NULL, &prevStrength);
     switch (type) {
@@ -1021,15 +1061,18 @@ s32 BattleSetStatusDamage(u32* result, BattleUnit* unit, BattleUnitPart* part, u
             }
             break;
     }
+#endif
     if (part->attributes & 0x20000000) {
         return 0;
     }
     if (part->attributes & 0x80000000) {
         return 0;
     }
+#ifndef VERSION_G8ME01_DEMO
     if (BtlUnit_CheckStatus(unit, 0) && !ok) {
         return 0;
     }
+#endif
     if (part->attributes & 0x40000000) {
         switch (type) {
             case 0:
@@ -1047,10 +1090,14 @@ s32 BattleSetStatusDamage(u32* result, BattleUnit* unit, BattleUnitPart* part, u
             case 0x19:
             case 0x1a:
             case 0x1b:
+#ifdef VERSION_G8ME01_DEMO
+                return 0;
+#else
                 if (!ok) {
                     return 0;
                 }
                 break;
+#endif
         }
     }
     if (unit->badgesEquipped.FeelingFine) {
@@ -1131,6 +1178,33 @@ s32 BattleSetStatusDamage(u32* result, BattleUnit* unit, BattleUnitPart* part, u
         } else {
             y += BtlUnit_GetHeight(unit) / 2;
         }
+#ifdef VERSION_G8ME01_DEMO
+        switch (type) {
+            case 1:
+                effStampN64Entry(0, x, y, 10.0f + z);
+                break;
+            case 5:
+                effStampN64Entry(1, x, y, 10.0f + z);
+                break;
+            case 0xe:
+            case 0xf:
+                eff = effStampN64Entry(2, x, y, 10.0f + z);
+                STAMP_COL(eff, 0, 0, 200, 0, 0, 10);
+                break;
+            case 0xa:
+            case 0xb:
+            case 0xc:
+            case 0xd:
+            case 0x10:
+                eff = effStampN64Entry(2, x, y, 10.0f + z);
+                STAMP_COL(eff, 200, 0, 0, 10, 0, 0);
+                break;
+            default:
+                eff = effStampN64Entry(2, x, y, 10.0f + z);
+                STAMP_COL(eff, 200, 200, 200, 10, 10, 10);
+                break;
+        }
+#else
         switch (unit->currentKind) {
             case 0x17:
             case 0x84:
@@ -1246,6 +1320,7 @@ s32 BattleSetStatusDamage(u32* result, BattleUnit* unit, BattleUnitPart* part, u
                 STAMP_COL(eff, 200, 200, 200, 10, 10, 10);
                 break;
         }
+#endif
         switch (type) {
             case 0xe:
             case 0xf:
@@ -1449,9 +1524,13 @@ s32 BattleSetStatusDamageFromWeapon(BattleUnit* attacker, BattleUnit* target, Ba
                     }
                     break;
             }
+#ifdef VERSION_G8ME01_DEMO
+            BattleSetStatusDamage(&result, target, part, weapon->special, i, (s8)rate, levelDiff, time, strength);
+#else
             if (BattleSetStatusDamage(&result, target, part, weapon->special, i, (s8)rate, levelDiff, time, strength) && i == 18) {
                 btlDispPoseAnime(part);
             }
+#endif
         }
     }
     return result;

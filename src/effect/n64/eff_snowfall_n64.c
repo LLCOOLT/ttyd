@@ -206,6 +206,8 @@ void effSnowfallMain(EffectEntry* effect) {
     } else {
         dispEntry(CAMERA_3D_EFFECTB, dispCalcZ(&position), 10, (DispCallback)effSnowfallDisp, effect);
     }
+#elif defined(VERSION_G8ME01_DEMO)
+    dispEntry(CAMERA_3D, dispCalcZ(&position), 2, (DispCallback)effSnowfallDisp, effect);
 #else
     dispEntry(CAMERA_3D, dispCalcZ(&position), 10, (DispCallback)effSnowfallDisp, effect);
 #endif

@@ -93,8 +93,13 @@ static PoseTableEntry pose_table[] = {
     {39, "KNP_D_1"},
     {42, "KNP_R_1"},
     {40, "KNP_W_1"},
+#ifdef VERSION_G8ME01_DEMO
+    {63, "KNP_T_1"},
+    {67, "KNP_S_1"},
+#else
     {65, "KNP_T_1"},
     {69, "KNP_S_1"},
+#endif
 };
 
 static BattleDataEntry data_table[] = {

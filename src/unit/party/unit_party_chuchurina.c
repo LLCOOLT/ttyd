@@ -104,7 +104,39 @@ static void __makeTechMenuFunc(BattleCommand* command, s32* count);
 
 
 
+static BattleUnitDefense defence = {{0, 0, 0, 0, 0}};
+
+static BattleUnitDefenseAttr defence_attr = {{0, 0, 0, 0, 0}};
+
+static StatusVulnerability regist = {100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100};
+
 PoseTableEntry pose_table_chuchurina_stay[] = {
+#ifdef VERSION_G8ME01_DEMO
+    {9, "PCH_D_4"},
+    {2, "PCH_D_4"},
+    {3, "PCH_X_1"},
+    {4, "PCH_D_2"},
+    {5, "PCH_X_1"},
+    {1, "PCH_N_1"},
+    {27, "PCH_D_3"},
+    {28, "PCH_S_1"},
+    {37, "PCH_G_1"},
+    {31, "PCH_G_1"},
+    {39, "PCH_D_1"},
+    {40, "PCH_W_1"},
+    {42, "PCH_R_1"},
+    {57, "PCH_D_2"},
+    {56, "PCH_D_2"},
+    {58, "PCH_D_4"},
+    {59, "PCH_D_2"},
+    {63, "PCH_T_1"},
+    {52, "PCH_I_1"},
+    {65, "PCH_C_1"},
+    {62, "PCH_X_1"},
+    {49, "PCH_O_1"},
+    {45, "PCH_G_1"},
+    {67, "PCH_S_1"},
+#else
     {9, "PCH_D_4"},
     {2, "PCH_D_4"},
     {3, "PCH_X_1"},
@@ -129,6 +161,7 @@ PoseTableEntry pose_table_chuchurina_stay[] = {
     {49, "PCH_O_1"},
     {45, "PCH_G_1"},
     {69, "PCH_S_1"},
+#endif
 };
 
 static BattleDataEntry data_table[] = {
@@ -251,6 +284,15 @@ static EVT_BEGIN(damage_event)
     RETURN
 EVT_END()
 
+static EVT_BEGIN(attack_event)
+    RETURN
+EVT_END()
+
+static EVT_BEGIN(wait_event)
+    CALL(btlevtcmd_AnimeChangePoseFromTable, -2, 1)
+    RETURN
+EVT_END()
+
 BattleWeapon partyWeapon_ChuchurinaNormalAttackLeft = {
     "btl_wn_pcr_normal", // name
 #ifdef VERSION_G8ME01
@@ -280,7 +322,11 @@ BattleWeapon partyWeapon_ChuchurinaNormalAttackLeft = {
     2, // reserved_6F
     "msg_ac_binta", // acHelpMsg
     0x34047, // special
+#ifdef VERSION_G8ME01_DEMO
+    0x2, // counterResistFlags
+#else
     0x202, // counterResistFlags
+#endif
     0x80002004, // targetWeightFlags
     0, 0, 0, 0, 0, 0, 0, 0, // sleepChance..poisonTime
     0, 0, 0, 0, 0, 0, 0, 0, // poisonStrength..burnChance
@@ -326,7 +372,11 @@ BattleWeapon partyWeapon_ChuchurinaNormalAttackRight = {
     2, // reserved_6F
     "msg_ac_binta", // acHelpMsg
     0x34047, // special
+#ifdef VERSION_G8ME01_DEMO
+    0x2, // counterResistFlags
+#else
     0x202, // counterResistFlags
+#endif
     0x80002004, // targetWeightFlags
     0, 0, 0, 0, 0, 0, 0, 0, // sleepChance..poisonTime
     0, 0, 0, 0, 0, 0, 0, 0, // poisonStrength..burnChance
@@ -812,7 +862,11 @@ EVT_BEGIN(partyChuchurinaAttack_NormalAttack)
         SET_VALUE(LW(12), PTR(&partyWeapon_ChuchurinaNormalAttackRightLast))
     END_IF
     LABEL(21)
+#ifdef VERSION_G8ME01_DEMO
+    CALL(btlevtcmd_CommandPreCheckCounter, -2, LW(3), LW(4), 256, LW(0))
+#else
     CALL(btlevtcmd_PreCheckCounter, -2, LW(3), LW(4), LW(12), 256, LW(0))
+#endif
     SWITCH(LW(0))
         CASE_OR_EQUAL(7)
         CASE_OR_EQUAL(8)
@@ -825,11 +879,13 @@ EVT_BEGIN(partyChuchurinaAttack_NormalAttack)
         CASE_OR_EQUAL(15)
         CASE_OR_EQUAL(16)
         CASE_OR_EQUAL(17)
+#ifndef VERSION_G8ME01_DEMO
         IF_INT_EQUAL(LW(12), PTR(&partyWeapon_ChuchurinaNormalAttackLeft))
             SET_VALUE(LW(12), PTR(&partyWeapon_ChuchurinaNormalAttackLeftLast))
         ELSE
             SET_VALUE(LW(12), PTR(&partyWeapon_ChuchurinaNormalAttackRightLast))
         END_IF
+#endif
         BEGIN_SIBLING_EVENT_GET_ID(LW(15))
             SET_VALUE(LW(7), LW(13))
             CALL(btlevtcmd_GetRotate, -2, -250000000, LW(0), -250000000)
@@ -1081,6 +1137,11 @@ EVT_BEGIN(partyChuchurinaAttack_NormalAttack)
         CALL_CHILD(btldefaultevt_SuitoruBadgeEffect)
         CALL(btlevtcmd_StartWaitEvent, -2)
         RETURN
+EVT_END()
+
+static EVT_BEGIN(main_evt)
+    CALL(mono_main)
+    RETURN
 EVT_END()
 
 #ifdef VERSION_G8ME01
@@ -1546,7 +1607,11 @@ EVT_BEGIN(partyChuchurinaAttack_MadowaseAttack)
         CALL(btlevtcmd_AcSetFlag, 49)
     END_SWITCH
     CALL(btlevtcmd_AcSetParamAll, 1, 240, 178, LW(0), LW(1), 100, 1, -250000000)
+#ifdef VERSION_G8ME01_DEMO
+    CALL(btlevtcmd_AcSetGaugeParam, 100, 100, 100, 100)
+#else
     CALL(btlevtcmd_AcSetGaugeParam, 34, 68, 100, 100)
+#endif
     CALL(btlevtcmd_SetupAC, -2, 6, 1, 0)
     CALL(btlevtcmd_GetPos, -2, LW(0), -250000000, -250000000)
     CALL(evt_btl_camera_set_mode, 0, 3)
@@ -1899,8 +1964,15 @@ EVT_BEGIN(partyChuchurinaAttack_MadowaseAttack)
         CALL(btlevtcmd_DivePosition, -2, LW(0), LW(1), LW(2), 0, 0, 2, 0, -1)
         CALL(btlevtcmd_SetRotate, -2, 0, 0, 0)
         CASE_DEFAULT
+#ifdef VERSION_G8ME01_DEMO
+        CALL(btlevtcmd_AudienceDeclareAcrobatResult, LW(12), 0, 0, 0, 0)
+        CALL(btlevtcmd_AnimeChangePose, -2, 1, STRING("PCH_D_3"))
+        CALL(btlevtcmd_AnimeWaitPlayComplete, -2, 1)
+        WAIT_MS(300)
+#else
         CALL(btlevtcmd_SetRotate, -2, 0, 0, 0)
         CALL(evt_audience_acrobat_notry)
+#endif
         CALL(evt_audience_ap_recovery)
         CALL(btlevtcmd_InviteApInfoReport)
         CALL(evt_btl_camera_set_mode, 0, 0)
@@ -2410,11 +2482,13 @@ EVT_BEGIN(partyChuchurinaAttack_Kiss)
         CALL(btlevtcmd_CalculateFaceDirection, -2, -1, LW(3), LW(4), 16, LW(15))
         CALL(btlevtcmd_ChangeFaceDirection, -2, LW(15))
     END_IF
+#ifndef VERSION_G8ME01_DEMO
     CALL_CHILD(subsetevt_check_target_movable)
     IF_INT_NOT_EQUAL(LW(0), 0)
         CALL(btlevtcmd_CalculateFaceDirection, LW(3), LW(4), -2, -1, 16, LW(15))
         CALL(btlevtcmd_ChangeFaceDirection, LW(3), LW(15))
     END_IF
+#endif
     CALL(btlevtcmd_CommandGetWeaponActionLv, LW(0))
     CALL(btlevtcmd_AcSetDifficulty, -2, LW(0))
     CALL(btlevtcmd_AcGetDifficulty, LW(0))
@@ -2457,13 +2531,19 @@ EVT_BEGIN(partyChuchurinaAttack_Kiss)
     CALL(btlevtcmd_StartAC, 1)
     BEGIN_SIBLING_EVENT
         CALL(btlevtcmd_AnimeChangePoseType, -2, 1, 40)
+#ifndef VERSION_G8ME01_DEMO
         CALL(btlevtcmd_GetStatusMg, -2, LW(6))
         CALL(btlevtcmd_GetStatusMg, LW(3), LW(7))
         MULTIPLY_FLOAT(LW(6), 12)
         MULTIPLY_FLOAT(LW(7), 7)
+#endif
         CALL(btlevtcmd_GetPos, LW(3), LW(0), LW(1), LW(2))
+#ifdef VERSION_G8ME01_DEMO
+        CALL(btlevtcmd_FaceDirectionAdd, LW(3), LW(0), 20)
+#else
         CALL(btlevtcmd_FaceDirectionAdd, LW(3), LW(0), LW(6))
         CALL(btlevtcmd_FaceDirectionAdd, LW(3), LW(0), LW(7))
+#endif
         CALL(btlevtcmd_MovePosition, -2, LW(0), LW(1), LW(2), 235, -1, 0)
         CALL(btlevtcmd_CalculateFaceDirection, -2, -1, LW(3), LW(4), 16, LW(15))
         CALL(btlevtcmd_ChangeFaceDirection, -2, LW(15))
@@ -2494,6 +2574,7 @@ EVT_BEGIN(partyChuchurinaAttack_Kiss)
     CALL(evt_btl_camera_set_zoom, 0, 350)
     CALL(btlevtcmd_AnimeChangePose, -2, 1, STRING("PCH_K_1"))
     WAIT_FRAMES(6)
+#ifndef VERSION_G8ME01_DEMO
     IF_INT_GREATER_OR_EQUAL(LW(5), 0)
         CALL_CHILD(subsetevt_check_target_movable)
         IF_INT_NOT_EQUAL(LW(0), 0)
@@ -2502,7 +2583,15 @@ EVT_BEGIN(partyChuchurinaAttack_Kiss)
     END_IF
     CALL(btlevtcmd_GetStatusMg, -2, LW(6))
     MULTIPLY_FLOAT(LW(6), 16)
+#endif
     CALL(btlevtcmd_GetPos, -2, LW(0), LW(1), LW(2))
+#ifdef VERSION_G8ME01_DEMO
+    CALL(btlevtcmd_FaceDirectionAdd, -2, LW(0), 25)
+    ADD(LW(1), 40)
+    CALL(btlevtcmd_GetFaceDirection, -2, LW(6))
+    MULTIPLY(LW(6), -45)
+    CALL(evt_eff, STRING(""), STRING("kiss"), 0, LW(0), LW(1), LW(2), LW(6), 0, 0, 0, 0, 0, 0, 0)
+#else
     CALL(btlevtcmd_FaceDirectionAdd, -2, LW(0), LW(6))
     CALL(btlevtcmd_GetStatusMg, -2, LW(6))
     MULTIPLY_FLOAT(LW(6), 40)
@@ -2510,6 +2599,7 @@ EVT_BEGIN(partyChuchurinaAttack_Kiss)
     CALL(btlevtcmd_GetFaceDirection, LW(3), LW(6))
     MULTIPLY(LW(6), 45)
     CALL(evt_eff, 0, STRING("kiss"), 0, LW(0), LW(1), LW(2), LW(6), 0, 0, 0, 0, 0, 0, 0)
+#endif
     CALL(btlevtcmd_snd_se, -2, STRING("SFX_BTL_CHURINA_KISS1"), -250000000, 0, -250000000)
     WAIT_FRAMES(40)
     CALL(btlevtcmd_GetPartsPos, LW(3), LW(4), LW(12), LW(13), LW(14))
@@ -2541,11 +2631,13 @@ EVT_BEGIN(partyChuchurinaAttack_Kiss)
     CALL(evt_btl_camera_set_moveSpeedLv, 0, 1)
     CALL(evt_audience_ap_recovery)
     CALL(btlevtcmd_InviteApInfoReport)
+#ifndef VERSION_G8ME01_DEMO
     CALL_CHILD(subsetevt_check_target_movable)
     IF_INT_NOT_EQUAL(LW(0), 0)
         CALL(btlevtcmd_ResetFaceDirection, LW(3))
         CALL(btlevtcmd_StartWaitEvent, LW(3))
     END_IF
+#endif
     CALL(btlevtcmd_AnimeChangePoseType, -2, 1, 42)
     CALL(btlevtcmd_GetHomePos, -2, LW(0), LW(1), LW(2))
     CALL(btlevtcmd_SetMoveSpeed, -2, FLOAT(4.0f))
@@ -2687,26 +2779,6 @@ static EVT_BEGIN(attack_audience_event)
     RETURN
 EVT_END()
 #endif
-
-static BattleUnitDefense defence = {{0, 0, 0, 0, 0}};
-
-static BattleUnitDefenseAttr defence_attr = {{0, 0, 0, 0, 0}};
-
-static StatusVulnerability regist = {100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100};
-
-static EVT_BEGIN(attack_event)
-    RETURN
-EVT_END()
-
-static EVT_BEGIN(wait_event)
-    CALL(btlevtcmd_AnimeChangePoseFromTable, -2, 1)
-    RETURN
-EVT_END()
-
-static EVT_BEGIN(main_evt)
-    CALL(mono_main)
-    RETURN
-EVT_END()
 
 
 s32 mono_alpha;

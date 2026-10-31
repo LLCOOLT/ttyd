@@ -531,8 +531,16 @@ static inline DEMOPadStatus* GET_DEMO_PAD_STATUS(u32 i) {
 #endif
 void makeKey(void) {
     s32 delay;
+#ifdef VERSION_G8ME01_DEMO
+    // The demo keeps button/dirs in 32-bit locals: with no u16 masks to fold, the global optimiser's constant
+    // propagation changes nothing in makeKey, so its dead-li deletion never runs and loop 2's count register
+    // is colour-coalesced with i's zero (the demo's loop-2 register assignment).
+    u32 button;
+    u32 dirs;
+#else
     u16 button;
     u16 dirs;
+#endif
     int i;
 
     DEMOPadRead();
@@ -598,6 +606,7 @@ void makeKey(void) {
     }
 #endif
 
+#ifndef VERSION_G8ME01_DEMO
     if (gp->rumbleEnabled) {
         for (i = 0; i < 4; i++) {
             if (gp->rumbleHardStop[i]) {
@@ -620,6 +629,7 @@ void makeKey(void) {
             }
         }
     }
+#endif
     gp->keyDataValid = 1;
 }
 
@@ -1022,6 +1032,22 @@ void systemStrippedPool1(const char** str, f32* f, f64* d, f32 x) {
 #else
 void systemStrippedPool1(const char** str, f32* f, f64* d, f32 x) {
     f[0] = 1.0f;
+#ifdef VERSION_G8ME01_DEMO
+    // the demo's small-data limit leaves the 6-byte names in .rodata, so the whole name table stays
+    str[0] = "LINEAR";
+    str[1] = "ACCEL";
+    str[2] = "DOUBLE_ACCEL";
+    str[3] = "TRIPLE_ACCEL";
+    str[4] = "DECEL";
+    str[5] = "DOUBLE_DECEL";
+    str[6] = "TRIPLE_DECEL";
+    str[7] = "GEMINI";
+    str[8] = "BURURUN";
+    str[9] = "BURURUN_DECEL";
+    str[10] = "BOUND";
+    str[11] = "SIN_ACCEL";
+    str[12] = "SIN_DECEL";
+#else
     str[0] = "LINEAR";
     str[1] = "DOUBLE_ACCEL";
     str[2] = "TRIPLE_ACCEL";
@@ -1032,6 +1058,7 @@ void systemStrippedPool1(const char** str, f32* f, f64* d, f32 x) {
     str[7] = "BURURUN_DECEL";
     str[8] = "SIN_ACCEL";
     str[9] = "SIN_DECEL";
+#endif
     f[1] = sqrtf(x);
     str[10] = "[%8s:% 4d] %s";
     d[0] = 1.5;

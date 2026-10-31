@@ -30,6 +30,13 @@
 #include "manager/evtmgr_cmd.h"
 #include "driver/fadedrv.h"
 
+// The fade types used here are two lower in the demo.
+#ifdef VERSION_G8ME01_DEMO
+#define FADE_TYPE(n) ((n) - 2)
+#else
+#define FADE_TYPE(n) (n)
+#endif
+
 
 #define STAGE_WORK(wp) (&(wp)->stageObjectWork)
 
@@ -90,10 +97,6 @@ EVT_BEGIN(nanika_luck_event)
     END_SIBLING_EVENT
     CALL(_set_effect_luck)
     CALL(btlevtcmd_WaitEventEnd, PTR(0xfe363c8f))
-    RETURN
-EVT_END()
-EVT_BEGIN(_default_haikei_set_entry_event)
-    CALL(_set_haikei_entry_scale)
     RETURN
 EVT_END()
 
@@ -182,6 +185,11 @@ const char* _rule_msg_table_after[] = {
 	"a", "a", "a", "stg3_tou_cp_047", "a", "a", "a", "stg3_tou_cp_054",
 	"stg3_tou_cp_053", "stg3_tou_cp_052", "a", "a",
 };
+
+EVT_BEGIN(_default_haikei_set_entry_event)
+    CALL(_set_haikei_entry_scale)
+    RETURN
+EVT_END()
 
 void BattleSequenceManager(void) { //1:1
 	BattleWork* wp = _battleWorkPointer;
@@ -475,7 +483,7 @@ void btlseqFirstAct(BattleWork* wp) {
 				break;
 			}
 			{
-				fadeEntry(0x17, 200, c);
+				fadeEntry(FADE_TYPE(0x17), 200, c);
 			}
 			wp->curtainSfxId = psndSFXOn("SFX_OFF_BTL_START_CURTAIN_UP1");
 			BattleSetSeq(wp, SEQ_FIRST_ACT, 0x2000002);
@@ -944,6 +952,9 @@ void btlseqTurn(BattleWork *wp)
     {
       break;
     }
+#ifdef VERSION_G8ME01_DEMO
+      BattleIncSeq(wp, SEQ_TURN);
+#else
       if (BattleCheckConcluded(wp))
     {
       BattleSetSeq(wp, SEQ_UNKNOWN, 3);
@@ -953,6 +964,7 @@ void btlseqTurn(BattleWork *wp)
     {
       BattleIncSeq(wp, SEQ_TURN);
     }
+#endif
       break;
 
     case 0x3000012:
@@ -1638,7 +1650,9 @@ void btlseqTurn(BattleWork *wp)
         sfx |= ret;
         if (ret)
         {
+#ifndef VERSION_G8ME01_DEMO
           BtlUnit_ResetMoveStatus(unit);
+#endif
           evt = evtEntry(subsetevt_status_recovery, 10, 0);
           if (evt)
           {
@@ -1830,6 +1844,9 @@ void btlseqTurn(BattleWork *wp)
       {
         break;
       }
+#ifdef VERSION_G8ME01_DEMO
+        BattleIncSeq(wp, SEQ_TURN);
+#else
         if (BattleCheckConcluded(wp))
       {
         BattleSetSeq(wp, SEQ_UNKNOWN, 3);
@@ -1839,6 +1856,7 @@ void btlseqTurn(BattleWork *wp)
       {
         BattleIncSeq(wp, SEQ_TURN);
       }
+#endif
         break;
 
     }
@@ -1958,7 +1976,11 @@ void btlseqTurn(BattleWork *wp)
             unit->currentHp = unit->maxHp;
           }
           BtlUnit_GetPartsWorldPos(BtlUnit_GetPartsPtr(unit, BtlUnit_GetBodyPartsId(unit)), &heartX, &heartY, &heartZ);
+#ifdef VERSION_G8ME01_DEMO
+          heartY += BtlUnit_GetHeight(unit);
+#else
           heartY += unit->mSizeMultiplier * BtlUnit_GetHeight(unit);
+#endif
           effRecoveryEntry(0, n, heartX, heartY, heartZ);
           evt = evtEntry(subsetevt_happy_heart, 10, 0);
           if (evt)
@@ -2008,7 +2030,11 @@ void btlseqTurn(BattleWork *wp)
         {
           BtlUnit_RecoverFp(unit, n);
           BtlUnit_GetPartsWorldPos(BtlUnit_GetPartsPtr(unit, BtlUnit_GetBodyPartsId(unit)), &flowerX, &flowerY, &flowerZ);
+#ifdef VERSION_G8ME01_DEMO
+          flowerY += BtlUnit_GetHeight(unit);
+#else
           flowerY += unit->mSizeMultiplier * BtlUnit_GetHeight(unit);
+#endif
           effRecoveryEntry(1, n, flowerX, flowerY, flowerZ);
           evt = evtEntry(subsetevt_happy_flower, 10, 0);
           if (evt)
@@ -2278,7 +2304,11 @@ void btlseqMove(BattleWork* wp) {
 				for (i = 0; i < 64; i++) {
 					unit = BattleGetUnitPtr(wp, i);
 					if (unit) {
+#ifdef VERSION_G8ME01_DEMO
+						unit->mTokenFlags &= 0x80000000;
+#else
 						unit->mTokenFlags &= 0x80002000;
+#endif
 						unit->totalHpDamageTaken = 0;
 						unit->hpDamageTaken = 0;
 						unit->hpDamageCount = 0;
@@ -2294,7 +2324,11 @@ void btlseqMove(BattleWork* wp) {
 					id = wp->movePriorityQueue[i];
 					if (id != -1) {
 						unit = BattleGetUnitPtr(wp, id);
+#ifdef VERSION_G8ME01_DEMO
+						if (unit) {
+#else
 						if (unit && unit->movesRemaining > 0) {
+#endif
 							state = unit->moveState;
 							if (state != 10 && (!BtlUnit_CheckStatus(unit, STATUS_INSTANT_KILL) || (unit->mAttributeFlags & 0x10000))) {
 								if (state != 1) {
@@ -2408,8 +2442,12 @@ BOOL BattlePhaseEndCheck(void) {
 	for (i = 0; i < 64; i++) {
 		if (wp->movePriorityQueue[i] != -1) {
 			unit = BattleGetUnitPtr(wp, wp->movePriorityQueue[i]);
+#ifdef VERSION_G8ME01_DEMO
+			if (unit && unit->moveState != 10 && !BtlUnit_CheckStatus(unit, STATUS_INSTANT_KILL)) {
+#else
 			if (unit && unit->moveState != 10 && unit->movesRemaining > 0 &&
 				!BtlUnit_CheckStatus(unit, STATUS_INSTANT_KILL)) {
+#endif
 				break;
 			}
 		}
@@ -2610,12 +2648,16 @@ void btlseqAct(BattleWork* wp) {
 						}
 						if (unit->movesRemaining <= 0) {
 							unit->moveState = 10;
+#ifdef VERSION_G8ME01_DEMO
+							unit->activeTurns = 0;
+#else
 							if (!(unit->mTokenFlags & 0x2000)) {
 								unit->activeTurns = 0;
 							}
 							else {
 								unit->mTokenFlags &= ~0x2000;
 							}
+#endif
 							if (!BtlUnit_GetBelong(unit) && unit->attackPhase == 0x4000002 &&
 								!BattlePhaseEndCheck() && !(wp->flags & 0x2000)) {
 								unit->mMoveColorLv = 0x60;
@@ -2729,7 +2771,11 @@ void btlseqPhaseFirstProcess(BattleWork* wp) {
 		unit = BattleGetUnitPtr(wp, i);
 		if (unit) {
 			unit->mMoveColorLv = 0xFF;
+#ifdef VERSION_G8ME01_DEMO
+			if (unit->moveState == 10) {
+#else
 			if (unit->moveState == 10 && !BtlUnit_CheckStatus(unit, 0x14)) {
+#endif
 				continue;
 			}
 			if (unit->attackPhase == BattleGetSeq(wp, SEQ_PHASE) &&

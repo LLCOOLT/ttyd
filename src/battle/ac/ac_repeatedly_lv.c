@@ -8,6 +8,13 @@
 #include "system.h"
 #include <string.h>
 
+// The demo draws the action command icons with icon flag 4; retail uses 0x10.
+#ifdef VERSION_G8ME01_DEMO
+#define AC_ICON_FLAGS 4
+#else
+#define AC_ICON_FLAGS 0x10
+#endif
+
 #pragma optimize_for_size on
 
 s32 BattleACGetButtonIcon(s32 button, s32 pressed);
@@ -387,35 +394,35 @@ static void actionCommandDisp(f32 x, f32 y) {
             Vec pos = {0.0f, 0.0f, 0.0f};
             pos.x = -200.0f + x;
             pos.y = 70.0f + y;
-            RL_IconDisp(&pos, 0x10, idleA, 1.0f);
+            RL_IconDisp(&pos, AC_ICON_FLAGS, idleA, 1.0f);
         } else {
             Vec pos = {0.0f, 0.0f, 0.0f};
             pos.x = -200.0f + x;
             pos.y = 70.0f + y;
-            RL_IconDisp(&pos, 0x10, pressedA, 1.0f);
+            RL_IconDisp(&pos, AC_ICON_FLAGS, pressedA, 1.0f);
         }
     } else {
         if ((phase & 1) == 1) {
             Vec pos = {0.0f, 0.0f, 0.0f};
             pos.x = -225.0f + x + off0;
             pos.y = 70.0f + y;
-            RL_IconDisp(&pos, 0x10, idleA, 1.0f);
+            RL_IconDisp(&pos, AC_ICON_FLAGS, idleA, 1.0f);
             {
                 Vec pos2 = {0.0f, 0.0f, 0.0f};
                 pos2.x = -175.0f + x + off1;
                 pos2.y = 70.0f + y;
-                RL_IconDisp(&pos2, 0x10, pressedB, 1.0f);
+                RL_IconDisp(&pos2, AC_ICON_FLAGS, pressedB, 1.0f);
             }
         } else {
             Vec pos = {0.0f, 0.0f, 0.0f};
             pos.x = -225.0f + x + off0;
             pos.y = 70.0f + y;
-            RL_IconDisp(&pos, 0x10, pressedA, 1.0f);
+            RL_IconDisp(&pos, AC_ICON_FLAGS, pressedA, 1.0f);
             {
                 Vec pos2 = {0.0f, 0.0f, 0.0f};
                 pos2.x = -175.0f + x + off1;
                 pos2.y = 70.0f + y;
-                RL_IconDisp(&pos2, 0x10, idleB, 1.0f);
+                RL_IconDisp(&pos2, AC_ICON_FLAGS, idleB, 1.0f);
             }
         }
     }
@@ -476,7 +483,7 @@ static void actionCommandDisp(f32 x, f32 y) {
         Vec pos = {0.0f, 0.0f, 0.0f};
         pos.x = -288.0f + x + (f32)(ac->params[6] * 0xB0) / 100.0f;
         pos.y = 45.0f + y;
-        RL_IconDisp(&pos, 0x10, ICON_096, 1.0f);
+        RL_IconDisp(&pos, AC_ICON_FLAGS, ICON_096, 1.0f);
     }
     if (ac->acFlags & 4) {
         Mtx m3, m1, m2;

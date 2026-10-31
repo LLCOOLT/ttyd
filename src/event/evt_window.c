@@ -6,6 +6,7 @@
 #include "manager/winmgr.h"
 #include "mario/mario.h"
 #include "mario/mario_pouch.h"
+#include "mario/mariost.h"
 #include "memory.h"
 #include "system.h"
 #include "win/win_main.h"
@@ -42,7 +43,15 @@ typedef struct OneMsgWin {
 #else
 #define EW_ICON_OFS 0
 #endif
+// icon draw flags (the demo passes 4)
+#ifdef VERSION_G8ME01_DEMO
+#define EW_ICON_FLAGS 4
+#else
+#define EW_ICON_FLAGS 0x10
+#endif
+#ifndef VERSION_G8ME01_DEMO
 s32 coinwin_se_wait;
+#endif
 s32 unk_80418b3c;
 static void coin_disp(WinMgrEntry* entry);
 static void oneMessageDisp(WinMgrEntry* entry);
@@ -54,6 +63,27 @@ WinMgrDesc coin_desc = {
 	2, 0, 8, -250, -75, 150, 45, {0xF0, 0xF0, 0xF0, 0xFF}, NULL, coin_disp
 };
 
+#ifdef VERSION_G8ME01_DEMO
+USER_FUNC(evt_win_item_select) {
+	EvtWord* args = event->args;
+	s32 type = evtGetValue(event, args[0]);
+	WinMgrSelect* sel;
+	s32 result;
+	if (isFirstCall) {
+		event->userdatap[0] = winMgrSelectEntry(type, 0, 1);
+		marioKeyOff();
+	}
+	sel = event->userdatap[0];
+	result = winMgrSelect(sel);
+	if (result == 0) {
+		return EVT_RETURN_BLOCK;
+	}
+	winMgrSelectDelete(sel);
+	marioKeyOn();
+	evtSetValue(event, args[1], result);
+	return EVT_RETURN_DONE;
+}
+#else
 USER_FUNC(evt_win_item_select) {
 	EvtWord* args = event->args;
 	s32 flag = evtGetValue(event, args[0]);
@@ -79,6 +109,7 @@ USER_FUNC(evt_win_item_select) {
 	}
 	return EVT_RETURN_DONE;
 }
+#endif
 
 USER_FUNC(evt_win_other_select) {
 	EvtWord* args = event->args;
@@ -280,9 +311,9 @@ static void coin_disp(WinMgrEntry* entry) {
 	PSMTXTrans(pos, -220.f, -113.f, 0.f);
 	PSMTXScale(scale, 0.7f, 0.7f, 0.7f);
 	PSMTXConcat(pos, scale, pos);
-	iconDispGx2(pos, 0x10, icon);
+	iconDispGx2(pos, EW_ICON_FLAGS, icon);
 	PSMTXTrans(pos, -192.f, -113.f, 0.f);
-	iconDispGx2(pos, 0x10, 0x1D6 + EW_ICON_OFS);
+	iconDispGx2(pos, EW_ICON_FLAGS, 0x1D6 + EW_ICON_OFS);
 	PSMTXTrans(pos, -126.f, -113.f, 0.f);
 	{
 		GXColor white = {0xFF, 0xFF, 0xFF, 0xFF};
@@ -300,14 +331,22 @@ static void coin_disp(WinMgrEntry* entry) {
 		}
 		w->timer++;
 		w->timer = w->timer % 1200;
+#ifdef VERSION_G8ME01_DEMO
+		if (__abs(target - w->coins) == 1 || gp->retraceCount % 6 == 0) {
+			psndSFXOn("SFX_COUNT_COIN1");
+		}
+#else
 		if (coinwin_se_wait == 0) {
 			psndSFXOn(SFX_NAME_WORD(0x2005B));
 			coinwin_se_wait = 7;
 		}
+#endif
 	}
+#ifndef VERSION_G8ME01_DEMO
 	if (coinwin_se_wait > 0) {
 		coinwin_se_wait--;
 	}
+#endif
 }
 
 USER_FUNC(evt_win_coin_on) {

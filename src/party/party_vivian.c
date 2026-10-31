@@ -7,6 +7,7 @@
 #include "system.h"
 #include <string.h>
 #include "mario/mario_sbr.h"
+#include "mario/mario_cam.h"
 
 #ifdef VERSION_G8ME01
 // US has no local duplicate: this is the global vivian_init
@@ -29,6 +30,15 @@ typedef struct VivianTail {
 
 #define TAIL_OFF(p) (((VivianTail*)&(p)->field_4F)->off)
 
+#ifdef VERSION_G8ME01_DEMO
+// the demo keeps the tail flags in the vivian work and hides with Mario's first draw offset
+#define VIV_TAIL(p) ((p)->work.vivian.tailFlags)
+#define VIV_MARIO_OFS(m) ((m)->dispOfs)
+#else
+#define VIV_TAIL(p) ((p)->tailFlags)
+#define VIV_MARIO_OFS(m) ((m)->dispOfs2)
+#endif
+
 extern void partyMoveFlyInit(PartyEntry* party, s32 arg);
 extern void partyFlyMain(PartyEntry* party);
 extern void partyPaperOff(PartyEntry* party);
@@ -38,6 +48,7 @@ extern char* partyChgPoseId(PartyEntry* party, s32 index);
 #pragma explicit_zero_data reset
 s32 vivian_cancel_req;
 
+#ifndef VERSION_G8ME01_DEMO
 void N_marioForceVivianAnime(void) {
     static const u32 gap_09_8041DF6C_sdata2 = 0;
     MarioWork* mario = marioGetPtr();
@@ -51,6 +62,7 @@ void N_marioForceVivianAnime(void) {
     mario->poseTime = 0x18;
     animPoseSetLocalTime(mario->paperAnimGroupId[marioAnimeId()], mario->poseTime);
 }
+#endif
 
 void mot_vivian(void) {
     MarioWork* mario = marioGetPtr();
@@ -62,15 +74,31 @@ void mot_vivian(void) {
         mario->airTimer = 0;
         mario->currSubMotionId = 0;
         mario->baseSpeed = 0.0f;
+#ifndef VERSION_G8ME01_DEMO
         mario->hitobjFront = NULL;
         mario->hitobjFrontA = NULL;
         mario->hitobjPush = NULL;
         mario->hitobjWall = NULL;
+#endif
     }
 }
 
 
+#ifdef VERSION_G8ME01_DEMO
+static inline void L_partyVivianTailStop(PartyEntry* party) {
+    if (party->currentMemberId == 6) {
+        VIV_TAIL(party) |= 1;
+    }
+}
+
+static inline void L_partyVivianTailStart(PartyEntry* party) {
+    if (party->currentMemberId == 6) {
+        VIV_TAIL(party) &= ~1;
+    }
+}
+#else
 void L_partyVivianTailStart(PartyEntry* party);
+#endif
 
 void mot_vivian_post(void) {
     PartyEntry* party = (PartyEntry*)partyGetPtr(marioGetPartyId());
@@ -81,7 +109,7 @@ void mot_vivian_post(void) {
         marioPaperOff();
         {
             Vec zero = {0.0f, 0.0f, 0.0f};
-            mario->dispOfs2 = zero;
+            VIV_MARIO_OFS(mario) = zero;
         }
         mario->flags &= ~0x400;
         if (party) {
@@ -99,6 +127,9 @@ void mot_vivian_post(void) {
             partyChgPoseId(party, 1);
             L_partyVivianTailStart(party);
         }
+#ifdef VERSION_G8ME01_DEMO
+        camFollowYOn();
+#endif
     } else if (party && party->currentMemberId == 6 && (party->flags & 0x100)) {
         goto cancel;
     }
@@ -113,7 +144,7 @@ void vivian_init_801809C0(PartyEntry* party) {
     party->height = 35.0f;
     party->width = 24.0f;
     party->work.vivian.shadowSize = 10.0f;
-    party->tailFlags = 0;
+    VIV_TAIL(party) = 0;
     party->trailPos = party->position;
     party->work.vivian.rippleEffect = NULL;
     vivian_cancel_req = 0;
@@ -151,6 +182,7 @@ void vivianUnhold(PartyEntry* party) {
     }
 }
 
+#ifndef VERSION_G8ME01_DEMO
 void L_partyVivianTailStop(PartyEntry* party) {
     if (party->currentMemberId == 6) {
         party->tailFlags |= 1;
@@ -178,11 +210,15 @@ BOOL N_vivianDisplayTailCheck(PartyEntry* party) {
     }
     return TRUE;
 }
+#endif
 
 void vivianShadow(PartyEntry* party) {
     f32 dx, dy, dz;
 
-    if (party && party->currentMemberId == 6) {
+#ifndef VERSION_G8ME01_DEMO
+    if (party && party->currentMemberId == 6)
+#endif
+    {
         dx = 0.1f * (party->position.x - party->trailPos.x);
         dy = 0.1f * (party->position.y - party->trailPos.y);
         dz = 0.1f * (party->position.z - party->trailPos.z);
@@ -225,6 +261,273 @@ extern void marioChgSmallJumpMotion(void);
 extern void marioChgMot(s32 mot);
 
 #pragma opt_common_subs off
+#ifdef VERSION_G8ME01_DEMO
+// demo: Vivian always hides 13 behind Mario, with no ground search outside the hidden state
+static inline void vivianFollow(PartyEntry* party) {
+    MarioWork* m = party->playerPtr;
+    f32 ofs;
+
+    party->moveTarget = m->position;
+    movePos(&party->moveTarget.x, &party->moveTarget.z, -13.0f, toMovedirSimple(m->displayDirection));
+    if (0.0f == m->displayDirectionTarget) {
+        ofs = -2.5f;
+    } else {
+        ofs = -2.5f;
+    }
+    movePos(&party->moveTarget.x, &party->moveTarget.z, ofs, toMovedir(270.0f + m->displayDirection));
+}
+
+void vivian_use(PartyEntry* party) {
+    f32 gx, gy, gz;
+    void* hit;
+    void* rip;
+    MarioWork* p;
+    MarioWork* m = party->playerPtr;
+
+    if (party->trigFlags & 8) {
+        party->trigFlags &= ~8;
+        party->useMotionId = 0;
+        party->work.vivian.shadowSize = 10.0f;
+        party->trailPos = party->position;
+        party->work.vivian.followOfs = 0.0f;
+        vivian_cancel_req = 0;
+        camFollowYOff();
+    }
+    m->baseSpeed = 0.0f;
+    party->moveSpeed = 0.0f;
+
+    switch (party->useMotionId) {
+    case 0:
+        marioChgMot(0x1C);
+        vivianFollow(party);
+        party->targetDir = angleABf(party->position.x, party->position.z, party->moveTarget.x, party->moveTarget.z);
+        party->displayDirection = m->displayDirection;
+        party->displayDirectionTarget = m->displayDirectionTarget;
+        party->moveSpeed = 0.0f;
+        party->velY = 0.0f;
+        party->useMotionId = 1;
+        party->moveFrames = 6;
+        partyChgPose(party, "PTR_A2_1");
+    case 1:
+        vivianFollow(party);
+        party->position.x += (party->moveTarget.x - party->position.x) / party->moveFrames;
+        party->position.y += (party->moveTarget.y - party->position.y) / party->moveFrames;
+        party->position.z += (party->moveTarget.z - party->position.z) / party->moveFrames;
+        party->trailPos = party->position;
+        if (--party->moveFrames > 0) {
+            break;
+        }
+        party->displayDirectionTarget = m->displayDirectionTarget;
+        party->moveDir = toMovedirSimple(party->displayDirectionTarget);
+        party->trailPos = party->position;
+        party->flags2 |= 0x200000;
+        partyChgPose(party, "PTR_A2_2");
+        party->useMotionId = 2;
+        party->moveFrames = 2;
+    case 2:
+        m->dispFlags |= 0x1000;
+        partyChgPose(party, "PTR_A2_3");
+        partyPaperOn((PartyEntry*)party, "p_bibi");
+        partyChgPaper(party, "PM_B_1");
+        party->useMotionId = 3;
+        party->moveFrames = 4;
+    case 3:
+        party->dispOfs.y += 1.6f;
+        m->dispFlags |= 0x1000;
+        marioPaperOn("p_bibi");
+        marioChgPose("M_B_3");
+        marioChgPaper("PM_B_1");
+        party->useMotionId = 4;
+        party->moveFrames = 30;
+        psndSFXOn_3D(0x936, &party->position);
+    case 4:
+        if (30 - party->moveFrames <= 24) {
+            party->dispOfs.y += 0.4f;
+            m->dispOfs.y += 0.4f;
+            if (party->dispOfs.y >= 8.0f) {
+                party->dispOfs.y = 8.0f;
+            }
+            if (m->dispOfs.y >= 8.0f) {
+                m->dispOfs.y = 8.0f;
+            }
+        }
+        party->work.vivian.shadowSize += 1.0f;
+        if (party->work.vivian.shadowSize >= 20.0f) {
+            party->work.vivian.shadowSize = 20.0f;
+            m->dispFlags |= 0x1000;
+        }
+        if (--party->moveFrames > 0) {
+            break;
+        }
+        rip = effRippleEntry(1, party->playerPtr->position.x, 1.5f + party->playerPtr->position.y, party->playerPtr->position.z);
+        party->work.vivian.rippleEffect = rip;
+        if (party->camId != 4) {
+            effRippleSetCamId(rip, party->camId);
+        }
+        psndSFXOn_3D(0x935, &party->position);
+        L_partyVivianTailStop(party);
+        party->useMotionId = 5;
+    case 5:
+        party->work.vivian.shadowSize -= 1.0f;
+        if (party->work.vivian.shadowSize <= 10.0f) {
+            party->work.vivian.shadowSize = 10.0f;
+            party->useMotionId = 10;
+            m->flags |= 0x400;
+        }
+        break;
+    case 10:
+        hit = marioSearchGround(&gx, &gy, &gz, 100.0f, -100.0f);
+        if (hit && !(hitGetAttr(hit) & 0xA00)) {
+            if (m->floorMove.y || m->floorMove.x) {
+                if ((f32)m->screenY > 480.0f || (f32)m->screenY < 50.0f) {
+                    camFollowYOn();
+                }
+            }
+            if (m->floorMove.y < 0.0f) {
+                gx += 0.2f;
+            }
+            m->hitobjStandOn = hit;
+            m->position.y = gx;
+            party->position.y = gx;
+        }
+        partyUpdateKeyData(party);
+        if (vivian_cancel_req) {
+            party->useMotionId = 20;
+        }
+        if (!(party->flags & 0x80000000) && (party->buttonTrg & 0x600)) {
+            party->useMotionId = 20;
+        }
+        break;
+    }
+
+    m->position.x += m->floorMove.x;
+    m->position.z += m->floorMove.z;
+    m->position.y += m->floorMove.y;
+    party->position.x += m->floorMove.x;
+    party->position.z += m->floorMove.z;
+    party->position.y += m->floorMove.y;
+    party->trailPos = m->position;
+    p = party->playerPtr;
+    if (party->work.vivian.rippleEffect == NULL) {
+        party->work.vivian.rippleEffect = NULL;
+    } else if (party->work.vivian.rippleEffect->flags == 0) {
+        party->work.vivian.rippleEffect = NULL;
+    } else {
+        effRippleSetPosition(party->work.vivian.rippleEffect, p->position.x, 1.5f + p->position.y, p->position.z);
+    }
+    if (party->useMotionId >= 4) {
+        party->trailPos = m->position;
+    }
+
+    switch (party->useMotionId) {
+    case 20:
+        m->flags &= ~0x400;
+        psndSFXOn_3D(0x934, &party->position);
+        party->useMotionId = 21;
+    case 21:
+        party->work.vivian.shadowSize += 1.0f;
+        if (party->work.vivian.shadowSize >= 20.0f) {
+            party->work.vivian.shadowSize = 20.0f;
+            party->useMotionId = 22;
+        }
+        break;
+    case 22:
+        marioAdjustMoveDir();
+        partyChgPose(party, "PTR_A2_4");
+        party->poseTime = 24;
+        L_partyVivianTailStart(party);
+        party->useMotionId = 23;
+        break;
+    case 23:
+        animPoseSetLocalTime(party->paperAnimGroup, 24.0f);
+        party->poseTime = 24;
+        party->useMotionId = 24;
+        party->moveFrames = 24;
+        psndSFXOn_3D(0x937, &party->position);
+    case 24:
+        animPoseSetLocalTime(party->paperAnimGroup, party->moveFrames);
+        party->dispOfs.y -= 0.4f;
+        if (party->dispOfs.y <= 2.7f) {
+            party->dispOfs.y = 2.7f;
+        }
+        if (--party->moveFrames <= 0) {
+            break;
+        }
+        if (party->moveFrames == 20) {
+            marioChgPose("M_S_1");
+            m->poseTime = 24;
+            party->work.vivian.marioAnimTime = 24;
+            party->useMotionId = 25;
+        }
+        break;
+    case 25:
+        animPoseSetLocalTime(party->paperAnimGroup, party->moveFrames);
+        animPoseSetLocalTime(m->paperAnimGroupId[marioAnimeId()], party->work.vivian.marioAnimTime);
+        m->dispOfs.y -= 0.4f;
+        if (m->dispOfs.y <= 2.7f) {
+            m->dispOfs.y = 2.7f;
+        }
+        party->dispOfs.y -= 0.4f;
+        if (party->dispOfs.y <= 2.7f) {
+            party->dispOfs.y = 2.7f;
+        }
+        party->work.vivian.marioAnimTime--;
+        if (--party->moveFrames > 0) {
+            break;
+        }
+        party->useMotionId = 26;
+        party->moveFrames = 24;
+    case 26:
+        animPoseSetLocalTime(party->paperAnimGroup, 0.0f);
+        animPoseSetLocalTime(m->paperAnimGroupId[marioAnimeId()], party->work.vivian.marioAnimTime);
+        m->dispOfs.y -= 0.4f;
+        if (m->dispOfs.y <= 2.7f) {
+            m->dispOfs.y = 2.7f;
+        }
+        party->dispOfs.y -= 0.4f;
+        if (party->dispOfs.y <= 2.7f) {
+            party->dispOfs.y = 2.7f;
+        }
+        if (--party->work.vivian.marioAnimTime > 0) {
+            party->work.vivian.marioAnimTime = 0;
+        }
+        if (--party->moveFrames > 0) {
+            party->moveFrames = 0;
+        }
+        if (party->work.vivian.marioAnimTime == 0 && party->moveFrames == 0) {
+            party->useMotionId = 27;
+            marioPaperOff();
+            m->reserved_20 = NULL;
+            m->dispFlags &= ~0x1000;
+            m->hitobjJumpFrom = m->hitobjStandOn;
+            m->hitobjStandOn = NULL;
+            {
+                Vec zero = {0.0f, 0.0f, 0.0f};
+                m->dispOfs = zero;
+            }
+            marioChgSmallJumpMotion();
+            m->baseSpeed = 0.0f;
+        }
+        break;
+    case 27:
+        animPoseSetLocalTime(party->paperAnimGroup, 0.0f);
+        party->work.vivian.shadowSize -= 1.0f;
+        if (!(party->work.vivian.shadowSize > 10.0f)) {
+            party->work.vivian.shadowSize = 10.0f;
+            partyPaperOff(party);
+            party->flags &= ~0x100;
+            party->flags2 &= ~0x200000;
+            party->work.vivian.shadowSize = 10.0f;
+            party->dispOfs.y = 0.0f;
+            partyChgRunMode(party, 2);
+            party->moveMode = 0;
+            partyChgPoseId(party, 1);
+            party->flags &= ~0x80000000;
+        }
+        break;
+    }
+}
+#else
 static inline void vivianFollow(PartyEntry* party) {
     void* hit;
     u8 id;
@@ -522,6 +825,7 @@ void vivian_use(PartyEntry* party) {
         break;
     }
 }
+#endif
 
 #pragma opt_common_subs reset
 

@@ -300,11 +300,13 @@ void kpa2DMain(void) {
     if (mp->kpaNoHitTimer) {
         mp->kpaNoHitTimer--;
     }
+#ifndef VERSION_G8ME01_DEMO
     mp->hitobjHead = NULL;
     mp->hitobjFront = NULL;
     mp->hitobjFrontA = NULL;
     mp->hitobjPush = NULL;
     mp->hitobjWall = NULL;
+#endif
     marioItemGetChk();
     kpaFireAttack();
     kpaFireMain();
@@ -351,7 +353,9 @@ void kpa2DMain(void) {
         }
         marioCheckWall(spd, ang);
     }
+#ifndef VERSION_G8ME01_DEMO
     mp->position.y += mp->floorMove.y;
+#endif
     PSVECSubtract(&mp->position, &saved, &diff);
     {
         f32 mag = PSVECMag(&diff);
@@ -867,6 +871,44 @@ void kpaFireMain(void) {
                 ((EffGonbabaBreathWork*)((EffGonbabaBreathWork*)fireefp->userdata)->child->userdata)->position.z = z;
             }
         }
+#ifdef VERSION_G8ME01_DEMO
+        // the demo checks the flame against every hit at every level, without the size cut-off
+        {
+            f32 sc;
+            f32 base;
+            fe = fireefp;
+            camGetPtr(4);
+            w = (EffGonbabaBreathWork*)fe->userdata;
+            base = w->scale;
+            PSMTXTrans(m80, w->position.x, w->position.y, w->position.z);
+            PSMTXRotRad(m50, 'y', 0.017453292f * (w->yaw - camGetPtr(4)->viewYaw));
+            if (w->yaw > 90.0f && w->yaw < 270.0f) {
+                PSMTXScale(mb0, w->scale, w->scale, -w->scale);
+            } else {
+                PSMTXScale(mb0, w->scale, w->scale, w->scale);
+            }
+            PSMTXConcat(m80, m50, m80);
+            PSMTXConcat(m80, mb0, m20);
+            w = w + 1;
+            for (i = 1; i < fe->count; i++, w++) {
+                if (((i - 1) & 3) == 0 && w->delay == 0 && w->life > 0x10) {
+                    void* hit;
+                    sc = 7.0f * w->scale;
+                    PSMTXTrans(m80, w->position.x, w->position.y, w->position.z);
+                    PSMTXScale(mb0, sc, sc, sc);
+                    PSMTXConcat(m80, mb0, m80);
+                    PSMTXConcat(m20, m80, m80);
+                    zero = *(Vec*)vec3_802fc920;
+                    PSMTXMultVec(m80, &zero, &out);
+                    hit = kpaFlameHitCheck(out.x, out.y, out.z, sc * base);
+                    if (hit) {
+                        KPW(mp)->flameHit = hit;
+                        break;
+                    }
+                }
+            }
+        }
+#else
         lv = kpaGetLevel();
         if (lv != 0) {
             fe = fireefp;
@@ -904,6 +946,7 @@ void kpaFireMain(void) {
                 }
             }
         }
+#endif
     }
     {
         if (kpaFireAttackCheck() == 0) {

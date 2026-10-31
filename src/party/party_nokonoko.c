@@ -43,7 +43,11 @@ void sincosf(f32* ret_sin, f32* ret_cos, f32 degree);
 f32 toMovedir(f32 angle);
 #define EXT_LIT(sym, val) (val)
 extern ItemEntry* itemNearDistCheck(f32 x, f32 y, f32 z, f32 range);
+#ifdef VERSION_G8ME01_DEMO
+extern void marioChkWallAround(Vec* pos, f32 a2, f32 angle, f32 radius, f32 height); // no mode argument in the demo
+#else
 extern void marioChkWallAround(Vec* pos, s32 a1, f32 a2, f32 angle, f32 radius, f32 height);
+#endif
 #ifdef VERSION_G8ME01
 void partyChkWallAround(PartyEntry* party, Vec* pos, f32 spd, f32 dir, f32 width, f32 height);
 #endif
@@ -123,7 +127,9 @@ void nokonoko_move(PartyEntry* party) {
         party->trigFlags &= ~8;
         partyWalkInit(party, 1);
     }
+#ifndef VERSION_G8ME01_DEMO
     partyUpdMoveSpd(party);
+#endif
     partyRecordFootmark(party);
     switch (party->moveMode) {
     case 0:
@@ -280,10 +286,12 @@ void nokonoko_use(PartyEntry* party) {
 
     switch (party->useMotionId) {
     case 0:
+#ifndef VERSION_G8ME01_DEMO
         if (mario->currMotionId == 0x20 || mario->currMotionId == 0x1f) {
             party->useMotionId = 70;
             break;
         }
+#endif
         partyClearJumpPara(party);
         party->flags |= 0x04000000;
         party->flags2 |= 0x10;
@@ -309,10 +317,12 @@ void nokonoko_use(PartyEntry* party) {
         mario->baseSpeed = EXT_LIT(float_0_8041b51c, 0.0f);
         break;
     case 1:
+#ifndef VERSION_G8ME01_DEMO
         if (mario->currMotionId == 0x20 || mario->currMotionId == 0x1f) {
             party->useMotionId = 70;
             break;
         }
+#endif
         party->displayDirection = revise360(EXT_LIT(float_45_8041b560, 45.0f) + party->displayDirection);
         party->position.x += (party->moveTarget.x - party->position.x) / (f32)party->moveFrames;
         party->position.y += (party->moveTarget.y - party->position.y) / (f32)party->moveFrames;
@@ -327,10 +337,12 @@ void nokonoko_use(PartyEntry* party) {
         party->useMotionId = 2;
         partyChgPose(party, "PNK_A_1");
     case 2:
+#ifndef VERSION_G8ME01_DEMO
         if (mario->currMotionId == 0x20 || mario->currMotionId == 0x1f) {
             party->useMotionId = 70;
             break;
         }
+#endif
         if (mario->hitobjStandOn == NULL) {
             break;
         }
@@ -419,8 +431,13 @@ void nokonoko_use(PartyEntry* party) {
         }
         NOKO_ITEM(party, party->useMotionId = 50; psndSFXOn_3D((const char*)0x92c, &party->position); noko_star(party, 1); noko_se_off(); break;)
         if (!(party->flags & 0x80000000)) {
+#ifdef VERSION_G8ME01_DEMO
+            if (mario->currMotionId == 0x19 || mario->currMotionId == 0x14 || mario->currMotionId == 0x18 || mario->currMotionId == 0x16 ||
+                (mario->flags & 0x20) || !marioChkKey()) {
+#else
             if (mario->currMotionId == 0x19 || mario->currMotionId == 0x14 || mario->currMotionId == 0x18 || mario->currMotionId == 0x16 || (u16)(mario->currMotionId - 0x1f) <= 1 ||
                 (mario->flags & 0x20) || !marioChkKey()) {
+#endif
                 nokonoko_finish(party);
                 noko_se_off();
                 break;
@@ -473,7 +490,11 @@ void nokonoko_use(PartyEntry* party) {
 #ifdef VERSION_G8ME01
             partyChkWallAround(party, &party->position, spd, dir, party->width, party->height);
 #else
+#ifdef VERSION_G8ME01_DEMO
+            marioChkWallAround(&party->position, spd, dir, party->width, party->height);
+#else
             marioChkWallAround(&party->position, 1, spd, dir, party->width, party->height);
+#endif
 #endif
             party->useMotionId = 70;
             psndSFXOn_3D((const char*)0x92c, &party->position);
@@ -948,8 +969,10 @@ HitEntry* ccwall(PartyEntry* party, s32 mode) {
         sincosf(&s2, &c2, 180.0f + party->targetDir);
         party->position.x = hx + 0.5f * (s2 * party->width);
         party->position.z = hz + 0.5f * (c2 * party->width);
+#ifndef VERSION_G8ME01_DEMO
         party->position.z -= w * (f32)cos(3.1415927f * (party->targetDir - 90.0f) / 180.0f);
         party->position.x -= w * (f32)sin(3.1415927f * (party->targetDir - 90.0f) / 180.0f);
+#endif
         vx = s * party->moveSpeed;
         vz = c * party->moveSpeed;
         d = vx * nx + vz * nz;
@@ -975,8 +998,10 @@ HitEntry* ccwall(PartyEntry* party, s32 mode) {
         sincosf(&s3, &c3, 180.0f + party->targetDir);
         party->position.x = hx + 0.5f * (s3 * party->width);
         party->position.z = hz + 0.5f * (c3 * party->width);
+#ifndef VERSION_G8ME01_DEMO
         party->position.z -= w * (f32)cos(3.1415927f * (90.0f + party->targetDir) / 180.0f);
         party->position.x -= w * (f32)sin(3.1415927f * (90.0f + party->targetDir) / 180.0f);
+#endif
         vx = s * party->moveSpeed;
         vz = c * party->moveSpeed;
         d = vx * nx + vz * nz;

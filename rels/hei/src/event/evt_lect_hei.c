@@ -241,7 +241,11 @@ static void lecture_button_disp(CameraId camera, void* param) {
             }
             pos = disp->pos;
             pos.y += ofs;
+#ifdef VERSION_G8ME01_DEMO
+            iconDispGxAlpha(&pos, 0x84, btn->iconId, btn->alpha, 1.0f);
+#else
             iconDispGxAlpha(&pos, 0x50, btn->iconId, btn->alpha, 1.0f);
+#endif
         }
     }
 }
@@ -459,12 +463,27 @@ EVT_BEGIN(nokotaro_party_lecture)
     CALL(evt_msg_print, 0, STRING("lecture_friends_04_0_1"), 0, 0)
     CALL(evt_msg_print, 0, STRING("lecture_friends_04_1"), 0, 0)
     CALL(evt_cam3d_evt_set_rel, FLOAT(0.0f), FLOAT(100.0f), FLOAT(630.0f), FLOAT(45.0f), FLOAT(39.0f), FLOAT(-100.0f), 1000, 0)
+#ifdef VERSION_G8ME01_DEMO
+    WAIT_MS(1000)
+#else
     WAIT_MS(1500)
+#endif
     CALL(evt_cam_letter_box_disable, 1)
     LOOP(2)
         CALL(evt_party_nokotaro_kick, 0)
         WAIT_MS(500)
     END_LOOP
+#ifdef VERSION_G8ME01_DEMO
+    CALL(x_flag_set, 0, 1)
+    BEGIN_INLINE_EVENT
+    CALL(evt_mario_get_pos, 0, LW(0), LW(1), LW(2))
+    SUBTRACT(LW(0), 30)
+    CALL(evt_party_move_pos2, 0, LW(0), LW(2), FLOAT(80.0f))
+    CALL(evt_party_set_dir, 0, 90, 300)
+    CALL(x_flag_set, 0, 0)
+    END_INLINE_EVENT
+    CALL(x_flag_wait, 0, 0)
+#endif
     CALL(evt_npc_change_fbat_mode, 8)
     SET_VALUE(LW(8), 2)
     LOOP(LW(8))
@@ -477,10 +496,13 @@ EVT_BEGIN(nokotaro_party_lecture)
         SET_VALUE(LW(1), STRING("TESTMOBJ"))
         CALL(evt_mario_get_pos, 0, LW(2), LW(3), LW(4))
         ADD(LW(2), -70)
+#ifndef VERSION_G8ME01_DEMO
         ADD(LW(3), 100)
+#endif
         SET_VALUE(GSWF(1803), 0)
         CALL(evt_mobj_switch_blue, 0, LW(1), LW(2), LW(3), LW(4), 0, GSWF(1803))
         CALL(evt_mobj_set_camid, LW(1), 7)
+#ifndef VERSION_G8ME01_DEMO
         CALL(evt_snd_sfxon, STRING("SFX_EVT_LECTURE_BLOCK_FALL1"), LW(7))
         BEGIN_INLINE_EVENT
             LOOP(0)
@@ -508,13 +530,18 @@ EVT_BEGIN(nokotaro_party_lecture)
             WAIT_FRAMES(1)
         END_LOOP
         WAIT_MS(300)
+#endif
         WAIT_MS(1000)
         CALL(evt_party_nokotaro_kick_hold, 0)
         SWITCH(LW(8))
             CASE_EQUAL(2)
             CALL(evt_msg_print_add, 0, STRING("lecture_friends_05_1"))
             CASE_EQUAL(1)
+#ifdef VERSION_G8ME01_DEMO
+            CALL(evt_mario_mov_pos2, 367, 74, FLOAT(135.0f))
+#else
             CALL(evt_mario_mov_pos2, 367, -38, FLOAT(135.0f))
+#endif
             CALL(evt_mario_mov_pos2, 416, -38, FLOAT(135.0f))
             CALL(evt_mario_set_dir, 270, 300, 0)
         END_SWITCH

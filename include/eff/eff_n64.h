@@ -11,6 +11,10 @@ typedef struct eff_n64_work {
 typedef struct eff_set {
     s16 id;     // 0x0
     char* name; // 0x4
+#ifdef VERSION_G8ME01_DEMO
+    const char* description; // 0x8
+    const char** users;      // 0xC, who uses the effect
+#endif
 } eff_set;
 
 // N64-style vertex, stride 0xE

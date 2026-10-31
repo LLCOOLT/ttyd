@@ -529,6 +529,16 @@ extern EvtWord zakoM2D_find_start_event[];
 extern EvtWord gesso2D_init_event[];
 extern EvtWord gesso2D_move_event[];
 
+// evt_item_entry modes for the scattered coins, hearts and flowers and for the dropped item; the demo's
+// values are one lower.
+#ifdef VERSION_G8ME01_DEMO
+#define DROP_SCATTER_MODE 9
+#define DROP_ITEM_MODE 8
+#else
+#define DROP_SCATTER_MODE 10
+#define DROP_ITEM_MODE 9
+#endif
+
 EVT_BEGIN(enemy_common_dead_event)
     CALL(evt_npc_flag_onoff, 1, STRING("me"), 1024)
     CALL(evt_npc_set_attack_mode, STRING("me"), 0)
@@ -541,29 +551,29 @@ EVT_BEGIN(enemy_common_dead_event)
     CALL(evt_npc_get_drop_coin, STRING("me"), LW(3))
     IF_INT_GREATER(LW(3), 0)
         LOOP(LW(3))
-            CALL(evt_item_entry, 0, 121, LW(0), LW(1), LW(2), 10, -1, 0)
+            CALL(evt_item_entry, 0, 121, LW(0), LW(1), LW(2), DROP_SCATTER_MODE, -1, 0)
         END_LOOP
     END_IF
     CALL(evt_npc_get_drop_heart, STRING("me"), LW(3))
     IF_INT_GREATER(LW(3), 0)
         LOOP(LW(3))
-            CALL(evt_item_entry, 0, 123, LW(0), LW(1), LW(2), 10, -1, 0)
+            CALL(evt_item_entry, 0, 123, LW(0), LW(1), LW(2), DROP_SCATTER_MODE, -1, 0)
         END_LOOP
     END_IF
     CALL(evt_npc_get_drop_flower, STRING("me"), LW(3))
     IF_INT_GREATER(LW(3), 0)
         LOOP(LW(3))
-            CALL(evt_item_entry, 0, 124, LW(0), LW(1), LW(2), 10, -1, 0)
+            CALL(evt_item_entry, 0, 124, LW(0), LW(1), LW(2), DROP_SCATTER_MODE, -1, 0)
         END_LOOP
     END_IF
     CALL(evt_npc_get_drop_item, STRING("me"), LW(3))
     IF_INT_NOT_EQUAL(LW(3), 0)
-        CALL(evt_item_entry, 0, LW(3), LW(0), LW(1), LW(2), 9, -1, 0)
+        CALL(evt_item_entry, 0, LW(3), LW(0), LW(1), LW(2), DROP_ITEM_MODE, -1, 0)
     END_IF
     CALL(evt_npc_getback_item_entry, STRING("me"))
     CALL(evt_npc_get_drop_fixitem, STRING("me"), LW(3))
     IF_INT_NOT_EQUAL(LW(3), 0)
-        CALL(evt_item_entry, 0, LW(3), LW(0), LW(1), LW(2), 9, -1, 0)
+        CALL(evt_item_entry, 0, LW(3), LW(0), LW(1), LW(2), DROP_ITEM_MODE, -1, 0)
     END_IF
     CALL(evt_npc_delete, STRING("me"))
     CALL(evt_npc_return_interrupt, STRING("me"))
@@ -579,6 +589,21 @@ EVT_BEGIN(enemy_event_dead_event_sub)
     CALL(evt_npc_delete, LW(10))
     RETURN
 EVT_END()
+
+#ifdef VERSION_G8ME01_DEMO
+EVT_BEGIN(enemy_event_dead_event)
+    SET_VALUE(LW(10), STRING("me"))
+    CALL_CHILD(enemy_event_dead_event_sub)
+    CALL(evt_npc_return_interrupt, STRING("me"))
+    RETURN
+EVT_END()
+
+EVT_BEGIN(enemy_slave_common_dead_event)
+    CALL(evt_npc_delete, STRING("me"))
+    CALL(evt_npc_return_interrupt, STRING("me"))
+    RETURN
+EVT_END()
+#endif
 
 EVT_BEGIN(enemy_common_blow_event)
     CALL(evt_npc_set_confuse_anim, STRING("me"))
@@ -706,8 +731,16 @@ EVT_BEGIN(_2d_dead_rotate_event)
     RETURN
 EVT_END()
 
-#ifdef VERSION_G8MP01
-// PAL only: kuriboo_move_event with the enemy flags set directly instead of enemy_common_flag_init_event; nothing in the
+#ifdef VERSION_G8ME01_DEMO
+EVT_BEGIN(enemy_common_flag_init_event)
+    CALL(evt_npc_flag_onoff, 1, STRING("me"), 269616152)
+    CALL(evt_npc_status_onoff, 1, STRING("me"), 2)
+    RETURN
+EVT_END()
+#endif
+
+#if defined(VERSION_G8MP01) || defined(VERSION_G8ME01_DEMO)
+// PAL and demo only: kuriboo_move_event with the enemy flags set directly instead of enemy_common_flag_init_event; nothing in the
 // game references it
 EVT_BEGIN(npc_loiter_move_event)
     CALL(evt_npc_flag_onoff, 1, STRING("me"), 1180688)
@@ -724,14 +757,31 @@ EVT_BEGIN(npc_loiter_move_event)
 EVT_END()
 #endif
 
+#ifdef VERSION_G8ME01_DEMO
+EVT_BEGIN(testenemynpc_init_event)
+    CALL_CHILD(enemy_common_flag_init_event)
+    RETURN
+EVT_END()
+#endif
+
 EVT_BEGIN(testenemynpc_move_event)
     CALL_CHILD(PTR(enemy_common_flag_init_event))
+#ifndef VERSION_G8ME01_DEMO
     CALL(evt_npc_set_stay_anim, STRING("me"))
+#endif
     LABEL(0)
     WAIT_MS(500)
     GOTO(0)
     RETURN
 EVT_END()
+
+#ifdef VERSION_G8ME01_DEMO
+EVT_BEGIN(npc_urouro_init_event)
+    CALL(evt_npc_flag_onoff, 1, STRING("me"), 1536)
+    CALL(evt_npc_status_onoff, 1, STRING("me"), 2)
+    RETURN
+EVT_END()
+#endif
 
 EVT_BEGIN(npc_urouro_move_event)
     CALL_CHILD(PTR(npc_urouro_init_event))
@@ -752,6 +802,13 @@ EVT_BEGIN(npc_urouro_return_event)
     CALL(evt_npc_return_interrupt, STRING("me"))
     RETURN
 EVT_END()
+
+#ifdef VERSION_G8ME01_DEMO
+EVT_BEGIN(kuriboo_init_event)
+    CALL_CHILD(enemy_common_flag_init_event)
+    RETURN
+EVT_END()
+#endif
 
 EVT_BEGIN(kuriboo_move_event)
     CALL_CHILD(PTR(enemy_common_flag_init_event))
@@ -801,8 +858,18 @@ EVT_BEGIN(kuriboo_return_event)
     RETURN
 EVT_END()
 
+#ifdef VERSION_G8ME01_DEMO
+EVT_BEGIN(patakuri_init_event)
+    CALL(evt_npc_flag_onoff, 1, STRING("me"), 1049624)
+    CALL(evt_npc_status_onoff, 1, STRING("me"), 2)
+    RETURN
+EVT_END()
+#endif
+
 EVT_BEGIN(patakuri_move_event)
+#ifndef VERSION_G8ME01_DEMO
     CALL(evt_npc_flag_onoff, 0, STRING("me"), 1024)
+#endif
     CALL(evt_sub_random, 360, LW(3))
     LABEL(0)
     CALL(evt_npc_set_stay_anim, STRING("me"))
@@ -863,6 +930,12 @@ EVT_BEGIN(patakuri_return_event)
     WAIT_MS(500)
     CALL(evt_npc_sound_data_reset, STRING("me"))
     CALL(evt_npc_set_stay_anim, STRING("me"))
+#ifdef VERSION_G8ME01_DEMO
+    CALL(evt_npc_reverse_ry, STRING("me"))
+    WAIT_MS(500)
+    CALL(evt_npc_reverse_ry, STRING("me"))
+    WAIT_MS(500)
+#endif
     CALL(evt_npc_get_position, STRING("me"), LW(1), LW(2), LW(3))
     CALL(evt_fbat_trans_floor_position, LW(1), LW(2), LW(3), 50, 500)
     CALL(evt_npc_glide_position, STRING("me"), LW(1), LW(2), LW(3), 1000, 0, 0, 0, 1)
@@ -1122,6 +1195,14 @@ EVT_BEGIN(togenoko_return_event)
     CALL(evt_npc_return_interrupt, STRING("me"))
     RETURN
 EVT_END()
+
+#ifdef VERSION_G8ME01_DEMO
+EVT_BEGIN(patapata_init_event)
+    CALL(evt_npc_flag_onoff, 1, STRING("me"), 1114136)
+    CALL(evt_npc_status_onoff, 1, STRING("me"), 2)
+    RETURN
+EVT_END()
+#endif
 
 EVT_BEGIN(patapata_move_event)
     CALL(evt_npc_set_rotate, STRING("me"), 0, 0, 0)
@@ -1422,8 +1503,18 @@ EVT_BEGIN(met_return_event)
     RETURN
 EVT_END()
 
+#ifdef VERSION_G8ME01_DEMO
+EVT_BEGIN(patamet_init_event)
+    CALL(evt_npc_flag_onoff, 1, STRING("me"), 1049624)
+    CALL(evt_npc_status_onoff, 1, STRING("me"), 2)
+    RETURN
+EVT_END()
+#endif
+
 EVT_BEGIN(patamet_move_event)
+#ifndef VERSION_G8ME01_DEMO
     CALL(evt_npc_flag_onoff, 0, STRING("me"), 1024)
+#endif
     CALL(evt_sub_random, 360, LW(3))
     CALL(evt_npc_sound_data_reset, STRING("me"))
     LABEL(0)
@@ -1513,6 +1604,14 @@ EVT_BEGIN(patamet_return_event)
     RETURN
 EVT_END()
 
+#ifdef VERSION_G8ME01_DEMO
+EVT_BEGIN(chorobon_init_event)
+    CALL(evt_npc_flag_onoff, 1, STRING("me"), 1179672)
+    CALL(evt_npc_status_onoff, 1, STRING("me"), 2)
+    RETURN
+EVT_END()
+#endif
+
 EVT_BEGIN(chorobon_move_event)
     CALL(evt_npc_set_scale, STRING("me"), 1, 1, 1)
     CALL(evt_npc_set_walk_anim, STRING("me"))
@@ -1584,6 +1683,13 @@ EVT_BEGIN(chorobon_return_event)
     RETURN
 EVT_END()
 
+#ifdef VERSION_G8ME01_DEMO
+EVT_BEGIN(pansy_init_event)
+    CALL_CHILD(enemy_common_flag_init_event)
+    RETURN
+EVT_END()
+#endif
+
 EVT_BEGIN(pansy_move_event)
     CALL_CHILD(PTR(enemy_common_flag_init_event))
     CALL(evt_sub_random, 360, LW(3))
@@ -1634,6 +1740,13 @@ EVT_BEGIN(pansy_return_event)
     CALL(evt_npc_return_interrupt, STRING("me"))
     RETURN
 EVT_END()
+
+#ifdef VERSION_G8ME01_DEMO
+EVT_BEGIN(twinkling_pansy_init_event)
+    CALL_CHILD(enemy_common_flag_init_event)
+    RETURN
+EVT_END()
+#endif
 
 EVT_BEGIN(twinkling_pansy_move_event)
     CALL_CHILD(PTR(enemy_common_flag_init_event))
@@ -1715,6 +1828,14 @@ EVT_BEGIN(karon_move_event)
     GOTO(0)
     RETURN
 EVT_END()
+
+#ifdef VERSION_G8ME01_DEMO
+EVT_BEGIN(karon_dead_event)
+    CALL(evt_npc_flag_onoff, 1, STRING("slave_0"), 128)
+    CALL_CHILD(enemy_common_dead_event)
+    RETURN
+EVT_END()
+#endif
 
 EVT_BEGIN(karon_find_event)
     CALL(evt_eff_fukidashi, 1, 0, STRING("me"), 0, 0, 0, 0, 0, 0, 0, 30)
@@ -1908,12 +2029,12 @@ EVT_BEGIN(killer_dead_event)
     END_IF
     CALL(evt_npc_get_drop_item, STRING("me"), LW(3))
     IF_INT_NOT_EQUAL(LW(3), 0)
-        CALL(evt_item_entry, 0, LW(3), LW(0), LW(1), LW(2), 9, -1, 0)
+        CALL(evt_item_entry, 0, LW(3), LW(0), LW(1), LW(2), DROP_ITEM_MODE, -1, 0)
     END_IF
     CALL(evt_npc_getback_item_entry, STRING("me"))
     CALL(evt_npc_get_drop_fixitem, STRING("me"), LW(3))
     IF_INT_NOT_EQUAL(LW(3), 0)
-        CALL(evt_item_entry, 0, LW(3), LW(0), LW(1), LW(2), 9, -1, 0)
+        CALL(evt_item_entry, 0, LW(3), LW(0), LW(1), LW(2), DROP_ITEM_MODE, -1, 0)
     END_IF
     CALL(evt_npc_set_position, STRING("me"), 0, -1000, 0)
     RETURN
@@ -1967,6 +2088,14 @@ EVT_BEGIN(killer_cannon_move_event)
     GOTO(0)
     RETURN
 EVT_END()
+
+#ifdef VERSION_G8ME01_DEMO
+EVT_BEGIN(sambo_init_event)
+    CALL(evt_npc_flag_onoff, 1, STRING("me"), 8)
+    CALL(evt_npc_flag_onoff, 1, STRING("me"), 1049616)
+    RETURN
+EVT_END()
+#endif
 
 EVT_BEGIN(sambo_move_event)
     CALL(evt_npc_flag_onoff, 0, STRING("me"), 1024)
@@ -2215,6 +2344,13 @@ EVT_BEGIN(sinemon_return_event)
     RETURN
 EVT_END()
 
+#ifdef VERSION_G8ME01_DEMO
+EVT_BEGIN(togedaruma_init_event)
+    CALL_CHILD(enemy_common_flag_init_event)
+    RETURN
+EVT_END()
+#endif
+
 EVT_BEGIN(togedaruma_move_event)
     CALL(evt_npc_set_rotate, STRING("me"), 0, 0, 0)
     CALL(evt_npc_set_attack_mode, STRING("me"), 0)
@@ -2452,19 +2588,29 @@ USER_FUNC(kamec_fire_magic) {
     s32 d = evtGetValue(event, args[3]);
     s32 e = evtGetValue(event, args[4]);
     s32 f = evtGetValue(event, args[5]);
+#ifdef VERSION_G8ME01_DEMO
+    // The demo does not name the effect after the npc.
+    EffectEntry* eff = effMagic1N64Entry(0, 60, (f32)a, (f32)b, (f32)c, (f32)d, (f32)e, (f32)f);
+#else
     NpcEntry* npc = evtNpcNameToPtr(event, "me");
     EffectEntry* eff = effMagic1N64Entry(0, 60, (f32)a, (f32)b, (f32)c, (f32)d, (f32)e, (f32)f);
     effSetName(eff, npc->description);
+#endif
     evtSetValue(event, args[6], (EvtWord)eff);
     return EVT_RETURN_DONE;
 }
 
 
 USER_FUNC(kamec_fire_magic_delete) {
+#ifdef VERSION_G8ME01_DEMO
+    // The demo deletes the effect whose pointer the event passes.
+    effSoftDelete((EffectEntry*)evtGetValue(event, event->args[0]));
+#else
     EffectEntry* eff = effNameToPtr(evtNpcNameToPtr(event, "me")->description);
     if (eff) {
         ((EffMagic1N64Work*)eff->userdata)->life = 1;
     }
+#endif
     return EVT_RETURN_DONE;
 }
 
@@ -2511,6 +2657,14 @@ EVT_BEGIN(barriern_blow_event)
     CALL_CHILD(PTR(enemy_common_blow_event))
     RETURN
 EVT_END()
+
+#ifdef VERSION_G8ME01_DEMO
+EVT_BEGIN(piders_init_event)
+    CALL_CHILD(enemy_common_flag_init_event)
+    CALL(evt_npc_flag_onoff, 0, STRING("me"), 131072)
+    RETURN
+EVT_END()
+#endif
 
 EVT_BEGIN(piders_move_event)
     CALL(evt_npc_flag_onoff, 0, STRING("me"), 1024)
@@ -2654,7 +2808,9 @@ EVT_BEGIN(pakkun_init_event)
 EVT_END()
 
 EVT_BEGIN(pakkun_move_event)
+#ifndef VERSION_G8ME01_DEMO
     CALL(evt_npc_flag_onoff, 0, STRING("me"), 2097152)
+#endif
     CALL(evt_npc_set_anim, STRING("me"), STRING("PKF_S_1"))
     LABEL(0)
     WAIT_FRAMES(1)
@@ -2663,7 +2819,9 @@ EVT_BEGIN(pakkun_move_event)
 EVT_END()
 
 EVT_BEGIN(pakkun_find_event)
+#ifndef VERSION_G8ME01_DEMO
     CALL(evt_npc_flag_onoff, 0, STRING("me"), 2097152)
+#endif
     CALL(evt_npc_get_position, STRING("me"), LW(0), LW(1), LW(2))
     CALL(evt_snd_sfxon_3d, STRING("SFX_FLD_ENM_PAKKUN_MOVE1"), LW(0), LW(1), LW(2), 0)
     CALL(evt_npc_flag_onoff, 1, STRING("me"), 32)
@@ -2691,7 +2849,9 @@ EVT_BEGIN(pakkun_find_event)
 EVT_END()
 
 EVT_BEGIN(pakkun_return_event)
+#ifndef VERSION_G8ME01_DEMO
     CALL(evt_npc_flag_onoff, 1, STRING("me"), 2097152)
+#endif
     CALL(evt_npc_get_position, STRING("me"), LW(0), LW(1), LW(2))
     CALL(evt_snd_sfxon_3d, STRING("SFX_FLD_ENM_PAKKUN_MOVE2"), LW(0), LW(1), LW(2), 0)
     CALL(evt_npc_set_anim, STRING("me"), STRING("PKF_E_1"))
@@ -2707,8 +2867,12 @@ EVT_BEGIN(pakkun_return_event)
     CALL(evt_npc_set_anim, STRING("me"), STRING("PKF_E_1"))
     WAIT_FRAMES(10)
     CALL(evt_npc_flag_onoff, 0, STRING("me"), 32)
+#ifdef VERSION_G8ME01_DEMO
+    WAIT_FRAMES(20)
+#else
     WAIT_FRAMES(25)
     CALL(evt_npc_flag_onoff, 0, STRING("me"), 2097152)
+#endif
     CALL(evt_npc_return_interrupt, STRING("me"))
     RETURN
 EVT_END()
@@ -2768,6 +2932,9 @@ EVT_BEGIN(dokugassun_lost_event)
     CALL(evt_npc_sound_data_reset, STRING("me"))
     CALL(evt_npc_flag_onoff, 0, STRING("me"), 1024)
     CALL(evt_npc_set_anim, STRING("me"), STRING("S_1"))
+#ifdef VERSION_G8ME01_DEMO
+    CALL(evt_eff_fukidashi, 1, 0, STRING("me"), 1, 0, 0, 0, 0, 0, 0, 30)
+#endif
     CALL(evt_npc_reverse_ry, STRING("me"))
     WAIT_MS(500)
     CALL(evt_npc_reverse_ry, STRING("me"))
@@ -2891,8 +3058,25 @@ EVT_BEGIN(basabasa_return_event)
     RETURN
 EVT_END()
 
+#ifdef VERSION_G8ME01_DEMO
+EVT_BEGIN(basabasa_dead_event)
+    CALL_CHILD(enemy_common_dead_event)
+    RETURN
+EVT_END()
+#endif
+
+#ifdef VERSION_G8ME01_DEMO
+EVT_BEGIN(basabasa2_init_event)
+    CALL(evt_npc_flag_onoff, 1, STRING("me"), 1049624)
+    CALL(evt_npc_status_onoff, 1, STRING("me"), 2)
+    RETURN
+EVT_END()
+#endif
+
 EVT_BEGIN(basabasa2_move_event)
+#ifndef VERSION_G8ME01_DEMO
     CALL(evt_npc_flag_onoff, 0, STRING("me"), 1024)
+#endif
     CALL(evt_sub_random, 360, LW(3))
     LABEL(0)
     CALL(evt_npc_set_stay_anim, STRING("me"))
@@ -2969,11 +3153,28 @@ EVT_BEGIN(basabasa2_return_event)
     RETURN
 EVT_END()
 
+#ifdef VERSION_G8ME01_DEMO
+EVT_BEGIN(basabasa2_dead_event)
+    CALL_CHILD(enemy_common_dead_event)
+    RETURN
+EVT_END()
+#endif
+
+#ifdef VERSION_G8ME01_DEMO
+EVT_BEGIN(teresa_init_event)
+    CALL(evt_npc_flag_onoff, 1, STRING("me"), 1049624)
+    CALL(evt_npc_status_onoff, 1, STRING("me"), 2)
+    RETURN
+EVT_END()
+#endif
+
 EVT_BEGIN(teresa_move_event)
+#ifndef VERSION_G8ME01_DEMO
     CALL(evt_npc_flag_onoff, 0, STRING("me"), 1024)
     CALL(evt_npc_flag_onoff, 0, STRING("me"), 2097152)
     CALL(evt_npc_flag_onoff, 0, STRING("me"), 32)
     CALL(evt_npc_set_color, STRING("me"), 255, 255, 255, 255)
+#endif
     CALL(evt_sub_random, 360, LW(3))
     LABEL(0)
     CALL(evt_npc_set_stay_anim, STRING("me"))
@@ -3031,7 +3232,9 @@ EVT_BEGIN(teresa_return_event)
     CALL(evt_set_dir_to_home, STRING("me"))
     CALL(evt_npc_get_dir, STRING("me"), LW(3))
     CALL(evt_npc_flag_onoff, 1, STRING("me"), 2097152)
+#ifndef VERSION_G8ME01_DEMO
     CALL(evt_npc_flag_onoff, 1, STRING("me"), 32)
+#endif
     SET_VALUE(LW(0), 255)
     LOOP(16)
         CALL(evt_npc_set_color, STRING("me"), 255, 255, 255, LW(0))
@@ -3051,14 +3254,33 @@ EVT_BEGIN(teresa_return_event)
         CALL(evt_npc_set_color, STRING("me"), 255, 255, 255, LW(0))
         WAIT_MS(30)
     END_LOOP
+#ifndef VERSION_G8ME01_DEMO
     CALL(evt_npc_flag_onoff, 0, STRING("me"), 32)
+#endif
     CALL(evt_npc_flag_onoff, 0, STRING("me"), 2097152)
     CALL(evt_npc_return_interrupt, STRING("me"))
     RETURN
 EVT_END()
 
+#ifdef VERSION_G8ME01_DEMO
+EVT_BEGIN(teresa_dead_event)
+    CALL_CHILD(enemy_common_dead_event)
+    RETURN
+EVT_END()
+#endif
+
+#ifdef VERSION_G8ME01_DEMO
+EVT_BEGIN(bubble_init_event)
+    CALL(evt_npc_flag_onoff, 1, STRING("me"), 1049624)
+    CALL(evt_npc_status_onoff, 1, STRING("me"), 2)
+    RETURN
+EVT_END()
+#endif
+
 EVT_BEGIN(bubble_move_event)
+#ifndef VERSION_G8ME01_DEMO
     CALL(evt_npc_flag_onoff, 0, STRING("me"), 1024)
+#endif
     CALL(evt_sub_random, 360, LW(3))
     LABEL(0)
     CALL(evt_npc_set_stay_anim, STRING("me"))
@@ -3140,6 +3362,13 @@ EVT_BEGIN(bubble_return_event)
     CALL(evt_npc_return_interrupt, STRING("me"))
     RETURN
 EVT_END()
+
+#ifdef VERSION_G8ME01_DEMO
+EVT_BEGIN(hbom_init_event)
+    CALL_CHILD(enemy_common_flag_init_event)
+    RETURN
+EVT_END()
+#endif
 
 EVT_BEGIN(hbom_move_event)
     CALL_CHILD(enemy_common_flag_init_event)
@@ -3225,6 +3454,14 @@ EVT_BEGIN(zakowiz_move_event)
     RETURN
 EVT_END()
 
+#ifdef VERSION_G8ME01_DEMO
+EVT_BEGIN(zakowiz_dead_event)
+    CALL(evt_npc_flag_onoff, 1, STRING("slave_0"), 128)
+    CALL_CHILD(enemy_common_dead_event)
+    RETURN
+EVT_END()
+#endif
+
 EVT_BEGIN(zakowiz_find_event)
     CALL(evt_eff_fukidashi, 1, 0, STRING("me"), 0, 0, 0, 0, 0, 0, 0, 30)
     CALL(evt_get_target_dir, STRING("me"), STRING("mario"), LW(0))
@@ -3248,7 +3485,9 @@ EVT_BEGIN(zakowiz_find_event)
     CALL(evt_npc_flag_onoff, 0, STRING("slave_0"), 32)
     CALL(evt_npc_set_attack_mode, STRING("slave_0"), 12)
     CALL(evt_npc_jump_position, STRING("slave_0"), LW(0), LW(1), LW(2), 1000, 0, FLOAT(75.0f), 0)
+#ifndef VERSION_G8ME01_DEMO
     CALL(evt_npc_get_position, STRING("slave_0"), LW(0), LW(1), LW(2))
+#endif
     CALL(evt_eff, STRING(""), STRING("kemuri_test"), 16, LW(0), LW(1), LW(2), FLOAT(1.0f), 0, 0, 0, 0, 0, 0, 0)
     CALL(evt_npc_set_attack_mode, STRING("slave_0"), 0)
     CALL(evt_npc_flag_onoff, 1, STRING("slave_0"), 32)
@@ -3289,6 +3528,14 @@ EVT_BEGIN(zakowiz_blow_event)
     CALL_CHILD(enemy_common_blow_event)
     RETURN
 EVT_END()
+
+#ifdef VERSION_G8ME01_DEMO
+EVT_BEGIN(hannya_init_event)
+    CALL_CHILD(enemy_common_flag_init_event)
+    CALL(evt_npc_status_onoff, 0, STRING("me"), 2)
+    RETURN
+EVT_END()
+#endif
 
 EVT_BEGIN(hannya_move_event)
     CALL(evt_sub_random, 360, LW(3))
@@ -3368,7 +3615,9 @@ EVT_BEGIN(mahoon_init_event)
 EVT_END()
 
 EVT_BEGIN(mahoon_move_event)
+#ifndef VERSION_G8ME01_DEMO
     CALL(evt_npc_flag_onoff, 0, STRING("me"), 1024)
+#endif
     BEGIN_SIBLING_EVENT
         LOOP(0)
             WAIT_FRAMES(1)
@@ -3560,7 +3809,11 @@ EVT_BEGIN(mahoon_return_event)
 EVT_END()
 
 EVT_BEGIN(kamec_init_event)
+#ifdef VERSION_G8ME01_DEMO
+    CALL(evt_npc_flag_onoff, 1, STRING("me"), 1049624)
+#else
     CALL(evt_npc_flag_onoff, 1, STRING("me"), 1048600)
+#endif
     CALL(evt_npc_status_onoff, 1, STRING("me"), 2)
     CALL(mahoon_get_groupname, LW(10))
     CALL(evt_npc_slave_entry, STRING("me"), 0, LW(10), LW(0), PTR(enemy_slave_common_dead_event))
@@ -3575,7 +3828,9 @@ EVT_BEGIN(kamec_init_event)
 EVT_END()
 
 EVT_BEGIN(kamec_move_event)
+#ifndef VERSION_G8ME01_DEMO
     CALL(evt_npc_flag_onoff, 0, STRING("me"), 1024)
+#endif
     CALL(evt_sub_random, 360, LW(3))
     CALL(evt_npc_flag_onoff, 1, STRING("slave_0"), 128)
     CALL(evt_npc_flag_onoff, 1, STRING("slave_0"), 32)
@@ -3682,6 +3937,14 @@ EVT_BEGIN(kamec_return_event)
     RETURN
 EVT_END()
 
+#ifdef VERSION_G8ME01_DEMO
+EVT_BEGIN(kamec_dead_event)
+    CALL(evt_npc_flag_onoff, 1, STRING("slave_0"), 128)
+    CALL_CHILD(enemy_common_dead_event)
+    RETURN
+EVT_END()
+#endif
+
 EVT_BEGIN(kamec_blow_event)
     CALL(evt_npc_set_attack_mode, STRING("slave_0"), 0)
     CALL(evt_npc_flag_onoff, 1, STRING("slave_0"), 32)
@@ -3748,7 +4011,11 @@ EVT_BEGIN(kamec2_find_event)
     ADD(LW(1), 20)
     CALL(evt_npc_flag_onoff, 0, STRING("slave_0"), 32)
     CALL(evt_npc_set_attack_mode, STRING("slave_0"), 12)
+#ifdef VERSION_G8ME01_DEMO
+    CALL(evt_npc_glide_position, STRING("slave_0"), LW(0), LW(1), LW(2), 1000, 0, FLOAT(0.0f), 0, 6)
+#else
     CALL(evt_npc_glide_position, STRING("slave_0"), LW(0), LW(1), LW(2), 1000, 0, FLOAT(0.0f), 0, 3)
+#endif
     CALL(kamec_fire_magic_delete, LW(10))
     CALL(evt_npc_set_attack_mode, STRING("slave_0"), 0)
     CALL(evt_npc_flag_onoff, 1, STRING("slave_0"), 32)
@@ -3780,6 +4047,14 @@ EVT_BEGIN(kamec2_return_event)
     CALL(evt_npc_return_interrupt, STRING("me"))
     RETURN
 EVT_END()
+
+#ifdef VERSION_G8ME01_DEMO
+EVT_BEGIN(kamec2_dead_event)
+    CALL(evt_npc_flag_onoff, 1, STRING("slave_0"), 128)
+    CALL_CHILD(enemy_common_dead_event)
+    RETURN
+EVT_END()
+#endif
 
 EVT_BEGIN(kamec2_blow_event)
     CALL(evt_npc_set_attack_mode, STRING("slave_0"), 0)
@@ -3817,6 +4092,14 @@ EVT_BEGIN(hbross_move_event)
     GOTO(0)
     RETURN
 EVT_END()
+
+#ifdef VERSION_G8ME01_DEMO
+EVT_BEGIN(hbross_dead_event)
+    CALL(evt_npc_flag_onoff, 1, STRING("slave_0"), 128)
+    CALL_CHILD(enemy_common_dead_event)
+    RETURN
+EVT_END()
+#endif
 
 EVT_BEGIN(hbross_find_event)
     CALL(evt_eff_fukidashi, 1, 0, STRING("me"), 0, 0, 0, 0, 0, 0, 0, 30)
@@ -4053,6 +4336,8 @@ EVT_BEGIN(hbross_blow_event)
     RETURN
 EVT_END()
 
+// Retail has these events here; the demo defines each next to the events of its enemy.
+#ifndef VERSION_G8ME01_DEMO
 EVT_BEGIN(enemy_event_dead_event)
     SET_VALUE(LW(10), STRING("me"))
     CALL_CHILD(enemy_event_dead_event_sub)
@@ -4218,6 +4503,7 @@ EVT_BEGIN(zakoM2D_dead_event)
     CALL_CHILD(enemy_2d_common_dead_event)
     RETURN
 EVT_END()
+#endif
 
 EVT_BEGIN(wanwan_init_event)
     CALL_CHILD(enemy_common_flag_init_event)
@@ -4351,10 +4637,13 @@ USER_FUNC(zakoEntryDokan) {
     {
         const char* hn = hitGetName(marioGetPtr()->hitobjStandOn);
         if (hn && !strcmp(hn, nm3)) return EVT_RETURN_DONE;
+#ifndef VERSION_G8ME01_DEMO
+        // The demo only checks the floor Mario stands on.
         hn = hitGetName(marioGetPtr()->hitobjJumpFrom);
         if (hn && !strcmp(hn, nm3)) return EVT_RETURN_DONE;
         hn = hitGetName(marioGetPtr()->hitobjFront);
         if (hn && !strcmp(hn, nm3)) return EVT_RETURN_DONE;
+#endif
     }
     for (i = 0; i < 3; i++) {
         zako = npcNameToPtr(names[i]);
@@ -4461,6 +4750,8 @@ USER_FUNC(zakoEntryFall) {
 }
 
 
+// The demo has no npc_fire_eff_fadeout; its zakoM2D_find_start_event uses an effect instead.
+#ifndef VERSION_G8ME01_DEMO
 USER_FUNC(npc_fire_eff_fadeout) {
     EvtWord* args;
     NpcEntry* npc;
@@ -4490,6 +4781,7 @@ USER_FUNC(npc_fire_eff_fadeout) {
     }
     return EVT_RETURN_BLOCK;
 }
+#endif
 
 
 USER_FUNC(set_bottle_flag_init) {
@@ -4598,6 +4890,12 @@ EVT_BEGIN(zako2D_move_event)
         CALL(evt_npc_set_ry, STRING("me"), LW(0))
         CALL(evt_npc_flag_onoff, 0, STRING("me"), 16)
         CALL(evt_npc_flag_onoff, 0, STRING("me"), 131072)
+#ifdef VERSION_G8ME01_DEMO
+        LOOP(30)
+            CALL(evt_npc_status_onoff, 1, STRING("me"), 4096)
+            WAIT_FRAMES(1)
+        END_LOOP
+#endif
         LOOP(35)
             CALL(evt_npc_status_onoff, 1, STRING("me"), 4096)
             CALL(evt_npc_get_position, STRING("me"), LW(0), LW(1), LW(2))
@@ -4769,6 +5067,7 @@ EVT_BEGIN(zakoM2D_move_event)
     RETURN
 EVT_END()
 
+#ifndef VERSION_G8ME01_DEMO
 EVT_BEGIN(zakoM2D_find_event)
     CALL(evt_npc_set_anim, STRING("slave_0"), STRING("B_1"))
     CALL(evt_npc_get_position, STRING("me"), LW(0), LW(1), LW(2))
@@ -4807,6 +5106,7 @@ EVT_BEGIN(zakoM2D_find_event)
     CALL(evt_npc_flag_onoff, 1, STRING("slave_0"), 32)
     RETURN
 EVT_END()
+#endif
 
 EVT_BEGIN(zakoM2D_find_start_event)
     BEGIN_SIBLING_EVENT
@@ -4835,11 +5135,50 @@ EVT_BEGIN(zakoM2D_find_start_event)
         WAIT_FRAMES(24)
         CALL(evt_npc_set_anim, STRING("me"), STRING("S_1"))
     END_SIBLING_EVENT
+#ifdef VERSION_G8ME01_DEMO
+    BEGIN_INLINE_EVENT
+        CALL(evt_npc_set_anim, STRING("slave_0"), STRING("B_1"))
+        CALL(evt_npc_set_ry, STRING("slave_0"), LW(0))
+        CALL(evt_npc_get_position, STRING("me"), LW(0), LW(1), LW(2))
+        CALL(evt_npc_facedirection_add, STRING("me"), LW(0), 10)
+        ADD(LW(1), 20)
+        CALL(evt_npc_set_position, STRING("slave_0"), LW(0), LW(1), LW(2))
+        CALL(evt_npc_flag_onoff, 0, STRING("slave_0"), 32)
+        CALL(evt_npc_flag_onoff, 0, STRING("slave_0"), 128)
+        IF_INT_GREATER_OR_EQUAL(LW(10), 200)
+            CALL(evt_npc_get_position, STRING("me"), LW(0), LW(1), LW(2))
+            CALL(evt_npc_facedirection_add, STRING("me"), LW(0), 100)
+            CALL(evt_npc_jump_position, STRING("slave_0"), LW(0), LW(1), LW(2), 0, FLOAT(300.0f), FLOAT(300.0f), 0)
+        ELSE
+            CALL(evt_npc_get_position, STRING("me"), LW(0), LW(1), LW(2))
+            CALL(evt_npc_facedirection_add, STRING("me"), LW(0), LW(10))
+            MULTIPLY_FLOAT(LW(10), FLOAT(1.5f))
+            CALL(evt_npc_jump_position, STRING("slave_0"), LW(0), LW(1), LW(2), 0, LW(10), FLOAT(300.0f), 0)
+        END_IF
+        CALL(evt_npc_get_position, STRING("slave_0"), LW(0), LW(1), LW(2))
+        CALL(evt_eff, STRING(""), STRING("toge_flush"), 0, LW(0), LW(1), LW(2), 60, 0, 0, 0, 0, 0, 0, 0)
+        CALL(evt_npc_set_anim, STRING("slave_0"), STRING("B_2"))
+        WAIT_FRAMES(10)
+        CALL(evt_npc_flag_onoff, 1, STRING("slave_0"), 128)
+        WAIT_FRAMES(60)
+        CALL(evt_npc_set_position, STRING("slave_0"), 0, -1000, 0)
+        CALL(evt_npc_flag_onoff, 1, STRING("slave_0"), 32)
+    END_INLINE_EVENT
+#else
     SPAWN_EVENT(zakoM2D_find_event)
+#endif
     WAIT_FRAMES(100)
     CALL(evt_npc_return_interrupt, STRING("me"))
     RETURN
 EVT_END()
+
+#ifdef VERSION_G8ME01_DEMO
+EVT_BEGIN(zakoM2D_dead_event)
+    CALL(evt_npc_status_onoff, 0, STRING("slave_0"), 4)
+    CALL_CHILD(enemy_2d_common_dead_event)
+    RETURN
+EVT_END()
+#endif
 
 EVT_BEGIN(gesso2D_init_event)
     CALL_CHILD(enemy_common_flag_init_event)
@@ -4882,7 +5221,11 @@ EVT_BEGIN(gesso2D_move_event)
         IF_INT_LESS(LW(1), LW(11))
             BREAK_LOOP
         END_IF
+#ifdef VERSION_G8ME01_DEMO
+        IF_INT_LESS(LW(1), 60)
+#else
         IF_INT_LESS(LW(1), 90)
+#endif
             BREAK_LOOP
         END_IF
         LABEL(5)

@@ -238,9 +238,128 @@ GXRenderModeObj GXNtsc480ProgMarioSt = {
 void viPostCallback(u32 retraceCount);
 void* gcDvdCheckThread(void* param);
 void gcRumbleCheck(void);
+#ifdef VERSION_G8ME01_DEMO
+static inline void L_gcResetCheck(void);
+#else
 void L_gcResetCheck(void);
+#endif
 
 
+#ifdef VERSION_G8ME01_DEMO
+// The demo's start-up: no error handler (it turns on the SDK's DVD fatal message instead), Japanese text
+// whatever the console font, a restart sets flag 4 and flag 0x1000 is always on, and its black fades are
+// fade types 7 and 8.
+void marioStInit(void) {
+	static u8 stack[0x1000];
+	if (!OSIsRestart()) {
+		DEMOInit(&GXNtsc480IntDfMarioSt);
+	}
+	else {
+		switch (OSGetResetCode() & OS_RESET_HOTRESET) {
+			case 0:
+				DEMOInit(&GXNtsc480IntDfMarioSt);
+				break;
+			case 1:
+				DEMOInit(&GXNtsc480ProgMarioSt);
+				break;
+		}
+	}
+	DEMOEnableGPHangWorkaround(5);
+	DEMOPadInit();
+	DVDSetAutoFatalMessaging(TRUE);
+	GXSetCopyClear((GXColor){0, 0, 0, 0}, 0xFFFFFF);
+	__GXSetIndirectMask(0);
+	memset(gp, 0, sizeof(GlobalWork));
+	gp->fbWidth = DEMOGetRenderModeObj()->fbWidth;
+	gp->efbHeight = DEMOGetRenderModeObj()->efbHeight;
+	if (OSIsRestart()) {
+		gp->flags |= 4;
+	}
+	gp->flags |= 0x1000;
+	gp->rumbleEnabled = 1;
+	gp->soundMode = 0;
+
+	gp->retraceLocalTime = 0;
+	gp->retraceDeltaTime = 0;
+	gp->retraceTime = OSGetTime();
+
+	gp->renderFieldTime = 0;
+	gp->renderTime = 0;
+
+	gp->systemLv3Time = 0;
+	gp->systemLv2Time = 0;
+	gp->systemLv1Time = 0;
+	gp->systemLv0Time = 0;
+
+	gp->mapFadeOutType = 7;
+	gp->mapFadeOutDuration = 300;
+	gp->mapFadeInType = 8;
+	gp->mapFadeInDuration = 300;
+	gp->areaFadeOutType = 7;
+	gp->areaFadeOutDuration = 300;
+	gp->areaFadeInType = 8;
+	gp->areaFadeInDuration = 300;
+	gp->language = 1;
+	gp->framerate = 60;
+	gp->systemLevelFlags = 0;
+	badgeShop_init(); //Badge Shop
+	yuugijou_init(); //Pianta Parlor
+	johoya_init(); //?????
+	gp->mapAlloc = __memAlloc(HEAP_DEFAULT, 660 * 1024);
+	VISetPostRetraceCallback(viPostCallback);
+	romFontInit();
+	OSCreateThread(&DvdCheckThread, gcDvdCheckThread, NULL, stack + sizeof(stack), sizeof(stack), 16, OS_THREAD_ATTR_DETACH);
+	DvdCheckTreadOn = TRUE;
+	OSResumeThread(&DvdCheckThread);
+	DVDMgrInit();
+	psndInit();
+	aramMgrInit();
+	fileInit();
+	smartInit();
+	dispInit();
+	camInit();
+	fontmgrInit();
+	windowInit();
+	mapInit();
+	hitInit();
+	itemInit();
+	iconInit();
+	fadeInit();
+	bgInit();
+	shadowInit();
+	evtmgrInit();
+	animInit();
+	msgInit();
+	npcInit();
+	mobjInit();
+	effInit();
+	marioInit();
+	caseInit();
+	imgInit();
+	lightInit();
+	offscreenInit();
+	arcInit();
+	extInit();
+	swInit();
+	cardInit();
+	winInit();
+	statusWinInit();
+	envInit();
+	countDownInit();
+	nameEntInit();
+	winMgrInit();
+	seqInit_MARIOSTORY();
+	seqSetSeq(0, NULL, NULL);
+	gp->soundMode = 0;
+	if (OSGetSoundMode() == OS_SOUND_MODE_MONO) {
+		SoundSetOutputMode(0);
+	}
+	else {
+		SoundSetOutputMode(1);
+	}
+	none_key = OSGetTime();
+}
+#else
 void marioStInit(void) {
 	static u8 stack[0x1000];
 	if (!OSIsRestart() || (OSGetResetCode() & OS_RESET_SHUTDOWN)) {
@@ -394,6 +513,7 @@ void marioStInit(void) {
 		SoundSetOutputMode(1);
 	}
 }
+#endif
 
 void marioStMain(void) {
 	int i;
@@ -446,9 +566,23 @@ void marioStMain(void) {
 			if (gp->triggerRight[i]) break;
 		}
 		if (i >= 4) {
+#ifdef VERSION_G8ME01_DEMO
+			// The kiosk demo: after a minute without input it plays the attract demo on the title and
+			// load screens, and resets anywhere else.
+			if (OSTicksToSeconds(OSGetTime() - none_key) > 60) {
+				if (seqGetSeq() == 2 || seqGetSeq() == 4) {
+					gp->flags |= 0x2000;
+					none_key = OSGetTime();
+				}
+				else {
+					gp->resetType = 1;
+				}
+			}
+#else
 			if (OSTicksToSeconds(OSGetTime() - none_key) > 120 && (seqGetSeq() == 2 || seqGetSeq() == 4)) {
 				gp->flags |= 0x2000;
 			}
+#endif
 		}
 		else {
 			none_key = OSGetTime();
@@ -585,9 +719,11 @@ void viPostCallback(u32 retraceCount) {
 			else {
 				gp->softResetWait = FALSE;
 			}
+#ifndef VERSION_G8ME01_DEMO
 			if (DVDGetDriveStatus() == -1) {
 				gp->resetType = 0;
 			}
+#endif
 		}
 	}
 exitcheck:
@@ -642,6 +778,11 @@ void* gcDvdCheckThread(void* param) {
 #endif
 				gp->dvdError = TRUE;
 				break;
+#ifdef VERSION_G8ME01_DEMO
+			// The demo has no message for a fatal error and leaves dvdError as it is.
+			case DVD_RESULT_FATAL_ERROR:
+				break;
+#else
 			case DVD_RESULT_FATAL_ERROR:
 #ifdef VERSION_G8ME01
 				msgId = 13;
@@ -650,6 +791,7 @@ void* gcDvdCheckThread(void* param) {
 #endif
 				gp->dvdError = TRUE;
 				break;
+#endif
 			default:
 				gp->dvdError = FALSE;
 				break;
@@ -674,17 +816,30 @@ void* gcDvdCheckThread(void* param) {
 		else {
 			SoundCloseCover();
 		}
+#ifndef VERSION_G8ME01_DEMO
 		if (gp->dvdError) {
 			if (cardIsExec()) {
 				gp->dvdError = FALSE;
 			}
 		}
+#endif
 #ifdef VERSION_G8ME01
 		if (gp->dvdError && stableCount > 10) {
 #else
 		if (gp->dvdError) {
 #endif
 			DEMOBeforeRender();
+#ifdef VERSION_G8ME01_DEMO
+			// The demo draws the message at 0.8 scale, centred at height 0.
+			if (msgId) {
+				message = romFontGetMessage(msgId);
+				width = 0.8f * romFontGetWidth(message);
+				MTXPerspective(mtx, 25.0f, 1.2666667f, 1.0f, 10000.0f);
+				GXSetProjection(mtx, GX_PERSPECTIVE);
+				xpos = -width / 2.0f;
+				romFontPrintGX(xpos, 0.0f, 0.8f, &(GXColor){0xFF, 0xFF, 0xFF, 0xFF}, message);
+			}
+#else
 			if (msgId) {
 				message = romFontGetMessage(msgId);
 				width = (f32)romFontGetWidth(message);
@@ -693,6 +848,7 @@ void* gcDvdCheckThread(void* param) {
 				xpos = -width / 2.0f;
 				romFontPrintGX(xpos, 60.0f, 1.0f, &(GXColor){0xFF, 0xFF, 0xFF, 0xFF}, message);
 			}
+#endif
 			DEMODoneRender();
 			makeKey();
 			L_gcResetCheck();
@@ -765,6 +921,50 @@ diff = (s32)now - (s32)gp->rumbleForcedOffTime[i];
 	}
 }
 
+#ifdef VERSION_G8ME01_DEMO
+// The demo inlines the reset check into its callers and logs the reset; its restart codes are only
+// RESTART and HOTRESET.
+static inline void L_gcResetCheck(void) {
+	u32 code;
+
+	if (gp->resetType) {
+		OSReport("\x83\x8A\x83\x5A\x83\x62\x83\x67\x8F\x88\x97\x9D\x8A\x4A\x8E\x6E\n");
+		VISetBlack(TRUE);
+		VIFlush();
+		VIWaitForRetrace();
+		VIWaitForRetrace();
+		VIWaitForRetrace();
+		psndExit();
+		DVDMgrDelete();
+		if (DvdCheckTreadOn) {
+			OSCancelThread(&DvdCheckThread);
+			DvdCheckTreadOn = FALSE;
+		}
+		while (cardIsExec()) {
+			cardMain();
+			VIWaitForRetrace();
+		}
+		if (gp->resetType != 2) {
+			if (!(gp->flags & 4)) {
+				code = OS_RESET_RESTART;
+			}
+			else {
+				if (!(gp->flags & 8)) {
+					code = OS_RESET_RESTART;
+				}
+				else {
+					code = OS_RESET_HOTRESET;
+				}
+			}
+			OSResetSystem(OS_RESET_RESTART, code, FALSE);
+		}
+		else {
+			OSResetSystem(OS_RESET_HOTRESET, 0, TRUE);
+		}
+		while (1) {}
+	}
+}
+#else
 #pragma dont_inline on
 void L_gcResetCheck(void) {
 	u32 code;
@@ -813,9 +1013,12 @@ void L_gcResetCheck(void) {
 	}
 }
 #pragma dont_inline reset
+#endif
 
 // prototypes for asm stopgap forward references
+#ifndef VERSION_G8ME01_DEMO
 void L_gcResetCheck(void);
+#endif
 void gcRumbleCheck(void);
 void* gcDvdCheckThread(void* param);
 void viPostCallback(u32 retraceCount);

@@ -40,15 +40,15 @@ typedef struct EffTimestampN64Work {
 } EffTimestampN64Work;
 
 
-static s32 pos_data[30] = {
-    -50, -70, 5,  80, -90, 20, 20, -50, 45,  -80, 30,  10,  30,  0,   35,
-    120, -30, 50, 10, 50,  30, 100, 30, 15,  40,  100, 40,  140, 90,  25,
-};
-
 static u8 scale_data[4] = {120, 80, 40, 60};
 static u8 colr[17] = {255, 255, 255, 198, 138, 130, 130, 130, 130, 130, 175, 215, 250, 255, 255, 255, 255};
 static u8 colg[17] = {130, 130, 130, 130, 130, 165, 213, 255, 255, 255, 255, 255, 255, 225, 198, 159, 130};
 static u8 colb[17] = {130, 196, 255, 255, 255, 255, 255, 255, 202, 144, 130, 130, 130, 130, 130, 130, 130};
+
+static s32 pos_data[30] = {
+    -50, -70, 5,  80, -90, 20, 20, -50, 45,  -80, 30,  10,  30,  0,   35,
+    120, -30, 50, 10, 50,  30, 100, 30, 15,  40,  100, 40,  140, 90,  25,
+};
 
 void effTimestampMain(EffectEntry* effect);
 void effTimestampDisp(CameraId cameraId, EffectEntry* effect);
@@ -163,8 +163,8 @@ void effTimestampDisp(CameraId cameraId, EffectEntry* effect) {
     Mtx rot;
     Mtx mtx;
     s32 frame;
-    s32 bright;
     s32 i;
+    s32 bright;
     effN64Vtx* vtx;
     effN64Vtx* p;
     s32 t;

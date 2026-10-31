@@ -504,7 +504,11 @@ EVT_BEGIN(boss_noko_talk)
         END_IF
         IF_INT_LESS(LW(0), LW(1))
             CALL(evt_msg_continue)
+#ifdef VERSION_G8ME01_DEMO
+            CALL(evt_item_entry, STRING("item_irai"), 174, 0, -1000, 0, 16, -1, 0)
+#else
             CALL(evt_item_entry, STRING("item_irai"), 174, 0, -1000, 0, 17, -1, 0)
+#endif
             CALL(evt_item_get_item, STRING("item_irai"))
             SET_VALUE(GSWF(1629), 1)
             ELSE
@@ -514,7 +518,11 @@ EVT_BEGIN(boss_noko_talk)
             CALL(evt_npc_status_onoff, 1, STRING("me"), 2)
             CALL(evt_npc_move_position, STRING("me"), -317, -350, 0, 40, 0)
             WAIT_MS(300)
+#ifdef VERSION_G8ME01_DEMO
+            CALL(evt_item_entry, STRING("iri_08"), 174, -317, 128, -374, 15, GSWF(1629), 0)
+#else
             CALL(evt_item_entry, STRING("iri_08"), 174, -317, 128, -374, 16, GSWF(1629), 0)
+#endif
             WAIT_MS(300)
             CALL(evt_npc_move_position, STRING("me"), LW(0), LW(2), 0, 40, 0)
             CALL(evt_set_dir_to_target, STRING("me"), STRING("mario"))
@@ -535,11 +543,19 @@ EVT_BEGIN(boss_noko_talk)
                 ELSE
                 IF_INT_EQUAL(GSWF(5407), 0)
                     CALL(evt_msg_print, 0, STRING("irai_17_00"), 0, 0)
+#ifdef VERSION_G8ME01_DEMO
+                    CALL(evt_win_item_select, PTR(iri_17_item_tbl), LW(0))
+#else
                     CALL(evt_win_item_select, 0, PTR(iri_17_item_tbl), LW(0), 0)
+#endif
                     IF_INT_NOT_EQUAL(LW(0), -1)
                         CALL(evt_pouch_remove_item, 98, LW(0))
                         CALL(evt_msg_print, 0, STRING("irai_17_01"), 0, 0)
+#ifdef VERSION_G8ME01_DEMO
+                        CALL(evt_item_entry, STRING("kairanban"), 98, 0, -1000, 0, 16, -1, 0)
+#else
                         CALL(evt_item_entry, STRING("kairanban"), 98, 0, -1000, 0, 17, -1, 0)
+#endif
                         CALL(evt_item_get_item, STRING("kairanban"))
                         CALL(evt_item_get_item_end_wait, STRING("kairanban"))
                         SET_VALUE(GSWF(5407), 1)
@@ -567,9 +583,11 @@ EVT_BEGIN(boss_noko_talk)
         CALL(evt_msg_print, 0, STRING("stg1_nok_56_01"), 0, 0)
         CASE_LESS(65)
         CALL(evt_msg_print, 0, STRING("stg1_nok_57"), 0, 0)
+#ifndef VERSION_G8ME01_DEMO
         CASE_EQUAL(354)
         SET_VALUE(GSWF(3877), 1)
         CALL(evt_msg_print, 0, STRING("stg1_nok_57_1_00"), 0, 0)
+#endif
         CASE_LESS_OR_EQUAL(402)
         CALL(evt_msg_print, 0, STRING("stg1_nok_57_1"), 0, 0)
         CASE_DEFAULT
@@ -1097,7 +1115,9 @@ EVT_BEGIN(nokotarou_tabidachi)
     SET_VALUE(GSW(0), 62)
     RESUME_TYPES_OTHER(4)
     CALL(evt_cam3d_evt_off, 500, 11)
+#ifndef VERSION_G8ME01_DEMO
     CALL(N_evt_bero_set_mario_bottomless_respawn_pos_to_current_mario_pos)
+#endif
     CALL(evt_mario_key_onoff, 1)
     CALL(evt_party_cont_onoff, 0, 1)
     CALL(evt_party_run, 0)
@@ -1228,7 +1248,11 @@ static EVT_BEGIN(sekai_yami_evt)
     CALL(evt_npc_wait_pera, STRING("村長"))
     CALL(evt_msg_print, 0, STRING("stg8_dark_01"), 0, STRING("村長"))
     WAIT_MS(1000)
+#ifdef VERSION_G8ME01_DEMO
+    CALL(evt_fade_set_mapchange_type, 1, 8, 300, 7, 300)
+#else
     CALL(evt_fade_set_mapchange_type, 1, 10, 300, 9, 300)
+#endif
     CALL(evt_bero_mapchange, STRING("mri_00"), STRING("sekai_yami1"))
     CALL(evt_mario_key_onoff, 1)
     RETURN
@@ -1339,7 +1363,11 @@ static EVT_BEGIN(minnnanokoe_evt)
     CALL(evt_msg_print, 0, STRING("stg8_las_148_09"), 0, STRING("ノコリン"))
     CALL(evt_cam3d_evt_set, 562, 320, 474, 0, 100, -50, 6000, 11)
     WAIT_MS(3000)
+#ifdef VERSION_G8ME01_DEMO
+    CALL(evt_fade_set_mapchange_type, 1, 8, 300, 7, 300)
+#else
     CALL(evt_fade_set_mapchange_type, 1, 10, 300, 9, 300)
+#endif
     CALL(evt_bero_mapchange, STRING("mri_00"), STRING("minnnanokoe"))
     RETURN
 EVT_END()
@@ -1508,7 +1536,11 @@ static EVT_BEGIN(epilogue_evt)
     CALL(evt_map_set_blend, 0, 0, 0, 0, 255)
     CALL(evt_snd_bgmoff_f, 512, 3000)
     CALL(evt_snd_envoff_f, 512, 3000)
+#ifdef VERSION_G8ME01_DEMO
+    CALL(evt_fade_set_mapchange_type, 1, 8, 1, 7, 900)
+#else
     CALL(evt_fade_set_mapchange_type, 1, 10, 1, 9, 900)
+#endif
     CALL(evt_bero_mapchange, STRING("tou_08"), STRING(""))
     RETURN
 EVT_END()
@@ -1519,7 +1551,11 @@ static EVT_BEGIN(evt_kusa_4)
     END_IF
     CALL(evt_item_delete_check, STRING("item_kusa_4"), LW(0))
     IF_INT_EQUAL(LW(0), 1)
+#ifdef VERSION_G8ME01_DEMO
+        CALL(evt_item_entry, STRING("item_kusa_4"), 174, -407, 70, -148, 4, LSWF(4), 0)
+#else
         CALL(evt_item_entry, STRING("item_kusa_4"), 174, -407, 70, -160, 4, LSWF(4), 0)
+#endif
     END_IF
     RETURN
 EVT_END()
@@ -1530,7 +1566,11 @@ static EVT_BEGIN(evt_kusa_5)
     END_IF
     CALL(evt_item_delete_check, STRING("item_kusa_5"), LW(0))
     IF_INT_EQUAL(LW(0), 1)
+#ifdef VERSION_G8ME01_DEMO
+        CALL(evt_item_entry, STRING("item_kusa_5"), 174, -452, 70, -148, 4, LSWF(4), 0)
+#else
         CALL(evt_item_entry, STRING("item_kusa_5"), 174, -452, 70, -160, 4, LSWF(4), 0)
+#endif
     END_IF
     RETURN
 EVT_END()
@@ -1541,7 +1581,11 @@ static EVT_BEGIN(evt_kusa_6)
     END_IF
     CALL(evt_item_delete_check, STRING("item_kusa_6"), LW(0))
     IF_INT_EQUAL(LW(0), 1)
+#ifdef VERSION_G8ME01_DEMO
+        CALL(evt_item_entry, STRING("item_kusa_6"), 174, -362, 70, -148, 4, LSWF(4), 0)
+#else
         CALL(evt_item_entry, STRING("item_kusa_6"), 174, -362, 70, -160, 4, LSWF(4), 0)
+#endif
     END_IF
     RETURN
 EVT_END()
@@ -1610,9 +1654,17 @@ EVT_BEGIN(nok_01_init_evt)
         SET_VALUE(LSWF(4), 1)
     END_IF
     CALL(evt_mobj_kururing_floor, STRING("kururin2"), 400, 0, 140, STRING("S_guround"), 125, GSWF(5602))
+#ifdef VERSION_G8ME01_DEMO
+    CALL(evt_item_entry, STRING("item_00"), 267, -180, 70, -425, 15, GSWF(1628), 0)
+#else
     CALL(evt_item_entry, STRING("item_00"), 267, -180, 70, -425, 16, GSWF(1628), 0)
+#endif
     IF_INT_EQUAL(GSWF(5382), 1)
+#ifdef VERSION_G8ME01_DEMO
+        CALL(evt_item_entry, STRING("iri_08"), 174, -317, 128, -374, 15, GSWF(1629), 0)
+#else
         CALL(evt_item_entry, STRING("iri_08"), 174, -317, 128, -374, 16, GSWF(1629), 0)
+#endif
     END_IF
     IF_INT_EQUAL(LF(0), 0)
         LOOP(2)

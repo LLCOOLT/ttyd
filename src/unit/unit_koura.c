@@ -38,7 +38,11 @@ PoseTableEntry pose_table_crack_lv1[5];
 PoseTableEntry pose_table_crack_lv2[5];
 static BattleUnitKindPart parts[2];
 static EvtWord init_event[46];
+#ifdef VERSION_G8ME01_DEMO
+static EvtWord phase_event[22];
+#else
 static EvtWord phase_event[38];
+#endif
 extern EvtWord koura_open[];
 extern EvtWord koura_close[];
 extern EvtWord damage_core[];
@@ -115,16 +119,6 @@ BattleUnitKind unit_koura = {
     data_table,
 };
 
-static BattleDataEntry data_table[] = {
-    {59, koura_open},
-    {60, koura_close},
-    {9, damage_core},
-    {61, pose_tbl_reset},
-    {62, destroy_event},
-    {49, dead_event},
-    {0, NULL},
-};
-
 static BattleUnitDefense defence = {{0, 0, 0, 0, 0}};
 
 static BattleUnitDefenseAttr defence_attr = {{0, 0, 0, 0, 0}};
@@ -135,24 +129,49 @@ static PoseTableEntry pose_table[] = {
     {28, "PKO_S_1"},
     {31, "PKO_S_1"},
     {39, "PKO_D_1"},
+#ifdef VERSION_G8ME01_DEMO
+    {66, "PKO_Z_1"},
+    {67, "PKO_S_1"},
+#else
     {68, "PKO_Z_1"},
     {69, "PKO_S_1"},
+#endif
 };
 
 PoseTableEntry pose_table_crack_lv1[] = {
     {28, "PKO_S_2"},
     {31, "PKO_S_2"},
     {39, "PKO_D_2"},
+#ifdef VERSION_G8ME01_DEMO
+    {66, "PKO_Z_2"},
+    {67, "PKO_S_2"},
+#else
     {68, "PKO_Z_2"},
     {69, "PKO_S_2"},
+#endif
 };
 
 PoseTableEntry pose_table_crack_lv2[] = {
     {28, "PKO_S_3"},
     {31, "PKO_S_3"},
     {39, "PKO_D_3"},
+#ifdef VERSION_G8ME01_DEMO
+    {66, "PKO_Z_3"},
+    {67, "PKO_S_3"},
+#else
     {68, "PKO_Z_3"},
     {69, "PKO_S_3"},
+#endif
+};
+
+static BattleDataEntry data_table[] = {
+    {59, koura_open},
+    {60, koura_close},
+    {9, damage_core},
+    {61, pose_tbl_reset},
+    {62, destroy_event},
+    {49, dead_event},
+    {0, NULL},
 };
 
 static BattleUnitKindPart parts[] = {
@@ -174,20 +193,35 @@ static EVT_BEGIN(init_event)
     RETURN
 EVT_END()
 
+static EVT_BEGIN(damage_event)
+    SET_VALUE(LW(10), -2)
+    SET_VALUE(LW(11), 1)
+    CALL_CHILD(PTR(btldefaultevt_Damage))
+    RETURN
+EVT_END()
+
 static EVT_BEGIN(phase_event)
     CALL(btlevtcmd_CheckPhase, LW(0), 67108865)
     IF_INT_NOT_EQUAL(LW(0), 0)
+#ifdef VERSION_G8ME01_DEMO
+        CALL_CHILD(PTR(koura_open))
+#else
         CALL(btlevtcmd_GetHp, -2, LW(0))
         IF_INT_GREATER(LW(0), 0)
             CALL_CHILD(PTR(koura_open))
         END_IF
+#endif
     END_IF
     CALL(btlevtcmd_CheckPhase, LW(0), 67108867)
     IF_INT_NOT_EQUAL(LW(0), 0)
+#ifdef VERSION_G8ME01_DEMO
+        CALL_CHILD(PTR(koura_close))
+#else
         CALL(btlevtcmd_GetHp, -2, LW(0))
         IF_INT_GREATER(LW(0), 0)
             CALL_CHILD(PTR(koura_close))
         END_IF
+#endif
     END_IF
     RETURN
 EVT_END()
@@ -210,7 +244,11 @@ EVT_BEGIN(koura_open)
     CALL(btlevtcmd_OffAttribute, LW(3), 64)
     CALL(btlevtcmd_OnPartsAttribute, -2, 1, 65536)
     CALL(btlevtcmd_SetUnitWork, -2, 2, 1)
+#ifdef VERSION_G8ME01_DEMO
+    CALL(btlevtcmd_AnimeChangePoseType, -2, 1, 66)
+#else
     CALL(btlevtcmd_AnimeChangePoseType, -2, 1, 68)
+#endif
     RETURN
 EVT_END()
 
@@ -238,6 +276,11 @@ EVT_BEGIN(koura_close)
     RETURN
 EVT_END()
 
+static EVT_BEGIN(wait_event)
+    CALL(btlevtcmd_AnimeChangePoseFromTable, -2, 1)
+    RETURN
+EVT_END()
+
 EVT_BEGIN(damage_core)
     CALL(btlevtcmd_GetUnitWork, -2, 3, LW(1))
     CALL(btlevtcmd_GetHp, -2, LW(0))
@@ -262,7 +305,11 @@ EVT_BEGIN(damage_core)
         CALL(btlevtcmd_SetUnitWork, -2, 3, 0)
     END_SWITCH
     CALL(btlevtcmd_AnimeChangePoseType, -2, 1, 39)
+#ifdef VERSION_G8ME01_DEMO
+    WAIT_FRAMES(30)
+#else
     WAIT_MS(500)
+#endif
     CALL(btlevtcmd_StartWaitEvent, -2)
     RETURN
 EVT_END()
@@ -363,18 +410,6 @@ EVT_BEGIN(destroy_event)
     CALL(btlevtcmd_GetPos, -2, LW(0), LW(1), LW(2))
     CALL(evt_eff, STRING(""), STRING("kemuri_test"), 2, LW(0), LW(1), LW(2), FLOAT(1.0f), 0, 0, 0, 0, 0, 0, 0)
     CALL(btlevtcmd_KillUnit, -2, 0)
-    RETURN
-EVT_END()
-
-static EVT_BEGIN(damage_event)
-    SET_VALUE(LW(10), -2)
-    SET_VALUE(LW(11), 1)
-    CALL_CHILD(PTR(btldefaultevt_Damage))
-    RETURN
-EVT_END()
-
-static EVT_BEGIN(wait_event)
-    CALL(btlevtcmd_AnimeChangePoseFromTable, -2, 1)
     RETURN
 EVT_END()
 

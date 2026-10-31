@@ -33,6 +33,17 @@ typedef struct GaugeKey {
 } GaugeKey;
 
 #define GAUGE_TABLE {{0, 0.0f, 1}, {20, 1.0f, 1}, {40, 1.0f, 1}, {80, 0.0f, 0}, {-1, -1.0f, 0}}
+#ifdef VERSION_G8ME01_DEMO
+// the demo curve rises faster and falls off sooner; table 3 already has the retail one
+#define GAUGE_TABLE_DEMO {{0, 0.0f, 1}, {10, 1.2f, 1}, {30, 0.7f, 1}, {50, 0.0f, 0}, {-1, -1.0f, 0}}
+GaugeKey _table_0[5] = GAUGE_TABLE_DEMO;
+GaugeKey _table_1[5] = GAUGE_TABLE_DEMO;
+GaugeKey _table_2[5] = GAUGE_TABLE_DEMO;
+GaugeKey _table_3[5] = GAUGE_TABLE;
+GaugeKey _table_4[5] = GAUGE_TABLE_DEMO;
+GaugeKey _table_5[5] = GAUGE_TABLE_DEMO;
+GaugeKey _table_6[5] = GAUGE_TABLE_DEMO;
+#else
 GaugeKey _table_0[5] = GAUGE_TABLE;
 GaugeKey _table_1[5] = GAUGE_TABLE;
 GaugeKey _table_2[5] = GAUGE_TABLE;
@@ -40,6 +51,7 @@ GaugeKey _table_3[5] = GAUGE_TABLE;
 GaugeKey _table_4[5] = GAUGE_TABLE;
 GaugeKey _table_5[5] = GAUGE_TABLE;
 GaugeKey _table_6[5] = GAUGE_TABLE;
+#endif
 
 typedef struct AirPw {
     s32 frame;
@@ -210,6 +222,16 @@ f32 _GetGaugeDecValue(void) {
     u32 frame;
 
     switch ((u32)ac->params[7]) {
+#ifdef VERSION_G8ME01_DEMO
+        case 0: base = 0.0f; t = _table_0; break;
+        case 1: base = 0.2f; t = _table_1; break;
+        case 2: base = 0.3f; t = _table_2; break;
+        case 3: base = 0.4f; t = _table_3; break;
+        case 4: base = 0.45f; t = _table_4; break;
+        case 5: base = 0.45f; t = _table_5; break;
+        case 6:
+        default: t = _table_6; base = 0.45f; break;
+#else
         case 0: base = 0.3f; t = _table_0; break;
         case 1: base = 0.33f; t = _table_1; break;
         case 2: base = 0.36f; t = _table_2; break;
@@ -218,6 +240,7 @@ f32 _GetGaugeDecValue(void) {
         case 5: base = 0.47f; t = _table_5; break;
         case 6:
         default: t = _table_6; base = 0.5f; break;
+#endif
     }
     while (pw->hold > t->frame) {
         t++;
@@ -301,12 +324,12 @@ static void actionCommandDisp(f32 x, f32 y) {
         Vec pos = {0.0f, 0.0f, 0.0f};
         pos.x = -200.0f + x;
         pos.y = 58.0f + y;
-        iconDispGx(&pos, 0x10, ICON_065, 1.0f);
+        iconDispGx(&pos, ICON_DISP_2D, ICON_065, 1.0f);
     } else {
         Vec pos = {0.0f, 0.0f, 0.0f};
         pos.x = -200.0f + x;
         pos.y = 58.0f + y;
-        iconDispGx(&pos, 0x10, ICON_064, 1.0f);
+        iconDispGx(&pos, ICON_DISP_2D, ICON_064, 1.0f);
     }
 }
 #pragma dont_inline reset

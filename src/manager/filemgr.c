@@ -12,10 +12,16 @@
 #include "addr_word.h"
 
 //.bss
+#ifdef VERSION_G8ME01_DEMO
+FileManagerWork fileWork; // .bss in the demo (-sdata 8), after _filename: .bss is laid out in reverse order
+#endif
+
 char _filename[0x400]; //for fileAllocf/fileAsyncf vsprintf
 
 //.sbss
+#ifndef VERSION_G8ME01_DEMO
 FileManagerWork fileWork;
+#endif
 
 //.sdata
 FileManagerWork* afp = &fileWork;

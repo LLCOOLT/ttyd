@@ -56,6 +56,32 @@ void nannpc_ext_main();
 void nannpc_ext_main_sub();
 void nannpc_ext_init();
 
+#ifdef VERSION_G8ME01_DEMO
+// the demo turns the name into a string in a helper (same code, other register order)
+static inline char* nanNPCEntryName(char* name) {
+    if (!((EvtWord)name & 0x80000000)) {
+        sprintf(makestring, "%06x", name);
+        name = makestring;
+    }
+    return name;
+}
+
+// the demo search through that helper
+static inline NanNPC* nanNPCSearch2(char* name) {
+    s32 i;
+    NanNPC* p;
+    NanNPCWork* w = nanNPCWork;
+    for (i = 0; i < w->num; i++) {
+        p = &w->npc[i];
+        name = nanNPCEntryName(name);
+        if (!strcmp((char*)p->name, name)) {
+            return p;
+        }
+    }
+    return NULL;
+}
+#endif
+
 static inline NanNPC* nanNPCSearch(char* name) {
     s32 i;
     NanNPC* p;
@@ -72,6 +98,13 @@ static inline NanNPC* nanNPCSearch(char* name) {
     }
     return NULL;
 }
+
+// the demo reads the NPC name into a local before the search (same code, other register order)
+#ifdef VERSION_G8ME01_DEMO
+#define NANNPC_FROM_ARG(npc, event, arg) char* npcName = (char*)evtGetValue(event, arg); NanNPC* npc = nanNPCSearch(npcName)
+#else
+#define NANNPC_FROM_ARG(npc, event, arg) NanNPC* npc = nanNPCSearch((char*)evtGetValue(event, arg))
+#endif
 
 static inline void nanNPCHitMove(NanNPC* r, f32 mag) {
     s32 clear;
@@ -422,6 +455,7 @@ USER_FUNC(evt_nannpc_set_subfunc) {
     return 2;
 }
 
+
 s32 evt_nannpc_entry(EventEntry *event, BOOL isFirstCall)
 {
   NanNPC *p;
@@ -439,6 +473,9 @@ s32 evt_nannpc_entry(EventEntry *event, BOOL isFirstCall)
   for (i = 0, off = 0; i < w->num; off += sizeof(NanNPC), i++)
   {
     p = (NanNPC *) (((u8 *) w->npc) - (-off));
+#ifdef VERSION_G8ME01_DEMO
+    str = nanNPCEntryName((char *) name);
+#else
     str = (char *) name;
     if (!(((EvtWord) str) & 0x80000000))
     {
@@ -446,6 +483,7 @@ s32 evt_nannpc_entry(EventEntry *event, BOOL isFirstCall)
       sprintf(makestring, "%06x", name);
       str = makestring;
     }
+#endif
     strcmp((char *) p->name, str);
     if (!p->pose)
     {
@@ -472,7 +510,7 @@ s32 evt_nannpc_entry(EventEntry *event, BOOL isFirstCall)
 
 USER_FUNC(evt_nannpc_set_position) {
     EvtWord* args = event->args;
-    NanNPC* npc = nanNPCSearch((char*)evtGetValue(event, args[0]));
+    NANNPC_FROM_ARG(npc, event, args[0]);
     f32 x = evtGetFloat(event, args[1]);
     npc->pos.x = x;
     npc->target.x = x;
@@ -487,7 +525,7 @@ USER_FUNC(evt_nannpc_set_position) {
 
 USER_FUNC(evt_nannpc_get_position) {
     EvtWord* args = event->args;
-    NanNPC* npc = nanNPCSearch((char*)evtGetValue(event, args[0]));
+    NANNPC_FROM_ARG(npc, event, args[0]);
     evtSetFloat(event, args[1], npc->pos.x);
     evtSetFloat(event, args[2], npc->pos.y);
     evtSetFloat(event, args[3], npc->pos.z);
@@ -496,7 +534,7 @@ USER_FUNC(evt_nannpc_get_position) {
 
 USER_FUNC(evt_nannpc_set_hosei_position) {
     EvtWord* args = event->args;
-    NanNPC* npc = nanNPCSearch((char*)evtGetValue(event, args[0]));
+    NANNPC_FROM_ARG(npc, event, args[0]);
     npc->hosei.x = evtGetFloat(event, args[1]);
     npc->hosei.y = evtGetFloat(event, args[2]);
     npc->hosei.z = evtGetFloat(event, args[3]);
@@ -505,7 +543,7 @@ USER_FUNC(evt_nannpc_set_hosei_position) {
 
 USER_FUNC(evt_nannpc_set_size) {
     EvtWord* args = event->args;
-    NanNPC* npc = nanNPCSearch((char*)evtGetValue(event, args[0]));
+    NANNPC_FROM_ARG(npc, event, args[0]);
     npc->sizeX = evtGetFloat(event, args[1]);
     npc->sizeY = evtGetFloat(event, args[2]);
     return 2;
@@ -530,7 +568,7 @@ void evt_nannpc_set_animtbl_sub(NanNPC* npc, s16* tbl) {
 
 USER_FUNC(evt_nannpc_set_animtbl) {
     EvtWord* args = event->args;
-    NanNPC* npc = nanNPCSearch((char*)evtGetValue(event, args[0]));
+    NANNPC_FROM_ARG(npc, event, args[0]);
     s16* tbl = (s16*)evtGetValue(event, args[1]);
     s32 n;
     npc->animtbl = tbl;
@@ -558,7 +596,7 @@ USER_FUNC(evt_nannpc_set_dir) {
 
 USER_FUNC(evt_nannpc_set_work) {
     EvtWord* args = event->args;
-    NanNPC* npc = nanNPCSearch((char*)evtGetValue(event, args[0]));
+    NANNPC_FROM_ARG(npc, event, args[0]);
     s32 idx = evtGetValue(event, args[1]);
     npc->work[idx] = evtGetValue(event, args[2]);
     return 2;
@@ -582,12 +620,17 @@ USER_FUNC(evt_nannpc_move_position2) {
     Vec diff;
     Vec step;
     args = event->args;
+#ifdef VERSION_G8ME01_DEMO
+    npc = nanNPCSearch2((char*)evtGetValue(event, args[0]));
+    now = gp->inBattle ? gp->renderTime : gp->renderFieldTime;
+#else
     npc = nanNPCSearch((char*)evtGetValue(event, args[0]));
     if (gp->inBattle) {
         now = gp->renderTime;
     } else {
         now = gp->renderFieldTime;
     }
+#endif
     target.x = evtGetValue(event, args[1]);
     target.y = evtGetValue(event, args[2]);
     target.z = evtGetValue(event, args[3]);
@@ -610,7 +653,11 @@ USER_FUNC(evt_nannpc_move_position2) {
 
 USER_FUNC(evt_nannpc_jump_position) {
     EvtWord* args = event->args;
-    NanNPC* npc = nanNPCSearch((char*)evtGetValue(event, args[0]));
+#ifdef VERSION_G8ME01_DEMO
+    NanNPC* npc = nanNPCSearch2((char*)evtGetValue(event, args[0]));
+#else
+    NANNPC_FROM_ARG(npc, event, args[0]);
+#endif
     f32 x = evtGetValue(event, args[1]);
     f32 y = evtGetValue(event, args[2]);
     f32 z = evtGetValue(event, args[3]);
@@ -674,7 +721,7 @@ USER_FUNC(evt_nannpc_ppflag_onoff) {
 
 USER_FUNC(evt_nannpc_set_func) {
     EvtWord* args = event->args;
-    NanNPC* npc = nanNPCSearch((char*)evtGetValue(event, args[0]));
+    NANNPC_FROM_ARG(npc, event, args[0]);
     npc->func = (void (*)(NanNPC*))evtGetValue(event, args[1]);
     return 2;
 }
@@ -689,7 +736,7 @@ USER_FUNC(evt_nannpc_set_shadow_position) {
 
 USER_FUNC(evt_nannpc_set_color) {
     EvtWord* args = event->args;
-    NanNPC* npc = nanNPCSearch((char*)evtGetValue(event, args[0]));
+    NANNPC_FROM_ARG(npc, event, args[0]);
     npc->color.r = evtGetValue(event, args[1]);
     npc->color.g = evtGetValue(event, args[2]);
     npc->color.b = evtGetValue(event, args[3]);

@@ -14,6 +14,13 @@
 #include <string.h>
 #include "icon_ids.h"
 
+// The demo draws these icons with icon flag 4; retail uses 0x10.
+#ifdef VERSION_G8ME01_DEMO
+#define ICON_DISP_FLAGS 4
+#else
+#define ICON_DISP_FLAGS 0x10
+#endif
+
 f32 BattleGetFloorHeight(BattleWork* wp, f32 x, f32 y, f32 z);
 
 extern ItemData itemDataTable[];
@@ -33,9 +40,15 @@ s32 BtlUnit_EnemyItemCanUseCheck(s32 item);
 //.sdata
 s32 _status_pose_table[] = {
 	STATUS_INSTANT_KILL,
+#ifdef VERSION_G8ME01_DEMO
+	STATUS_SLEEP,
+	STATUS_STOP,
+	STATUS_FREEZE,
+#else
 	STATUS_STOP,
 	STATUS_FREEZE,
 	STATUS_SLEEP,
+#endif
 	STATUS_POISON,
 	STATUS_CONFUSE,
 	STATUS_DIZZY,
@@ -371,8 +384,17 @@ void btlDispMain(void) {
 				if (target->damageEventId && evtCheckID(target->damageEventId)) goto next;
 				BtlUnit_GetPos(unit, &pos.x, &pos.y, &pos.z);
 				BtlUnit_GetPos(target, &tpos.x, &tpos.y, &tpos.z);
+#ifdef VERSION_G8ME01_DEMO
+				tpos.z += 5.0f;
+#else
 				tpos.z += 7.0f;
+#endif
+#ifdef VERSION_G8ME01_DEMO
+#define SHELL_Y tpos.y // the demo keeps the shell at the target's height, not the floor's
+#else
 				h = BattleGetFloorHeight(wp, tpos.x, tpos.y, tpos.z);
+#define SHELL_Y h
+#endif
 				switch (unit->work[2]) {
 					case 2:
 						dist = __fabs(pos.x - tpos.x);
@@ -388,22 +410,23 @@ void btlDispMain(void) {
 						break;
 					case 3:
 						if (__fabs(pos.x - tpos.x) < 1.0) {
-							BtlUnit_SetPos(unit, tpos.x, h, tpos.z);
+							BtlUnit_SetPos(unit, tpos.x, SHELL_Y, tpos.z);
 							unit->work[2] = 1;
 						}
 						else if (tpos.x > pos.x) {
 							pos.x += 1.0f;
-							BtlUnit_SetPos(unit, pos.x, h, tpos.z);
+							BtlUnit_SetPos(unit, pos.x, SHELL_Y, tpos.z);
 						}
 						else {
 							pos.x -= 1.0f;
-							BtlUnit_SetPos(unit, pos.x, h, tpos.z);
+							BtlUnit_SetPos(unit, pos.x, SHELL_Y, tpos.z);
 						}
 						break;
 					default:
-						BtlUnit_SetPos(unit, tpos.x, h, tpos.z);
+						BtlUnit_SetPos(unit, tpos.x, SHELL_Y, tpos.z);
 						break;
 				}
+#undef SHELL_Y
 			}
 		}
 next:
@@ -1343,13 +1366,13 @@ void _btlStockExpDisp(CameraId camId, void* param) {
 			Vec pos = {0.0f, 0.0f, -100.0f};
 			pos.x = 308.0f + x - 3.5f - 13.0f * i;
 			pos.y = y - 220.0f;
-			iconDispGx(&pos, 0x10, ICON_18C, 0.35f);
+			iconDispGx(&pos, ICON_DISP_FLAGS, ICON_18C, 0.35f);
 		}
 		for (i = 0; i < tens; i++) {
 			Vec pos = {0.0f, 0.0f, -100.0f};
 			pos.x = 4.0f + (308.0f + x - 10.0f - 20.0f * i);
 			pos.y = 16.0f + (y - 220.0f);
-			iconDispGx(&pos, 0x10, ICON_18C, 0.5f);
+			iconDispGx(&pos, ICON_DISP_FLAGS, ICON_18C, 0.5f);
 		}
 	}
 }

@@ -227,7 +227,11 @@ static USER_FUNC(evtflash) {
     }
     switch (event->userdata[2]) {
         case 0:
+#ifdef VERSION_G8ME01_DEMO
+            fadeEntry(8, 20, (GXColor){0xFF, 0xFF, 0xFF, 0xFF});
+#else
             fadeEntry(10, 20, (GXColor){0xFF, 0xFF, 0xFF, 0xFF});
+#endif
             event->userdata[2]++;
         case 1:
             if (fadeIsFinish() != TRUE) {
@@ -247,7 +251,11 @@ static USER_FUNC(evtflash) {
             event->userdata[2]++;
             return EVT_RETURN_BLOCK;
         case 3:
+#ifdef VERSION_G8ME01_DEMO
+            fadeEntry(7, 80, (GXColor){0xFF, 0xFF, 0xFF, 0xFF});
+#else
             fadeEntry(9, 80, (GXColor){0xFF, 0xFF, 0xFF, 0xFF});
+#endif
             event->userdata[2]++;
         case 4:
             if (fadeIsFinish() != TRUE) {
@@ -265,10 +273,35 @@ USER_FUNC(elder_talk_sub_punicheck) {
     s32 traps = 0;
     s32 others = 0;
     s32 result;
+#ifdef VERSION_G8ME01_DEMO
+    s32 c[3]; // puniswGetindex writes a Vec here
+#else
     s32 c[5];
+#endif
     s32 trap;
     s32 puni;
 
+#ifdef VERSION_G8ME01_DEMO
+    for (i = 1; i < 103; i++) {
+        puniGetPunidat();
+        puniswGetindex(LSW(0), i - 1, &puni, c);
+        if (puni != 0 && puni != punigp[0x328 / 4]) {
+            others++;
+        } else {
+            puniswTrapGetindex(i, &trap);
+            if (trap != 0) {
+                traps++;
+            }
+        }
+    }
+    result = 1;
+    if (traps != 0) {
+        result = 2;
+    }
+    if (others != 0) {
+        result = 0;
+    }
+#else
     for (i = 1; i < 103; i++) {
         puniGetPunidat();
         if (i == 1 && swGet(0xB14)) {
@@ -288,6 +321,7 @@ USER_FUNC(elder_talk_sub_punicheck) {
     } else if (traps != 0) {
         result = 2;
     }
+#endif
     evtSetValue(event, args[0], result);
     return EVT_RETURN_DONE;
 }
@@ -389,6 +423,7 @@ EVT_BEGIN(puni_return)
         ADD(LW(11), -1)
         CALL(evt_puni_get_lsw_index, LSW(0), LW(11), LW(0), LW(1), LW(2), LW(3))
         CALL(evt_puni_get_flag, LW(10), LW(4))
+#ifndef VERSION_G8ME01_DEMO
         CALL(evt_puni_get_trap_index, LW(10), LW(5))
         IF_INT_EQUAL(LW(10), 1)
             IF_INT_EQUAL(GSWF(2836), 1)
@@ -404,15 +439,35 @@ EVT_BEGIN(puni_return)
             DEBUG_PUT_MSG(STRING("ここにいます＆仲間になっていません"))
             GOTO(100)
         END_IF
+#endif
+#ifdef VERSION_G8ME01_DEMO
+        IF_INT_NOT_EQUAL(LW(0), 0)
+#endif
         IF_BITS_SET(LW(4), 1024)
+#ifdef VERSION_G8ME01_DEMO
+            DEBUG_PUT_MSG(STRING("長老の能力"))
+            DEBUG_PUT_MSG(STRING("プニ番号"))
+            DEBUG_PUT_REG(LW(11))
+#endif
             DEBUG_PUT_MSG(STRING("同じエリアにいます"))
+#ifndef VERSION_G8ME01_DEMO
             GOTO(100)
         END_IF
         DEBUG_PUT_MSG(STRING("はぐれから合流しました"))
+#endif
+#ifdef VERSION_G8ME01_DEMO
+        ELSE
+#endif
         READ_INT2(LW(12), LW(13))
         CALL(evt_puni_set_lsw_index, LSW(0), LW(11), 0, 0, 0, 0)
         CALL(evt_puni_init_puni, LW(10), 1, LW(12), 0, LW(13), 0)
+#ifndef VERSION_G8ME01_DEMO
         LABEL(100)
+#endif
+#ifdef VERSION_G8ME01_DEMO
+        END_IF
+        END_IF
+#endif
         ADD(LW(10), 1)
         IF_INT_EQUAL(LW(10), 103)
             BREAK_LOOP
@@ -544,7 +599,11 @@ static EVT_BEGIN(elder_talk)
         CALL(evt_pouch_check_item, 151, LW(0))
         IF_INT_GREATER_OR_EQUAL(LW(0), 1)
             CALL(evt_msg_print, 0, STRING("irai_10_01"), 0, STRING("me"))
+#ifdef VERSION_G8ME01_DEMO
+            CALL(evt_win_item_select, PTR(irai_item_tbl), LW(0))
+#else
             CALL(evt_win_item_select, 0, PTR(irai_item_tbl), LW(0), 0)
+#endif
             IF_INT_NOT_EQUAL(LW(0), -1)
                 CALL(evt_msg_print, 0, STRING("irai_10_02"), 0, STRING("me"))
                 CALL(evt_sub_get_coin, 60)
@@ -563,11 +622,19 @@ static EVT_BEGIN(elder_talk)
             ELSE
             IF_INT_EQUAL(GSWF(5406), 0)
                 CALL(evt_msg_print, 0, STRING("irai_17_00"), 0, 0)
+#ifdef VERSION_G8ME01_DEMO
+                CALL(evt_win_item_select, PTR(iri_17_item_tbl), LW(0))
+#else
                 CALL(evt_win_item_select, 0, PTR(iri_17_item_tbl), LW(0), 0)
+#endif
                 IF_INT_NOT_EQUAL(LW(0), -1)
                     CALL(evt_pouch_remove_item, 98, LW(0))
                     CALL(evt_msg_print, 0, STRING("irai_17_01"), 0, 0)
+#ifdef VERSION_G8ME01_DEMO
+                    CALL(evt_item_entry, STRING("kairanban"), 98, 0, -1000, 0, 16, -1, 0)
+#else
                     CALL(evt_item_entry, STRING("kairanban"), 98, 0, -1000, 0, 17, -1, 0)
+#endif
                     CALL(evt_item_get_item, STRING("kairanban"))
                     CALL(evt_item_get_item_end_wait, STRING("kairanban"))
                     SET_VALUE(GSWF(5406), 1)
@@ -613,15 +680,21 @@ EVT_END()
 
 EVT_BEGIN(puni_1_talk)
     SWITCH(GSW(0))
+#ifdef VERSION_G8ME01_DEMO
+        CASE_LESS_OR_EQUAL(402)
+#else
         CASE_BETWEEN(354, 354)
+#endif
         IF_INT_EQUAL(GSWF(3879), 0)
             CALL(evt_msg_print, 0, STRING("stg2_mri_re_000"), 0, STRING("me"))
             ELSE
             CALL(evt_msg_print, 0, STRING("stg2_mri_re_000_1"), 0, STRING("me"))
             SET_VALUE(GSWF(3889), 1)
         END_IF
+#ifndef VERSION_G8ME01_DEMO
         CASE_LESS_OR_EQUAL(402)
         CALL(evt_msg_print, 0, STRING("stg2_mri_re_000"), 0, STRING("me"))
+#endif
         CASE_DEFAULT
         CALL(evt_msg_print, 0, STRING("stg2_mri_re_000_1_1"), 0, STRING("me"))
     END_SWITCH
@@ -754,7 +827,11 @@ static EVT_BEGIN(sister_talk)
             CALL(evt_npc_jump_position_nohit, STRING("me"), LW(0), LW(1), LW(2), 200, 18)
             CALL(evt_msg_print, 0, STRING("stg2_mri_re_012"), 0, STRING("me"))
             CALL(evt_msg_print, 0, STRING("stg2_mri_re_014"), 0, STRING("me"))
+#ifdef VERSION_G8ME01_DEMO
+            CALL(evt_item_entry, STRING("puniko_item"), 168, 0, -1000, 0, 15, -1, 0)
+#else
             CALL(evt_item_entry, STRING("puniko_item"), 168, 0, -1000, 0, 16, -1, 0)
+#endif
             CALL(evt_item_get_item, STRING("puniko_item"))
             CALL(evt_msg_print, 0, STRING("stg2_mri_re_015"), 0, STRING("me"))
             SET_VALUE(GSWF(2827), 1)
@@ -964,6 +1041,7 @@ EVT_BEGIN(bigtree_firstbattle)
     END_LOOP
     CALL(evt_mario_key_onoff, 0)
     CALL(evt_mario_normalize)
+#ifndef VERSION_G8ME01_DEMO
     BEGIN_INLINE_EVENT
         CALL(evt_mario_dispflag_onoff, 1, 4)
         CALL(evt_mario_set_dir, 90, 200, 0)
@@ -981,6 +1059,7 @@ EVT_BEGIN(bigtree_firstbattle)
         CALL(evt_party_stop, 0)
         CALL(evt_party_set_dir, 0, 90, 200)
     END_INLINE_EVENT
+#endif
     CALL(evt_cam3d_evt_set, -28, 152, 548, -28, 57, 7, 1000, 11)
     WAIT_MS(1000)
     SET_VALUE(LW(10), STRING("ガイド"))
@@ -1112,7 +1191,9 @@ EVT_BEGIN(bigtree_firstbattle)
     CALL(evt_npc_battle_start, LW(10))
     CALL(evt_npc_wait_battle_end)
     CALL(evt_mario_key_onoff, 1)
+#ifndef VERSION_G8ME01_DEMO
     CALL(evt_party_run, 0)
+#endif
     SET_VALUE(GSW(0), 89)
     SET_VALUE(LW(10), STRING("第三勢力部下Ａ"))
     SET_VALUE(LW(11), STRING("第三勢力部下Ｂ"))
@@ -1922,7 +2003,11 @@ EVT_BEGIN(rival_nakama)
     CALL(evt_snd_sfxon_3d, STRING("SFX_STG2_CHOUROU_PUNIDAMA1"), LW(0), LW(1), LW(2), 0)
     ADD(LW(1), 5)
     ADD(LW(2), -2)
+#ifdef VERSION_G8ME01_DEMO
+    CALL(evt_item_entry, STRING("item00"), 64, LW(0), LW(1), LW(2), 15, -1, 0)
+#else
     CALL(evt_item_entry, STRING("item00"), 64, LW(0), LW(1), LW(2), 16, -1, 0)
+#endif
     CALL(evt_item_flag_on, STRING("item00"), 2)
     ADD(LW(1), 8)
     CALL(evt_item_move_3d_position, STRING("item00"), LW(0), LW(1), LW(2), 500, 0)
@@ -2880,7 +2965,11 @@ EVT_BEGIN(boss_battle_win)
         MULTIPLY(LW(13), 9)
         ADD(LW(13), LW(0))
         CALL(evt_npc_set_position, STRING("ダミー"), LW(0), LW(1), LW(2))
+#ifdef VERSION_G8ME01_DEMO
+        CALL(evt_item_entry, STRING("item00"), 115, 0, -1000, 0, 15, -1, 0)
+#else
         CALL(evt_item_entry, STRING("item00"), 115, 0, -1000, 0, 16, -1, 0)
+#endif
         SET_VALUE(LW(8), STRING("ダミー"))
         SET_VALUE(LW(9), STRING("item00"))
         SPAWN_EVENT_GET_ID(PTR(starstone_item), LW(15))
@@ -2975,33 +3064,65 @@ EVT_BEGIN(boss_battle_win)
         CALL(evt_npc_set_position, LW(14), 0, -1000, 0)
     END_INLINE_EVENT
     BEGIN_INLINE_EVENT
+#ifdef VERSION_G8ME01_DEMO
+        WAIT_MS(1100)
+#else
         WAIT_MS(600)
+#endif
         CALL(evt_npc_get_position, LW(11), LW(0), LW(1), LW(2))
+#ifdef VERSION_G8ME01_DEMO
+        ADD(LW(0), -40)
+#else
         ADD(LW(0), -80)
+#endif
         ADD(LW(1), 30)
         CALL(evt_msg_toge, 2, LW(0), LW(1), LW(2))
         CALL(evt_msg_print, 0, STRING("stg2_mri_e25_00_03"), 0, 0)
     END_INLINE_EVENT
     BEGIN_INLINE_EVENT
+#ifdef VERSION_G8ME01_DEMO
+        WAIT_MS(1100)
+#else
         WAIT_MS(600)
+#endif
         CALL(evt_npc_get_position, LW(12), LW(0), LW(1), LW(2))
+#ifdef VERSION_G8ME01_DEMO
+        ADD(LW(0), -40)
+#else
         ADD(LW(0), -80)
+#endif
         ADD(LW(1), 30)
         CALL(evt_msg_toge, 2, LW(0), LW(1), LW(2))
         CALL(evt_msg_print, 0, STRING("stg2_mri_e25_00_04"), 0, 0)
     END_INLINE_EVENT
     BEGIN_INLINE_EVENT
+#ifdef VERSION_G8ME01_DEMO
+        WAIT_MS(1700)
+#else
         WAIT_MS(1200)
+#endif
         CALL(evt_npc_get_position, LW(13), LW(0), LW(1), LW(2))
+#ifdef VERSION_G8ME01_DEMO
+        ADD(LW(0), -40)
+#else
         ADD(LW(0), -80)
+#endif
         ADD(LW(1), 30)
         CALL(evt_msg_toge, 2, LW(0), LW(1), LW(2))
         CALL(evt_msg_print, 0, STRING("stg2_mri_e25_00_05"), 0, 0)
     END_INLINE_EVENT
     BEGIN_INLINE_EVENT
+#ifdef VERSION_G8ME01_DEMO
+        WAIT_MS(2000)
+#else
         WAIT_MS(1500)
+#endif
         CALL(evt_npc_get_position, LW(14), LW(0), LW(1), LW(2))
+#ifdef VERSION_G8ME01_DEMO
+        ADD(LW(0), -40)
+#else
         ADD(LW(0), -80)
+#endif
         ADD(LW(1), 30)
         CALL(evt_msg_toge, 2, LW(0), LW(1), LW(2))
         CALL(evt_msg_print, 0, STRING("stg2_mri_e25_00_06"), 0, 0)
@@ -3060,11 +3181,17 @@ EVT_BEGIN(boss_battle_win)
     CALL(evt_item_get_position, STRING("item00"), LW(0), LW(1), LW(2))
     CALL(evt_item_set_position, STRING("item00"), 0, -1000, 0)
     SET_VALUE(LW(10), STRING("item01"))
+#ifdef VERSION_G8ME01_DEMO
+    CALL(evt_item_entry, LW(10), 115, LW(0), LW(1), LW(2), 15, -1, 0)
+#else
     CALL(evt_item_entry, LW(10), 115, LW(0), LW(1), LW(2), 16, -1, 0)
+#endif
     CALL(evt_item_flag_on, LW(10), 2)
     SET_VALUE(LW(0), 2)
     SET_VALUE(LW(1), LW(10))
+#ifndef VERSION_G8ME01_DEMO
     CALL(evt_snd_bgmoff_f, 512, 2000)
+#endif
     CALL_CHILD(PTR(evt_sub_starstone))
     RETURN
 EVT_END()
@@ -3449,7 +3576,11 @@ EVT_BEGIN(mri_01_koopa_second_evt)
     CALL_CHILD(PTR(evt_memcard_save))
 #endif
     CALL(evt_mario_set_mode, 0)
+#ifdef VERSION_G8ME01_DEMO
+    CALL(evt_fade_set_mapchange_type, 1, 57, 0, 56, 0)
+#else
     CALL(evt_fade_set_mapchange_type, 1, 59, 0, 58, 0)
+#endif
     CALL(evt_bero_mapchange, STRING("tou_02"), 0)
     RETURN
 EVT_END()

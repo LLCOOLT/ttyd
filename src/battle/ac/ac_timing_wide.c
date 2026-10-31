@@ -267,7 +267,7 @@ void battleAcDelete_TimingWide(BattleWork* work) {
         Vec pos = {0.0f, 0.0f, 0.0f};       \
         pos.x = -200.0f + x;                \
         pos.y = 50.0f + y;                  \
-        iconDispGx(&pos, 0x10, (id), 1.0f); \
+        iconDispGx(&pos, ICON_DISP_2D, (id), 1.0f); \
     }
 static void actionCommandDisp(f32 x, f32 y) {
     BattleWork* work = _battleWorkPointer;

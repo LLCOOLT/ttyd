@@ -8,6 +8,12 @@
 #include "mario/mario_pouch.h"
 #include "driver/mobjdrv.h"
 
+#ifdef VERSION_G8ME01_DEMO
+// The demo's PartyEntry has no frontWallDist. This name only lets the file build for the demo, where
+// this unit is not matched yet.
+#define frontWallDist dropDepth
+#endif
+
 #ifdef VERSION_G8ME01
 // US has no local duplicate: this is the global kuribo_init
 #define kuribo_init_800C23B4 kuribo_init
@@ -43,6 +49,13 @@ USER_FUNC(pre_kurio_use) {
         return EVT_RETURN_DONE;
     }
 
+#ifdef VERSION_G8ME01_DEMO
+    if (!(party->flags & 2)) {
+        return EVT_RETURN_DONE;
+    }
+
+    psndSetFlag(0x80);
+#else
     if (party->flags2 & 0x4000000) {
         return EVT_RETURN_DONE;
     }
@@ -50,6 +63,7 @@ USER_FUNC(pre_kurio_use) {
     psndSetFlag(0x80);
     party->flags |= 0x04000000;
     party->flags |= 0x02000000;
+#endif
 
     mario = party->playerPtr;
     if (event->lwData[0]) {
@@ -161,11 +175,17 @@ USER_FUNC(post_kurio_use) {
     if (!party) {
         return EVT_RETURN_DONE;
     }
+#ifdef VERSION_G8ME01_DEMO
+    party->useMotionId = 10;
+    marioStSystemLevel(0);
+    psndClearFlag(0x80);
+#else
     party->useMotionId = 20;
     marioStSystemLevel(0);
     psndClearFlag(0x80);
     party->flags &= ~0x04000000;
     party->flags &= ~0x02000000;
+#endif
     return EVT_RETURN_DONE;
 }
 
@@ -200,10 +220,50 @@ f32 PSVECDistance(const Vec*, const Vec*);
 
 
 void kuribo_use_post(PartyEntry* party) {
+#ifndef VERSION_G8ME01_DEMO
     party->flags &= ~0x04000000;
     party->flags &= ~0x02000000;
+#endif
 }
 
+#ifdef VERSION_G8ME01_DEMO
+// The demo starts the message right where Goombella stands; retail first walks her next to Mario.
+void kuribo_use(PartyEntry* party) {
+    EventEntry* evt;
+
+    if (party->trigFlags & 8) {
+        party->trigFlags &= ~8;
+        partyChgMoveMode(party, 0);
+        partyChgMot(party, 0);
+        partyChgPoseId(party, 1);
+        party->moveFrames = 100;
+        party->useMotionId = 0;
+    }
+
+    switch (party->useMotionId) {
+    case 0:
+        evt = evtEntryType(kurio_msg_evt, 0, 0, 26);
+        marioStSystemLevel(1);
+        evt->lwData[0] = fbatNpcTalkCheck();
+        party->useMotionId = 1;
+        break;
+    case 10:
+        party->moveFrames = 5;
+        party->useMotionId = 11;
+    case 11:
+        if (--party->moveFrames > 0) {
+            break;
+        }
+        partyChgRunMode(party, 2);
+        partyChgMoveMode(party, 0);
+        partyChgMot(party, 0);
+        partyChgPoseId(party, 1);
+        party->flags &= ~0x100;
+        break;
+    }
+    partyChkGnd(party);
+}
+#else
 void kuribo_use(PartyEntry* party) {
     MarioWork* player = party->playerPtr;
     void* wall;
@@ -218,13 +278,19 @@ void kuribo_use(PartyEntry* party) {
             pos = party->position;
             wall = partySearchFrontWall(party, &pos, 150.0f,
                 angleABf(party->position.x, party->position.z, player->position.x, player->position.z));
+#ifndef VERSION_G8ME01_DEMO
             if (wall) {
+#ifdef VERSION_G8ME01_DEMO
+                if (TRUE) { // the demo PartyEntry has no frontWallDist (and its kuribo code has no wall check here)
+#else
                 if (party->frontWallDist < distABf(party->position.x, party->position.z, player->position.x, player->position.z)) {
+#endif
                     party->useMotionId = 0;
                 } else {
                     wall = NULL;
                 }
             }
+#endif
             if (!wall) {
                 partyChgPoseId(party, 1);
                 party->moveSpeed = 0.0f;
@@ -289,6 +355,7 @@ void kuribo_use(PartyEntry* party) {
     }
     partyChkGnd(party);
 }
+#endif
 
 void kuribo_bye(PartyEntry* party) {
     if (party->trigFlags & 8) {

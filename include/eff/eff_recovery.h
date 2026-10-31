@@ -19,7 +19,9 @@ typedef struct RecoveryWork {
     u32 tick;        // 0x34
     struct MayaAnim* anim; // 0x38
     s32 delay;       // 0x3c
+#ifndef VERSION_G8ME01_DEMO
     f32 baseY;       // 0x40
+#endif
 } RecoveryWork;
 
 EffectEntry* effRecoveryEntry(s32 type, s32 amount, f32 x, f32 y, f32 z);

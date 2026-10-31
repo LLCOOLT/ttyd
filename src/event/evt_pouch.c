@@ -55,6 +55,7 @@ USER_FUNC(evt_pouch_remove_item) {
 	return EVT_RETURN_DONE;
 }
 
+#ifndef VERSION_G8ME01_DEMO
 USER_FUNC(N_evt_pouch_remove_item_index) {
 	EvtWord* args = event->args;
 	s32 a = evtGetValue(event, args[0]);
@@ -68,6 +69,7 @@ USER_FUNC(N_evt_pouch_remove_item_index) {
 	}
 	return EVT_RETURN_DONE;
 }
+#endif
 
 USER_FUNC(evt_pouch_add_keepitem) {
 	EvtWord* args = event->args;
@@ -81,6 +83,13 @@ USER_FUNC(evt_pouch_add_keepitem) {
 
 USER_FUNC(evt_pouch_remove_keepitem) {
 	EvtWord* args = event->args;
+#ifdef VERSION_G8ME01_DEMO
+	if (pouchRemoveKeepItem(evtGetValue(event, args[0]))) {
+		evtSetValue(event, args[1], 0);
+	} else {
+		evtSetValue(event, args[1], -1);
+	}
+#else
 	s32 a = evtGetValue(event, args[0]);
 	s32 b = evtGetValue(event, args[1]);
 	if (pouchRemoveKeepItem(a, b)) {
@@ -88,6 +97,7 @@ USER_FUNC(evt_pouch_remove_keepitem) {
 	} else {
 		evtSetValue(event, args[2], -1);
 	}
+#endif
 	return EVT_RETURN_DONE;
 }
 
@@ -97,8 +107,10 @@ USER_FUNC(evt_pouch_check_item) {
 	return EVT_RETURN_DONE;
 }
 
+#ifndef VERSION_G8ME01_DEMO
 GETTER(L_evt_pouch_get_hp, RAW_GET(pouchGetHP))
 SETTER(L_evt_pouch_set_hp, RAW_SET(pouchSetHP))
+#endif
 GETTER(evt_pouch_get_max_ap, RAW_GET(pouchGetMaxAP))
 SETTER(evt_pouch_set_ap, RAW_SET(pouchSetAP))
 SETTER(evt_pouch_party_join, partyJoin)

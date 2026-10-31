@@ -33,7 +33,18 @@ typedef struct EffPeachDustWork {
     EffPeachDustParticle particles[100];
 } EffPeachDustWork;
 
+static u8 scale_data[] = {
+    0x1E, 0x3C, 0x5A, 0x64, 0x68, 0x6A, 0x6C, 0x6E, 0x70, 0x71, 0x71, 0x6E, 0x6B,
+    0x67, 0x64, 0x68, 0x6A, 0x6C, 0x6E, 0x70, 0x71, 0x71, 0x6E, 0x6B, 0x67,
+};
+
 char data[768] = ".......+..............@.#...........$%&.*=..........-...;>.........,'....)!.......~~......{.......~~......]@@^....~/........(_......#:<.....+.......[}|.....+.......1.......23......45.....677......8......7.......90......7.......a22b...c...........deee............f++++..........ff....+........ff......+........+......+.......+.......ff......+........+...f++.........+..ff...........+f..+............+.ff............+..+............+..f+.f+++f.....+....+f..+......+.......+.......+.......+.......+........+++++++f.....gh............+g.ggg..........g...hh..........g....g..........hh..hh.hh.......g..hg+ghgg......hghg.g...g.......hggg.....+.....g+.h......g....g..........g....g..........g.....g.........g.....g.........hgg...g...........g...g.........hg.....gggggggggh...";
+
+static u8 color_rotation_data[] = {
+    0xFE, 0xAC, 0xAC, 0xFE, 0xAC, 0xD5, 0xFE, 0xB4, 0x9A, 0xD5, 0xB4, 0xFE,
+    0xB4, 0xB4, 0xFE, 0xB4, 0xDD, 0xFE, 0xB4, 0xFE, 0xFE, 0xB4, 0xFE, 0xD5,
+    0xB4, 0xFE, 0xB4, 0xD5, 0xFE, 0xB4, 0xFE, 0xFE, 0xB4, 0xFE, 0xD5, 0xAC,
+};
 
 static effN64Vtx size8x8_tex22x22_vtx[] = {
     {-8, -8, 0, 0, 0, 0, 0, 0, 255},
@@ -68,17 +79,6 @@ static effN64Vtx size8x8_tex22x22_vtx[] = {
     {8, -8, 0, 5632, 0, 0, 0, 0, 255},
     {8, 8, 0, 5632, 704, 0, 0, 0, 255},
     {-8, 8, 0, 4928, 704, 0, 0, 0, 255},
-};
-
-static u8 scale_data[] = {
-    0x1E, 0x3C, 0x5A, 0x64, 0x68, 0x6A, 0x6C, 0x6E, 0x70, 0x71, 0x71, 0x6E, 0x6B,
-    0x67, 0x64, 0x68, 0x6A, 0x6C, 0x6E, 0x70, 0x71, 0x71, 0x6E, 0x6B, 0x67,
-};
-
-static u8 color_rotation_data[] = {
-    0xFE, 0xAC, 0xAC, 0xFE, 0xAC, 0xD5, 0xFE, 0xB4, 0x9A, 0xD5, 0xB4, 0xFE,
-    0xB4, 0xB4, 0xFE, 0xB4, 0xDD, 0xFE, 0xB4, 0xFE, 0xFE, 0xB4, 0xFE, 0xD5,
-    0xB4, 0xFE, 0xB4, 0xD5, 0xFE, 0xB4, 0xFE, 0xFE, 0xB4, 0xFE, 0xD5, 0xAC,
 };
 
 void effPeachDustMain(EffectEntry* effect);
@@ -182,9 +182,14 @@ void effPeachDustMain(EffectEntry* effect) {
         } else {
             p->frame++;
             f = p->frame;
+#ifdef VERSION_G8ME01_DEMO
+            if (f - 1 < 25) {
+                p->scale = 0.4f * (0.01f * scale_data[f - 1]);
+#else
             g = f - 1;
             if (g < 25) {
                 p->scale = 0.4f * (0.01f * scale_data[g]);
+#endif
             } else {
                 p->scale += 0.1f * (0.1f - p->scale);
             }

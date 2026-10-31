@@ -37,6 +37,12 @@ TitleWork* wp2 = &work2;
 #else
 #define TFR 60
 #endif
+// frame count that scrolls the "press start" gradient
+#ifdef VERSION_G8ME01_DEMO
+#define TITLE_FRAME (gp->retraceCount)
+#else
+#define TITLE_FRAME (wp2->frame)
+#endif
 void L_titleInit(SequenceWork* work);
 void titleMain(SequenceWork* work);
 void disp1(CameraId cameraId, void* param);
@@ -48,6 +54,40 @@ const char* DbgBtlSel_GetMsgDataPtr(void) {
 	return NULL;
 }
 
+#ifdef VERSION_G8ME01_DEMO
+void seq_titleInit(SequenceWork* work) {
+	memset(wp2, 0, sizeof(TitleWork));
+	wp2->texture = fileAllocf(4, "%s/mariost.tpl", getMarioStDvdRoot());
+	wp2->topPosX = 0.0f;
+	wp2->topPosY = 1000.0f;
+	wp2->bottomPosX = 0.0f;
+	wp2->bottomPosY = -1000.0f;
+	wp2->fadeAlpha = 0.0f;
+	if (seqGetPrevSeq() != SEQ_LOAD && seqGetPrevSeq() != SEQ_MAP_CHANGE && seqGetPrevSeq() == SEQ_GAME_OVER) {
+		psndStopAllFadeOut();
+	}
+	if (seqGetPrevSeq() != SEQ_LOAD) {
+		if (seqGetPrevSeq() == SEQ_GAME_OVER) {
+			psndBGMOn(0x200, "BGM_DIGEST1");
+			if ((u32)psbgm[0].streamId != 0xFFFFFFFFU) {
+				sound.streams[psbgm[0].streamId].flags |= 0x8000;
+			}
+		}
+		else {
+			psndBGMOn(0x200, "BGM_TITLE1");
+			if ((u32)psbgm[0].streamId != 0xFFFFFFFFU) {
+				sound.streams[psbgm[0].streamId].flags |= 0x8000;
+			}
+		}
+	}
+	camGetPtr(CAMERA_2D)->flags &= ~0x100;
+	camGetPtr(CAMERA_2D)->flags |= 0x400;
+	gp->flags &= ~2;
+	gp->flags &= ~0x40;
+	gp->flags &= ~0x20;
+	gp->flags &= ~0x1000;
+}
+#else
 void seq_titleInit(SequenceWork* work) {
 	L_titleInit(work);
 	gp->flags &= ~2;
@@ -55,6 +95,7 @@ void seq_titleInit(SequenceWork* work) {
 	gp->flags &= ~0x20;
 	gp->flags &= ~0x1000;
 }
+#endif
 
 void seq_titleExit(SequenceWork* work) {
 	fileFree(wp2->texture);
@@ -67,6 +108,7 @@ void seq_titleMain(SequenceWork* work) {
 	titleMain(work);
 }
 
+#ifndef VERSION_G8ME01_DEMO
 s32 N_getDebugMode(void) {
 	return wp2->debug;
 }
@@ -116,8 +158,131 @@ void L_titleInit(SequenceWork* work) {
 	camGetPtr(CAMERA_2D)->flags &= ~0x100;
 	camGetPtr(CAMERA_2D)->flags |= 0x400;
 }
+#endif
 
-
+#ifdef VERSION_G8ME01_DEMO
+void titleMain(SequenceWork* work) {
+	switch (wp2->state) {
+		case 0:
+			if (psndBGMStartCheck(0) != 0U) {
+				if (seqGetPrevSeq() == SEQ_LOAD) {
+					fadeEntry(0x3E, 0, (GXColor){0xFF, 0xFF, 0xFF, 0xFF});
+					fadeEntry(0x1D, 0, (GXColor){0x00, 0x00, 0x00, 0xFF});
+					wp2->timer = 0;
+				}
+				else if (seqGetPrevSeq() == SEQ_GAME_OVER) {
+					fadeEntry(0x13, 0, (GXColor){0xFF, 0xFF, 0xFF, 0xFF});
+					fadeEntry(0x1B, 0, (GXColor){0x00, 0x00, 0x00, 0xFF});
+					wp2->timer = 78;
+				}
+				else {
+					fadeEntry(0x13, 0, (GXColor){0xFF, 0xFF, 0xFF, 0xFF});
+					fadeEntry(0x20, 0, (GXColor){0x00, 0x00, 0x00, 0xFF});
+					fadeSetNarrowFast();
+					wp2->timer = 38;
+				}
+				wp2->state++;
+			}
+			break;
+		case 1:
+			wp2->timer--;
+			if (wp2->timer == 0) {
+				if ((u32)psbgm[0].streamId != 0xFFFFFFFFU) {
+					sound.streams[psbgm[0].streamId].flags &= ~0x8000;
+				}
+			}
+			if (fadeIsFinish()) {
+				if (seqGetPrevSeq() != SEQ_LOAD) {
+					fadeEntry(0x12, 500, (GXColor){0xFF, 0xFF, 0xFF, 0xFF});
+					wp2->state++;
+				}
+				else {
+					wp2->topPosY = 130.0f;
+					wp2->bottomPosY = -170.0f;
+					wp2->state = 3;
+				}
+			}
+			break;
+		case 2:
+			wp2->topPosX = 0.0f;
+			wp2->topPosY = intplGetValue(10, wp2->counter, 60, 300.0f, 130.0f);
+			wp2->timer--;
+			if (wp2->timer == 0) {
+				if ((u32)psbgm[0].streamId != 0xFFFFFFFFU) {
+					sound.streams[psbgm[0].streamId].flags &= ~0x8000;
+				}
+				if (seqGetPrevSeq() == SEQ_GAME_OVER) {
+					psndSFXOn((const char*)0xAB8);
+				}
+			}
+			wp2->bottomPosX = 0.0f;
+			wp2->bottomPosY = intplGetValue(11, wp2->counter, 60, -300.0f, -170.0f);
+			wp2->counter++;
+			if (wp2->counter > 60) {
+				titleLoadDemo();
+				wp2->state++;
+			}
+			break;
+		case 3:
+			wp2->fadeAlpha += 0.1f;
+			if (wp2->fadeAlpha > 1.0f) {
+				wp2->fadeAlpha = 1.0f;
+			}
+			if (keyGetButtonTrg(0) & 0x1100) {
+				psndSFXOn((const char*)0x12);
+				wp2->state = 10;
+			}
+			else if (++wp2->idle > 60 * 20 - 60) {
+				wp2->state = 20;
+			}
+			break;
+		case 10:
+			fadeEntry(0x3D, 0, (GXColor){0xFF, 0xFF, 0xFF, 0xFF});
+			wp2->state++;
+		case 11:
+			if (fadeIsFinish()) {
+				fadeEntry(0x18, 0, (GXColor){0xFF, 0xFF, 0xFF, 0xFF});
+				wp2->state++;
+			}
+			break;
+		case 12:
+			if (fadeIsFinish()) {
+				fadeReset(4);
+				seqSetSeq(SEQ_LOAD, NULL, NULL);
+			}
+			break;
+		case 20:
+			fadeEntry(0x1F, 0, (GXColor){0x00, 0x00, 0x00, 0xFF});
+			fadeEntry(0xF, 1000, (GXColor){0x00, 0x00, 0x00, 0xFF});
+			psndBGMOff_f_d(0x200, 1000, 0);
+			wp2->counter = 0;
+			wp2->state++;
+			break;
+		case 21:
+			wp2->topPosY = ((f32 (*)(f32, f32, s32, s32, s32))intplGetValue)(130.0f, 400.0f, 11, wp2->counter, 60);
+			wp2->bottomPosY = intplGetValue(11, wp2->counter, 60, -170.0f, -400.0f);
+			wp2->counter++;
+			if (wp2->counter > 60) {
+				wp2->counter = 60;
+			}
+			wp2->fadeAlpha -= 0.1f;
+			if (wp2->fadeAlpha < 0.0f) {
+				wp2->fadeAlpha = 0.0f;
+			}
+			if (fadeIsFinish()) {
+				fadeReset(1);
+				gp->areaFadeInType = 15;
+				gp->areaFadeInDuration = 0;
+				seqSetSeq(SEQ_MAP_CHANGE, "dmo_00", NULL);
+			}
+			break;
+	}
+	if (wp2->state != 12 && work->state < 14) {
+		dispEntry((CameraId)4, 0.0f, 0, disp1, NULL);
+		dispEntry((CameraId)7, 0.0f, 0, disp2, NULL);
+	}
+}
+#else
 void titleMain(SequenceWork* work) {
 	switch (wp2->state) {
 		case 0:
@@ -312,6 +477,7 @@ void titleMain(SequenceWork* work) {
 		}
 	}
 }
+#endif
 
 void disp1(CameraId cameraId, void* param) {
 	CameraEntry* cam = camGetPtr(CAMERA_2D);
@@ -365,12 +531,19 @@ void disp2(CameraId cameraId, void* param) {
 #else
 	winTexSet(gp->language + 9, (Vec){wp2->bottomPosX, wp2->bottomPosY, 0.0f}, (Vec){1.0f, 1.0f, 1.0f}, (GXColor){0xFF, 0xFF, 0xFF, 0xFF});
 #endif
+#elif defined(VERSION_G8ME01_DEMO)
+	winTexSet(5, (Vec){wp2->topPosX, wp2->topPosY, 0.0f}, (Vec){1.0f, 1.0f, 1.0f}, (GXColor){0xFF, 0xFF, 0xFF, 0xFF});
+	winTexSet(6, (Vec){wp2->bottomPosX, wp2->bottomPosY, 0.0f}, (Vec){1.0f, 1.0f, 1.0f}, (GXColor){0xFF, 0xFF, 0xFF, 0xFF});
 #else
 	winTexSetNearest(5, (Vec){wp2->topPosX, wp2->topPosY, 0.0f}, (Vec){1.0f, 1.0f, 1.0f}, (GXColor){0xFF, 0xFF, 0xFF, 0xFF});
 	winTexSet(6, (Vec){wp2->bottomPosX, wp2->bottomPosY, 0.0f}, (Vec){1.0f, 1.0f, 1.0f}, (GXColor){0xFF, 0xFF, 0xFF, 0xFF});
 #endif
+#ifdef VERSION_G8ME01_DEMO
+	s = (f32)sin((f32)gp->retraceCount / 30.0f);
+#else
 	wp2->frame++;
 	s = (f32)sin(6.2831855f * (f32)wp2->frame / 120.0f);
+#endif
 	alpha = (s32)(wp2->fadeAlpha * (459.0f * s));
 	if (alpha < 0) {
 		alpha = 0;
@@ -383,6 +556,7 @@ void disp2(CameraId cameraId, void* param) {
 #else
 	pressStartGX(alpha, 0.0f, -110.0f);
 #endif
+#ifndef VERSION_G8ME01_DEMO
 	if (wp2->debug < 0 && (keyGetButton(0) & 0x10)) {
 		FontDrawStart();
 		FontDrawEdge();
@@ -391,6 +565,7 @@ void disp2(CameraId cameraId, void* param) {
 		FontDrawString(60.0f, 220.0f, build_date_ptr);
 		FontDrawString(200.0f, 220.0f, build_time_ptr);
 	}
+#endif
 	*camGetPtr(cameraId) = saved;
 	GXSetProjectionv(proj);
 	GXSetViewport(vp[0], vp[1], vp[2], vp[3], vp[4], vp[5]);
@@ -432,7 +607,7 @@ PSTATIC void pressStartGX(s32 alpha, f32 x, f32 y) {
 	GXSetTexCoordGen(GX_TEXCOORD0, GX_TG_MTX2x4, GX_TG_TEX0, 60);
 	GXSetTexCoordGen(GX_TEXCOORD1, GX_TG_MTX2x4, GX_TG_TEX0, 30);
 	MTXScale(v16, 1.0f, 1.0f, 1.0f);
-	MTXTrans(v17, (f32)wp2->frame / -200.0f, 0.0f, 0.0f);
+	MTXTrans(v17, (f32)TITLE_FRAME / -200.0f, 0.0f, 0.0f);
 	MTXConcat(v16, v17, v17);
 	GXLoadTexMtxImm(v17, 30, GX_MTX2x4);
 	GXSetBlendMode(GX_BM_BLEND, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA, GX_LO_CLEAR);
@@ -468,7 +643,9 @@ static void titleLoadDemo(void) {
 	animGroupBaseAsync("c_peach", 0, 0);
 	animGroupBaseAsync("c_nazo", 0, 0);
 	animGroupBaseAsync("MOBJ_GoldenTreasureBox", 0, 0);
+#ifndef VERSION_G8ME01_DEMO
 	animGroupBaseAsync("MOBJ_BigTreasureBox", 0, 0);
+#endif
 	animGroupBaseAsync("c_roten", 0, 0);
 	animGroupBaseAsync("c_kuribo_n", 0, 0);
 	animGroupBaseAsync("c_tyusan", 0, 0);

@@ -119,8 +119,13 @@ static PoseTableEntry pose_table[] = {
     {40, "KUR_W_1"},
     {56, "KUR_I_1"},
     {57, "KUR_I_1"},
+#ifdef VERSION_G8ME01_DEMO
+    {63, "KUR_T_1"},
+    {67, "KUR_S_1"},
+#else
     {65, "KUR_T_1"},
     {69, "KUR_S_1"},
+#endif
 };
 
 static BattleDataEntry data_table[] = {
@@ -132,7 +137,11 @@ static BattleUnitDefense defence = {{0, 0, 0, 0, 0}};
 
 static BattleUnitDefenseAttr defence_attr = {{0, 0, 0, 0, 0}};
 
+#ifdef VERSION_G8ME01_DEMO
+static StatusVulnerability regist = {100, 120, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 120, 120, 100, 100, 100, 100, 150};
+#else
 static StatusVulnerability regist = {100, 110, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 110, 100, 100, 100, 100, 100, 150};
+#endif
 
 static BattleUnitKindPart parts[] = {
     {1, "btl_un_kuriboo", "c_kuribo", 0.0f, 0.0f, 0.0f, 0.0f, 22.0f, 0.0f, 0.0f, 30.0f, 0.0f, 20, 30, 255, &defence, &defence_attr, 0x9, 0, pose_table},
@@ -289,7 +298,11 @@ static EVT_BEGIN(attack_event)
     LABEL(90)
     CALL(btlevtcmd_JumpContinue, -2)
     CALL(btlevtcmd_SetRotate, -2, 0, 0, 0)
+#ifdef VERSION_G8ME01_DEMO
+    SET_VALUE(LW(15), 67)
+#else
     SET_VALUE(LW(15), 69)
+#endif
     CALL(btlevtcmd_AnimeChangePoseType, -2, 1, LW(15))
     CALL(btlevtcmd_GetPos, -2, LW(0), LW(1), LW(2))
     CALL(btlevtcmd_MoveDirectionAdd, -2, LW(0), 30)
@@ -306,7 +319,11 @@ static EVT_BEGIN(attack_event)
     CALL(btlevtcmd_ResultACDefence, LW(3), PTR(&weapon_kuriboo_attack))
     CALL(btlevtcmd_CheckDamage, -2, LW(3), LW(4), PTR(&weapon_kuriboo_attack), 256, LW(5))
     CALL(btlevtcmd_SetRotate, -2, 0, 0, 0)
+#ifdef VERSION_G8ME01_DEMO
+    SET_VALUE(LW(15), 67)
+#else
     SET_VALUE(LW(15), 69)
+#endif
     CALL(btlevtcmd_AnimeChangePoseType, -2, 1, LW(15))
     CALL(btlevtcmd_GetPos, -2, LW(0), LW(1), LW(2))
     SET_VALUE(LW(1), 0)

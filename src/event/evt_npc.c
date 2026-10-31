@@ -91,6 +91,14 @@ USER_FUNC(evt_npc_slave_entry) {
     return EVT_RETURN_DONE;
 }
 
+#ifdef VERSION_G8ME01_DEMO
+// FAKE: the demo's .rodata keeps an orphan "%f%f%f" just before "_s%d"; an unreferenced static that prints an NPC position
+// leaves the string where the original's stripped code did
+static void npc_report_pos(NpcEntry* npc) {
+    OSReport("%f%f%f", npc->position.x, npc->position.y, npc->position.z);
+}
+#endif
+
 // const char* lookupName
 USER_FUNC(evt_npc_delete) {
     const char* name;
@@ -525,8 +533,11 @@ USER_FUNC(evt_npc_move_position) {
         }
     }
 
-    // Integrate move offset along heading (flag 0x10000 freezes it)
-    if (!(npc->jumpFlags & 0x10000)) {
+    // Integrate move offset along heading (flag 0x10000 freezes it; the demo has no freeze flag)
+#ifndef VERSION_G8ME01_DEMO
+    if (!(npc->jumpFlags & 0x10000))
+#endif
+    {
         f32 temp = (f32)sin(npc->moveDir * 6.2831855f / 360.0f);
         npc->moveOffset.x += npc->moveDt * (npc->moveSpeed * temp);
         temp = (f32)cos(npc->moveDir * 6.2831855f / 360.0f);
@@ -1935,7 +1946,11 @@ USER_FUNC(evt_npc_wait_battle_end) {
     if (party) {
         partyCtrlOn();
     }
+#ifdef VERSION_G8ME01_DEMO
+    psndClearFlag(0x10);
+#else
     L_psndBGM_stop();
+#endif
 #ifdef VERSION_G8ME01
     marioFBattlePost();
 #endif
@@ -2039,7 +2054,11 @@ USER_FUNC(evt_npc_get_drop_item) {
     if (npc->battleInfo.battleFlags & 8) {
         evtSetValue(event, index, 0);
     } else {
+#ifdef VERSION_G8ME01_DEMO
+        evtSetValue(event, index, 0); // the demo never reports a dropped item
+#else
         evtSetValue(event, index, npc->battleInfo.itemDropped);
+#endif
     }
     return 2;
 }
@@ -2445,9 +2464,11 @@ void _kamek_houki_kemuri(NpcEntry* npc, s32 animState) {
         }
         effect = effKemuri10N64Entry(0, a2, (18.0f * npc->scale.x) + npc->position.y, npc->position.z, a5, 0.0f, 0.0f,
                                      npc->scale.x);
+#ifndef VERSION_G8ME01_DEMO
         if (!strcmp(gp->currentMapName, "kpa_01")) {
             ((EffKemuri10N64Work*)effect->userdata)->camera = 7;
         }
+#endif
     }
 }
 #pragma dont_inline reset
@@ -2757,4 +2778,3 @@ USER_FUNC(evt_npc_release_fieldnpc) {
     }
     return EVT_RETURN_DONE;
 }
-

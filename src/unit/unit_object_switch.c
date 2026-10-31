@@ -71,7 +71,11 @@ static PoseTableEntry pose_table[] = {
     {28, "M_S_1"},
     {31, "M_S_1"},
     {39, "M_O_1"},
+#ifdef VERSION_G8ME01_DEMO
+    {67, "M_S_1"},
+#else
     {69, "M_S_1"},
+#endif
 };
 
 static BattleUnitKindPart parts[] = {
@@ -133,7 +137,11 @@ EVT_END()
 
 static s32 _data[] = {
     -5, 0, 15, 0, -15, 0, 14, 0, -13, 0, 12, 0, -11, 0, 10, 0, -9, 0,
+#ifdef VERSION_G8ME01_DEMO
+    8, 0, -7, 0, 6, 0, -6, 0, 5, 0, -4, 0, 2, 0, -2, 0,
+#else
     8, 0, -7, 0, 6, 0, -6, 0, 5, 0, -4, 0, 2, 0, -2, 0, 0,
+#endif
 };
 
 USER_FUNC(_rumble_switch) {

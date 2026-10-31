@@ -58,7 +58,11 @@ static BeroEntry bero_entry_data[] = {
 static EVT_BEGIN(evt_ki_3)
     CALL(evt_item_delete_check, STRING("item_ki_3"), LW(0))
     IF_INT_EQUAL(LW(0), 1)
+#ifdef VERSION_G8ME01_DEMO
+        CALL(evt_item_entry, STRING("item_ki_3"), 121, 17, 90, -122, 13, GSWF(1791), 0)
+#else
         CALL(evt_item_entry, STRING("item_ki_3"), 121, 17, 90, -122, 14, GSWF(1791), 0)
+#endif
     END_IF
     RETURN
 EVT_END()

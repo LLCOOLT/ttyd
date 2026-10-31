@@ -186,6 +186,13 @@ MayaHermitKey ice_effHermit_1[] = {
         },
     },
 };
+s16 ice_effFace_pPlane1_0[] = {
+    3, // vertex count
+    -1280, 1280, 0, 0, 0,
+    -640, 640, 0, 128, 128,
+    0, 1280, 0, 256, 0,
+};
+s16* ice_effFaceDt_pPlane1 = ice_effFace_pPlane1_0;
 MayaHermitKey ice_effHermit_2[] = {
     {
         0, // time
@@ -221,6 +228,13 @@ MayaHermitKey ice_effHermit_2[] = {
         },
     },
 };
+s16 ice_effFace_pPlane2_0[] = {
+    3, // vertex count
+    -1280, 0, 0, 0, 256,
+    -640, 640, 0, 128, 128,
+    -1280, 1280, 0, 0, 0,
+};
+s16* ice_effFaceDt_pPlane2 = ice_effFace_pPlane2_0;
 MayaHermitKey ice_effHermit_3[] = {
     {
         0, // time
@@ -256,6 +270,13 @@ MayaHermitKey ice_effHermit_3[] = {
         },
     },
 };
+s16 ice_effFace_pPlane3_0[] = {
+    3, // vertex count
+    -1280, 0, 0, 0, 256,
+    0, 0, 0, 256, 256,
+    -640, 640, 0, 128, 128,
+};
+s16* ice_effFaceDt_pPlane3 = ice_effFace_pPlane3_0;
 MayaHermitKey ice_effHermit_4[] = {
     {
         0, // time
@@ -291,6 +312,13 @@ MayaHermitKey ice_effHermit_4[] = {
         },
     },
 };
+s16 ice_effFace_pPlane4_0[] = {
+    3, // vertex count
+    0, 1280, 0, 256, 0,
+    -640, 640, 0, 128, 128,
+    0, 0, 0, 256, 256,
+};
+s16* ice_effFaceDt_pPlane4 = ice_effFace_pPlane4_0;
 MayaHermitKey ice_effHermit_5[] = {
     {
         0, // time
@@ -326,6 +354,13 @@ MayaHermitKey ice_effHermit_5[] = {
         },
     },
 };
+s16 ice_effFace_pPlane5_0[] = {
+    3, // vertex count
+    0, 1280, 0, 256, 0,
+    640, 640, 0, 384, 128,
+    1280, 1280, 0, 512, 0,
+};
+s16* ice_effFaceDt_pPlane5 = ice_effFace_pPlane5_0;
 MayaHermitKey ice_effHermit_6[] = {
     {
         0, // time
@@ -361,6 +396,13 @@ MayaHermitKey ice_effHermit_6[] = {
         },
     },
 };
+s16 ice_effFace_pPlane6_0[] = {
+    3, // vertex count
+    0, 0, 0, 256, 256,
+    640, 640, 0, 384, 128,
+    0, 1280, 0, 256, 0,
+};
+s16* ice_effFaceDt_pPlane6 = ice_effFace_pPlane6_0;
 MayaHermitKey ice_effHermit_7[] = {
     {
         0, // time
@@ -396,6 +438,13 @@ MayaHermitKey ice_effHermit_7[] = {
         },
     },
 };
+s16 ice_effFace_pPlane7_0[] = {
+    3, // vertex count
+    0, 0, 0, 256, 256,
+    1280, 0, 0, 512, 256,
+    640, 640, 0, 384, 128,
+};
+s16* ice_effFaceDt_pPlane7 = ice_effFace_pPlane7_0;
 MayaHermitKey ice_effHermit_8[] = {
     {
         0, // time
@@ -431,6 +480,13 @@ MayaHermitKey ice_effHermit_8[] = {
         },
     },
 };
+s16 ice_effFace_pPlane8_0[] = {
+    3, // vertex count
+    640, 640, 0, 384, 128,
+    1280, 0, 0, 512, 256,
+    1280, 1280, 0, 512, 0,
+};
+s16* ice_effFaceDt_pPlane8 = ice_effFace_pPlane8_0;
 MayaHermitKey ice_effHermit_9[] = {
     {
         0, // time
@@ -466,6 +522,13 @@ MayaHermitKey ice_effHermit_9[] = {
         },
     },
 };
+s16 ice_effFace_pPlane9_0[] = {
+    3, // vertex count
+    -640, -640, 0, 128, 384,
+    0, 0, 0, 256, 256,
+    -1280, 0, 0, 0, 256,
+};
+s16* ice_effFaceDt_pPlane9 = ice_effFace_pPlane9_0;
 MayaHermitKey ice_effHermit_10[] = {
     {
         0, // time
@@ -501,6 +564,13 @@ MayaHermitKey ice_effHermit_10[] = {
         },
     },
 };
+s16 ice_effFace_pPlane10_0[] = {
+    3, // vertex count
+    -1280, -1280, 0, 0, 512,
+    -640, -640, 0, 128, 384,
+    -1280, 0, 0, 0, 256,
+};
+s16* ice_effFaceDt_pPlane10 = ice_effFace_pPlane10_0;
 MayaHermitKey ice_effHermit_11[] = {
     {
         0, // time
@@ -536,6 +606,13 @@ MayaHermitKey ice_effHermit_11[] = {
         },
     },
 };
+s16 ice_effFace_pPlane11_0[] = {
+    3, // vertex count
+    -1280, -1280, 0, 0, 512,
+    0, -1280, 0, 256, 512,
+    -640, -640, 0, 128, 384,
+};
+s16* ice_effFaceDt_pPlane11 = ice_effFace_pPlane11_0;
 MayaHermitKey ice_effHermit_12[] = {
     {
         0, // time
@@ -571,6 +648,13 @@ MayaHermitKey ice_effHermit_12[] = {
         },
     },
 };
+s16 ice_effFace_pPlane12_0[] = {
+    3, // vertex count
+    -640, -640, 0, 128, 384,
+    0, -1280, 0, 256, 512,
+    0, 0, 0, 256, 256,
+};
+s16* ice_effFaceDt_pPlane12 = ice_effFace_pPlane12_0;
 MayaHermitKey ice_effHermit_13[] = {
     {
         0, // time
@@ -606,6 +690,13 @@ MayaHermitKey ice_effHermit_13[] = {
         },
     },
 };
+s16 ice_effFace_pPlane13_0[] = {
+    3, // vertex count
+    0, 0, 0, 256, 256,
+    640, -640, 0, 384, 384,
+    1280, 0, 0, 512, 256,
+};
+s16* ice_effFaceDt_pPlane13 = ice_effFace_pPlane13_0;
 MayaHermitKey ice_effHermit_14[] = {
     {
         0, // time
@@ -641,6 +732,13 @@ MayaHermitKey ice_effHermit_14[] = {
         },
     },
 };
+s16 ice_effFace_pPlane14_0[] = {
+    3, // vertex count
+    0, -1280, 0, 256, 512,
+    640, -640, 0, 384, 384,
+    0, 0, 0, 256, 256,
+};
+s16* ice_effFaceDt_pPlane14 = ice_effFace_pPlane14_0;
 MayaHermitKey ice_effHermit_15[] = {
     {
         0, // time
@@ -676,6 +774,13 @@ MayaHermitKey ice_effHermit_15[] = {
         },
     },
 };
+s16 ice_effFace_pPlane15_0[] = {
+    3, // vertex count
+    0, -1280, 0, 256, 512,
+    1280, -1280, 0, 512, 512,
+    640, -640, 0, 384, 384,
+};
+s16* ice_effFaceDt_pPlane15 = ice_effFace_pPlane15_0;
 MayaHermitKey ice_effHermit_16[] = {
     {
         0, // time
@@ -711,6 +816,13 @@ MayaHermitKey ice_effHermit_16[] = {
         },
     },
 };
+s16 ice_effFace_pPlane16_0[] = {
+    3, // vertex count
+    1280, 0, 0, 512, 256,
+    640, -640, 0, 384, 384,
+    1280, -1280, 0, 512, 512,
+};
+s16* ice_effFaceDt_pPlane16 = ice_effFace_pPlane16_0;
 MayaHermitKey ice_effHermit_17[] = {
     {
         0, // time
@@ -746,6 +858,14 @@ MayaHermitKey ice_effHermit_17[] = {
         },
     },
 };
+s16 ice_effFace_pPlane17_0[] = {
+    4, // vertex count
+    -1280, -1280, 0, 0, 512,
+    1280, -1280, 0, 512, 512,
+    1280, 1280, 0, 512, 0,
+    -1280, 1280, 0, 0, 0,
+};
+s16* ice_effFaceDt_pPlane17 = ice_effFace_pPlane17_0;
 MayaPoly ice_effAnimRST[] = {
     {8, ice_effHermit_0, 0, NULL},
     {3, ice_effHermit_1, 1, &ice_effFaceDt_pPlane1},
@@ -766,126 +886,6 @@ MayaPoly ice_effAnimRST[] = {
     {3, ice_effHermit_16, 1, &ice_effFaceDt_pPlane16},
     {3, ice_effHermit_17, 1, &ice_effFaceDt_pPlane17},
 };
-s16 ice_effFace_pPlane1_0[] = {
-    3, // vertex count
-    -1280, 1280, 0, 0, 0,
-    -640, 640, 0, 128, 128,
-    0, 1280, 0, 256, 0,
-};
-s16* ice_effFaceDt_pPlane1 = ice_effFace_pPlane1_0;
-s16 ice_effFace_pPlane2_0[] = {
-    3, // vertex count
-    -1280, 0, 0, 0, 256,
-    -640, 640, 0, 128, 128,
-    -1280, 1280, 0, 0, 0,
-};
-s16* ice_effFaceDt_pPlane2 = ice_effFace_pPlane2_0;
-s16 ice_effFace_pPlane3_0[] = {
-    3, // vertex count
-    -1280, 0, 0, 0, 256,
-    0, 0, 0, 256, 256,
-    -640, 640, 0, 128, 128,
-};
-s16* ice_effFaceDt_pPlane3 = ice_effFace_pPlane3_0;
-s16 ice_effFace_pPlane4_0[] = {
-    3, // vertex count
-    0, 1280, 0, 256, 0,
-    -640, 640, 0, 128, 128,
-    0, 0, 0, 256, 256,
-};
-s16* ice_effFaceDt_pPlane4 = ice_effFace_pPlane4_0;
-s16 ice_effFace_pPlane5_0[] = {
-    3, // vertex count
-    0, 1280, 0, 256, 0,
-    640, 640, 0, 384, 128,
-    1280, 1280, 0, 512, 0,
-};
-s16* ice_effFaceDt_pPlane5 = ice_effFace_pPlane5_0;
-s16 ice_effFace_pPlane6_0[] = {
-    3, // vertex count
-    0, 0, 0, 256, 256,
-    640, 640, 0, 384, 128,
-    0, 1280, 0, 256, 0,
-};
-s16* ice_effFaceDt_pPlane6 = ice_effFace_pPlane6_0;
-s16 ice_effFace_pPlane7_0[] = {
-    3, // vertex count
-    0, 0, 0, 256, 256,
-    1280, 0, 0, 512, 256,
-    640, 640, 0, 384, 128,
-};
-s16* ice_effFaceDt_pPlane7 = ice_effFace_pPlane7_0;
-s16 ice_effFace_pPlane8_0[] = {
-    3, // vertex count
-    640, 640, 0, 384, 128,
-    1280, 0, 0, 512, 256,
-    1280, 1280, 0, 512, 0,
-};
-s16* ice_effFaceDt_pPlane8 = ice_effFace_pPlane8_0;
-s16 ice_effFace_pPlane9_0[] = {
-    3, // vertex count
-    -640, -640, 0, 128, 384,
-    0, 0, 0, 256, 256,
-    -1280, 0, 0, 0, 256,
-};
-s16* ice_effFaceDt_pPlane9 = ice_effFace_pPlane9_0;
-s16 ice_effFace_pPlane10_0[] = {
-    3, // vertex count
-    -1280, -1280, 0, 0, 512,
-    -640, -640, 0, 128, 384,
-    -1280, 0, 0, 0, 256,
-};
-s16* ice_effFaceDt_pPlane10 = ice_effFace_pPlane10_0;
-s16 ice_effFace_pPlane11_0[] = {
-    3, // vertex count
-    -1280, -1280, 0, 0, 512,
-    0, -1280, 0, 256, 512,
-    -640, -640, 0, 128, 384,
-};
-s16* ice_effFaceDt_pPlane11 = ice_effFace_pPlane11_0;
-s16 ice_effFace_pPlane12_0[] = {
-    3, // vertex count
-    -640, -640, 0, 128, 384,
-    0, -1280, 0, 256, 512,
-    0, 0, 0, 256, 256,
-};
-s16* ice_effFaceDt_pPlane12 = ice_effFace_pPlane12_0;
-s16 ice_effFace_pPlane13_0[] = {
-    3, // vertex count
-    0, 0, 0, 256, 256,
-    640, -640, 0, 384, 384,
-    1280, 0, 0, 512, 256,
-};
-s16* ice_effFaceDt_pPlane13 = ice_effFace_pPlane13_0;
-s16 ice_effFace_pPlane14_0[] = {
-    3, // vertex count
-    0, -1280, 0, 256, 512,
-    640, -640, 0, 384, 384,
-    0, 0, 0, 256, 256,
-};
-s16* ice_effFaceDt_pPlane14 = ice_effFace_pPlane14_0;
-s16 ice_effFace_pPlane15_0[] = {
-    3, // vertex count
-    0, -1280, 0, 256, 512,
-    1280, -1280, 0, 512, 512,
-    640, -640, 0, 384, 384,
-};
-s16* ice_effFaceDt_pPlane15 = ice_effFace_pPlane15_0;
-s16 ice_effFace_pPlane16_0[] = {
-    3, // vertex count
-    1280, 0, 0, 512, 256,
-    640, -640, 0, 384, 384,
-    1280, -1280, 0, 512, 512,
-};
-s16* ice_effFaceDt_pPlane16 = ice_effFace_pPlane16_0;
-s16 ice_effFace_pPlane17_0[] = {
-    4, // vertex count
-    -1280, -1280, 0, 0, 512,
-    1280, -1280, 0, 512, 512,
-    1280, 1280, 0, 512, 0,
-    -1280, 1280, 0, 0, 0,
-};
-s16* ice_effFaceDt_pPlane17 = ice_effFace_pPlane17_0;
 MayaKeyList ice_effAnimRSTDt = {18, ice_effAnimRST};
 MayaAnimData ice_effAnimDt = { { 0 }, 119.0f, &ice_effAnimRSTDt };
 

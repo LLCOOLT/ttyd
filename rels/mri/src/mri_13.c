@@ -280,13 +280,31 @@ USER_FUNC(evt_puni_force_pose) {
 }
 
 EVT_BEGIN(yuka_shake)
+#ifdef VERSION_G8ME01_DEMO
+    LOOP(0)
+        CALL(evt_cam_shake, 4, FLOAT(0.009765625f), FLOAT(0.0f), 1500)
+#else
     LOOP(5)
         CALL(evt_cam_shake, 4, FLOAT(0.0f), FLOAT(0.009765625f), 1000)
+#endif
     END_LOOP
     RETURN
 EVT_END()
 
 EVT_BEGIN(yuka_shake2)
+#ifdef VERSION_G8ME01_DEMO
+    CALL(evt_cam_shake, 4, FLOAT(0.009765625f), FLOAT(0.0f), 500)
+    CALL(evt_cam_shake, 4, FLOAT(0.0087890625f), FLOAT(0.0f), 1000)
+    CALL(evt_cam_shake, 4, FLOAT(0.0078125f), FLOAT(0.0f), 1000)
+    CALL(evt_cam_shake, 4, FLOAT(0.0068359375f), FLOAT(0.0f), 1000)
+    CALL(evt_cam_shake, 4, FLOAT(0.005859375f), FLOAT(0.0f), 1000)
+    CALL(evt_cam_shake, 4, FLOAT(0.0048828125f), FLOAT(0.0f), 1000)
+    CALL(evt_cam_shake, 4, FLOAT(0.00390625f), FLOAT(0.0f), 1000)
+    CALL(evt_cam_shake, 4, FLOAT(0.0029296875f), FLOAT(0.0f), 1000)
+    CALL(evt_cam_shake, 4, FLOAT(0.001953125f), FLOAT(0.0f), 1000)
+    CALL(evt_cam_shake, 4, FLOAT(0.0009765625f), FLOAT(0.0f), 1000)
+    CALL(evt_cam_shake, 4, FLOAT(0.0146484375f), FLOAT(0.0f), 1000)
+#else
     CALL(evt_cam_shake, 4, FLOAT(0.0f), FLOAT(0.009765625f), 500)
     CALL(evt_cam_shake, 4, FLOAT(0.0f), FLOAT(0.0087890625f), 1000)
     CALL(evt_cam_shake, 4, FLOAT(0.0f), FLOAT(0.0078125f), 1000)
@@ -298,6 +316,7 @@ EVT_BEGIN(yuka_shake2)
     CALL(evt_cam_shake, 4, FLOAT(0.0f), FLOAT(0.001953125f), 1000)
     CALL(evt_cam_shake, 4, FLOAT(0.0f), FLOAT(0.0009765625f), 1000)
     CALL(evt_cam_shake, 4, FLOAT(0.0f), FLOAT(0.0146484375f), 1000)
+#endif
     RETURN
 EVT_END()
 
@@ -473,7 +492,9 @@ EVT_BEGIN(yuka_event)
     CALL(evt_target_set_position, 0, -55, -309, 50)
     SET_VALUE(GSW(0), 107)
     CALL(evt_puni_set_hamari, -180, -310, 60, 2, -2, -306, -312)
+#ifndef VERSION_G8ME01_DEMO
     CALL(evt_puni_winddisable_onoff, 0)
+#endif
     CALL(evt_mario_key_onoff, 1)
     RETURN
 EVT_END()

@@ -123,6 +123,7 @@ USER_FUNC(urouro_main_func) {
             npc->moveOffset.x = step * (f32)sin(npc->moveDir * 6.2831855f / 360.0f);
             temp = (f32)cos(npc->moveDir * 6.2831855f / 360.0f);
             npc->moveOffset.z = step * -temp;
+#ifndef VERSION_G8ME01_DEMO
             sfxFlag = 0;
             if (psndGetFlag() & 0x100) {
                 if (!(animPoseGetMaterialFlag(npc->poseId) & 0x1800)) {
@@ -146,6 +147,7 @@ USER_FUNC(urouro_main_func) {
             if (npc->footstepSfxB != 0 || npc->footstepToggle != 0) {
                 npc->footstepAccum += 1000.0f * npc->moveDt;
             }
+#endif
         }
         break;
     case 2:

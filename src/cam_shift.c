@@ -20,6 +20,13 @@ typedef struct CamShiftWork {
     u8 pad_34[0x38 - 0x34];     // 0x34, pads to the 8-byte alignment
 } CamShiftWork;
 
+// The demo times the shift with the field clock (it stops in battle), retail with the render clock.
+#ifdef VERSION_G8ME01_DEMO
+#define SHIFT_TIME renderFieldTime
+#else
+#define SHIFT_TIME renderTime
+#endif
+
 static CamShiftWork work;
 static CamShiftWork* wp = &work;
 
@@ -71,10 +78,10 @@ void camShiftMain(CameraEntry* camera, MarioWork* mario, f32* out) {
     if (stick) {
         if (stick < 0.0f) {
             if (wp->stickAccum > 0.0f) {
-                wp->stickAccum = getV60FPS(stick, wp->prevTime, gp->renderTime);
+                wp->stickAccum = getV60FPS(stick, wp->prevTime, gp->SHIFT_TIME);
             }
             else {
-                wp->stickAccum += getV60FPS(stick, wp->prevTime, gp->renderTime);
+                wp->stickAccum += getV60FPS(stick, wp->prevTime, gp->SHIFT_TIME);
             }
             if (wp->stickAccum <= -wp->stickLimit) {
                 wp->active = 1.0f;
@@ -87,10 +94,10 @@ void camShiftMain(CameraEntry* camera, MarioWork* mario, f32* out) {
         }
         else {
             if (wp->stickAccum < 0.0f) {
-                wp->stickAccum = getV60FPS(stick, wp->prevTime, gp->renderTime);
+                wp->stickAccum = getV60FPS(stick, wp->prevTime, gp->SHIFT_TIME);
             }
             else {
-                wp->stickAccum += getV60FPS(stick, wp->prevTime, gp->renderTime);
+                wp->stickAccum += getV60FPS(stick, wp->prevTime, gp->SHIFT_TIME);
             }
             if (wp->stickAccum >= wp->stickLimit) {
                 wp->active = 1.0f;
@@ -104,7 +111,7 @@ void camShiftMain(CameraEntry* camera, MarioWork* mario, f32* out) {
     }
 
     if (wp->active) {
-        wp->rate += getV60FPS(wp->accel, wp->prevTime, gp->renderTime);
+        wp->rate += getV60FPS(wp->accel, wp->prevTime, gp->SHIFT_TIME);
         if (wp->rate > 1.0f) {
             wp->rate = 1.0f;
         }
@@ -134,7 +141,7 @@ void camShiftMain(CameraEntry* camera, MarioWork* mario, f32* out) {
     }
 
     if (stick || reset) {
-        wp->current += getV60FPS(speed, wp->prevTime, gp->renderTime);
+        wp->current += getV60FPS(speed, wp->prevTime, gp->SHIFT_TIME);
         if (wp->target < 0.0f) {
             if (wp->current < wp->target) {
                 wp->current = wp->target;
@@ -153,7 +160,7 @@ void camShiftMain(CameraEntry* camera, MarioWork* mario, f32* out) {
 }
 
 void camShiftPostMain(void) {
-    wp->prevTime = gp->renderTime;
+    wp->prevTime = gp->SHIFT_TIME;
 }
 
 void camShiftReset(void) {

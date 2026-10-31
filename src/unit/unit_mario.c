@@ -51,7 +51,11 @@ void faker_mario_makkuro_set(void);
 static void callback(MapTevCallbackInfo* info);
 s32 mario_pinch_pose_sound_callback(BattleUnit* unit);
 
+#ifdef VERSION_G8ME01_DEMO
+PoseTableEntry pose_table_mario_stay[32];
+#else
 PoseTableEntry pose_table_mario_stay[34];
+#endif
 BattleDataEntry data_table_mario[10];
 static BattleUnitDefense defence;
 static BattleUnitDefenseAttr defence_attr;
@@ -72,6 +76,12 @@ static EvtWord damage_event[10];
 static EvtWord attack_event[2];
 static EvtWord wait_event[6];
 extern EvtWord mario_win_reaction[];
+
+static BattleUnitDefense defence = {{0, 0, 0, 0, 0}};
+
+static BattleUnitDefenseAttr defence_attr = {{0, 0, 0, 0, 0}};
+
+static StatusVulnerability regist = {100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100};
 
 PoseTableEntry pose_table_mario_stay[] = {
     {4, "M_S_3"},
@@ -96,6 +106,18 @@ PoseTableEntry pose_table_mario_stay[] = {
     {52, "M_I_1"},
     {57, "M_S_3"},
     {56, "M_S_3"},
+#ifdef VERSION_G8ME01_DEMO
+    {60, "M_V_2"},
+    {61, "M_V_2"},
+    {58, "M_D_2"},
+    {59, "M_V_1"},
+    {65, "M_C_3"},
+    {64, "M_N_8"},
+    {62, "M_I_O"},
+    {49, "M_J_1B"},
+    {45, "M_B_2"},
+    {67, "M_S_1"},
+#else
     {62, "M_V_2"},
     {63, "M_V_2"},
     {58, "M_A_3B"},
@@ -108,6 +130,17 @@ PoseTableEntry pose_table_mario_stay[] = {
     {49, "M_J_1B"},
     {45, "M_B_2"},
     {69, "M_S_1"},
+#endif
+};
+
+PoseTableEntry pose_table_object[] = {
+    {28, "KRN_H_1"},
+    {39, "KRN_H_1"},
+#ifdef VERSION_G8ME01_DEMO
+    {67, "KRN_H_1"},
+#else
+    {69, "KRN_H_1"},
+#endif
 };
 
 BattleDataEntry data_table_mario[] = {
@@ -121,18 +154,6 @@ BattleDataEntry data_table_mario[] = {
     {65, mario_ride_btl_entry_event},
     {47, btldefaultevt_avoid_counter_event},
     {0, NULL},
-};
-
-static BattleUnitDefense defence = {{0, 0, 0, 0, 0}};
-
-static BattleUnitDefenseAttr defence_attr = {{0, 0, 0, 0, 0}};
-
-static StatusVulnerability regist = {100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100};
-
-PoseTableEntry pose_table_object[] = {
-    {28, "KRN_H_1"},
-    {39, "KRN_H_1"},
-    {69, "KRN_H_1"},
 };
 
 BattleUnitKindPart unitpartsdata_Mario[] = {
@@ -263,6 +284,11 @@ EVT_BEGIN(mario_ride_btl_entry_event)
     RETURN
 EVT_END()
 
+static PoseSoundTiming pose_sound_timing_table[] = {
+    {"M_S_3", 0.25f, mario_pinch_pose_sound_callback, NULL, 0, 1},
+    {NULL, 0.0f, NULL, NULL, 0, 1},
+};
+
 static EVT_BEGIN(init_event)
     CALL(btlevtcmd_SetEventWait, -2, PTR(wait_event))
     CALL(btlevtcmd_SetEventAttack, -2, PTR(attack_event))
@@ -282,6 +308,22 @@ static EVT_BEGIN(init_event)
         END_IF
     END_IF
     CALL(btlevtcmd_StartWaitEvent, -2)
+    RETURN
+EVT_END()
+
+static EVT_BEGIN(damage_event)
+    SET_VALUE(LW(10), -2)
+    SET_VALUE(LW(11), 1)
+    CALL_CHILD(PTR(btldefaultevt_Damage))
+    RETURN
+EVT_END()
+
+static EVT_BEGIN(attack_event)
+    RETURN
+EVT_END()
+
+static EVT_BEGIN(wait_event)
+    CALL(btlevtcmd_AnimeChangePoseFromTable, -2, 1)
     RETURN
 EVT_END()
 
@@ -479,13 +521,23 @@ EVT_BEGIN(mario_emergency_revival_event)
 EVT_END()
 
 EVT_BEGIN(mario_appeal_event)
+#ifdef VERSION_G8ME01_DEMO
+    CALL(btlevtcmd_AnimeChangePoseType, -2, 1, 64)
+#else
     CALL(btlevtcmd_AnimeChangePoseType, -2, 1, 66)
+#endif
     CALL(btlevtcmd_GetPos, -2, LW(0), LW(1), LW(2))
     CALL(evt_snd_sfxon_3d, STRING("SFX_MARIO_APPEAL1"), LW(0), LW(1), LW(2), 0)
     WAIT_FRAMES(60)
     CALL(btlevtcmd_AudienceAppeal, -2)
     WAIT_FRAMES(30)
     CALL(btlevtcmd_StartWaitEvent, -2)
+    RETURN
+EVT_END()
+
+EVT_BEGIN(mario_win_reaction)
+    CALL(btlevtcmd_AnimeChangePose, -2, 1, STRING("M_V_2"))
+    WAIT_MS(1000)
     RETURN
 EVT_END()
 
@@ -585,11 +637,19 @@ EVT_BEGIN(btlataudevtMarioHammer)
         CASE_EQUAL(2)
         SET_VALUE(LW(0), STRING("M_H_5A"))
         SET_VALUE(LW(1), STRING("M_H_5B"))
+#ifdef VERSION_G8ME01_DEMO
+        SET_VALUE(LW(2), STRING("M_H_15"))
+#else
         SET_VALUE(LW(2), STRING("M_H_14"))
+#endif
         CASE_EQUAL(3)
         SET_VALUE(LW(0), STRING("M_H_9A"))
         SET_VALUE(LW(1), STRING("M_H_9B"))
+#ifdef VERSION_G8ME01_DEMO
+        SET_VALUE(LW(2), STRING("M_H_14"))
+#else
         SET_VALUE(LW(2), STRING("M_H_15"))
+#endif
         CASE_DEFAULT
         SET_VALUE(LW(0), STRING("M_H_1A"))
         SET_VALUE(LW(1), STRING("M_H_1B"))
@@ -636,6 +696,14 @@ EVT_BEGIN(btlataudevtMarioHammer)
         CALL(evt_btl_camera_set_mode, 0, 0)
         WAIT_MS(1000)
     END_SIBLING_EVENT
+#ifdef VERSION_G8ME01_DEMO
+    WAIT_MS(30)
+    CALL(btlevtcmd_AnimeChangePoseType, -2, 1, 42)
+    CALL(btlevtcmd_GetHomePos, -2, LW(0), LW(1), LW(2))
+    CALL(btlevtcmd_SetPos, -2, LW(8), LW(1), LW(2))
+    CALL(btlevtcmd_WaitEventEnd, LW(15))
+    CALL(btlevtcmd_MovePosition, -2, LW(0), LW(1), LW(2), 0, -1, 0)
+#else
     WAIT_MS(500)
     CALL(btlevtcmd_AnimeChangePose, -2, 1, STRING("M_H_16"))
     CALL(btlevtcmd_AnimeWaitPlayComplete, -2, 1)
@@ -651,34 +719,7 @@ EVT_BEGIN(btlataudevtMarioHammer)
     CALL(btlevtcmd_SetPos, -2, LW(8), LW(1), LW(2))
     CALL(btlevtcmd_GetHomePos, -2, LW(0), LW(1), LW(2))
     CALL(btlevtcmd_MovePosition, -2, LW(0), LW(1), LW(2), 0, -1, 0)
+#endif
     CALL(btlevtcmd_StartWaitEvent, -2)
     RETURN
 EVT_END()
-
-static PoseSoundTiming pose_sound_timing_table[] = {
-    {"M_S_3", 0.25f, mario_pinch_pose_sound_callback, NULL, 0, 1},
-    {NULL, 0.0f, NULL, NULL, 0, 1},
-};
-
-static EVT_BEGIN(damage_event)
-    SET_VALUE(LW(10), -2)
-    SET_VALUE(LW(11), 1)
-    CALL_CHILD(PTR(btldefaultevt_Damage))
-    RETURN
-EVT_END()
-
-static EVT_BEGIN(attack_event)
-    RETURN
-EVT_END()
-
-static EVT_BEGIN(wait_event)
-    CALL(btlevtcmd_AnimeChangePoseFromTable, -2, 1)
-    RETURN
-EVT_END()
-
-EVT_BEGIN(mario_win_reaction)
-    CALL(btlevtcmd_AnimeChangePose, -2, 1, STRING("M_V_2"))
-    WAIT_MS(1000)
-    RETURN
-EVT_END()
-

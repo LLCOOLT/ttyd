@@ -12,6 +12,13 @@
 // (win_item reads party.count, win_badge rebuilds mario.poseId and log.pose, win_root sorts
 // and draws the item, badge and log lists).
 
+// Directory of the window files on the disc (format prefix "%s/" is the DVD root); the demo uses "window".
+#ifdef VERSION_G8ME01_DEMO
+#define WIN_DIR "%s/window/"
+#else
+#define WIN_DIR "%s/w/"
+#endif
+
 typedef struct WinTab {
     s32 id;          // 0x0
     f32 x;           // 0x4
@@ -44,7 +51,9 @@ typedef struct WinBadgeEnt {
 
 typedef struct WinMarioState {
     s32 poseId; // 0x188
-    s32 f18C;   // 0x18C
+#ifndef VERSION_G8ME01_DEMO
+    s32 f18C;   // 0x18C, not in the demo
+#endif
     s32 f190;   // 0x190
     s32 f194;   // 0x194
     s32 f198;   // 0x198
@@ -207,8 +216,11 @@ typedef struct WindowWork {
     FileEntry* res;             // 0x28, win.tpl
     FileEntry* mailRes;         // 0x2C, mail tpl
     FileEntry* mapRes;          // 0x30, log map tpl
+#ifndef VERSION_G8ME01_DEMO
+    // The demo has no background capture.
     smartEntry* texBuf;         // 0x34, background capture texture
     s32 texBufValid;            // 0x38
+#endif
     EventEntry* currentEvent;   // 0x3C
     s32 tabSel;                 // 0x40
     s32 tabNum;                 // 0x44
@@ -245,7 +257,7 @@ typedef struct WindowWork {
     WinBadgeState badge;        // 0x3DC
     WinLogState log;            // 0xD68
     s32 useWin[2];              // 0x1208 (US 0x1210), item use windows (winMgr ids)
-} WindowWork;                   // 0x1210 (US 0x1218)
+} WindowWork;                   // 0x1210 (US 0x1218, demo 0x1204)
 
 struct BattleWeapon;
 

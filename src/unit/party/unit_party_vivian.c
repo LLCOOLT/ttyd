@@ -74,7 +74,9 @@ USER_FUNC(_disp_heart_entry_stop);
 void _disp_heart(CameraId camera, void* param);
 USER_FUNC(_disp_heart_entry);
 USER_FUNC(_make_kagenuke_weapon);
+#ifndef VERSION_G8ME01_DEMO
 USER_FUNC(_get_vivian_attack_position);
+#endif
 USER_FUNC(_get_move_frame);
 static void __makeTechMenuFunc(BattleCommand* command, s32* count);
 USER_FUNC(battle_evt_majo_disp_off);
@@ -91,6 +93,7 @@ static VivDefAttr defence_attr;
 static VivRegist regist;
 static EvtWord init_event[68];
 static EvtWord damage_event[16];
+static EvtWord wait_event[6];
 extern EvtWord vivian_hide_event[];
 BattleWeapon partyWeapon_VivianNormalAttack;
 BattleWeapon partyWeapon_VivianShadowGuard;
@@ -125,7 +128,39 @@ static EvtWord attack_audience_event[189];
 
 
 
+static VivDef defence = {{{0, 0, 0, 0, 0}}, {0, 0, 0}};
+
+static VivDefAttr defence_attr = {{{0, 0, 0, 0, 0}}, {0, 0, 0}};
+
+static VivRegist regist = {{100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100}, {0, 0}};
+
 PoseTableEntry pose_table_vivian_stay[] = {
+#ifdef VERSION_G8ME01_DEMO
+    {9, "PTR_D_4"},
+    {2, "PTR_D_4"},
+    {3, "PTR_X_1"},
+    {4, "PTR_D_2"},
+    {5, "PTR_X_1"},
+    {1, "PTR_N_1"},
+    {27, "PTR_D_3"},
+    {28, "PTR_S_1"},
+    {37, "PTR_G_2"},
+    {31, "PTR_G_1"},
+    {39, "PTR_D_1"},
+    {40, "PTR_W_1"},
+    {42, "PTR_R_1"},
+    {57, "PTR_D_2"},
+    {56, "PTR_D_2"},
+    {58, "PTR_D_4"},
+    {59, "PTR_D_2"},
+    {63, "PTR_T_1"},
+    {52, "PTR_I_1"},
+    {65, "PTR_C_1"},
+    {62, "PTR_X_1"},
+    {49, "PTR_D_1"},
+    {45, "PTR_G_1"},
+    {67, "PTR_S_1"},
+#else
     {9, "PTR_D_4"},
     {2, "PTR_D_4"},
     {3, "PTR_X_1"},
@@ -150,6 +185,7 @@ PoseTableEntry pose_table_vivian_stay[] = {
     {49, "PTR_D_1"},
     {45, "PTR_G_1"},
     {69, "PTR_S_1"},
+#endif
 };
 
 static BattleDataEntry data_table[] = {
@@ -245,18 +281,7 @@ BattleUnitKind unitdata_Party_Vivian = {
     data_table,
 };
 
-static VivDef defence = {{{0, 0, 0, 0, 0}}, {0, 0, 0}};
-
-static VivDefAttr defence_attr = {{{0, 0, 0, 0, 0}}, {0, 0, 0}};
-
-static VivRegist regist = {{100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100}, {0, 0}};
-
 static EVT_BEGIN(attack_event)
-    RETURN
-EVT_END()
-
-static EVT_BEGIN(wait_event)
-    CALL(btlevtcmd_AnimeChangePoseFromTable, -2, 1)
     RETURN
 EVT_END()
 
@@ -442,6 +467,11 @@ EVT_BEGIN(vivian_hide_event)
     RETURN
 EVT_END()
 
+static EVT_BEGIN(wait_event)
+    CALL(btlevtcmd_AnimeChangePoseFromTable, -2, 1)
+    RETURN
+EVT_END()
+
 BattleWeapon partyWeapon_VivianNormalAttack = {
     "btl_wn_ptr_normal", // name
 #ifdef VERSION_G8ME01
@@ -621,7 +651,11 @@ BattleWeapon partyWeapon_VivianCharmKissAttack = {
     0x80002004, // targetWeightFlags
     0, 0, 0, 0, 0, 0, 0, 0, // sleepChance..poisonTime
     0, // poisonStrength
+#ifdef VERSION_G8ME01_DEMO
+    90, // confuseChance
+#else
     100, // confuseChance
+#endif
     3, // confuseTime
     0, 0, 0, 0, 0, 0, 0, 0, // electricChance..freezeTime
     0, 0, 0, 0, 0, 0, 0, 0, // sizeChangeChance..defChangeTime
@@ -820,7 +854,18 @@ EVT_BEGIN(partyVivianAttack_NormalAttack)
     CALL(battle_evt_majo_disp_off, -2, 1, 0, 0)
     CALL(btlevtcmd_StartAC, 1)
     CALL(btlevtcmd_GetHitPos, LW(3), LW(4), LW(0), LW(1), LW(2))
+#ifdef VERSION_G8ME01_DEMO
+    CALL(btlevtcmd_GetHitPos, LW(3), LW(4), LW(6), LW(7), LW(8))
+    CALL(btlevtcmd_TransStageFloorPosition, LW(6), LW(7), LW(8))
+    CALL(btlevtcmd_FaceDirectionAdd, LW(3), LW(0), 30)
+    SUBTRACT(LW(1), 20)
+    IF_INT_LESS(LW(1), LW(7))
+        SET_VALUE(LW(1), LW(7))
+    END_IF
+    CALL(btlevtcmd_TransStageFloorPosition, LW(0), LW(1), LW(2))
+#else
     CALL(_get_vivian_attack_position, LW(3), LW(0), LW(1), LW(2))
+#endif
     CALL(btlevtcmd_GetPos, -2, -250000000, LW(1), -250000000)
     CALL(btlevtcmd_DivePosition, -2, LW(0), LW(1), LW(2), 50, 0, 5, 0, -1)
     CALL(btlevtcmd_SetUnitWork, -2, 3, 1)
@@ -830,9 +875,18 @@ EVT_BEGIN(partyVivianAttack_NormalAttack)
     CALL(btlevtcmd_SetPos, -2, LW(0), LW(1), LW(2))
     CALL(btlevtcmd_GetHitPos, LW(3), LW(4), LW(0), LW(1), LW(2))
     CALL(btlevtcmd_GetHitPos, LW(3), LW(4), LW(6), LW(7), LW(8))
+#ifdef VERSION_G8ME01_DEMO
+    CALL(btlevtcmd_TransStageFloorPosition, LW(6), LW(7), LW(8))
+    CALL(btlevtcmd_FaceDirectionAdd, LW(3), LW(0), 30)
+    SUBTRACT(LW(1), 20)
+    IF_INT_LESS(LW(1), LW(7))
+        SET_VALUE(LW(1), LW(7))
+    END_IF
+#else
     CALL(_get_vivian_attack_position, LW(3), LW(0), LW(1), LW(2))
     CALL(_get_vivian_attack_position, LW(3), LW(6), LW(7), LW(8))
     CALL(btlevtcmd_TransStageFloorPosition, LW(6), LW(7), LW(8))
+#endif
     CALL(btlevtcmd_GetFaceDirection, LW(3), LW(15))
     MULTIPLY(LW(15), -1)
     CALL(btlevtcmd_ChangeFaceDirection, -2, LW(15))
@@ -993,14 +1047,20 @@ EVT_BEGIN(partyVivianAttack_ShadowGuard)
         CALL(btlevtcmd_MovePosition, -2, LW(0), LW(1), LW(2), 0, -1, 0)
         GOTO(90)
     END_IF
+#ifdef VERSION_G8ME01_DEMO
+    CALL(btlevtcmd_GetResultPrizeLv, LW(3), 0, LW(6))
+#else
     CALL(btlevtcmd_GetResultPrizeLv, -1, 0, LW(6))
+#endif
     CALL(btlevtcmd_GetHitPos, LW(3), LW(4), LW(0), LW(1), LW(2))
     CALL(btlevtcmd_ACSuccessEffect, LW(6), LW(0), LW(1), LW(2))
     CALL(btlevtcmd_AudienceDeclareACResult, LW(12), LW(6))
     CALL(btlevtcmd_StopAC)
     CALL(evt_btl_camera_set_moveSpeedLv, 0, 2)
     CALL(evt_btl_camera_set_zoom, 0, 350)
+#ifndef VERSION_G8ME01_DEMO
     CALL(evt_btl_camera_set_posoffset, 0, 0, 0, 0)
+#endif
     CALL(btlevtcmd_AnimeChangePose, -2, 1, STRING("PTR_A2_2"))
     CALL(btlevtcmd_AnimeWaitPlayComplete, -2, 1)
     CALL(btlevtcmd_AnimeChangePose, -2, 1, STRING("PTR_A2_3"))
@@ -1039,7 +1099,9 @@ EVT_BEGIN(partyVivianAttack_ShadowGuard)
     LABEL(95)
     CALL(evt_btl_camera_set_mode, 0, 0)
     CALL(evt_btl_camera_set_moveSpeedLv, 0, 1)
+#ifndef VERSION_G8ME01_DEMO
     CALL(evt_btl_camera_set_posoffset, 0, 0, 0, 0)
+#endif
     LABEL(99)
     CALL(btlevtcmd_StartWaitEvent, -2)
     RETURN
@@ -1749,6 +1811,7 @@ USER_FUNC(_get_move_frame) {
     return EVT_RETURN_DONE;
 }
 
+#ifndef VERSION_G8ME01_DEMO
 f32 BattleGetFloorHeight(BattleWork* wp, f32 x, f32 y, f32 z);
 
 USER_FUNC(_get_vivian_attack_position) {
@@ -1788,6 +1851,7 @@ USER_FUNC(_get_vivian_attack_position) {
     evtSetValue(event, i3, z);
     return EVT_RETURN_DONE;
 }
+#endif
 
 USER_FUNC(_make_kagenuke_weapon) {
     BattleWork* wp = _battleWorkPointer;

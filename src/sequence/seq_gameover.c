@@ -149,6 +149,8 @@ EVT_BEGIN(fall_gameover)
     END_LOOP
 #ifdef VERSION_G8ME01
     WAIT_MS(1000)
+#elif defined(VERSION_G8ME01_DEMO)
+    WAIT_FRAMES(120)
 #else
     WAIT_FRAMES(60)
 #endif
@@ -215,7 +217,9 @@ EVT_BEGIN(evt_gameover)
     CALL(evt_party_set_pos, 1, 0, -1000, 0)
     CALL(evt_mario_clear_party, 1)
     WAIT_FRAMES(1)
+#ifndef VERSION_G8ME01_DEMO
     CALL(N_evt_snd_bgm_unpause)
+#endif
     CALL(evt_mario_dispflag_onoff, 1, 2)
     CALL(evt_mario_set_pose, STRING("M_D_2"))
     CALL(evt_mario_set_dir, 180, 0, 0)
@@ -292,7 +296,11 @@ void seq_gameOverMain(SequenceWork* work) {
             if (work->mapName == NULL) {
                 GXColor color = {0, 0, 0, 255};
                 fadeEntry(2, 1000, color);
+#ifdef VERSION_G8ME01_DEMO
+                gp->areaFadeInType = 8;
+#else
                 gp->areaFadeInType = 10;
+#endif
                 gp->areaFadeInDuration = 300;
             }
             mapPreLoad("sys_00");
@@ -350,7 +358,11 @@ void seq_gameOverMain(SequenceWork* work) {
             break;
         case 3: {
             GXColor color = {0, 0, 0, 255};
+#ifdef VERSION_G8ME01_DEMO
+            fadeEntry(29, 200, color);
+#else
             fadeEntry(31, 200, color);
+#endif
             work->state++;
             break;
         }
@@ -359,14 +371,20 @@ void seq_gameOverMain(SequenceWork* work) {
                 break;
             } else {
                 GXColor color = {0, 0, 0, 255};
-                fadeEntry(9, 1000, color);
+                fadeEntry(FADE_IN_BLACK, 1000, color);
             }
+#ifdef VERSION_G8ME01_DEMO
+            psndBGMOn(0x200, (char*)0x93);
+            marioReset();
+            marioEntry();
+#else
             marioReset();
             marioEntry();
             psndBGMOn(0x200, (char*)0x93);
             if ((u32)psbgm[0].streamId != 0xFFFFFFFFU) {
                 sound.streams[psbgm[0].streamId].flags |= 0x8000;
             }
+#endif
             wp->evt = evtEntryType(evt_gameover, 0, 0, 0);
             work->state++;
             break;
@@ -378,15 +396,24 @@ void seq_gameOverMain(SequenceWork* work) {
             }
             {
                 GXColor color = {0, 0, 0, 255};
+#ifdef VERSION_G8ME01_DEMO
+                fadeEntry(34, 0, color);
+#else
                 fadeEntry(36, 0, color);
+#endif
             }
+#ifndef VERSION_G8ME01_DEMO
             psndBGMOff_f_d(0x200, 4000, FALSE);
+#endif
             work->state++;
             break;
         case 6:
             if (!fadeIsFinish()) {
                 break;
             }
+#ifdef VERSION_G8ME01_DEMO
+            gp->resetType = 1;
+#else
             _relUnLoad();
             _unload("sys_00", NULL, NULL);
             strcpy(gp->beroEnterName, "");
@@ -399,6 +426,7 @@ void seq_gameOverMain(SequenceWork* work) {
             } else {
                 seqSetSeq(1, NULL, NULL);
             }
+#endif
             break;
     }
 }

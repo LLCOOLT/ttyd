@@ -214,7 +214,11 @@ BattleUnit* BtlUnit_Entry(BattleUnitSetup* setup) {
     part->mNextPart = NULL;
 
     body = BtlUnit_GetPartsPtr(unit, BtlUnit_GetBodyPartsId(unit));
+#ifdef VERSION_G8ME01_DEMO
+    unit->talkPose = BtlUnit_GetPoseNameFromType(body, 0x3F);
+#else
     unit->talkPose = BtlUnit_GetPoseNameFromType(body, 0x41);
+#endif
     unit->stayPose = BtlUnit_GetPoseNameFromType(body, 0x2B);
     unit->mMoveColorLv = 0xFF;
     unit->moveColorLvDisp = 0xFF;
@@ -1153,6 +1157,18 @@ BOOL BtlUnit_SetStatus(BattleUnit* unit, StatusEffectType type, s8 turns, s8 str
             break;
         case STATUS_CHARGE:
             unit->mChargeStrength += strength;
+#ifdef VERSION_G8ME01_DEMO
+            if (unit->mChargeStrength < 0) {
+                unit->mChargeStrength = 0;
+            }
+            else if (unit->mChargeStrength > 99) {
+                unit->mChargeStrength = 99;
+            }
+            break;
+        case STATUS_ALLERGIC:
+            unit->mAllergicTurns = turns;
+            break;
+#else
             if (unit->mChargeStrength < 0) {
                 unit->mChargeStrength = 0;
                 return FALSE;
@@ -1170,6 +1186,7 @@ BOOL BtlUnit_SetStatus(BattleUnit* unit, StatusEffectType type, s8 turns, s8 str
                 return FALSE;
             }
             break;
+#endif
         case STATUS_FLIPPED:
             unit->flippedTurns = turns;
             break;
@@ -1177,6 +1194,9 @@ BOOL BtlUnit_SetStatus(BattleUnit* unit, StatusEffectType type, s8 turns, s8 str
             unit->mInvisibleTurns = turns;
             break;
         case STATUS_PAYBACK:
+#ifdef VERSION_G8ME01_DEMO
+            unit->mPaybackTurns = turns;
+#else
             if (turns > 0) {
                 unit->mPaybackTurns = turns;
             }
@@ -1184,6 +1204,7 @@ BOOL BtlUnit_SetStatus(BattleUnit* unit, StatusEffectType type, s8 turns, s8 str
                 unit->mPaybackTurns = 0;
                 return FALSE;
             }
+#endif
             break;
         case STATUS_HOLD_FAST:
             unit->mHoldFastTurns = turns;
@@ -1237,7 +1258,9 @@ BOOL BtlUnit_SetStatus(BattleUnit* unit, StatusEffectType type, s8 turns, s8 str
 void BtlUnit_ClearStatus(BattleUnit* unit) {
     memset(&unit->mSleepTurns, 0, 0x1Eu);
     BtlUnit_SetStatus(unit, STATUS_CHARGE, 1, -99);
+#ifndef VERSION_G8ME01_DEMO
     BattleStatusChangeInfoWorkInit(unit);
+#endif
 }
 
 BOOL BtlUnit_CheckRecoveryStatus(BattleUnit* unit, StatusEffectType type) {
@@ -1419,14 +1442,24 @@ char* BtlUnit_GetPoseNameFromType(BattleUnitPart* part, s32 type) {
     else if (type < 0x28) {
         alt = 0x27;
     }
+#ifdef VERSION_G8ME01_DEMO
+    else if (type < 0x44) {
+        alt = 0x43;
+    }
+#else
     else if (type < 0x46) {
         alt = 0x45;
     }
+#endif
     else {
         return NULL;
     }
     while (pose) {
+#ifdef VERSION_G8ME01_DEMO
+        if (pose->type >= 0x44) {
+#else
         if (pose->type >= 0x46) {
+#endif
             return NULL;
         }
         if (pose->type != type && pose->type != alt) {
@@ -1842,9 +1875,11 @@ s32 BtlUnit_GetWeaponCost(BattleUnit* unit, BattleWeapon* weapon) {
             cost = 1;
         }
     }
+#ifndef VERSION_G8ME01_DEMO
     if (cost >= 1000) {
         cost = 999;
     }
+#endif
     return cost;
 }
 
@@ -2003,7 +2038,11 @@ void BtlUnit_SetCommandAnimPose(BattleUnit* unit) {
         special = TRUE;
     }
     if (special) {
+#ifdef VERSION_G8ME01_DEMO
+        BtlUnit_SetAnimType(part, 0x41);
+#else
         BtlUnit_SetAnimType(part, 0x43);
+#endif
         PART_FLAGS(part) |= 0x80;
     }
     else {

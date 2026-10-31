@@ -172,7 +172,7 @@ s32 msgWindow_Entry(const char* msg, s32 callback, s32 priority);
 
 const char* partyMsgStr[] = {"", "_kur", "_nok", "_bom", "_yos", "_win", "_viv", "_chu", "_jug", "_tel", "_lui"};
 const char* battlePartyMsgStr[] = {"_kur", "_nok", "_yos", "_win", "_viv", "_bom", "_chu"};
-#ifndef VERSION_G8ME01
+#if !defined(VERSION_G8ME01) && !defined(VERSION_G8ME01_DEMO)
 static const char* battlePartyMsgPad[6] = {0};
 #endif
 

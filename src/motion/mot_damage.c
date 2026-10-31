@@ -95,6 +95,7 @@ void mot_damage(void) {
 
     if (mario->trigFlags & 1) {
         mario->trigFlags &= ~1;
+#ifndef VERSION_G8ME01_DEMO
         if (mario->jumpVelocityY == 0.0f) {
             mario->jumpVelocityY = -6.0f;
             mario->jumpAccelerationY = 0.0f;
@@ -102,6 +103,7 @@ void mot_damage(void) {
             mario->jumpSnapY = 0.0f;
         }
         marioClearSlitFloor();
+#endif
         marioOfsRotReset();
         mario->dispFlags &= ~0x100;
         marioAdjustMoveDir();
@@ -117,7 +119,11 @@ void mot_damage(void) {
         mario->airTimer = 0;
         mario->baseSpeed = 0.0f;
         mario->multiTimer = 20;
+#ifdef VERSION_G8ME01_DEMO
+        if (mario->prevMotionId != MARIO_MOTION_YOSHI) {
+#else
         if (mario->prevMotionId != MARIO_MOTION_YOSHI && mario->prevMotionId != MARIO_MOTION_PLANE) {
+#endif
             Vec pos = mario->position;
             marioSetSplash(0, &pos);
         }
@@ -220,11 +226,13 @@ void mot_damage(void) {
             mario->mot.damage.camStepY = (dest.y - mario->mot.damage.rootY) / (f32)(s32)mario->multiTimer;
             mario->currSubMotionId = 12;
             mario->dispFlags |= 1;
+#ifndef VERSION_G8ME01_DEMO
             if ((s32)mario->multiTimer == 0) {
                 mario->multiTimer = 10;
                 mario->mot.damage.camStepY = (dest.y - mario->mot.damage.rootY) / (f32)(s32)mario->multiTimer;
                 mario->currSubMotionId = 14;
             }
+#endif
         }
         break;
     }
@@ -240,7 +248,9 @@ void mot_damage(void) {
         mario->flags |= 0x80;
         marioSetFallPara();
         mario->dispFlags &= ~1;
+#ifndef VERSION_G8ME01_DEMO
         mario->multiTimer = 1;
+#endif
         break;
     case 13:
         if (--mario->multiTimer > 0) {
@@ -248,6 +258,7 @@ void mot_damage(void) {
         }
         mario->currSubMotionId = 20;
         break;
+#ifndef VERSION_G8ME01_DEMO
     case 14:
         mario->camTarget.y += mario->mot.damage.camStepY;
         mario->camTarget.x = mario->position.x;
@@ -260,6 +271,7 @@ void mot_damage(void) {
         mario->dispFlags &= ~1;
         mario->currSubMotionId = 20;
         break;
+#endif
     case 20: {
         HitEntry* h;
         f32 landY;
@@ -355,12 +367,16 @@ void mot_damageToge(void) {
 
     if (mario->trigFlags & 1) {
         mario->trigFlags &= ~1;
+#ifndef VERSION_G8ME01_DEMO
         marioClearSlitFloor();
+#endif
         mario->dispFlags &= ~0x100;
         marioAdjustMoveDir();
         marioSlitForceCancel();
         marioYoshiForceCancel();
+#ifndef VERSION_G8ME01_DEMO
         nokonoko_use_cancel();
+#endif
         marioNoUpdateCamPos();
         bomhei_use_cancel2();
         mario->currSubMotionId = 0;

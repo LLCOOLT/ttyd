@@ -22,6 +22,11 @@ static BattleUnitKindPart parts[] = {
     {1, "btl_un_system", NULL, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 20, 30, 255, &defence, &defence_attr, 0x3010009, 0, NULL},
 };
 
+#ifdef VERSION_G8ME01_DEMO
+// the demo defines regist here (it is .data there, small data in retail)
+static StatusVulnerability regist = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
+#endif
+
 BattleUnitKind unit_system = {
     220,
     "btl_un_system",
@@ -105,7 +110,9 @@ static BattleDataEntry data_table[] = {
     {0, NULL},
 };
 
+#ifndef VERSION_G8ME01_DEMO
 static StatusVulnerability regist = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
+#endif
 
 static EVT_BEGIN(damage_event)
     RETURN

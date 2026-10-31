@@ -16,6 +16,10 @@ double cos(double);
 // TODO: use SoundInit to fill in SoundStream/Entry
 
 //.bss
+#ifdef VERSION_G8ME01_DEMO
+// the demo defines the ARAM block table first, so it ends up last in .bss
+u32 aramMemArray[8];
+#endif
 SND_AUX_REVERBHI revH;
 SND_AUX_REVERBSTD revS;
 SND_AUX_CHORUS cho;
@@ -24,8 +28,10 @@ SND_AUX_DELAY dly;
 
 SoundWork sound;
 
+#ifndef VERSION_G8ME01_DEMO
 //.sbss
 u32 aramMemArray[8];
+#endif
 
 static inline char* _ssGetStr(void) {
     static char str[0x100];
@@ -105,10 +111,15 @@ void SoundInit(void) { // 1:1, assuming sndMalloc inlines
     sndAuxCallbackPrepareDelay(&dly);
     sndSetAuxProcessingCallbacks(0, sndAuxCallbackReverbHI, &revH, 0xFF, 0, sndAuxCallbackChorus, &cho, 0xFF, 0);
     sndVolume(0x7F, 0, 0xFF);
+#ifdef VERSION_G8ME01_DEMO
+    sound.outputMode = SND_OUTPUTMODE_STEREO;
+    sndOutputMode(SND_OUTPUTMODE_STEREO);
+#else
     if (sound.outputMode != SND_OUTPUTMODE_STEREO) {
         sound.outputMode = SND_OUTPUTMODE_STEREO;
         sndOutputMode(SND_OUTPUTMODE_STEREO);
     }
+#endif
     sound.callback = AIRegisterDMACallback(SoundAIDMACallback);
 #ifdef VERSION_G8ME01
     sound.dmaAddress = (u8*)(AIGetDMAStartAddr() | 0x80000000);
@@ -286,6 +297,9 @@ void* loadDVD_callback(u32 offset, u32 bytes) { // 1:1
 
 BOOL SoundLoadDVD2(const char* path) { // 1:1
     DVDEntry* entry;
+#ifdef VERSION_G8ME01_DEMO
+    const char* root;
+#endif
     u32 length;
     void* pointer;
 
@@ -293,7 +307,12 @@ BOOL SoundLoadDVD2(const char* path) { // 1:1
         return 0;
     }
 
+#ifdef VERSION_G8ME01_DEMO
+    root = getMarioStDvdRoot();
+    sprintf(str, "%s/%s%s", root, path, ".pool");
+#else
     sprintf(str, "%s/%s%s", getMarioStDvdRoot(), path, ".pool");
+#endif
     entry = DVDMgrOpen(str, 2, 0);
     length = entry == NULL; // fixes regalloc
     if (entry == NULL) {
@@ -586,6 +605,21 @@ static inline void _ssDropStop(void) {
         SoundStream* stream;
         if (sound.streams[i].flags) {
             stream = &sound.streams[i];
+#ifdef VERSION_G8ME01_DEMO
+            // as in the demo's SoundSSStopCh
+            if (!(stream->flags & 8)) {
+                stream->flags |= 4;
+                continue;
+            }
+            if (stream->flags & 0x400) {
+                sound.slotUsed[stream->slot] = 0;
+            }
+            stream->flags = 0;
+            if (!sound.interruptDepth) {
+                sound.interrupts = OSDisableInterrupts();
+            }
+            sound.interruptDepth++;
+#else
             if (!sound.interruptDepth) {
                 sound.interrupts = OSDisableInterrupts();
             }
@@ -594,6 +628,7 @@ static inline void _ssDropStop(void) {
                 sound.slotUsed[stream->slot] = 0;
             }
             stream->flags = 0;
+#endif
             DVDMgrClose(stream->entries[0].dvd);
             DVDMgrClose(stream->entries[1].dvd);
             sndStreamFree(stream->entries[0].streamId);
@@ -650,6 +685,21 @@ BOOL SoundDropData(void) {
         SoundStream* stream;
         if (sound.streams[i].flags) {
             stream = &sound.streams[i];
+#ifdef VERSION_G8ME01_DEMO
+            // as in the demo's SoundSSStopCh
+            if (!(stream->flags & 8)) {
+                stream->flags |= 4;
+                continue;
+            }
+            if (stream->flags & 0x400) {
+                sound.slotUsed[stream->slot] = 0;
+            }
+            stream->flags = 0;
+            if (!sound.interruptDepth) {
+                sound.interrupts = OSDisableInterrupts();
+            }
+            sound.interruptDepth++;
+#else
             if (!sound.interruptDepth) {
                 sound.interrupts = OSDisableInterrupts();
             }
@@ -658,6 +708,7 @@ BOOL SoundDropData(void) {
                 sound.slotUsed[stream->slot] = 0;
             }
             stream->flags = 0;
+#endif
             DVDMgrClose(stream->entries[0].dvd);
             DVDMgrClose(stream->entries[1].dvd);
             sndStreamFree(stream->entries[0].streamId);
@@ -719,10 +770,15 @@ BOOL SoundDropData(void) {
 }
 
 void SoundSetOutputMode(SND_OUTPUTMODE mode) {
+#ifdef VERSION_G8ME01_DEMO
+    sound.outputMode = mode;
+    sndOutputMode(mode);
+#else
     if (sound.outputMode != mode) {
         sound.outputMode = mode;
         sndOutputMode(mode);
     }
+#endif
 }
 
 void SoundOpenCover(void) {
@@ -1272,11 +1328,20 @@ static inline u32 _ssAlign32(u32 x) {
 
 static inline u32 _ssCalcLen(SoundStreamEntry* entry) {
     u32 len;
+#ifndef VERSION_G8ME01_DEMO
     int i;
+#endif
     len = SS_LOAD_BUFFER_SIZE;
     if (entry->offset + SS_LOAD_BUFFER_SIZE > entry->size) {
         len = entry->size - entry->offset;
     } else {
+#ifdef VERSION_G8ME01_DEMO
+        // The demo only shortens the read when the stream ends within the next buffer.
+        if (entry->offset + 2 * SS_LOAD_BUFFER_SIZE > entry->size) {
+            len -= (SS_LOAD_BUFFER_SIZE - (entry->size - (entry->offset + SS_LOAD_BUFFER_SIZE))) / 2;
+            len += 0x20 - (len % 0x20);
+        }
+#else
         for (i = 2; i < 6; i++) {
             if (entry->offset + i * SS_LOAD_BUFFER_SIZE > entry->size) {
                 len -= (SS_LOAD_BUFFER_SIZE - (entry->size - (entry->offset + (i - 1) * SS_LOAD_BUFFER_SIZE))) / i;
@@ -1284,6 +1349,7 @@ static inline u32 _ssCalcLen(SoundStreamEntry* entry) {
                 break;
             }
         }
+#endif
     }
     return len;
 }
@@ -1300,7 +1366,16 @@ inline void _ssDVDReadAsync(SoundStream* stream, int ch) {
     if (ch) {
         extra = entry->size + (0x20 - (entry->size % 0x20));
     }
+#ifdef VERSION_G8ME01_DEMO
+    // The demo always reads at least a whole buffer.
+    aligned = len = _ssCalcLen(entry);
+    if (len < SS_LOAD_BUFFER_SIZE) {
+        aligned = SS_LOAD_BUFFER_SIZE;
+    }
+    aligned = (aligned + 0x1F) & ~0x1F;
+#else
     aligned = _ssAlign32(len = _ssCalcLen(entry));
+#endif
     if (!(stream->flags & 0x400)) {
         DVDMgrReadAsync(entry->dvd, entry->loadBuffer[1 - entry->curBuf], aligned,
                         stream->dataOffset + entry->offset + extra, _ssDVDReadAsync_activeChk);
@@ -1334,6 +1409,102 @@ inline void _ssResetEntries(SoundStream* stream) {
     stream->entries[1].runCount = 0;
 }
 
+#ifdef VERSION_G8ME01_DEMO
+// The demo masks interrupts only around the updates, not the whole search.
+void _ssDVDReadAsync_activeChk(s32 result, DVDFileInfo* fileInfo) {
+    SoundStream* stream;
+    SoundStreamEntry* entry;
+    int i;
+    int ch;
+
+    for (i = 0; i < 3; i++) {
+        stream = &sound.streams[i];
+        if (stream->flags) {
+            entry = NULL;
+            ch = 0;
+            if (&stream->entries[0].dvd->info == fileInfo) {
+                entry = &stream->entries[0];
+                ch = 0;
+            }
+            if (&stream->entries[1].dvd->info == fileInfo) {
+                entry = &stream->entries[1];
+                ch = 1;
+            }
+            if (entry) {
+                if (result >= 0) {
+                    SoundIntOff();
+                    entry->offset += entry->requestLength;
+                    entry->loadedLen[1 - entry->curBuf] = entry->requestLength;
+                    entry->loaded = 1;
+                    if (entry->offset >= entry->size) {
+                        entry->offset = entry->loopStart;
+                        if (stream->flags & 0x200) {
+                            if (ch == 0) {
+                                stream->flags &= ~0x1000;
+                            } else {
+                                stream->flags &= ~0x2000;
+                            }
+                        } else {
+                            stream->flags |= 0x4000;
+                        }
+                    } else if (ch == 0) {
+                        stream->flags &= ~0x1000;
+                    } else {
+                        stream->flags &= ~0x2000;
+                    }
+                    SoundIntOn();
+                    if (stream->count == 2) {
+                        if (sound.coverState == 2 && stream->entries[0].loaded == 1 && stream->entries[1].loaded == 1) {
+                            sound.coverState = 0;
+                        }
+                    } else if (sound.coverState == 2 && stream->entries[0].loaded == 1) {
+                        sound.coverState = 0;
+                    }
+                    continue;
+                }
+                return;
+            }
+        }
+    }
+    for (i = 0; i < 3; i++) {
+        stream = &sound.streams[i];
+        if (stream->flags && !(stream->flags & 8)) {
+            if (&stream->entries[0].dvd->info == fileInfo) {
+                stream->entries[0].ready = 1;
+            }
+            if (&stream->entries[1].dvd->info == fileInfo) {
+                stream->entries[1].ready = 1;
+            }
+            if (stream->count == 2) {
+                if (!stream->entries[0].ready || !stream->entries[1].ready) {
+                    continue;
+                }
+            } else if (!stream->entries[0].ready) {
+                continue;
+            }
+            stream->entries[0].curBuf = 0;
+            stream->entries[1].curBuf = 0;
+            stream->entries[0].loaded = 0;
+            stream->entries[1].loaded = 0;
+            if (stream->flags & 0x100) {
+                stream->entries[0].srcPos = 0;
+                stream->entries[0].pos = 0;
+                stream->entries[1].srcPos = 0;
+                stream->entries[1].pos = 0;
+            }
+            SoundIntOff();
+            sndStreamActivate(stream->entries[0].streamId);
+            if (stream->count == 2) {
+                sndStreamActivate(stream->entries[1].streamId);
+            }
+            SoundSSSetPanCh(i, stream->pan);
+            SoundIntOn();
+            stream->flags |= 8;
+            return;
+        }
+    }
+}
+#else
 void _ssDVDReadAsync_activeChk(s32 result, DVDFileInfo* fileInfo) {
     int i;
     SoundStream* stream;
@@ -1420,6 +1591,7 @@ void _ssDVDReadAsync_activeChk(s32 result, DVDFileInfo* fileInfo) {
 end:
     SoundIntOn();
 }
+#endif
 
 void cache_flush(u32 pointerToARQRequest) {
     _ssDVDReadAsync_activeChk(0, &((SoundStreamEntry*)((ARQRequest*)pointerToARQRequest)->owner)->dvd->info);
@@ -1631,6 +1803,14 @@ u32 _sscallback(void* p_b1, u32 len1, void* p_b2, u32 p_l2, u32 user) {
         src8 = entry->loadBuffer[entry->curBuf]; src8 = src8 + entry->srcPos;
         n = ((len1 + 13) / 14) * 8;
         while (n != 0) {
+#ifdef VERSION_G8ME01_DEMO
+            // The demo writes silence once the stream is stopping.
+            if (stream->flags & 4) {
+                *(((u8*)dst)++) = 0;
+                n--;
+                continue;
+            }
+#endif
             *(((u8*)dst)++) = *(src8++);
             n--;
             entry->srcPos++;
@@ -1666,6 +1846,14 @@ u32 _sscallback(void* p_b1, u32 len1, void* p_b2, u32 p_l2, u32 user) {
         dst = buffer2;
         n = ((len2 + 13) / 14) * 8;
         while (n != 0) {
+#ifdef VERSION_G8ME01_DEMO
+            // The demo writes silence once the stream is stopping.
+            if (stream->flags & 4) {
+                *(((u8*)dst)++) = 0;
+                n--;
+                continue;
+            }
+#endif
             *(((u8*)dst)++) = *(src8b++);
             n--;
             entry->srcPos++;
@@ -1758,6 +1946,23 @@ u32 _sscallback(void* p_b1, u32 len1, void* p_b2, u32 p_l2, u32 user) {
     return stream->samplePos;
 }
 
+#ifdef VERSION_G8ME01_DEMO
+// FAKE: the demo had a function here that nothing called, so the linker dropped its code
+// from main.dol; its constants (3.5, 4.0, ".adp", ".song") stayed in .rodata. The original
+// body is unknown; this stand-in only recreates those constants and is dead-stripped the same way.
+f64 SoundDemoStrippedRate(const char* ext, f64 t) {
+    f64 adp = t * 3.5;
+    f64 song = t * 4.0;
+    if (strcmp(ext, ".adp") == 0) {
+        return adp;
+    }
+    if (strcmp(ext, ".song") == 0) {
+        return song;
+    }
+    return t;
+}
+#endif
+
 void SoundSSPlayChEx(s32 chan, const char* name, s32 aram);
 
 void SoundSSPlayCh(s32 chan, const char* name) {
@@ -1768,6 +1973,9 @@ void SoundSSPlayChEx(s32 chan, const char* name, s32 aram) {
     SoundStream* stream;
     int i;
     const char* path;
+#ifdef VERSION_G8ME01_DEMO
+    const char* paths[1];
+#endif
 
     stream = &sound.streams[chan];
     if (stream->flags) {
@@ -1795,9 +2003,20 @@ void SoundSSPlayChEx(s32 chan, const char* name, s32 aram) {
     if (aram) {
         stream->flags |= 0x400;
     }
+#ifdef VERSION_G8ME01_DEMO
+    sprintf(str, "%s/%s%s", getMarioStDvdRoot(), name, ".stm");
+#else
     path = getMarioStDvdRoot();
     sprintf(str, "%s/%s%s", path, name, ".stm");
+#endif
+#ifdef VERSION_G8ME01_DEMO
+    // FAKE: the stream path goes through a one-element temporary so the address of str is built in the
+    // saved register first, as in the demo (behaviour-identical; see docs/FAKES.md)
+    paths[0] = str;
+    path = paths[0];
+#else
     path = str;
+#endif
     if (!(stream->entries[0].dvd = DVDMgrOpen(path, 0, 0))) {
         stream->flags = 0;
         return;
@@ -1882,11 +2101,15 @@ void SoundSSPlayChEx_main(s32 result, DVDFileInfo* fileInfo) {
         if (!(stream->flags & 0x400)) {
             stream->entries[0].curBuf = 1;
             _ssDVDReadAsync(stream, 0);
+#ifndef VERSION_G8ME01_DEMO
             stream->flags |= 0x1000;
+#endif
             if (stream->count == 2) {
                 stream->entries[1].curBuf = 1;
                 _ssDVDReadAsync(stream, 1);
+#ifndef VERSION_G8ME01_DEMO
                 stream->flags |= 0x2000;
+#endif
             }
         }
         size = sndStreamAllocLength(0xE00, 0);
@@ -1916,9 +2139,15 @@ void SoundSSPlayChEx_main(s32 result, DVDFileInfo* fileInfo) {
                                      _sscallback, i | 0x100, &stream->entries[1].info);
             }
         }
+#ifdef VERSION_G8ME01_DEMO
+        SoundSSSetPanCh(i, stream->pan);
+        stream->fadeStep = stream->vol;
+        stream->flags |= 0x10;
+#else
         stream->fadeStep = stream->vol;
         stream->flags |= 0x10;
         SoundSSSetPanCh(i, stream->pan);
+#endif
         if (stream->flags & 0x400) {
             len = DVDMgrGetLength(stream->entries[0].dvd);
             if (stream->entries[0].offset + SS_LOAD_BUFFER_SIZE >= len) {
@@ -1936,6 +2165,28 @@ void SoundSSPlayChEx_main(s32 result, DVDFileInfo* fileInfo) {
 void SoundSSStopCh(s32 chan) {
     SoundStream* stream;
 
+#ifdef VERSION_G8ME01_DEMO
+    if (sound.streams[chan].flags) {
+        stream = &sound.streams[chan];
+        if (!(stream->flags & 8)) {
+            stream->flags |= 4;
+            return;
+        }
+        if (stream->flags & 0x400) {
+            sound.slotUsed[stream->slot] = 0;
+        }
+        stream->flags = 0;
+        SoundIntOff();
+        DVDMgrClose(stream->entries[0].dvd);
+        DVDMgrClose(stream->entries[1].dvd);
+        sndStreamFree(stream->entries[0].streamId);
+        if (stream->count == 2) {
+            sndStreamFree(stream->entries[1].streamId);
+        }
+        SoundIntOn();
+        sound.streamChannel = -1;
+    }
+#else
     if (sound.streams[chan].flags) {
         stream = &sound.streams[chan];
         SoundIntOff();
@@ -1952,6 +2203,7 @@ void SoundSSStopCh(s32 chan) {
         SoundIntOn();
         sound.streamChannel = -1;
     }
+#endif
 }
 
 void SoundSSFadeoutCh(s32 chan) {

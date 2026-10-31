@@ -50,7 +50,9 @@ EffectEntry *effMahorn2Entry(BOOL unused, f32 posX, f32 posY, f32 posZ, f32 dstX
     data++;
     
     for (i = 1; i < 4; i++, data++) {
+#ifndef VERSION_G8ME01_DEMO
         memset(data, 0, sizeof(effMahorn2Data));
+#endif
         data->type = 1;
         data->position.x = 0.0f;
         data->position.y = 0.0f;
@@ -61,7 +63,9 @@ EffectEntry *effMahorn2Entry(BOOL unused, f32 posX, f32 posY, f32 posZ, f32 dstX
     }
     
     for (i = 4; i < 5; i++, data++) {
+#ifndef VERSION_G8ME01_DEMO
         memset(data, 0, sizeof(effMahorn2Data));
+#endif
         data->type = 2;
         data->position.x = 0.0f;
         data->position.y = 0.0f;
@@ -72,7 +76,9 @@ EffectEntry *effMahorn2Entry(BOOL unused, f32 posX, f32 posY, f32 posZ, f32 dstX
     }
     
     for (i = 5; i < 6; i++, data++) {
+#ifndef VERSION_G8ME01_DEMO
         memset(data, 0, sizeof(effMahorn2Data));
+#endif
         data->type = 3;
         data->position.x = 0.0f;
         data->position.y = 0.0f;
@@ -83,7 +89,9 @@ EffectEntry *effMahorn2Entry(BOOL unused, f32 posX, f32 posY, f32 posZ, f32 dstX
     }
     
     for (i = 6; i < effect->count; i++, data++) {
+#ifndef VERSION_G8ME01_DEMO
         memset(data, 0, sizeof(effMahorn2Data));
+#endif
         data->type = 4;
         data->position.x = dstX - posX;
         data->position.y = dstY - posY;
@@ -269,7 +277,12 @@ void effMahorn2Disp(CameraId cameraId, EffectEntry *effect) {
             GXTexCoord2f32(0.0f, v);
         }
         else {
+#ifdef VERSION_G8ME01_DEMO
+            // The demo counts the three segments with the outer loop counter i.
+#define j i
+#else
             s32 j;
+#endif
             for (j = 0; j < 3; j++) {
                 GXBegin(GX_QUADS, GX_VTXFMT0, 4);
                 {
@@ -285,6 +298,9 @@ void effMahorn2Disp(CameraId cameraId, EffectEntry *effect) {
                 GXTexCoord2f32(2.0f * us[j][0], v);
                 }
             }
+#ifdef VERSION_G8ME01_DEMO
+#undef j
+#endif
         }
     }
 }

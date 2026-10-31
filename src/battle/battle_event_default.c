@@ -15,6 +15,13 @@
 #include "evt/evt_batstage.h"
 #include "evt/evt_sub.h"
 
+// Pose types from 58 on are two lower in the demo (retail added two before them).
+#ifdef VERSION_G8ME01_DEMO
+#define POSE_TYPE(n) ((n) - 2)
+#else
+#define POSE_TYPE(n) (n)
+#endif
+
 
 f32 sinfd(f32 degrees);
 EffectEntry* effFireEntry(s32 type, s32 time, f32 x, f32 y, f32 z, f32 scale);
@@ -596,6 +603,17 @@ EVT_BEGIN(btldefaultevt_ChangeParty)
     RETURN
 EVT_END()
 
+// The short scripts sit where the demo's .data places them (retail keeps them in .sdata).
+EVT_BEGIN(btldefaultevt_ProtectPartner)
+    CALL(btlevtcmd_GetPartnerId, -2, LW(3))
+    CALL(btlevtcmd_SetGuard, -2, LW(3))
+    RETURN
+EVT_END()
+
+EVT_BEGIN(btldefaultevt_Dummy)
+    RETURN
+EVT_END()
+
 EVT_BEGIN(btldefaultevt_BiribiriMove)
     CALL(evt_sub_intpl_init, 8, 0, 5, 16)
     LABEL(0)
@@ -659,17 +677,34 @@ EVT_BEGIN(btldefaultevt_guard_return)
     RETURN
 EVT_END()
 
+EVT_BEGIN(btldefaultevt_Wait)
+    CALL(btlevtcmd_StartWaitEvent, -2)
+    RETURN
+EVT_END()
+
+EVT_BEGIN(btldefaultevt_LectureEnd)
+#ifdef VERSION_G8ME01_DEMO
+    CALL(btlevtcmd_RunDataEventChild, -6, 69)
+#else
+    CALL(btlevtcmd_RunDataEventChild, -6, 70)
+#endif
+    RETURN
+EVT_END()
+
 EVT_BEGIN(btldefaultevt_Appeal)
     CALL(btlevtcmd_GetBodyId, -2, LW(0))
     CALL(btlevtcmd_AnimeChangePoseType, -2, LW(0), 43)
+#ifndef VERSION_G8ME01_DEMO
     CALL(btlevtcmd_CheckStatus, -2, 10, LW(0))
     IF_INT_EQUAL(LW(0), 0)
+#endif
         CALL(btlevtcmd_GetPos, -2, LW(0), LW(1), LW(2))
         SET_VALUE(LW(3), LW(1))
         ADD(LW(1), 53)
         ADD(LW(3), 35)
         SET_VALUE(LW(4), LW(2))
         ADD(LW(2), 250)
+#ifndef VERSION_G8ME01_DEMO
     ELSE
         CALL(btlevtcmd_GetPos, -2, LW(0), LW(1), LW(2))
         SET_VALUE(LW(3), LW(1))
@@ -678,6 +713,7 @@ EVT_BEGIN(btldefaultevt_Appeal)
         SET_VALUE(LW(4), LW(2))
         ADD(LW(2), 400)
     END_IF
+#endif
     CALL(evt_btl_camera_set_mode, 0, 3)
     CALL(evt_btl_camera_set_moveto, 0, LW(0), LW(1), LW(2), LW(0), LW(3), LW(4), 30, 11)
     CALL(evt_batstage_light_set_player_on, 0)
@@ -692,7 +728,7 @@ EVT_BEGIN(btldefaultevt_Appeal)
         RETURN
     END_IF
     CALL(btlevtcmd_GetBodyId, -2, LW(0))
-    CALL(btlevtcmd_AnimeChangePoseType, -2, LW(0), 66)
+    CALL(btlevtcmd_AnimeChangePoseType, -2, LW(0), POSE_TYPE(66))
     CALL(btlevtcmd_snd_se, -2, STRING("SFX_MARIO_APPEAL1"), -250000000, 0, -250000000)
     WAIT_FRAMES(60)
     CALL(evt_btl_camera_set_mode, 0, 0)
@@ -725,6 +761,18 @@ EVT_BEGIN(_Defence_core)
     CALL(btlevtcmd_ftof, 60, LW(0))
     CALL(btlevtcmd_AnnounceMessage, 0, 0, 0, STRING("btl_msg_defend_command_exec"), LW(0))
     CALL(btlevtcmd_StartWaitEvent, -2)
+    RETURN
+EVT_END()
+
+EVT_BEGIN(btldefaultevt_Defend)
+    SET_VALUE(LW(12), PTR(&badgeWeapon_DefenceCommand))
+    CALL_CHILD(PTR(_Defence_core))
+    RETURN
+EVT_END()
+
+EVT_BEGIN(btldefaultevt_DefendParty)
+    SET_VALUE(LW(12), PTR(&badgeWeapon_DefenceCommandP))
+    CALL_CHILD(PTR(_Defence_core))
     RETURN
 EVT_END()
 
@@ -803,13 +851,13 @@ EVT_BEGIN(btldefaultevt_Escape)
                     CALL(btlevtcmd_GetPos, LW(10), LW(0), LW(1), LW(2))
                     CALL(btlevtcmd_FaceDirectionAdd, LW(10), LW(0), 30)
                     CALL(btlevtcmd_MovePosition, LW(10), LW(0), LW(1), LW(2), 0, -1, 0)
-                    CALL(btlevtcmd_AnimeChangePoseType, LW(10), LW(11), 60)
+                    CALL(btlevtcmd_AnimeChangePoseType, LW(10), LW(11), POSE_TYPE(60))
                     CALL(btlevtcmd_FaceDirectionAdd, LW(10), LW(0), 5)
                     CALL(btlevtcmd_MovePosition, LW(10), LW(0), LW(1), LW(2), 5, -1, 0)
                     CALL(btlevtcmd_FaceDirectionAdd, LW(10), LW(0), 10)
                     CALL(btlevtcmd_MovePosition, LW(10), LW(0), LW(1), LW(2), 60, -1, 0)
                     WAIT_FRAMES(25)
-                    CALL(btlevtcmd_AnimeChangePoseType, LW(10), LW(11), 61)
+                    CALL(btlevtcmd_AnimeChangePoseType, LW(10), LW(11), POSE_TYPE(61))
                     WAIT_FRAMES(40)
                     CALL(btlevtcmd_OnUnitFlag, LW(10), 2097152)
                 END_IF
@@ -821,14 +869,14 @@ EVT_BEGIN(btldefaultevt_Escape)
         CALL(btlevtcmd_GetPos, -2, LW(0), LW(1), LW(2))
         CALL(btlevtcmd_FaceDirectionAdd, -2, LW(0), 30)
         CALL(btlevtcmd_MovePosition, -2, LW(0), LW(1), LW(2), 0, -1, 0)
-        CALL(btlevtcmd_AnimeChangePoseType, -2, LW(11), 60)
+        CALL(btlevtcmd_AnimeChangePoseType, -2, LW(11), POSE_TYPE(60))
         CALL(btlevtcmd_audience_code_escape_fail)
         CALL(btlevtcmd_FaceDirectionAdd, -2, LW(0), 5)
         CALL(btlevtcmd_MovePosition, -2, LW(0), LW(1), LW(2), 5, -1, 0)
         CALL(btlevtcmd_FaceDirectionAdd, -2, LW(0), 10)
         CALL(btlevtcmd_MovePosition, -2, LW(0), LW(1), LW(2), 60, -1, 0)
         WAIT_FRAMES(25)
-        CALL(btlevtcmd_AnimeChangePoseType, -2, LW(11), 61)
+        CALL(btlevtcmd_AnimeChangePoseType, -2, LW(11), POSE_TYPE(61))
         CALL(evt_btl_camera_set_mode, 0, 0)
         WAIT_FRAMES(40)
         CALL(btlevtcmd_OnUnitFlag, LW(10), 2097152)
@@ -902,7 +950,7 @@ EVT_END()
 
 EVT_BEGIN(btldefaultevt_CantMoveZeroGravity)
     CALL(btlevtcmd_GetBodyId, -2, LW(0))
-    CALL(btlevtcmd_AnimeChangePoseType, -2, LW(0), 64)
+    CALL(btlevtcmd_AnimeChangePoseType, -2, LW(0), POSE_TYPE(64))
     CALL(evt_btl_camera_set_mode, 0, 7)
     CALL(evt_btl_camera_set_homing_unit, 0, -2, -1)
     CALL(evt_btl_camera_set_moveSpeedLv, 0, 1)
@@ -919,12 +967,18 @@ EVT_BEGIN(btldefaultevt_SuitoruBadgeEffect)
     IF_INT_GREATER_OR_EQUAL(LW(5), 1)
         BEGIN_SIBLING_EVENT
             CALL(btlevtcmd_GetBodyId, -2, LW(4))
+#ifdef VERSION_G8ME01_DEMO
+            CALL(btlevtcmd_GetPartsPos, -2, LW(4), LW(0), LW(1), LW(2))
+            ADD(LW(1), 50)
+            CALL(evt_eff, STRING(""), STRING("recovery"), 0, LW(0), LW(1), LW(2), LW(5), 0, 0, 0, 0, 0, 0, 0)
+#else
             CALL(btlevtcmd_GetStatusMg, -2, LW(6))
             CALL(btlevtcmd_GetHeight, -2, LW(7))
             MULTIPLY_FLOAT(LW(7), LW(6))
             CALL(btlevtcmd_GetPartsPos, -2, LW(4), LW(0), LW(1), LW(2))
             ADD(LW(1), LW(7))
             CALL(evt_eff, 0, STRING("recovery"), 0, LW(0), LW(1), LW(2), LW(5), 0, 0, 0, 0, 0, 0, 0)
+#endif
             WAIT_FRAMES(120)
             CALL(btlevtcmd_RecoverHp, -2, LW(4), LW(5))
         END_SIBLING_EVENT
@@ -933,6 +987,12 @@ EVT_BEGIN(btldefaultevt_SuitoruBadgeEffect)
     CALL(_get_flower_suitoru_point, -2, LW(5))
     IF_INT_GREATER_OR_EQUAL(LW(5), 1)
         BEGIN_SIBLING_EVENT
+#ifdef VERSION_G8ME01_DEMO
+            CALL(btlevtcmd_GetBodyId, -2, LW(4))
+            CALL(btlevtcmd_GetPartsPos, -2, LW(4), LW(0), LW(1), LW(2))
+            ADD(LW(1), 50)
+            CALL(evt_eff, STRING(""), STRING("recovery"), 1, LW(0), LW(1), LW(2), LW(5), 0, 0, 0, 0, 0, 0, 0)
+#else
             CALL(btlevtcmd_GetStatusMg, -2, LW(6))
             CALL(btlevtcmd_GetHeight, -2, LW(7))
             MULTIPLY_FLOAT(LW(7), LW(6))
@@ -940,6 +1000,7 @@ EVT_BEGIN(btldefaultevt_SuitoruBadgeEffect)
             CALL(btlevtcmd_GetPartsPos, -2, LW(4), LW(0), LW(1), LW(2))
             ADD(LW(1), LW(7))
             CALL(evt_eff, 0, STRING("recovery"), 1, LW(0), LW(1), LW(2), LW(5), 0, 0, 0, 0, 0, 0, 0)
+#endif
             WAIT_FRAMES(120)
             CALL(btlevtcmd_RecoverFp, -2, LW(4), LW(5))
         END_SIBLING_EVENT
@@ -959,38 +1020,6 @@ EVT_BEGIN(btldefaultevt_avoid_counter_event)
         END_LOOP
     END_SIBLING_EVENT
     CALL(btlevtcmd_WaitEventEnd, LW(0))
-    RETURN
-EVT_END()
-
-EVT_BEGIN(btldefaultevt_ProtectPartner)
-    CALL(btlevtcmd_GetPartnerId, -2, LW(3))
-    CALL(btlevtcmd_SetGuard, -2, LW(3))
-    RETURN
-EVT_END()
-
-EVT_BEGIN(btldefaultevt_Dummy)
-    RETURN
-EVT_END()
-
-EVT_BEGIN(btldefaultevt_Wait)
-    CALL(btlevtcmd_StartWaitEvent, -2)
-    RETURN
-EVT_END()
-
-EVT_BEGIN(btldefaultevt_LectureEnd)
-    CALL(btlevtcmd_RunDataEventChild, -6, 70)
-    RETURN
-EVT_END()
-
-EVT_BEGIN(btldefaultevt_Defend)
-    SET_VALUE(LW(12), PTR(&badgeWeapon_DefenceCommand))
-    CALL_CHILD(PTR(_Defence_core))
-    RETURN
-EVT_END()
-
-EVT_BEGIN(btldefaultevt_DefendParty)
-    SET_VALUE(LW(12), PTR(&badgeWeapon_DefenceCommandP))
-    CALL_CHILD(PTR(_Defence_core))
     RETURN
 EVT_END()
 

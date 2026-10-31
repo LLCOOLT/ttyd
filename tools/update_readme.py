@@ -107,19 +107,23 @@ def main():
             + (f" ({tc['needed_fns']} needed, {tc['paved_fns']} over matching C) |\n\n" if "needed_fns" in tc else " |\n\n")
         )
     us = ""
-    us_report = os.path.join(ROOT, "build", "G8ME01", "report.json")
-    if os.path.exists(us_report):  # US (G8ME01) figures, once that version has been built
-        ur = json.load(open(us_report, encoding="utf-8"))
-        um = ur["measures"]
-        urows = [("All", um)] + [(c["name"], c["measures"]) for c in ur.get("categories", [])]
-        utable = table[:2] + [
+    # Other versions, each once it has been built (L 2026-10-26: PAL and the demo get tables too)
+    for ver, label in (("G8ME01", "US (G8ME01)"), ("G8MP01", "Europe (G8MP01)"),
+                       ("G8ME01_DEMO", "Demo (G8ME01_DEMO, in progress)")):
+        vr_path = os.path.join(ROOT, "build", ver, "report.json")
+        if not os.path.exists(vr_path):
+            continue
+        vr = json.load(open(vr_path, encoding="utf-8"))
+        vm = vr["measures"]
+        vrows = [("All", vm)] + [(c["name"], c["measures"]) for c in vr.get("categories", [])]
+        vtable = table[:2] + [
             f"| {n} | {pct(m, 'matched_code_percent'):.2f}% | {pct(m, 'complete_code_percent'):.2f}% "
             f"| {m.get('complete_units', 0)} / {m.get('total_units', 0)} "
             f"| {m.get('matched_functions', 0)} / {m.get('total_functions', 0)} |"
-            for n, m in urows
+            for n, m in vrows
         ]
-        us = (f"\n\n**US (G8ME01)**, data matched {pct(um, 'matched_data_percent'):.2f}%:\n\n"
-              + "\n".join(utable))
+        us += (f"\n\n**{label}**, data matched {pct(vm, 'matched_data_percent'):.2f}%:\n\n"
+               + "\n".join(vtable))
     section = (
         "<!-- progress-start -->\n"
         + head

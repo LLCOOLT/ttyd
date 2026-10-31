@@ -30,6 +30,7 @@ s32 battleAcMain_ButtonDown(BattleWork *work)
 {
   BattleActions *ac = &work->actionCommands;
   BDWork *p = (BDWork *) work->actionCommands.work;
+  s32 j;
   BattleACDispParams *disp = &work->actionCommands.disp;
   s32 allDone;
   s32 i;
@@ -110,7 +111,6 @@ s32 battleAcMain_ButtonDown(BattleWork *work)
               u32 cand;
               while (!found)
               {
-                s32 j;
                 s32 ok;
                 cand = _button_table[irand(7)];
                 ok = 1;
@@ -338,14 +338,14 @@ static void actionCommandDisp(s32 unused, f32 x, f32 y)
   by = 70.0f + y;
   pos.x = lx;
   pos.y = by;
-  iconDispGx(&pos, 16, ICON_08F, 1.0f);
+  iconDispGx(&pos, ICON_DISP_2D, ICON_08F, 1.0f);
   lx += 16.0f;
   for (k = 1; k < end; k++)
   {
     Vec pos2 = {0.0f, 0.0f, -2.0f};
     pos2.x = lx;
     pos2.y = by;
-    size = 16;
+    size = ICON_DISP_2D;
     iconDispGx(&pos2, size, ICON_08E, 1.0f);
     lx += 16.0f;
   }
@@ -354,7 +354,7 @@ static void actionCommandDisp(s32 unused, f32 x, f32 y)
     Vec pos3 = {0.0f, 0.0f, -2.0f};
     pos3.x = lx;
     pos3.y = by;
-    iconDispGx(&pos3, 16, ICON_090, 1.0f);
+    iconDispGx(&pos3, ICON_DISP_2D, ICON_090, 1.0f);
   }
   if ((work->actionCommands.acFlags) & 1)
   {

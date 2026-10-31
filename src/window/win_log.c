@@ -52,20 +52,59 @@ extern ItemData itemDataTable[];
 void capture(CameraId camera, void* param);
 void monosiri_disp(CameraId camera, void* param);
 
+#ifdef VERSION_G8ME01_DEMO
+// Unreferenced; every demo TU that had it carries its own copy at the start of .data.
+static f32 unusedSignTbl[16] = {-1.0f, 1.0f, -1.0f, 1.0f, 1.0f, -1.0f, 1.0f, -1.0f, -1.0f, 1.0f, -1.0f, 1.0f, 1.0f, -1.0f, 1.0f, -1.0f};
+
+s32 stone_tbl[] = {ITEM_DIAMOND_STAR, ITEM_EMERALD_STAR, ITEM_GOLD_STAR, ITEM_RUBY_STAR, ITEM_SAPPHIRE_STAR, ITEM_GARNET_STAR, ITEM_CRYSTAL_STAR};
+
+static inline void winLogAddMenu(WindowWork* w, s32 id) {
+    static const char* msg_help[] = {
+        "msg_menu_kiroku_map",
+        "msg_menu_kiroku_stone",
+        "msg_menu_kiroku_badge",
+        "msg_menu_kiroku_ryori",
+        "msg_menu_kiroku_mono",
+    };
+    WinLogMenu* m = &w->log.menu[w->log.count];
+    s32 i;
+    m->id = id;
+    m->timer = 0;
+    m->state = 0;
+    m->msg = msg_help[id];
+    w->log.count++;
+    for (i = 0; i < w->log.count; i++) {
+        w->log.menu[i].x = 0.0f;
+        w->log.menu[i].tx = 0.0f;
+        w->log.menu[i].ty = w->log.menu[i].y = 45.0f * w->log.count / 2.0f - 45.0f * i;
+    }
+}
+#endif
+
+// The demo has no per-chapter tubu switches (type) and opens the moo/aji
+// route one sequence step earlier.
+#ifdef VERSION_G8ME01_DEMO
+#define TUBU_TYPE(t) 0
+#define TUBU_SEQ_361 360
+#else
+#define TUBU_TYPE(t) (t)
+#define TUBU_SEQ_361 361
+#endif
+
 TubuDt tubuDt[] = {
     {14, -34, 1, 0, 3, "gor"},
-    {-4, -31, 0, 2, 12, "gor"},
-    {-20, -31, 0, 2, 12, "gor"},
-    {-33, -38, 1, 2, 12, "tik"},
+    {-4, -31, 0, TUBU_TYPE(2), 12, "gor"},
+    {-20, -31, 0, TUBU_TYPE(2), 12, "gor"},
+    {-33, -38, 1, TUBU_TYPE(2), 12, "tik"},
     {118, 30, 1, 0, 23, "hei"},
     {134, 22, 0, 0, 26, "hei"},
     {150, 14, 0, 0, 26, "hei"},
     {176, 9, 0, 0, 26, "hei"},
     {200, 6, 1, 0, 26, "nok"},
-    {136, 39, 0, 3, 35, "hei"},
-    {152, 48, 0, 3, 35, "hei"},
-    {165, 53, 0, 3, 35, "hei"},
-    {165, 68, 1, 3, 35, "gon"},
+    {136, 39, 0, TUBU_TYPE(3), 35, "hei"},
+    {152, 48, 0, TUBU_TYPE(3), 35, "hei"},
+    {165, 53, 0, TUBU_TYPE(3), 35, "hei"},
+    {165, 68, 1, TUBU_TYPE(3), 35, "gon"},
     {0, 36, 1, 0, 71, "win"},
     {0, 56, 0, 0, 74, "win"},
     {0, 75, 1, 0, 74, "mri"},
@@ -86,15 +125,15 @@ TubuDt tubuDt[] = {
     {80, 141, 0, 0, 127, "gor"},
     {97, 150, 1, 0, 127, "tou"},
     {-181, -90, 1, 0, 178, "usu"},
-    {-163, -90, 0, 4, 184, "usu"},
-    {-145, -90, 0, 4, 184, "usu"},
-    {-135, -77, 0, 4, 184, "usu"},
-    {-143, -63, 0, 4, 184, "usu"},
-    {-159, -63, 0, 4, 184, "usu"},
-    {-176, -63, 0, 4, 184, "usu"},
-    {-191, -63, 0, 4, 184, "usu"},
-    {-206, -63, 0, 4, 184, "usu"},
-    {-228, -63, 1, 4, 184, "gra"},
+    {-163, -90, 0, TUBU_TYPE(4), 184, "usu"},
+    {-145, -90, 0, TUBU_TYPE(4), 184, "usu"},
+    {-135, -77, 0, TUBU_TYPE(4), 184, "usu"},
+    {-143, -63, 0, TUBU_TYPE(4), 184, "usu"},
+    {-159, -63, 0, TUBU_TYPE(4), 184, "usu"},
+    {-176, -63, 0, TUBU_TYPE(4), 184, "usu"},
+    {-191, -63, 0, TUBU_TYPE(4), 184, "usu"},
+    {-206, -63, 0, TUBU_TYPE(4), 184, "usu"},
+    {-228, -63, 1, TUBU_TYPE(4), 184, "gra"},
     {-228, -44, 0, 0, 193, "gra"},
     {-216, -31, 0, 0, 193, "gra"},
     {-198, -27, 0, 0, 193, "gra"},
@@ -139,15 +178,16 @@ TubuDt tubuDt[] = {
     {-167, 116, 0, 0, 358, "bom"},
     {-167, 133, 0, 0, 358, "bom"},
     {-167, 151, 1, 0, 358, "moo"},
-    {-171, 169, 0, 0, 361, "moo"},
-    {-185, 177, 0, 0, 361, "moo"},
-    {-200, 171, 0, 0, 361, "moo"},
-    {-209, 159, 1, 0, 361, "aji"},
+    {-171, 169, 0, 0, TUBU_SEQ_361, "moo"},
+    {-185, 177, 0, 0, TUBU_SEQ_361, "moo"},
+    {-200, 171, 0, 0, TUBU_SEQ_361, "moo"},
+    {-209, 159, 1, 0, TUBU_SEQ_361, "aji"},
     {-33, -50, 0, 0, 382, "gor"},
     {-33, -62, 0, 0, 382, "gor"},
     {-33, -74, 1, 0, 382, "las"},
 };
 
+#ifndef VERSION_G8ME01_DEMO
 s32 stone_tbl[] = {ITEM_DIAMOND_STAR, ITEM_EMERALD_STAR, ITEM_GOLD_STAR, ITEM_RUBY_STAR, ITEM_SAPPHIRE_STAR, ITEM_GARNET_STAR, ITEM_CRYSTAL_STAR};
 
 static inline void winLogAddMenu(WindowWork* w, s32 id) {
@@ -171,14 +211,24 @@ static inline void winLogAddMenu(WindowWork* w, s32 id) {
         w->log.menu[i].ty = w->log.menu[i].y = 45.0f * w->log.count / 2.0f - 45.0f * i;
     }
 }
+#endif
 
 void winLogInit(WindowWork* w) {
+#ifdef VERSION_G8ME01_DEMO
+    s32 j;
+    s32 i;
+    u32 k;
+    EffectEntry* e;
+    const char* area;
+    TattleEntry* t;
+#else
     u32 k;
     const char* area;
     s32 i;
     s32 j;
     TattleEntry* t;
     EffectEntry* e;
+#endif
     WinSortEnt tmp;
 
     w->log.fD68 = 0;
@@ -209,7 +259,9 @@ void winLogInit(WindowWork* w) {
         }
         ((EffStarStoneWork*)e->userdata)->cam = 8;
         ((EffStarStoneWork*)e->userdata)->flags &= ~4;
+#ifndef VERSION_G8ME01_DEMO
         ((EffStarStoneWork*)e->userdata)->flags |= 0x20;
+#endif
     }
 
     w->mapRes = NULL;
@@ -251,7 +303,9 @@ void winLogInit(WindowWork* w) {
     if (!strncmp(gp->currentMapName, "hom", 3)) area = "eki";
     if (!strncmp(gp->currentMapName, "jon", 3)) area = "tik";
     if (!strcmp(gp->currentMapName, "gra_06")) area = "jin";
+#ifndef VERSION_G8ME01_DEMO
     if (!strcmp(gp->currentMapName, "muj_10") || !strcmp(gp->currentMapName, "muj_11") || !strcmp(gp->currentMapName, "muj_12")) area = "dou";
+#endif
 
     {
         for (k = 0; k < 93; k++) {
@@ -507,13 +561,13 @@ s32 winLogMain(WindowWork* w) {
 #ifdef VERSION_G8ME01
         if (!((void* (*)(u8, FileCallback, const char*, ...))fileAsyncf)(4, NULL, "%s/w/%s/%s", getMarioStDvdRoot(), (u32)gp->language == 0 ? "jp" : "us", winGetMapTplName())) break;
 #else
-        if (!((void* (*)(u8, FileCallback, const char*, ...))fileAsyncf)(4, NULL, "%s/w/jp/%s", getMarioStDvdRoot(), winGetMapTplName())) break;
+        if (!((void* (*)(u8, FileCallback, const char*, ...))fileAsyncf)(4, NULL, WIN_DIR "jp/%s", getMarioStDvdRoot(), winGetMapTplName())) break;
 #endif
         if (!w->mapRes) {
 #ifdef VERSION_G8ME01
             w->mapRes = fileAllocf(4, "%s/w/%s/%s", getMarioStDvdRoot(), (u32)gp->language == 0 ? "jp" : "us", winGetMapTplName());
 #else
-            w->mapRes = fileAllocf(4, "%s/w/jp/%s", getMarioStDvdRoot(), winGetMapTplName());
+            w->mapRes = fileAllocf(4, WIN_DIR "jp/%s", getMarioStDvdRoot(), winGetMapTplName());
 #endif
         }
         if (w->log.pose == -1) {
@@ -578,7 +632,12 @@ s32 winLogMain(WindowWork* w) {
         by = 120.0f + w->log.scrollY;
         for (k = 0; k < 0x5D; k++) {
             t = &tubuDt[k];
+#ifdef VERSION_G8ME01_DEMO
+            if (swByteGet(0) < t->id) break;
+            {
+#else
             if (swByteGet(0) >= t->id || tubuCheck(t->type)) {
+#endif
                 if (t->big) {
                     f32 d = distABf(bx + t->x, by + t->y, x, y);
                     if (min > d) {
@@ -1009,17 +1068,24 @@ void winLogDisp(CameraId cam, void* param, s32 idx) {
             PSMTXRotRad(m2, 'y', 0.017453292f * (51.42857f * i - w->log.fE80));
             PSMTXMultVec(m2, &v, &v);
             PSMTXMultVec(m1, &v, &v);
+#ifndef VERSION_G8ME01_DEMO
             winKageGX(w, (GXColor){0x00, 0x00, 0x00, 0x80}, v.x + (x + w->log.fE68), (v.y + (y + w->log.fE70)) - 30.0f, v.z, 1.0f);
+#endif
             wk = w->log.eff[i]->userdata;
             wk->position.x = v.x + (x + w->log.fE68);
             wk = w->log.eff[i]->userdata;
             wk->position.y = 20.0f + (v.y + (y + w->log.fE70));
             wk = w->log.eff[i]->userdata;
             wk->position.z = v.z;
+#ifdef VERSION_G8ME01_DEMO
+            winKageGX(w, (GXColor){0x00, 0x00, 0x00, 0x80}, v.x + (x + w->log.fE68), (v.y + (y + w->log.fE70)) - 30.0f, v.z, 1.0f);
+#endif
         }
+#ifndef VERSION_G8ME01_DEMO
         for (i = 0; i < 7; i++) {
             effStarStoneDraw(8, w->log.eff[i]);
         }
+#endif
     }
     if (w->log.badge.x < 320.0f && w->log.badge.y > -240.0f) {
         winHakoGX(w, 0, x + w->log.badge.x, y + w->log.badge.y);
@@ -1134,7 +1200,12 @@ void mapGX(WindowWork* w, f32 x, f32 y) {
         winTexInit(*w->res->data);
         for (i = 0; i < sizeof(tubuDt) / sizeof(TubuDt); i++) {
             t = &tubuDt[i];
+#ifdef VERSION_G8ME01_DEMO
+            if (swByteGet(0) < t->id) break;
+            {
+#else
             if (swByteGet(0) >= t->id || tubuCheck(t->type)) {
+#endif
                 if (w->log.fE14 == i) {
                     winTexSet((tex = 0xBA, ((gp->retraceCount >> 4) & 1) ? tex = 0xB9 : 0, tex), (Vec){mx + t->x, my + t->y, 0.0f}, (Vec){1.0f, 1.0f, 1.0f}, white);
                 } else {
@@ -1151,19 +1222,39 @@ void mapGX(WindowWork* w, f32 x, f32 y) {
             id = ICON_198;
             k = 1;
         } else if (sw >= 0x79 && sw < 0xA4) {
+#ifdef VERSION_G8ME01_DEMO
+            id = ICON_199;
+#else
             id = ICON_19A;
+#endif
             k = 2;
         } else if (sw >= 0xAF && sw < 0xD5) {
+#ifdef VERSION_G8ME01_DEMO
+            id = ICON_19A;
+#else
             id = ICON_19C;
+#endif
             k = 3;
         } else if (sw >= 0xDE && sw < 0x105) {
+#ifdef VERSION_G8ME01_DEMO
+            id = ICON_19B;
+#else
             id = ICON_19D;
+#endif
             k = 4;
         } else if (sw >= 0x110 && sw < 0x152) {
+#ifdef VERSION_G8ME01_DEMO
+            id = ICON_19C;
+#else
             id = ICON_199;
+#endif
             k = 5;
         } else if (sw >= 0x15C && sw < 0x175) {
+#ifdef VERSION_G8ME01_DEMO
+            id = ICON_19D;
+#else
             id = ICON_19B;
+#endif
             k = 6;
         }
         if (id != -1) {
@@ -1222,7 +1313,6 @@ void monoshiriGX(WindowWork* w, f32 x, f32 y) {
     char buf[256];
     char num[32];
     s32 i;
-    s32 id;
     u16 tw;
     const char* msg;
     const char* name;
@@ -1253,17 +1343,21 @@ void monoshiriGX(WindowWork* w, f32 x, f32 y) {
     winFontSet((Vec){(x - 108.0f) + (100 - tw) / 2, y - 184.0f, 0.0f}, (Vec){0.75f, 0.75f, 0.75f}, k1, buf);
     winFontInit();
     for (i = 0; i < 16; i++) {
+        s32 id;
         id = w->log.enemy[w->log.enemyPage * 16 + i].id;
         te = battleGetUnitMonosiriPtr(id);
         if (w->log.enemyPage * 16 + i >= w->log.enemyNum) break;
         if (swGet(id + 0x117A)) {
+#ifndef VERSION_G8ME01_DEMO
             if (id == 0x4D || id == 0x87) {
                 if (evtGetValue(NULL, GSW(0)) < 0xD2) {
                     name = msgSearch("btl_un_hatena");
                 } else {
                     name = msgSearch("btl_un_rampell");
                 }
-            } else {
+            } else
+#endif
+            {
                 name = msgSearch(te->enemyTag);
             }
         } else {
@@ -1295,13 +1389,16 @@ void monoshiriGX(WindowWork* w, f32 x, f32 y) {
         winIconInit();
         winIconSet(ICON_080, (Vec){440.0f + x, y - 240.0f, 0.0f}, (Vec){0.6f, 0.6f, 0.6f}, white);
     }
-    msg = msgSearch("msg_menu_sort_narabikae");
-    fw = 0.7f * FontGetMessageWidth(msg);
-    winFontInit();
-    ix = x + (420.0f - fw);
-    winFontSet((Vec){ix, y - 210.0f, 0.0f}, (Vec){0.7f, 0.7f, 0.7f}, k1, msg);
-    winIconInit();
-    winIconSet(ICON_217, (Vec){ix - 30.0f, y - 220.0f, 0.0f}, (Vec){0.6f, 0.6f, 0.6f}, white);
+    {
+        const char* msg;
+        msg = msgSearch("msg_menu_sort_narabikae");
+        fw = 0.7f * FontGetMessageWidth(msg);
+        winFontInit();
+        ix = x + (420.0f - fw);
+        winFontSet((Vec){ix, y - 210.0f, 0.0f}, (Vec){0.7f, 0.7f, 0.7f}, k1, msg);
+        winIconInit();
+        winIconSet(ICON_217, (Vec){ix - 30.0f, y - 220.0f, 0.0f}, (Vec){0.6f, 0.6f, 0.6f}, white);
+    }
 }
 
 MonosiriWork* monosiriInit(s32 id, f32 x, f32 y) {
@@ -1313,9 +1410,11 @@ MonosiriWork* monosiriInit(s32 id, f32 x, f32 y) {
     m->y = y;
     m->curX = 500.0f;
     m->curY = -300.0f;
+#ifndef VERSION_G8ME01_DEMO
     m->alpha = 0;
     m->pose1 = -1;
     m->pose2 = -1;
+#endif
     return m;
 }
 
@@ -1332,19 +1431,24 @@ void monosiriMain(MonosiriWork* m) {
     if (!m) return;
     switch (m->state) {
     case 0:
-        if (!((void* (*)(u8, FileCallback, const char*, ...))fileAsyncf)(4, NULL, "%s/w/%s/win.tpl", getMarioStDvdRoot(), lang[gp->language])) break;
+        if (!((void* (*)(u8, FileCallback, const char*, ...))fileAsyncf)(4, NULL, WIN_DIR "%s/win.tpl", getMarioStDvdRoot(), lang[gp->language])) break;
 #ifdef VERSION_G8ME01
         if (!((void* (*)(u8, FileCallback, const char*, ...))fileAsyncf)(0, NULL, "%s/w/%s/mono.dat", getMarioStDvdRoot(), (u32)gp->language == 0 ? "jp" : "us")) break;
 #else
-        if (!((void* (*)(u8, FileCallback, const char*, ...))fileAsyncf)(0, NULL, "%s/w/jp/mono.dat", getMarioStDvdRoot())) break;
+        if (!((void* (*)(u8, FileCallback, const char*, ...))fileAsyncf)(0, NULL, WIN_DIR "jp/mono.dat", getMarioStDvdRoot())) break;
 #endif
-        m->file1 = fileAllocf(4, "%s/w/%s/win.tpl", getMarioStDvdRoot(), lang[gp->language]);
+        m->file1 = fileAllocf(4, WIN_DIR "%s/win.tpl", getMarioStDvdRoot(), lang[gp->language]);
 #ifdef VERSION_G8ME01
         m->file2 = fileAllocf(0, "%s/w/%s/mono.dat", getMarioStDvdRoot(), (u32)gp->language == 0 ? "jp" : "us");
 #else
-        m->file2 = fileAllocf(0, "%s/w/jp/mono.dat", getMarioStDvdRoot());
+        m->file2 = fileAllocf(0, WIN_DIR "jp/mono.dat", getMarioStDvdRoot());
 #endif
         m->state++;
+#ifdef VERSION_G8ME01_DEMO
+        m->alpha = 0;
+        m->pose1 = -1;
+        m->pose2 = -1;
+#endif
         TEXGetGXTexObjFromPalette(*(TEXPalette**)m->file1->data, &tex, 0x37);
         m->smart = smartAlloc(GXGetTexBufferSize(GXGetTexObjWidth(&tex), GXGetTexObjHeight(&tex), 5, 0, 0), 0);
         break;
@@ -1396,6 +1500,24 @@ BOOL monosiriCloseWait(MonosiriWork* m) {
 }
 
 void monosiriExit(MonosiriWork* m) {
+#ifdef VERSION_G8ME01_DEMO
+    if (m) {
+        if (m->file1) {
+            fileFree(m->file1);
+        }
+        if (m->file2) {
+            fileFree(m->file2);
+        }
+        if (m->pose1 != -1) {
+            animPoseRelease(m->pose1);
+        }
+        if (m->pose2 != -1) {
+            animPoseRelease(m->pose2);
+        }
+        smartFree(m->smart);
+        _mapFree(m);
+    }
+#else
     if (m) {
         if (m->file1) {
             fileFree(m->file1);
@@ -1419,6 +1541,7 @@ void monosiriExit(MonosiriWork* m) {
         }
         _mapFree(m);
     }
+#endif
 }
 
 typedef struct MonoDat {
@@ -1606,7 +1729,10 @@ void monosiri_disp(CameraId camera, void* param) {
 
     x = m->curX;
     y = m->curY;
-    if (m->file1) {
+#ifndef VERSION_G8ME01_DEMO
+    if (m->file1)
+#endif
+    {
         winHalfBookGX(*(TEXPalette**)m->file1->data, 0, x, y);
         TEXGetGXTexObjFromPalette(*(TEXPalette**)m->file1->data, &tex, 0x37);
         tw = GXGetTexObjWidth(&tex);
@@ -1686,6 +1812,10 @@ void monosiri_disp(CameraId camera, void* param) {
         } else {
             sprintf(buf, (u32)gp->language != 0 ? "%d. %s" : "%d．%s", enemy_monoshiri_sort_table[id], msgSearch(te->enemyTag));
         }
+#elif defined(VERSION_G8ME01_DEMO)
+        id = m->id;
+        te = battleGetUnitMonosiriPtr(id);
+        sprintf(buf, "%d．%s", enemy_monoshiri_sort_table[id], msgSearch(te->enemyTag));
 #else
         id = m->id;
         te = battleGetUnitMonosiriPtr(id);
@@ -1708,7 +1838,11 @@ void monosiri_disp(CameraId camera, void* param) {
         sprintf(buf, "%s　%s", msgSearch("menu_monosiri_derutokoro"), msgSearch(te->locationTag));
 #endif
         w = 0.75f * FontGetMessageWidth(buf);
+#ifdef VERSION_G8ME01_DEMO
+        winFontSet((Vec){(16.0f + x) + (248.0f - w) / 2.0f, y - 210.0f, 0.0f}, (Vec){0.75f, 0.75f, 0.75f}, black, buf);
+#else
         winFontSet((Vec){1.0f + ((16.0f + x) + (248.0f - w) / 2.0f), y - 210.0f, 0.0f}, (Vec){0.75f, 0.75f, 0.75f}, black, buf);
+#endif
     }
 }
 

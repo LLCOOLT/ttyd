@@ -32,6 +32,7 @@ static inline void marioPartyKillSlot1(void) {
     }
 }
 
+#ifndef VERSION_G8ME01_DEMO
 s32 marioUseParty(void) {
     MarioWork* wp = marioGetPtr();
     PartyEntry* party;
@@ -111,6 +112,7 @@ s32 marioUsePartyMain(void) {
     }
     return 0;
 }
+#endif
 
 s32 marioPartyEntry(PartyId id) {
     MarioWork* wp = marioGetPtr();
@@ -178,6 +180,62 @@ void marioPartyKill(void) {
     marioPartyKillSlot0();
     marioPartyKillSlot1();
 }
+
+#ifdef VERSION_G8ME01_DEMO
+// The demo has one function for the partner button: the request flag is trigFlags 0x100000, and the wait for
+// partyDoWork runs here (retail splits it out into marioUsePartyMain).
+s32 marioUseParty(void) {
+    MarioWork* wp = marioGetPtr();
+    PartyEntry* party;
+
+    if ((wp->trigFlags & 0x100000) && marioKeyOffChk()) {
+        wp->trigFlags &= ~0x100000;
+        return 0;
+    }
+    if (wp->currPartySlotId[0] < 0) {
+        wp->trigFlags &= ~0x100000;
+        return 0;
+    }
+    if (wp->flags & 0x80000000) {
+        return 0;
+    }
+    if ((wp->flags & 0x30000) || wp->airTimer != 0) {
+        wp->trigFlags &= ~0x100000;
+        return 0;
+    }
+    if (wp->currMotionId != 0 && wp->currMotionId != 1 && wp->currMotionId != 2) {
+        wp->trigFlags &= ~0x100000;
+        return 0;
+    }
+    if (wp->dispFlags & 0x1000000) {
+        return 0;
+    }
+    if (partyGetPtr(marioGetPartyId())->flags & 0x100) {
+        return 0;
+    }
+    party = partyGetPtr(marioGetPartyId());
+    if (party == NULL) {
+        return 0;
+    }
+    if (party->currentMemberId == 1 && !(party->flags & 2)) {
+        return 0;
+    }
+    if (party->currentMemberId == 4 && yoshiGetStatus()) {
+        return 0;
+    }
+    if (!(wp->trigFlags & 0x100000)) {
+        if (wp->buttonTrg & 0x400) {
+            wp->trigFlags |= 0x100000;
+            wp->partyUseDelay = 5;
+        }
+    } else if (--wp->partyUseDelay <= 0) {
+        wp->partyUseDelay = 0;
+        wp->trigFlags &= ~0x100000;
+        return partyDoWork();
+    }
+    return 0;
+}
+#endif
 
 s32 marioGetParty(void) {
     s32 id;

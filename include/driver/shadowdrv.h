@@ -42,9 +42,13 @@ typedef struct ShadowEntry {
     f32 volume; //0x1C
     f32 decay; //0x20
     f32 decay2; //0x24
+#ifdef VERSION_G8ME01_DEMO
+    Mtx mtx; //0x28, the demo has no per-shadow alpha
+#else
     u8 alpha; //0x28
     u8 pad_29[3]; //0x29
     Mtx mtx; //0x2C
+#endif
 } ShadowEntry;
 
 typedef struct CharShadowWork {

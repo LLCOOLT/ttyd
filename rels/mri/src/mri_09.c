@@ -172,6 +172,9 @@ static BeroEntry bero_entry_data[] = {
 };
 
 EVT_BEGIN(wall_roll_sub)
+#ifdef VERSION_G8ME01_DEMO
+    CALL(evt_paper_entry, LW(0))
+#endif
     CALL(evt_img_entry, LW(2))
     CALL(evt_img_set_paper, LW(2), LW(0))
     CALL(evt_offscreen_entry, LW(3))
@@ -250,7 +253,9 @@ EVT_BEGIN(wall_roll)
     CALL(evt_hitobj_onoff, STRING("A_f2_rak03"), 1, 1)
     CALL(evt_hitobj_onoff, STRING("A_f2_rak04"), 1, 0)
     SET_VALUE(GSWF(2850), 1)
+#ifndef VERSION_G8ME01_DEMO
     WAIT_FRAMES(1)
+#endif
     CALL(evt_puni_all_fall_check)
     CALL(evt_puni_set_maze)
     CALL(evt_cam3d_evt_off, 300, 11)
@@ -277,10 +282,16 @@ EVT_BEGIN(wall_roll)
 EVT_END()
 
 static EVT_BEGIN(breakyuka_init)
+#ifdef VERSION_G8ME01_DEMO
+    IF_INT_EQUAL(GSWF(2851), 1)
+#else
     IF_INT_EQUAL(GSWF(2851), 0)
+#endif
         CALL(evt_hitobj_onoff, STRING("A_f2_rak_02"), 1, 0)
+#ifndef VERSION_G8ME01_DEMO
         ELSE
         CALL(evt_hitobj_onoff, STRING("A_f2_rak_02"), 1, 1)
+#endif
     END_IF
     RETURN
 EVT_END()
@@ -430,7 +441,11 @@ EVT_END()
 EVT_BEGIN(get_blue_jail_key)
     CALL(evt_mario_key_onoff, 0)
     CALL(evt_mobj_get_position, STRING("mobj_box00"), LW(0), LW(1), LW(2))
+#ifdef VERSION_G8ME01_DEMO
+    CALL(evt_item_entry, STRING("item00"), 17, LW(0), LW(1), LW(2), 15, -1, 0)
+#else
     CALL(evt_item_entry, STRING("item00"), 17, LW(0), LW(1), LW(2), 16, -1, 0)
+#endif
     CALL(evt_item_flag_on, STRING("item00"), 2)
     CALL(evt_mobj_wait_animation_end, STRING("mobj_box00"))
     CALL(evt_item_get_item, STRING("item00"))
@@ -510,10 +525,12 @@ EVT_BEGIN(mri_09_init_evt)
         CALL(evt_mobj_switch_red, 1, STRING("slot01"), -30, 0, 135, PTR(slot01_event), 0)
         CALL(evt_mobj_switch_red, 1, STRING("slot02"), 30, 0, 135, PTR(slot02_event), 0)
         CALL(evt_mobj_switch_red, 1, STRING("slot03"), 80, 0, 135, PTR(slot03_event), 0)
+#ifndef VERSION_G8ME01_DEMO
         CALL(evt_paper_entry, STRING("OFF_d_roll_down"))
         CALL(evt_paper_entry, STRING("OFF_d_roll_up"))
         CALL(evt_paper_entry, STRING("OFF_d_roll_left"))
         CALL(evt_paper_entry, STRING("OFF_d_roll_right"))
+#endif
         CASE_GREATER_OR_EQUAL(104)
         CALL(evt_mapobj_flag_onoff, 1, 1, STRING("S_isk_01A"), 1)
         CALL(evt_hitobj_onoff, STRING("A_isk_01A"), 1, 0)
@@ -521,7 +538,11 @@ EVT_BEGIN(mri_09_init_evt)
         CALL(evt_hitobj_onoff, STRING("A_f2_rak04"), 1, 0)
     END_SWITCH
     CALL(evt_mobj_itembox, STRING("mobj_box00"), 125, 0, 25, 0, 0, PTR(get_blue_jail_key), GSWF(2852))
+#ifdef VERSION_G8ME01_DEMO
+    CALL(evt_item_entry, STRING("item100"), 256, -250, -234, 75, 15, GSWF(2853), 0)
+#else
     CALL(evt_item_entry, STRING("item100"), 256, -250, -234, 75, 16, GSWF(2853), 0)
+#endif
     CALL(evt_mobj_powerupblk, STRING("pblk1"), 0, -174, -125, 0, GSWF(5543), 0)
     SPAWN_EVENT(PTR(breakyuka_init))
     CALL(evt_mobj_breaking_floor, STRING("mobj_bf00"), 0, 0, 75, 1, PTR(breakyuka_main), GSWF(2851))

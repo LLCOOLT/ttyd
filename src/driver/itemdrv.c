@@ -107,6 +107,14 @@ WinMgrDesc itemdrv_window_desc[4] = {
 //TODO: inline function? I see nothing in the symbol map
 #define itemGetWork() (gp->inBattle ? &work[1] : &work[0])
 
+#ifdef VERSION_G8ME01_DEMO
+// the demo returns a badge to the pouch when its 0x100 flag is clear, in or out of battle
+inline void itemCheckBadge(ItemEntry* entry) {
+    if (BADGE_MIN <= entry->itemId && entry->itemId < BADGE_MAX && !(entry->flags & 0x100)) {
+        pouchArriveBadge(entry->itemId);
+    }
+}
+#else
 inline void itemCheckBadge(ItemEntry* entry) {
     if (!gp->inBattle) {
         if (BADGE_MIN <= entry->itemId && entry->itemId < BADGE_MAX) {
@@ -116,6 +124,7 @@ inline void itemCheckBadge(ItemEntry* entry) {
         }
     }
 }
+#endif
 
 void itemseq_Bound(ItemEntry* entry);
 static inline BOOL itemGetPouch(ItemEntry* entry) {
@@ -143,10 +152,12 @@ static inline BOOL itemGetPouch(ItemEntry* entry) {
 static inline void itemGetEnd(ItemEntry* entry) {
 	marioStSystemLevel(0);
 	psndClearFlag(0x80);
+#ifndef VERSION_G8ME01_DEMO
 	if (entry->flags2 & 0x1000000) {
 		entry->flags2 &= ~0x1000000;
 		marioCtrlOn();
 	}
+#endif
 	marioKeyOn();
 	marioChgStayMotion();
 	camGetPtr(8)->flags &= ~0x200;
@@ -204,10 +215,18 @@ void itemCoinDrop(Vec* position) {
 }
 
 BOOL itemGetCheck(ItemEntry* entry) {
+#ifdef VERSION_G8ME01_DEMO
+	// the demo has no N_fbatPreventMarioEventChk: only field battle modes 0 and 1 allow pick-ups
+	s32 fbatMode = fbatGetPointer()->mode;
+#endif
 	MarioWork* mario = marioGetPtr();
 
 	if (!entry) return FALSE;
 	if (entry->flags2 & 0x100000) return FALSE;
+#ifdef VERSION_G8ME01_DEMO
+	if (marioStGetSystemLevel() != 0U) return FALSE;
+	if (mario->flags & 0xA) return FALSE;
+#else
 	if (mario->characterId == 2) {
 		if (!(mario->stageFlags & 1)) {
 			if (marioStGetSystemLevel() != 0U) return FALSE;
@@ -218,10 +237,13 @@ BOOL itemGetCheck(ItemEntry* entry) {
 		if (marioStGetSystemLevel() != 0U) return FALSE;
 		if (mario->flags & 0xA) return FALSE;
 	}
+#endif
 	if (gp->mapEventId) return FALSE;
 	if (seqGetSeq() != 2) return FALSE;
 	if (mario->currMotionId == 0x19) return FALSE;
+#ifndef VERSION_G8ME01_DEMO
 	if (mario->currMotionId == 0x18) return FALSE;
+#endif
 	if (vivianGetStatus()) return FALSE;
 	if (mario->currMotionId == 0x1F || mario->currMotionId == 0x20) return FALSE;
 	if (nokonoko_holdItem()) return FALSE;
@@ -235,7 +257,11 @@ BOOL itemGetCheck(ItemEntry* entry) {
 			}
 		}
 	}
+#ifdef VERSION_G8ME01_DEMO
+	if (fbatMode != 0 && fbatMode != 1) return FALSE;
+#else
 	if (N_fbatPreventMarioEventChk()) return FALSE;
+#endif
 	switch (entry->mode) {
 		case 5:
 		case 6:
@@ -255,13 +281,18 @@ BOOL itemGetCheck(ItemEntry* entry) {
 }
 
 BOOL itemGetNokoCheck(ItemEntry* entry) {
+#ifdef VERSION_G8ME01_DEMO
+	s32 fbatMode = fbatGetPointer()->mode;
+#endif
 	MarioWork* mario = marioGetPtr();
 
 	if (!entry) return FALSE;
 	if (entry->flags2 & 0x100000) return FALSE;
 	if (marioStGetSystemLevel() != 0U) return FALSE;
 	if (mario->flags & 0xA) return FALSE;
+#ifndef VERSION_G8ME01_DEMO
 	if (entry->flags2 & 0x2000000) return FALSE;
+#endif
 	if (gp->mapEventId) return FALSE;
 	if (seqGetSeq() != 2) return FALSE;
 	if (mario->currMotionId == 0x19) return FALSE;
@@ -278,7 +309,12 @@ BOOL itemGetNokoCheck(ItemEntry* entry) {
 			}
 		}
 	}
+#ifdef VERSION_G8ME01_DEMO
+	if (fbatMode != 0 && fbatMode != 1) return FALSE;
+	return TRUE;
+#else
 	return !N_fbatPreventMarioEventChk();
+#endif
 }
 
 BOOL N_itemPickUpFromFieldCheck(void) {
@@ -382,6 +418,9 @@ void itemMain(void) {
 					f32 px = entry->position.x, py = entry->position.y + 20.0f, pz = entry->position.z;
 					{ f64 d = __fabs(-1.0); hitDist = 20.0 + d; }
 					hit = hitCheckFilter(NULL, &hitX, &hitY, &hitZ, &hitDist, &hitNX, &hitNY, &hitNZ, px, py, pz, 0.0f, -1.0f, 0.0f);
+#ifdef VERSION_G8ME01_DEMO
+					hit = hit ? hit : NULL;
+#else
 					if (hit) {
 						newY = hitY;
 					}
@@ -389,13 +428,16 @@ void itemMain(void) {
 						hit = NULL;
 						newY = y + dirY;
 					}
+#endif
 				} }
 				if (!hit) {
 					itemModeChange(entry, 3);
 				}
+#ifndef VERSION_G8ME01_DEMO
 				else {
 					entry->position.y = newY;
 				}
+#endif
 				break;
 			case 2:
 				itemseq_GetItem(entry);
@@ -414,6 +456,9 @@ void itemMain(void) {
 				}
 				break;
 			case 9:
+#ifdef VERSION_G8ME01_DEMO
+				itemCheckBadge(entry);
+#endif
 				itemDelete(entry->name);
 				break;
 		}
@@ -627,7 +672,9 @@ ItemEntry* itemEntry(const char* name, s32 itemId, s32 type, s32 collectFlag, s3
 		entry->effect = effStarStoneEntry(entry->itemId - 0x72, x, 16.0f + y, z, 1.0f);
 		break;
 	default:
+#ifndef VERSION_G8ME01_DEMO
 		entry->effect = NULL;
+#endif
 		iconEntry(entry->name, itemDataTable[itemId].icon_id);
 		{ char* nm = ((ItemEntry*)entry)->name; iconSetPos(nm, x, y, z); }
 		iconSetScale(entry->name, entry->scale);
@@ -642,6 +689,75 @@ ItemEntry* itemEntry(const char* name, s32 itemId, s32 type, s32 collectFlag, s3
 		break;
 	}
 
+#ifdef VERSION_G8ME01_DEMO
+	// The demo has no retail type 9 (badge with flag 0x100), so the retail types from 10 up are one lower.
+	switch ((u16)type) {
+		case 16:
+			entry->flags |= 2;
+		case 15:
+			itemModeChange(entry, 7);
+			break;
+		case 0:
+			itemModeChange(entry, 1);
+			break;
+		case 1:
+			itemModeChange(entry, 1);
+			entry->flags |= 2;
+			break;
+		case 4:
+			itemModeChange(entry, 6);
+			break;
+		case 3:
+			entry->timer = 5000;
+			itemModeChange(entry, 5);
+			break;
+		case 10:
+			entry->flags2 |= 0x4000;
+			entry->timer = 20000;
+			itemModeChange(entry, 6);
+			break;
+		case 11:
+			entry->flags2 |= 0x4000;
+			entry->timer = 20000;
+			itemModeChange(entry, 6);
+			entry->flags |= 0x400;
+			break;
+		case 8:
+			entry->flags2 |= 0x4000;
+			entry->timer = 8000;
+			itemModeChange(entry, 6);
+			break;
+		case 9:
+			entry->flags2 |= 0x4000;
+			entry->timer = 8000;
+			itemModeChange(entry, 6);
+			entry->flags |= 0x400;
+			break;
+		case 7:
+			entry->flags2 |= 0x4000;
+		case 5:
+			entry->timer = 5000;
+			itemModeChange(entry, 6);
+			break;
+		case 6:
+			entry->timer = 5000;
+			entry->flags2 |= 0x40;
+			itemModeChange(entry, 6);
+			break;
+		case 2:
+			itemModeChange(entry, 5);
+			break;
+		case 12:
+			itemModeChange(entry, 3);
+			break;
+		case 13:
+			itemModeChange(entry, 4);
+			break;
+		case 14:
+			itemModeChange(entry, 10);
+			break;
+	}
+#else
 	switch ((u16)type) {
 		case 17:
 			entry->flags |= 2;
@@ -710,6 +826,7 @@ ItemEntry* itemEntry(const char* name, s32 itemId, s32 type, s32 collectFlag, s3
 			itemModeChange(entry, 10);
 			break;
 	}
+#endif
 	return entry;
 }
 
@@ -720,7 +837,9 @@ void itemDelete(const char* name) {
 
 	for (entry = wp->entries, i = 0; i < wp->count; i++, entry++) {
 		if (!strcmp(entry->name, name)) {
+#ifndef VERSION_G8ME01_DEMO
 			itemCheckBadge(entry);
+#endif
 			switch (entry->itemId) {
 				case 0x72: case 0x73: case 0x74: case 0x75: case 0x76: case 0x77: case 0x78:
 					effSoftDelete(entry->effect);
@@ -804,10 +923,16 @@ ItemEntry* itemNearDistCheck(f32 x, f32 y, f32 z, f32 range) {
 	pos = makeVecByValue2(x, y, z);
 	for (; i < wp->count; i++, entry++) {
 		if (!(entry->flags & 1)) continue;
+#ifdef VERSION_G8ME01_DEMO
+		if (entry->flags & 2) continue;
+		if (entry->flags2 & 0x1000) continue;
+		if (entry->mode == 2) continue;
+#else
 		if (entry->flags2 & 0x1000) continue;
 		if (entry->flags2 & 0x100000) continue;
 		if (entry->mode == 2) continue;
 		if (entry->flags2 & 0x2000000) continue;
+#endif
 		{ f32 iz, iy, ix; ix = entry->position.x; iy = entry->position.y; iz = entry->position.z; itemPos = makeVecByValue(ix, iy, iz); }
 		PSVECSubtract(&itemPos, &pos, &diff);
 		dist = PSVECMag(&diff);
@@ -953,6 +1078,30 @@ void winHelpDisp(WinMgrEntry* win) {
 	}
 }
 
+#ifdef VERSION_G8ME01_DEMO
+// the demo has no badge-full message
+void winFullDisp(WinMgrEntry* win) {
+	ItemEntry* entry;
+	const char* msg;
+	u16 width;
+
+	entry = win->param;
+	msg = msgSearch("msg_window_item_full");
+	width = (u16)FontGetMessageWidth(msg);
+
+	if (width + 20 > win->width) {
+		win->width = width + 20;
+		win->x = -win->width / 2;
+	}
+	if (!winMgrAction(entry->winId[2])) {
+		FontDrawStart();
+		FontDrawEdge();
+		FontDrawColor((GXColor){0xFF, 0xFF, 0xFF, 0xFF});
+		FontDrawMessage(-width / 2, win->y - 10, msg);
+		FontDrawEdgeOff();
+	}
+}
+#else
 void winFullDisp(WinMgrEntry* win) {
 	ItemEntry* entry = win->param;
 	BOOL isBadge = FALSE;
@@ -976,7 +1125,297 @@ void winFullDisp(WinMgrEntry* win) {
 		FontDrawEdgeOff();
 	}
 }
+#endif
 
+#ifdef VERSION_G8ME01_DEMO
+// The demo's item-get sequence: no retail sub-states 2 (control off) and 8 (motion abort), so retail 3-7 and 9
+// are 2-7 here; no badge flag bookkeeping, no item renaming after a swap, and the icon flags are 0x40/0x100
+// where retail has 0x100/0x200.
+void itemseq_GetItem(ItemEntry* entry) {
+	ItemWork* wp = itemGetWork();
+	MarioWork* mario;
+	s32 type, bgm;
+	s32 select;
+
+	mario = marioGetPtr();
+	switch (entry->subState) {
+		case 0:
+			entry->flags2 &= ~0x10000;
+			if (entry->flags & 4) {
+				if (itemGetPouch(entry)) {
+					entry->timer = 0;
+					itemGetSound(entry);
+					itemDelete(entry->name);
+				}
+				else {
+					itemModeChange(entry, 4);
+				}
+				break;
+			}
+			entry->subState = 1;
+			entry->timer = 0;
+			camGetPtr(8)->flags |= 0x200;
+			marioKeyOff();
+			marioStSystemLevel(2);
+			psndSetFlag(0x80);
+			if (entry->itemId == 7 || entry->itemId == 8 || entry->itemId == 10 || entry->itemId == 11) {
+				entry->flags2 |= 0x2000;
+			}
+		case 1:
+			if (!(entry->flags & 0x1000) || entry->flags & 0x4000) {
+				if (!marioChkItemGetMotion()) {
+					break;
+				}
+			}
+			entry->subState = 2;
+			marioChgGetItemMotion();
+			{
+				f32 y = 50.0f + mario->position.y, z = mario->position.z;
+				entry->position.x = mario->position.x;
+				entry->position.y = y;
+				entry->position.z = z;
+			}
+			type = 7;
+			bgm = -1;
+			if (entry->itemId == 0x57) {
+				type = 4;
+				bgm = -1;
+			}
+			else if (entry->itemId == 0x7D) {
+				type = 8;
+				bgm = 0;
+			}
+			else if (entry->itemId < 0xC) {
+				type = 3;
+				bgm = 3;
+			}
+			else if (entry->itemId < 0x72) {
+				type = 6;
+				bgm = 1;
+			}
+			else if (entry->itemId < 0x79) {
+				type = 0;
+				bgm = -1;
+			}
+			else if (entry->itemId < 0xEC) {
+				type = 7;
+				bgm = -1;
+			}
+			else if (entry->itemId < 0x153) {
+				type = 5;
+				bgm = 2;
+			}
+			wp->effect = effItemGetEntry(type, mario->position.x, 62.0f + mario->position.y, mario->position.z);
+			if (type == 0 || type == 3) {
+				if (entry->flags2 & 0x2000) {
+					((ItemGetWork*)wp->effect->userdata)->camera = 5;
+					marioSetCamId(7);
+					iconFlagOn(entry->name, 0x100);
+				}
+				else {
+					((ItemGetWork*)wp->effect->userdata)->camera = 5;
+					marioSetCamId(5);
+					iconFlagOn(entry->name, 0x40);
+				}
+			}
+			if (!(entry->flags & 0x8000)) {
+				if (psndBGMChkSilent(0)) {
+					entry->flags |= 8;
+				}
+				switch (bgm) {
+					case 0:
+						if (!(entry->flags & 8)) {
+							psndBGMOff(0x3800);
+						}
+						psndBGMOn(0x211, "BGM_FF_GET_STARPIECE1");
+						break;
+					case 1:
+						if (!(entry->flags & 8)) {
+							psndBGMOff(0x3800);
+						}
+						psndBGMOn(0x211, "BGM_FF_GET_KEYITEM1");
+						break;
+					case 2:
+						if (!(entry->flags & 8)) {
+							psndBGMOff(0x3800);
+						}
+						psndBGMOn(0x211, "BGM_FF_GET_BADGE1");
+						break;
+					case 3:
+						if (!(entry->flags & 8)) {
+							psndBGMOff(0x3800);
+						}
+						psndBGMOn(0x211, "BGM_FF_GET_IMPORTANT_ITEM1");
+						break;
+					default:
+						if (!(entry->flags & 8)) {
+							psndBGMOff(0x3800);
+						}
+						psndBGMOn(0x211, "BGM_FF_GET_ITEM1");
+						break;
+				}
+			}
+			if (type == 8) {
+				evtSetValue(NULL, 0xF5DE01A2, evtGetValue(NULL, 0xF5DE01A2) + 1);
+			}
+			entry->flags &= ~0x2000;
+			itemGetSound(entry);
+			entry->winId[0] = winMgrEntry(&itemdrv_window_desc[0]);
+			winMgrOpen(entry->winId[0]);
+			winMgrSetParam(entry->winId[0], entry);
+			if (!(entry->flags2 & 0x2000)) {
+				entry->winId[1] = winMgrEntry(&itemdrv_window_desc[1]);
+				winMgrOpen(entry->winId[1]);
+				winMgrSetParam(entry->winId[1], entry);
+			}
+			if (!itemGetPouch(entry)) {
+				entry->winId[2] = winMgrEntry(&itemdrv_window_desc[2]);
+				winMgrOpen(entry->winId[2]);
+				winMgrSetParam(entry->winId[2], entry);
+			}
+			if (entry->itemId == 0x49) {
+				iconChange(entry->name, 0x114);
+			}
+			break;
+		case 2:
+			if (!(entry->flags & 0x8000) && !(entry->flags & 0x2000)) {
+				if (psndBGMChk(1)) {
+					entry->flags |= 0x2000;
+					psndBGMOff(0x201);
+					if (!(entry->flags & 8)) {
+						psndBGMOn(0xA0, NULL);
+					}
+				}
+			}
+			if (winMgrAction(entry->winId[0])) {
+				break;
+			}
+			if (!(keyGetButtonTrg(0) & 0x300)) {
+				break;
+			}
+			winMgrCloseAutoDelete(entry->winId[0]);
+			if (!(entry->flags2 & 0x2000)) {
+				winMgrCloseAutoDelete(entry->winId[1]);
+			}
+			if (!(entry->flags & 0x8000) && !(entry->flags & 0x2000)) {
+				psndBGMOff(0x201);
+				if (!(entry->flags & 8)) {
+					psndBGMOn(0xA0, NULL);
+				}
+			}
+			if (entry->flags2 & 0x2000) {
+				entry->subState = 5;
+				break;
+			}
+			if (entry->itemId >= 0x79 && entry->itemId < 0xEC && entry->itemId != 0x7D && !swGet(0xEB) && !(gp->flags & 0x1000)) {
+				swSet(0xEB);
+				entry->subState = 3;
+				wp->msgWindowId = msgWindow_Entry(msgSearch("item_first_hit"), 0, 0);
+				break;
+			}
+			effSoftDelete(wp->effect);
+			marioSetCamId(4);
+			iconFlagOff(entry->name, 0x40);
+			if (entry->itemId == 0x49) {
+				iconChange(entry->name, 0x115);
+			}
+			if (entry->flags2 & 1) {
+				itemGetEnd(entry);
+				itemDelete(entry->name);
+				break;
+			}
+			entry->subState = 4;
+			winMgrCloseAutoDelete(entry->winId[2]);
+			marioChgStayMotion();
+			iconFlagOn(entry->name, 2);
+			{
+				s32 id = entry->itemId;
+				if (id >= 0xF0 && id < 0x153) {
+					wp->select = winMgrSelectEntry(2, id, 1);
+				}
+				else {
+					wp->select = winMgrSelectEntry(1, id, 1);
+				}
+			}
+			break;
+		case 3:
+			if (windowCheckID(wp->msgWindowId)) {
+				break;
+			}
+			effSoftDelete(wp->effect);
+			marioSetCamId(4);
+			iconFlagOff(entry->name, 0x40);
+			itemGetEnd(entry);
+			itemDelete(entry->name);
+			break;
+		case 4:
+			select = winMgrSelect(wp->select);
+			if (!select) {
+				break;
+			}
+			winMgrSelectDelete(wp->select);
+			if (select >= 0) {
+				pouchRemoveItem(select);
+				itemGetPouch(entry);
+				entry->flags2 &= ~1;
+				entry->itemId = select;
+				entry->evtCode = 0;
+				entry->flags &= ~0x60;
+				iconChange(entry->name, itemDataTable[entry->itemId].icon_id);
+			}
+			entry->speed = 85.0f;
+			entry->velocityY = 120.0f;
+			entry->bounceFactor = 0.7f;
+			entry->gravityScale = 1.0f;
+			entry->winId[0] = winMgrEntry(&itemdrv_window_desc[3]);
+			winMgrOpen(entry->winId[0]);
+			winMgrSetParam(entry->winId[0], entry);
+			marioChgGetItemMotion();
+			iconFlagOff(entry->name, 2);
+			if (mario->flags & 0x2000000) {
+				entry->flags2 |= 0x8000;
+			}
+			entry->subState = 7;
+			break;
+		case 5:
+			wp->lectureEvt = evtEntryType(all_juyoitem_lecture, 0, 0, 0);
+			wp->lectureEvt->lwData[8] = (EvtWord)entry;
+			wp->lectureEvt->lwData[9] = (EvtWord)wp->effect;
+			psndClearFlag(0x80);
+			entry->subState = 6;
+			break;
+		case 6:
+			if (evtCheckID(wp->lectureEvt->eventId)) {
+				break;
+			}
+			itemGetEnd(entry);
+			itemDelete(entry->name);
+			break;
+		case 7:
+			if (!(keyGetButtonTrg(0) & 0x100)) {
+				break;
+			}
+			winMgrCloseAutoDelete(entry->winId[0]);
+			entry->flags2 |= 8;
+			itemModeChange(entry, 6);
+			entry->flags &= ~0x10;
+			if (entry->itemId >= 1 && entry->itemId < 0x79) {
+				entry->timer = 0;
+			}
+			else if (entry->itemId >= 0xF0 && entry->itemId < 0x153) {
+				entry->timer = 0;
+			}
+			else {
+				entry->timer = 20000;
+			}
+			entry->flags2 |= 0x10000;
+			entry->flags2 &= ~0x1000;
+			entry->flags &= ~2;
+			itemGetEnd(entry);
+			break;
+	}
+}
+#else
 void itemseq_GetItem(ItemEntry* entry) {
 	ItemWork* wp = itemGetWork();
 	MarioWork* mario;
@@ -1341,6 +1780,7 @@ void itemseq_GetItem(ItemEntry* entry) {
 			break;
 	}
 }
+#endif
 
 static s32 _move_dir_1090;
 void itemseq_Bound(ItemEntry* entry) {
@@ -1533,7 +1973,9 @@ void itemseq_Bound(ItemEntry* entry) {
 				}
 				entry->flags2 |= 0x10000;
 				entry->flags2 &= ~0x1000;
+#ifndef VERSION_G8ME01_DEMO
 				entry->flags |= 0x100;
+#endif
 				break;
 			}
 			if (dy >= 0.0f) {

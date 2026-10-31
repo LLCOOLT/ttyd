@@ -30,6 +30,27 @@ typedef struct IconBinary {
 
 // flags, 1 = in use, 0x10 = 2D, 0x1000 = animated(?), 0x2000 = ?(something to do with bin)
 
+// IconEntry flags that the demo numbers differently
+#ifdef VERSION_G8ME01_DEMO
+#define ICON_FLAG_2D 0x4
+#define ICON_FLAG_FLIP_X 0x8
+#define ICON_FLAG_FLIP_Y 0x10
+#define ICON_FLAG_EFFECT_A 0x40
+#define ICON_FLAG_NO_MAP_BLEND 0x80
+#define ICON_FLAG_EFFECT_B 0x100
+#define ICON_FLAG_CULL_BACK 0x200
+#define ICON_FLAG_CULL_FRONT 0x400
+#else
+#define ICON_FLAG_FLIP_X 0x4
+#define ICON_FLAG_FLIP_Y 0x8
+#define ICON_FLAG_2D 0x10
+#define ICON_FLAG_NO_MAP_BLEND 0x40 // the map's blend colour is not applied
+#define ICON_FLAG_EFFECT_A 0x100 // drawn by the 3deff_A camera
+#define ICON_FLAG_EFFECT_B 0x200 // drawn by the 3deff_B camera
+#define ICON_FLAG_CULL_BACK 0x400
+#define ICON_FLAG_CULL_FRONT 0x800
+#endif
+
 typedef struct IconEntry {
     union {
         s16 flags;    // 0x0
@@ -63,6 +84,16 @@ void iconEntry(const char* name, s16 iconId);
 void iconEntry2D(const char* name, s16 iconId);
 void iconDelete(const char* name);
 void iconChange(const char* name, s16 iconId);
+// iconDispGx flag bits: drawn with the 2D camera, mirrored in x. The demo's 2D bit is 4, with the flips after it
+// (x 8, y 0x10); retail moved the flips to 4 and 8 and the 2D bit to 0x10.
+#ifdef VERSION_G8ME01_DEMO
+#define ICON_DISP_2D 4
+#define ICON_DISP_FLIP_X 8
+#else
+#define ICON_DISP_2D 0x10
+#define ICON_DISP_FLIP_X 4
+#endif
+
 void iconDispGxAlpha(Vec* position, s16 flags, u16 iconId, u8 alpha, f32 scale);
 void iconDispGx(Vec* position, s16 flags, u16 iconId, f32 scale);
 void iconDispGx2(Mtx mtx, s16 flags, u16 iconId);

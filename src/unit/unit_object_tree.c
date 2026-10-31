@@ -18,7 +18,11 @@ USER_FUNC(btlevtcmd_StartWaitEvent);
 static BattleUnitKindPart parts[1];
 static EvtWord init_event[25];
 static EvtWord damage_event[14];
+#ifdef VERSION_G8ME01_DEMO
+static s32 _data[34];
+#else
 static s32 _data[35];
+#endif
 static BattleUnitDefense defence;
 static BattleUnitDefenseAttr defence_attr;
 static StatusVulnerability regist;
@@ -93,6 +97,27 @@ BattleUnitKind unit_object_tree = {
     data_table,
 };
 
+static BattleUnitDefense defence = {{0, 0, 0, 0, 0}};
+
+static BattleUnitDefenseAttr defence_attr = {{0, 0, 0, 0, 0}};
+
+static StatusVulnerability regist = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
+
+static PoseTableEntry pose_table[] = {
+    {28, "M_S_1"},
+    {31, "M_S_1"},
+    {39, "M_O_1"},
+#ifdef VERSION_G8ME01_DEMO
+    {67, "M_S_1"},
+#else
+    {69, "M_S_1"},
+#endif
+};
+
+static BattleDataEntry data_table[] = {
+    {0, NULL},
+};
+
 static BattleUnitKindPart parts[] = {
     {1, "btl_un_tree", "b_mario", 0.0f, 0.0f, 0.0f, 0.0f, 25.0f, 0.0f, 0.0f, 30.0f, 0.0f, 20, 30, 255, &defence, &defence_attr, 0x3000009, 0, pose_table},
 };
@@ -115,35 +140,22 @@ static EVT_BEGIN(damage_event)
     RETURN
 EVT_END()
 
+static EVT_BEGIN(attack_event)
+    CALL(btlevtcmd_StartWaitEvent, -2)
+    RETURN
+EVT_END()
+
 static s32 _data[] = {
     -5, 0, 15, 0, -15, 0, 14, 0,
     -13, 0, 12, 0, -11, 0, 10, 0,
     -9, 0, 8, 0, -7, 0, 6, 0,
     -6, 0, 5, 0, -4, 0, 2, 0,
+#ifdef VERSION_G8ME01_DEMO
+    -2, 0,
+#else
     -2, 0, 0,
+#endif
 };
-
-static BattleUnitDefense defence = {{0, 0, 0, 0, 0}};
-
-static BattleUnitDefenseAttr defence_attr = {{0, 0, 0, 0, 0}};
-
-static StatusVulnerability regist = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
-
-static PoseTableEntry pose_table[] = {
-    {28, "M_S_1"},
-    {31, "M_S_1"},
-    {39, "M_O_1"},
-    {69, "M_S_1"},
-};
-
-static BattleDataEntry data_table[] = {
-    {0, NULL},
-};
-
-static EVT_BEGIN(attack_event)
-    CALL(btlevtcmd_StartWaitEvent, -2)
-    RETURN
-EVT_END()
 
 static EVT_BEGIN(wait_event)
     RETURN

@@ -543,7 +543,11 @@ void main_weapon(s32 idx) {
         wp->state = 3;
         o->state = 3;
         effStardustN64Entry(5, o->pos.x, o->pos.y, o->pos.z, 10.0f);
+#ifdef VERSION_G8ME01_DEMO
+        effHitEntry(0, 10, o->pos.x, o->pos.y, o->pos.z, 1.0f);
+#else
         effHitEntry(0, 5, o->pos.x, o->pos.y, o->pos.z, 1.0f);
+#endif
         switch (o->kind) {
         case 0:
             psndSFXOn_3D((const char*)0xA64, &wp->pos);
@@ -1185,18 +1189,6 @@ static USER_FUNC(start_game);
 
 
 static GenkiWork* get_ptr(void);
-EVT_BEGIN(marioAttackEvent_Genki0)
-    SET_VALUE(LW(15), 0)
-    CALL_CHILD(genki_evt_common)
-    RETURN
-EVT_END()
-
-EVT_BEGIN(marioAttackEvent_Genki1)
-    SET_VALUE(LW(15), 1)
-    CALL_CHILD(genki_evt_common)
-    RETURN
-EVT_END()
-
 #ifdef VERSION_G8ME01
 EVT_BEGIN(genki_evt_common)
     CALL(btlevtcmd_GetUnitId, -4, LW(13))
@@ -1390,6 +1382,20 @@ EVT_BEGIN(genki_evt_common)
     RETURN
 EVT_END()
 #endif
+
+// After genki_evt_common, where the demo's .data places them (retail keeps them in .sdata).
+EVT_BEGIN(marioAttackEvent_Genki0)
+    SET_VALUE(LW(15), 0)
+    CALL_CHILD(genki_evt_common)
+    RETURN
+EVT_END()
+
+EVT_BEGIN(marioAttackEvent_Genki1)
+    SET_VALUE(LW(15), 1)
+    CALL_CHILD(genki_evt_common)
+    RETURN
+EVT_END()
+
 
 EVT_BEGIN(status_recover_evt)
     CALL(btlevtcmd_CheckStatus, LW(9), 1, LW(0))

@@ -50,10 +50,51 @@ void windowInit(void) {
 	w[5].userdata = NULL;
 	w[6].flags = 0;
 	w[6].userdata = NULL;
+#ifndef VERSION_G8ME01_DEMO
 	winTpl = NULL;
 	tpl_loaded = FALSE;
+#endif
 }
 
+#ifdef VERSION_G8ME01_DEMO
+void windowLoadTpl(const char* name);
+
+// the demo loads msgWindow.tpl synchronously
+void windowTexSetup(void) {
+	s32 i;
+
+	windowLoadTpl("font/msgWindow.tpl");
+	wakuTexObj = __memAlloc(HEAP_DEFAULT, sizeof(GXTexObj) * winTpl->numDescriptors);
+
+	for (i = 0; i < winTpl->numDescriptors; i++) {
+		TEXGetGXTexObjFromPalette(winTpl, &wakuTexObj[i], i);
+	}
+}
+
+// inlined into windowTexSetup; the linker strips the unreferenced copy
+void windowLoadTpl(const char* name) {
+	DVDEntry* entry;
+	u32 size;
+	u32 len;
+	char path[128];
+
+	arcOpen(name, (void**)&winTpl, &size);
+	if (winTpl) {
+		UnpackTexPalette(winTpl);
+	}
+	else {
+		sprintf(path, "%s/%s", getMarioStDvdRoot(), name);
+		entry = DVDMgrOpen(path, 2, 0);
+		if (entry) {
+			len = OSRoundUp32B(DVDMgrGetLength(entry));
+			winTpl = __memAlloc(HEAP_DEFAULT, len);
+			DVDMgrRead(entry, winTpl, len, 0);
+			DVDMgrClose(entry);
+			UnpackTexPalette(winTpl);
+		}
+	}
+}
+#else
 //new in retail
 void windowTexSetup_callback(s32 error, DVDFileInfo* info) {
 	DVDEntry* entry = info->cb.userData;
@@ -95,6 +136,7 @@ void windowTexSetup(void) {
 		}
 	}
 }
+#endif
 
 void windowReInit(void) {
 	WindowEntry* w = WinObjects;
@@ -1044,8 +1086,15 @@ end:
 	;
 }
 
+#ifdef VERSION_G8ME01_DEMO
+TEXPalette* winTpl;
+// the demo loads the frame textures synchronously and has no load flag
+#define WINDOW_TPL_READY() TRUE
+#else
 BOOL tpl_loaded; //new in retail, tpl loaded
 TEXPalette* winTpl; //new in retail
+#define WINDOW_TPL_READY() tpl_loaded
+#endif
 
 void windowDispGX_Message(s32 type, s32 a2, u8 alpha, f32 x, f32 y, f32 height, f32 width, f32 a9, f32 a10) {
 	GXSetCullMode(GX_CULL_NONE);
@@ -1087,7 +1136,7 @@ void windowDispGX_Waku_col(u16 gxTexMapID, GXColor color, f32 x, f32 y, f32 widt
 	f32 twothirds, third;
 	f32 right, bottom, innerLeft, innerRight, innerTop, innerBottom;
 
-	if (tpl_loaded) {
+	if (WINDOW_TPL_READY()) {
 		if (gxTexMapID) {
 			gxTexMapID = 0;
 		}
@@ -1263,7 +1312,7 @@ void windowDispGX2_Waku_col(Mtx mtx, u16 gxTexMapID, GXColor color, f32 x, f32 y
 	f32 twothirds, third;
 	f32 fVar1, fVar4, fVar2, fVar6, fVar5, fVar3; //TODO: rename
 
-	if (tpl_loaded) {
+	if (WINDOW_TPL_READY()) {
 		if (gxTexMapID) {
 			gxTexMapID = 0;
 		}

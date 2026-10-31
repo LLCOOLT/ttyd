@@ -29,6 +29,13 @@ s32 evt_img_alloc_capture(EventEntry* event, BOOL isFirstCall);
 
 static FadeWork* wp;
 
+// The demo has no fade types 7 and 8 (the retail aliases of 3 and 4), so every type from 9 up is 2 lower
+#ifdef VERSION_G8ME01_DEMO
+#define FT(n) ((n) >= 9 ? (n) - 2 : (n))
+#else
+#define FT(n) (n)
+#endif
+
 //local prototypes
 void _callback(s32 error, DVDFileInfo* info);
 void disp_texture(CameraId camId, void* param);
@@ -61,7 +68,9 @@ void fadeInit(void) {
 		entry->animOffsetX = 0.0f;
 		entry->animOffsetY = 0.0f;
 		entry->scale = 1.0f;
+#ifndef VERSION_G8ME01_DEMO
 		entry->delayFrames = 0;
+#endif
 	}
 
 	wp->lastEntryId = -1;
@@ -97,47 +106,51 @@ void fadeEntry(s32 type, s32 duration, GXColor color) {
 	if (!type) {
 		return;
 	}
-	if (type == 16) { //type 16 is type 9 but white
-		type = 9;
+	if (type == FT(16)) { //type 16 is type 9 but white
+		type = FT(9);
 		color = (GXColor){0xF0, 0xF0, 0xF0, 0xFF};
 	}
-	if (type == 17) {
-		type = 10;
+	if (type == FT(17)) {
+		type = FT(10);
 		color = (GXColor){0xF0, 0xF0, 0xF0, 0xFF};
 	}
-	if (type == 18) {
-		type = 11;
+	if (type == FT(18)) {
+		type = FT(11);
 		color = (GXColor){0xF0, 0xF0, 0xF0, 0xFF};
 	}
-	if (type == 19) {
-		type = 12;
+	if (type == FT(19)) {
+		type = FT(12);
 		color = (GXColor){0xF0, 0xF0, 0xF0, 0xFF};
 	}
-	if (type == 20) {
-		type = 14;
+	if (type == FT(20)) {
+		type = FT(14);
 		color = (GXColor){0xF0, 0xF0, 0xF0, 0xFF};
 	}
-	if (type == 21) {
-		type = 15;
+	if (type == FT(21)) {
+		type = FT(15);
 		color = (GXColor){0xF0, 0xF0, 0xF0, 0xFF};
 	}
 	if ((type == 1 || type == 2) && duration < 1000) {
 		duration = 1000;
 	}
+#ifndef VERSION_G8ME01_DEMO
 	if (type == 7) {
 		type = 3;
 	}
 	else if (type == 8) {
 		type = 4;
 	}
-	else if (((u32)(type - 3) <= 2 || type == 6) && duration < 1000) {
+	else
+#endif
+	if (((u32)(type - 3) <= 2 || type == 6) && duration < 1000) {
 		duration = 1000;
 	}
 	switch (type) {
-		case 0x1: case 0x2: case 0x3: case 0x4: case 0x5: case 0x6: case 0x9: case 0xA: case 0xB: case 0xC: case 0xD: case 0xE: case 0xF:
+		case 0x1: case 0x2: case 0x3: case 0x4: case 0x5: case 0x6: case FT(0x9): case FT(0xA): case FT(0xB): case FT(0xC): case FT(0xD): case FT(0xE): case FT(0xF):
 			id = 0;
 			entry = &wp->entries[0];
 			fadeReset(2);
+#ifndef VERSION_G8ME01_DEMO
 			entry->delayFrames = 0;
 			switch (type) {
 				case 1: case 3: case 5: case 9: case 11: case 14:
@@ -146,26 +159,27 @@ void fadeEntry(s32 type, s32 duration, GXColor color) {
 					}
 					break;
 			}
+#endif
 			break;
-		case 0x16: case 0x17: case 0x18: case 0x19: case 0x1A: case 0x1B: case 0x1C: case 0x1D: case 0x1E: case 0x1F: case 0x20: case 0x21: case 0x22: case 0x23: case 0x24: case 0x25: case 0x26: case 0x27: case 0x28: case 0x33:
+		case FT(0x16): case FT(0x17): case FT(0x18): case FT(0x19): case FT(0x1A): case FT(0x1B): case FT(0x1C): case FT(0x1D): case FT(0x1E): case FT(0x1F): case FT(0x20): case FT(0x21): case FT(0x22): case FT(0x23): case FT(0x24): case FT(0x25): case FT(0x26): case FT(0x27): case FT(0x28): case FT(0x33):
 			id = 1;
 			entry = &wp->entries[1];
 			break;
-		case 0x29: case 0x2A: case 0x2B: case 0x2C: case 0x2D: case 0x2E: case 0x2F: case 0x30:
+		case FT(0x29): case FT(0x2A): case FT(0x2B): case FT(0x2C): case FT(0x2D): case FT(0x2E): case FT(0x2F): case FT(0x30):
 			id = 2;
 			entry = &wp->entries[2];
 			fadeReset(0);
 			break;
-		case 0x31: case 0x32: case 0x34: case 0x35: case 0x36: case 0x37: case 0x38: case 0x39: case 0x3A: case 0x3B: case 0x3C: case 0x3D: case 0x3E:
+		case FT(0x31): case FT(0x32): case FT(0x34): case FT(0x35): case FT(0x36): case FT(0x37): case FT(0x38): case FT(0x39): case FT(0x3A): case FT(0x3B): case FT(0x3C): case FT(0x3D): case FT(0x3E):
 			id = 3;
 			entry = &wp->entries[3];
 			switch (type) {
-				case 0x32: case 0x35: case 0x36: case 0x38: case 0x3A:
+				case FT(0x32): case FT(0x35): case FT(0x36): case FT(0x38): case FT(0x3A):
 					fadeReset(0);
 					break;
 			}
 			break;
-		case 0x3F: case 0x40:
+		case FT(0x3F): case FT(0x40):
 			id = 4;
 			entry = &wp->entries[4];
 			break;
@@ -182,167 +196,167 @@ void fadeEntry(s32 type, s32 duration, GXColor color) {
 	entry->animOffsetX = 0.0f;
 	entry->animOffsetY = 0.0f;
 	entry->scale = 1.0f;
-	if (type != 0x32 && type != 0x35) {
+	if (type != FT(0x32) && type != FT(0x35)) {
 		entry->callback = NULL;
 	}
 	wp->lastEntryId = id;
-	if (type == 0x22 || type == 0x28) {
+	if (type == FT(0x22) || type == FT(0x28)) {
 		entry->scale = 3.0f;
 	}
 	switch (type) {
-		case 0x2B:
+		case FT(0x2B):
 			entry->animFile = "OFF_d_dokan_down";
 			entry->animName = "A_1";
 			entry->imageType = 2;
 			break;
-		case 0x2C:
+		case FT(0x2C):
 			entry->animFile = "OFF_d_dokan_down";
 			entry->animName = "A_2";
 			entry->imageType = 2;
 			break;
-		case 0x29:
+		case FT(0x29):
 			entry->animFile = "OFF_d_dokan_up";
 			entry->animName = "A_1";
 			entry->imageType = 2;
 			break;
-		case 0x2A:
+		case FT(0x2A):
 			entry->animFile = "OFF_d_dokan_up";
 			entry->animName = "A_2";
 			entry->imageType = 2;
 			break;
-		case 0x2D:
+		case FT(0x2D):
 			entry->animFile = "OFF_d_dokan_left";
 			entry->animName = "A_1";
 			entry->imageType = 2;
 			break;
-		case 0x2E:
+		case FT(0x2E):
 			entry->animFile = "OFF_d_dokan_left";
 			entry->animName = "A_2";
 			entry->imageType = 2;
 			break;
-		case 0x2F:
+		case FT(0x2F):
 			entry->animFile = "OFF_d_dokan_right";
 			entry->animName = "A_1";
 			entry->imageType = 2;
 			break;
-		case 0x30:
+		case FT(0x30):
 			entry->animFile = "OFF_d_dokan_right";
 			entry->animName = "A_2";
 			entry->imageType = 2;
 			break;
-		case 0x16:
+		case FT(0x16):
 			entry->animFile = "OFF_d_maku_up_down";
 			entry->animName = "A_1";
 			entry->imageType = 2;
 			break;
-		case 0x17:
+		case FT(0x17):
 			entry->animFile = "OFF_d_maku_up_down";
 			entry->animName = "A_2";
 			entry->imageType = 2;
 			break;
-		case 0x18:
-		case 0x1B:
-		case 0x3F:
+		case FT(0x18):
+		case FT(0x1B):
+		case FT(0x3F):
 			entry->animFile = "OFF_d_maku_left_right";
 			entry->animName = "A_1";
 			entry->imageType = 2;
 			break;
-		case 0x1A:
+		case FT(0x1A):
 			entry->animFile = "OFF_d_maku_left_right";
 			entry->animName = "Z_1";
 			entry->imageType = 2;
 			break;
-		case 0x19:
-		case 0x1C:
-		case 0x40:
+		case FT(0x19):
+		case FT(0x1C):
+		case FT(0x40):
 			entry->animFile = "OFF_d_maku_left_right";
 			entry->animName = "A_2";
 			entry->imageType = 2;
 			break;
-		case 0x1D:
-		case 0x23:
+		case FT(0x1D):
+		case FT(0x23):
 			entry->animFile = "OFF_d_maku_center";
 			entry->animName = "A_1";
 			entry->imageType = 2;
 			break;
-		case 0x1E:
-		case 0x24:
+		case FT(0x1E):
+		case FT(0x24):
 			entry->animFile = "OFF_d_maku_center";
 			entry->animName = "A_2";
 			entry->imageType = 2;
 			break;
-		case 0x1F:
-		case 0x22:
-		case 0x25:
-		case 0x28:
+		case FT(0x1F):
+		case FT(0x22):
+		case FT(0x25):
+		case FT(0x28):
 			entry->animFile = "OFF_d_maku_center";
 			entry->animName = "Z_2";
 			entry->imageType = 2;
 			break;
-		case 0x20:
-		case 0x26:
+		case FT(0x20):
+		case FT(0x26):
 			entry->animFile = "OFF_d_maku_center";
 			entry->animName = "Z_1";
 			entry->imageType = 2;
 			break;
-		case 0x31:
-		case 0x34:
+		case FT(0x31):
+		case FT(0x34):
 			entry->animFile = "OFF_d_meku";
 			entry->animName = "Z_1";
 			entry->imageType = 2;
 			break;
-		case 0x32:
-		case 0x35:
+		case FT(0x32):
+		case FT(0x35):
 			entry->animFile = "OFF_d_meku";
 			entry->animName = "A_1";
 			entry->imageType = 2;
 			break;
-		case 0x33:
+		case FT(0x33):
 			entry->animFile = "OFF_d_four_meku_5sec";
 			entry->animName = "A_1";
 			entry->imageType = 2;
 			break;
-		case 0x36:
+		case FT(0x36):
 			entry->animFile = "OFF_f_in_out_mario";
 			entry->animName = "A_3";
 			entry->imageType = 2;
 			break;
-		case 0x37:
+		case FT(0x37):
 			entry->animFile = "OFF_f_in_out_mario";
 			entry->animName = "A_1";
 			entry->imageType = 2;
 			break;
-		case 0x38:
+		case FT(0x38):
 			entry->animFile = "OFF_f_in_out_peach";
 			entry->animName = "A_3";
 			entry->imageType = 2;
 			break;
-		case 0x39:
+		case FT(0x39):
 			entry->animFile = "OFF_f_in_out_peach";
 			entry->animName = "A_1";
 			entry->imageType = 2;
 			break;
-		case 0x3A:
+		case FT(0x3A):
 			entry->animFile = "OFF_f_in_out_kuppa";
 			entry->animName = "A_3";
 			entry->imageType = 2;
 			break;
-		case 0x3B:
+		case FT(0x3B):
 			entry->animFile = "OFF_f_in_out_kuppa";
 			entry->animName = "A_1";
 			entry->imageType = 2;
 			break;
-		case 0x3C:
+		case FT(0x3C):
 			entry->animFile = "OFF_f_in_out_mario";
 			entry->animName = "A_2";
 			entry->imageType = 2;
 			break;
-		case 0x3D:
+		case FT(0x3D):
 			entry->animFile = "OFF_f_in_out_peach";
 			entry->animName = "A_2";
 			entry->imageType = 2;
 			break;
-		case 0x3E:
+		case FT(0x3E):
 			entry->animFile = "OFF_f_in_out_kuppa";
 			entry->animName = "A_2";
 			entry->imageType = 2;
@@ -425,7 +439,12 @@ static inline void fadeCapture(const char* name, const char* off, s32 mode) {
 }
 
 #define FADE_DURATION(e) (*(s64*)&(e)->durationHi)
-#define SFX_ON(id) psndSFXOn(SFX_NAME_WORD(id))
+// The demo starts the fade sounds by name, retail by id
+#ifdef VERSION_G8ME01_DEMO
+#define SFX_ON(id, name) psndSFXOn(SFX_NAME_WORD(name))
+#else
+#define SFX_ON(id, name) psndSFXOn(SFX_NAME_WORD(id))
+#endif
 
 void fadeMain(void) {
 	FadeEntry* entry;
@@ -437,9 +456,20 @@ void fadeMain(void) {
 			continue;
 		}
 		switch (entry->type) {
-			case 1: case 3: case 5: case 9: case 11: case 14:
+			case 1: case 3: case 5: case FT(9): case FT(11): case FT(14):
 				switch (entry->state) {
 					case 0:
+#ifdef VERSION_G8ME01_DEMO
+						entry->elapsed += VERSION_PICK(16.666666f, 1000.0f / gp->framerate);
+						entry->progress = entry->elapsed / FADE_DURATION(entry);
+						entry->progress = 1.0f - entry->progress;
+						entry->rotation += 10.0f;
+						if (entry->progress < 0.0f) {
+							entry->progress = 0.0f;
+							entry->flags |= 2;
+							entry->state++;
+						}
+#else
 						if (FADE_DURATION(entry) != 0) {
 							if ((s32)entry->delayFrames != 0) {
 								entry->delayFrames--;
@@ -461,12 +491,23 @@ void fadeMain(void) {
 							entry->flags |= 2;
 							entry->state++;
 						}
+#endif
 						break;
 				}
 				break;
-			case 2: case 4: case 6: case 10: case 12: case 13: case 15:
+			case 2: case 4: case 6: case FT(10): case FT(12): case FT(13): case FT(15):
 				switch (entry->state) {
 					case 0:
+#ifdef VERSION_G8ME01_DEMO
+						entry->elapsed += VERSION_PICK(16.666666f, 1000.0f / gp->framerate);
+						entry->progress = entry->elapsed / FADE_DURATION(entry);
+						entry->rotation -= 10.0f;
+						if (entry->progress > 1.0f) {
+							entry->progress = 1.0f;
+							entry->flags |= 2;
+							entry->state++;
+						}
+#else
 						if (FADE_DURATION(entry) != 0) {
 							entry->elapsed += VERSION_PICK(16.666666f, 1000.0f / gp->framerate);
 							entry->progress = entry->elapsed / FADE_DURATION(entry);
@@ -482,14 +523,15 @@ void fadeMain(void) {
 							entry->flags |= 2;
 							entry->state++;
 						}
+#endif
 						break;
 				}
 				break;
-			case 0x29: case 0x2A: case 0x2B: case 0x2C: case 0x2D: case 0x2E: case 0x2F: case 0x30:
+			case FT(0x29): case FT(0x2A): case FT(0x2B): case FT(0x2C): case FT(0x2D): case FT(0x2E): case FT(0x2F): case FT(0x30):
 				switch (entry->state) {
 					case 0:
 						if ((s32)animGroupBaseAsync(entry->animFile, entry->imageType, NULL) == 0) {
-							if (entry->paperPoseId < 0 && (entry->type == 0x2A || entry->type == 0x2C || entry->type == 0x2E || entry->type == 0x30)) {
+							if (entry->paperPoseId < 0 && (entry->type == FT(0x2A) || entry->type == FT(0x2C) || entry->type == FT(0x2E) || entry->type == FT(0x30))) {
 								wp->flags |= 0x8000;
 							}
 							break;
@@ -510,29 +552,29 @@ void fadeMain(void) {
 						imgClearVirtualPoint(entry->image);
 						fadeCapture("fImg_dokan", NULL, 0);
 						switch (entry->type) {
-							case 0x2D:
-								entry->sfxId = SFX_ON(0x403AB);
+							case FT(0x2D):
+								entry->sfxId = SFX_ON(0x403AB, "SFX_OFF_CHANGE_MAP_DOKAN1");
 								break;
-							case 0x2F:
-								entry->sfxId = SFX_ON(0x403AC);
+							case FT(0x2F):
+								entry->sfxId = SFX_ON(0x403AC, "SFX_OFF_CHANGE_MAP_DOKAN2");
 								break;
-							case 0x29:
-								entry->sfxId = SFX_ON(0x403AD);
+							case FT(0x29):
+								entry->sfxId = SFX_ON(0x403AD, "SFX_OFF_CHANGE_MAP_DOKAN3");
 								break;
-							case 0x2B:
-								entry->sfxId = SFX_ON(0x403AE);
+							case FT(0x2B):
+								entry->sfxId = SFX_ON(0x403AE, "SFX_OFF_CHANGE_MAP_DOKAN4");
 								break;
-							case 0x2E:
-								entry->sfxId = SFX_ON(0x403AF);
+							case FT(0x2E):
+								entry->sfxId = SFX_ON(0x403AF, "SFX_OFF_CHANGE_MAP_DOKAN5");
 								break;
-							case 0x30:
-								entry->sfxId = SFX_ON(0x403B0);
+							case FT(0x30):
+								entry->sfxId = SFX_ON(0x403B0, "SFX_OFF_CHANGE_MAP_DOKAN6");
 								break;
-							case 0x2A:
-								entry->sfxId = SFX_ON(0x403B1);
+							case FT(0x2A):
+								entry->sfxId = SFX_ON(0x403B1, "SFX_OFF_CHANGE_MAP_DOKAN7");
 								break;
-							case 0x2C:
-								entry->sfxId = SFX_ON(0x403B2);
+							case FT(0x2C):
+								entry->sfxId = SFX_ON(0x403B2, "SFX_OFF_CHANGE_MAP_DOKAN8");
 								break;
 						}
 						entry->state++;
@@ -541,7 +583,7 @@ void fadeMain(void) {
 						if (entry->image->loopTimes >= 1.0f) {
 							entry->flags |= 2;
 							switch (entry->type) {
-								case 0x2A: case 0x2C: case 0x2E: case 0x30:
+								case FT(0x2A): case FT(0x2C): case FT(0x2E): case FT(0x30):
 									imgRelease(entry->image, entry->imageType);
 									animPaperPoseRelease(entry->paperPoseId);
 									entry->paperPoseId = -1;
@@ -553,7 +595,7 @@ void fadeMain(void) {
 						break;
 				}
 				break;
-			case 0x31: case 0x34: case 0x37: case 0x39: case 0x3B: case 0x3C: case 0x3D: case 0x3E:
+			case FT(0x31): case FT(0x34): case FT(0x37): case FT(0x39): case FT(0x3B): case FT(0x3C): case FT(0x3D): case FT(0x3E):
 				switch (entry->state) {
 					case 0:
 						if ((s32)animGroupBaseAsync(entry->animFile, entry->imageType, NULL) == 0) {
@@ -574,17 +616,17 @@ void fadeMain(void) {
 						entry->image->animName = entry->animName;
 						imgClearVirtualPoint(entry->image);
 						switch (entry->type) {
-							case 0x34:
+							case FT(0x34):
 								offscreenEntry("fOff_peron");
 								fadeCapture("fImg_peron", "fOff_peron", 0);
 								break;
-							case 0x37: case 0x39: case 0x3B:
+							case FT(0x37): case FT(0x39): case FT(0x3B):
 								fadeCapture("fImg_peron", NULL, 2);
 								entry->image->camId = 10;
 								entry->image->dispCamId = 10;
-								SFX_ON(0x403B4);
+								SFX_ON(0x403B4, "SFX_OFF_CHANGE_STORY1");
 								break;
-							case 0x3C: case 0x3D: case 0x3E:
+							case FT(0x3C): case FT(0x3D): case FT(0x3E):
 								fadeCapture("fImg_peron", NULL, 2);
 								entry->image->camId = 9;
 								entry->image->dispCamId = 9;
@@ -598,7 +640,7 @@ void fadeMain(void) {
 					case 1:
 						if (entry->image->loopTimes >= 1.0f) {
 							switch (entry->type) {
-								case 0x37: case 0x39: case 0x3B: case 0x3C: case 0x3D: case 0x3E:
+								case FT(0x37): case FT(0x39): case FT(0x3B): case FT(0x3C): case FT(0x3D): case FT(0x3E):
 									entry->image->animTime = animTimeGetTime(entry->imageType);
 									entry->image->animName = "A_2";
 									break;
@@ -617,7 +659,7 @@ void fadeMain(void) {
 						break;
 				}
 				break;
-			case 0x32: case 0x35: case 0x36: case 0x38: case 0x3A:
+			case FT(0x32): case FT(0x35): case FT(0x36): case FT(0x38): case FT(0x3A):
 				switch (entry->state) {
 					case 0:
 						entry->image = imgNameToPtr("fImg_peron", entry->imageType);
@@ -626,11 +668,11 @@ void fadeMain(void) {
 						entry->image->animName = entry->animName;
 						imgClearVirtualPoint(entry->image);
 						switch (entry->type) {
-							case 0x36: case 0x38: case 0x3A:
-								SFX_ON(0x403B5);
+							case FT(0x36): case FT(0x38): case FT(0x3A):
+								SFX_ON(0x403B5, "SFX_OFF_CHANGE_STORY2");
 								break;
-							case 0x32: case 0x35:
-								SFX_ON(0x40365);
+							case FT(0x32): case FT(0x35):
+								SFX_ON(0x40365, "SFX_OFF3_MAP_CHANGE1");
 								break;
 						}
 						entry->state++;
@@ -642,7 +684,7 @@ void fadeMain(void) {
 							animPaperPoseRelease(entry->paperPoseId);
 							entry->paperPoseId = -1;
 							entry->image = NULL;
-							if (entry->type == 0x35) {
+							if (entry->type == FT(0x35)) {
 								offscreenDelete("fOff_peron");
 							}
 							entry->state++;
@@ -650,7 +692,7 @@ void fadeMain(void) {
 						break;
 				}
 				break;
-			case 0x16:
+			case FT(0x16):
 				switch (entry->state) {
 					case 0:
 						if ((s32)animGroupBaseAsync(entry->animFile, entry->imageType, NULL) == 0) {
@@ -677,7 +719,7 @@ void fadeMain(void) {
 						break;
 				}
 				break;
-			case 0x17:
+			case FT(0x17):
 				switch (entry->state) {
 					case 0:
 						if ((s32)animGroupBaseAsync(entry->animFile, entry->imageType, NULL) == 0) {
@@ -710,25 +752,25 @@ void fadeMain(void) {
 						break;
 				}
 				break;
-			case 0x18: case 0x19: case 0x1A: case 0x1B: case 0x1C: case 0x1D: case 0x1E: case 0x1F: case 0x20:
-			case 0x22: case 0x23: case 0x24: case 0x25: case 0x26: case 0x28: case 0x33: case 0x3F: case 0x40:
+			case FT(0x18): case FT(0x19): case FT(0x1A): case FT(0x1B): case FT(0x1C): case FT(0x1D): case FT(0x1E): case FT(0x1F): case FT(0x20):
+			case FT(0x22): case FT(0x23): case FT(0x24): case FT(0x25): case FT(0x26): case FT(0x28): case FT(0x33): case FT(0x3F): case FT(0x40):
 				switch (entry->state) {
 					case 0:
 						if ((s32)animGroupBaseAsync(entry->animFile, entry->imageType, NULL) == 0) {
 							break;
 						}
 						switch (entry->type) {
-							case 0x18: case 0x1B: case 0x3F:
-								entry->sfxId = SFX_ON(0x40325);
+							case FT(0x18): case FT(0x1B): case FT(0x3F):
+								entry->sfxId = SFX_ON(0x40325, "SFX_OFF_BTL_KORTESS_CHANGE1");
 								break;
-							case 0x19: case 0x1C: case 0x40:
-								entry->sfxId = SFX_ON(0x40326);
+							case FT(0x19): case FT(0x1C): case FT(0x40):
+								entry->sfxId = SFX_ON(0x40326, "SFX_OFF_BTL_KORTESS_CHANGE2");
 								break;
-							case 0x1D: case 0x23:
-								entry->sfxId = SFX_ON(0x40321);
+							case FT(0x1D): case FT(0x23):
+								entry->sfxId = SFX_ON(0x40321, "SFX_OFF_STG_START_CURTAIN_UP1");
 								break;
-							case 0x1E: case 0x24:
-								entry->sfxId = SFX_ON(0x40322);
+							case FT(0x1E): case FT(0x24):
+								entry->sfxId = SFX_ON(0x40322, "SFX_OFF_STG_START_CURTAIN_DOWN1");
 								break;
 						}
 						if (entry->poseId >= 0) {
@@ -738,13 +780,13 @@ void fadeMain(void) {
 						animPoseSetMaterialFlagOn(entry->poseId, 0x1800);
 						animPoseSetAnim(entry->poseId, entry->animName, TRUE);
 						entry->state++;
-						if (entry->type == 0x22 || entry->type == 0x28) {
+						if (entry->type == FT(0x22) || entry->type == FT(0x28)) {
 							entry->scale = 3.0f;
 							entry->scaleTimer = 0;
 						}
 					case 1:
 						animPoseMain(entry->poseId);
-						if (entry->type == 0x22 || entry->type == 0x28) {
+						if (entry->type == FT(0x22) || entry->type == FT(0x28)) {
 							if (!(entry->flags & 8)) {
 								if (entry->scaleTimer < FPS_FRAMES(180)) {
 									entry->scale = intplGetValue(12, ++entry->scaleTimer, FPS_FRAMES(180), 3.0f, 1.0f);
@@ -757,7 +799,7 @@ void fadeMain(void) {
 							}
 						}
 						if (animPoseGetLoopTimes(entry->poseId) >= 1.0f) {
-							if (entry->type == 0x22 || entry->type == 0x28) {
+							if (entry->type == FT(0x22) || entry->type == FT(0x28)) {
 								if (!(entry->flags & 8)) {
 									if (entry->scaleTimer == FPS_FRAMES(180)) {
 										entry->flags |= 2;
@@ -775,7 +817,7 @@ void fadeMain(void) {
 								entry->flags |= 2;
 								entry->state++;
 								psndSFXOff(entry->sfxId);
-								if (entry->type == 0x19 || entry->type == 0x1C || entry->type == 0x40) {
+								if (entry->type == FT(0x19) || entry->type == FT(0x1C) || entry->type == FT(0x40)) {
 									animPoseRelease(entry->poseId);
 									entry->poseId = -1;
 								}
@@ -789,7 +831,7 @@ void fadeMain(void) {
 						break;
 				}
 				break;
-			case 0x21: case 0x27:
+			case FT(0x21): case FT(0x27):
 				switch (entry->state) {
 					case 0:
 						entry->scale = 1.0f;
@@ -811,28 +853,28 @@ void fadeMain(void) {
 				break;
 		}
 		switch (entry->type) {
-			case 0x16: case 0x17: case 0x23: case 0x24: case 0x25: case 0x26: case 0x27: case 0x28:
+			case FT(0x16): case FT(0x17): case FT(0x23): case FT(0x24): case FT(0x25): case FT(0x26): case FT(0x27): case FT(0x28):
 				dispEntry(CAMERA_FADE, 0.0f, 0, disp_maku, entry);
 				break;
-			case 0x1B: case 0x1C: case 0x3F: case 0x40:
+			case FT(0x1B): case FT(0x1C): case FT(0x3F): case FT(0x40):
 				dispEntry(CAMERA_FADE2, 0.0f, 0, disp_maku, entry);
 				break;
-			case 0x18: case 0x19: case 0x1A: case 0x1D: case 0x1E: case 0x1F: case 0x20: case 0x21: case 0x22: case 0x33:
+			case FT(0x18): case FT(0x19): case FT(0x1A): case FT(0x1D): case FT(0x1E): case FT(0x1F): case FT(0x20): case FT(0x21): case FT(0x22): case FT(0x33):
 				dispEntry(CAMERA_3D_IMAGE, 0.0f, 0, disp_maku, entry);
 				break;
-			case 0x31: case 0x32: case 0x34: case 0x35: case 0x36: case 0x37: case 0x38: case 0x39: case 0x3A:
-			case 0x3B: case 0x3C: case 0x3D: case 0x3E:
+			case FT(0x31): case FT(0x32): case FT(0x34): case FT(0x35): case FT(0x36): case FT(0x37): case FT(0x38): case FT(0x39): case FT(0x3A):
+			case FT(0x3B): case FT(0x3C): case FT(0x3D): case FT(0x3E):
 				if (entry->paperPoseId >= 0 && entry->callback) {
 					dispEntry(CAMERA_OFFSCREEN2, 0.0f, 0, entry->callback, entry->offparam);
 				}
 				break;
-			case 0xB: case 0xC: case 0xD:
+			case FT(0xB): case FT(0xC): case FT(0xD):
 				dispEntry(CAMERA_2D, 1000.0f, 0, disp_texture, wp);
 				break;
-			case 5: case 6: case 0xE: case 0xF:
+			case 5: case 6: case FT(0xE): case FT(0xF):
 				dispEntry(CAMERA_3D, 0.0f, 7, disp_texture, wp);
 				break;
-			case 0x29: case 0x2A: case 0x2B: case 0x2C: case 0x2D: case 0x2E: case 0x2F: case 0x30:
+			case FT(0x29): case FT(0x2A): case FT(0x2B): case FT(0x2C): case FT(0x2D): case FT(0x2E): case FT(0x2F): case FT(0x30):
 				break;
 			default:
 				dispEntry(CAMERA_FADE, 0.0f, 0, disp_texture, wp);
@@ -852,7 +894,7 @@ void fadeMain(void) {
 
 
 void disp_texture(CameraId camId, void* param) {
-	static u8 i4tex[1] = {0xFF};
+	static u8 i4tex[1] ATTRIBUTE_ALIGN(32) = {0xFF}; // GX texture data; 32-aligned in every version
 	FadeWork* work;
 	CameraEntry* camera;
 	f32 scale;
@@ -871,9 +913,9 @@ void disp_texture(CameraId camId, void* param) {
 		case 1:
 		case 3:
 		case 5:
-		case 9:
-		case 11:
-		case 14:
+		case FT(9):
+		case FT(11):
+		case FT(14):
 			if (work->entries[0].flags & 2) {
 				return;
 			}
@@ -942,12 +984,12 @@ void disp_texture(CameraId camId, void* param) {
 				PSMTXTrans(work->entries[0].texMtx, 1.0f, 1.0f, 0.0f);
 			}
 			break;
-		case 9:
-		case 10:
-		case 11:
-		case 12:
-		case 14:
-		case 15:
+		case FT(9):
+		case FT(10):
+		case FT(11):
+		case FT(12):
+		case FT(14):
+		case FT(15):
 			GXLoadPosMtxImm(camera->view, 0);
 			GXSetCurrentMtx(0);
 			GXInitTexObj(&obj, i4tex, 1, 1, GX_TF_I4, GX_CLAMP, GX_CLAMP, GX_FALSE);
@@ -955,7 +997,7 @@ void disp_texture(CameraId camId, void* param) {
 			PSMTXIdentity(work->entries[0].texMtx);
 			work->entries[0].color.a = 255.0f * work->entries[0].progress;
 			break;
-		case 13:
+		case FT(13):
 			GXLoadPosMtxImm(camera->view, 0);
 			GXSetCurrentMtx(0);
 			GXInitTexObj(&obj, i4tex, 1, 1, GX_TF_I4, GX_CLAMP, GX_CLAMP, GX_FALSE);
@@ -1071,18 +1113,18 @@ void disp_maku(CameraId camId, void* param) {
 
 	camera = camGetPtr(camId);
 	switch (entry->type) {
-		case 0x17:
-		case 0x19:
-		case 0x1C:
-		case 0x40:
+		case FT(0x17):
+		case FT(0x19):
+		case FT(0x1C):
+		case FT(0x40):
 			if (entry->flags & 2) {
 				return;
 			}
 	}
 	switch (entry->type) {
-		case 0x16: case 0x17: case 0x18: case 0x19: case 0x1A: case 0x1B: case 0x1C:
-		case 0x1D: case 0x1E: case 0x1F: case 0x20: case 0x21: case 0x22: case 0x23:
-		case 0x24: case 0x25: case 0x26: case 0x27: case 0x28: case 0x33: case 0x3F: case 0x40:
+		case FT(0x16): case FT(0x17): case FT(0x18): case FT(0x19): case FT(0x1A): case FT(0x1B): case FT(0x1C):
+		case FT(0x1D): case FT(0x1E): case FT(0x1F): case FT(0x20): case FT(0x21): case FT(0x22): case FT(0x23):
+		case FT(0x24): case FT(0x25): case FT(0x26): case FT(0x27): case FT(0x28): case FT(0x33): case FT(0x3F): case FT(0x40):
 			break;
 		default:
 			return;

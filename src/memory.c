@@ -18,7 +18,12 @@ struct MapAllocEntry {
 };
 
 //.bss
+#ifdef VERSION_G8ME01_DEMO
+// demo: smartWork is defined after the heap arrays (they share its .bss), so it is laid out first
+extern SmartWork smartWork;
+#else
 SmartWork smartWork;
+#endif
 
 //.sdata
 //flag, size / 0x400 (>> 10)
@@ -37,7 +42,11 @@ s32 size_table[HEAP_COUNT][2] = {
 #define HEAP_COUNT 6
 #define SMART_HEAP 5
 s32 size_table[HEAP_COUNT][2] = {
+#ifdef VERSION_G8ME01_DEMO
+	{1, 0x3784}, //0xDE1000
+#else
 	{1, 0x1C84}, //0x721000, 7300 KiB/7.13 MiB
+#endif
 	{1, 0xD90}, //0x364000, 3472 KiB/3.39 MiB
 	{1, 0xE0}, //0x38000, 224 KiB
 	{1, 0x80}, //0x20000, 128 KiB
@@ -51,6 +60,9 @@ static SmartWork* wp = &smartWork;
 OSHeapHandle heapHandle[HEAP_COUNT];
 void* heapStart[HEAP_COUNT];
 void* heapEnd[HEAP_COUNT];
+#ifdef VERSION_G8ME01_DEMO
+SmartWork smartWork;
+#endif
 #ifdef VERSION_G8ME01
 // uninitialized .sbss is laid out in reverse definition order
 u32 mapalloc_size;
@@ -72,6 +84,15 @@ u32 count;
 #define COUNT (*(u16*)&count)
 #define MAPBASE_PARAM
 #define MAPBASE mapalloc_base_ptr
+#endif
+
+#ifdef VERSION_G8ME01_DEMO
+// demo: the smart heap is a fixed 7 MiB block taken from the default heap
+#define SMART_ALLOC_HEAP HEAP_DEFAULT
+#define SMART_SIZE 0x700000
+#else
+#define SMART_ALLOC_HEAP SMART_HEAP
+#define SMART_SIZE ((u8*)heapEnd[SMART_HEAP] - (u8*)heapStart[SMART_HEAP] - 32)
 #endif
 
 //local prototypes
@@ -362,8 +383,8 @@ void smartInit(void) {
 	void* ptr;
 	int i;
 
-	size = (u8*)heapEnd[SMART_HEAP] - (u8*)heapStart[SMART_HEAP] - 32;
-	ptr = OSAllocFromHeap(heapHandle[SMART_HEAP], size);
+	size = SMART_SIZE;
+	ptr = OSAllocFromHeap(heapHandle[SMART_ALLOC_HEAP], size);
 	if (ptr) {
 		memset(ptr, 0, size);
 		DCFlushRange(ptr, size);
@@ -371,8 +392,8 @@ void smartInit(void) {
 	wp->ptr = ptr;
 	wp->allocHead = 0;
 	wp->allocTail = 0;
-	wp->bytesLeft = (u8*)heapEnd[SMART_HEAP] - (u8*)heapStart[SMART_HEAP] - 32;
-	memset(wp->ptr, 0, (u8*)heapEnd[SMART_HEAP] - (u8*)heapStart[SMART_HEAP] - 32);
+	wp->bytesLeft = SMART_SIZE;
+	memset(wp->ptr, 0, SMART_SIZE);
 	memset(wp->work, 0, sizeof(wp->work));
 	e = wp->work;
 	for (i = 0; i < 0x800; i++, e++) {
@@ -387,6 +408,7 @@ void smartInit(void) {
 	g_bFirstSmartAlloc = FALSE;
 }
 
+#ifndef VERSION_G8ME01_DEMO
 void L_smartReInit(void) {
 	smartEntry* e;
 	int i;
@@ -407,6 +429,7 @@ void L_smartReInit(void) {
 	wp->tail->next = NULL;
 	g_bFirstSmartAlloc = 0;
 }
+#endif
 
 #pragma dont_inline on
 void smartAutoFree(s32 a1) {
@@ -537,7 +560,7 @@ smartEntry* smartAlloc(u32 size, u8 type) {
 		}
 		wp->allocHead = entry2;
 		if (!entry2->next) {
-			entry2->spaceAfter = ((u8*)heapEnd[SMART_HEAP] - (u8*)heapStart[SMART_HEAP] - 32) + (u8*)wp->ptr - (u8*)entry2->address - entry2->size;
+			entry2->spaceAfter = SMART_SIZE + (u8*)wp->ptr - (u8*)entry2->address - entry2->size;
 			wp->allocTail = entry2;
 		}
 		return entry2;
@@ -605,7 +628,7 @@ void smartGarbage(void) {
 		wp->bytesLeft = 0;
 	}
 	else {
-		wp->bytesLeft = (u8*)heapEnd[SMART_HEAP] - (u8*)heapStart[SMART_HEAP] - 32;
+		wp->bytesLeft = SMART_SIZE;
 	}
 	prev = NULL;
 	ptr = wp->ptr;
@@ -636,9 +659,9 @@ void smartGarbage(void) {
 	}
 	entry = wp->allocTail;
 	if (entry) {
-		entry->spaceAfter = ((u8*)heapEnd[SMART_HEAP] - (u8*)heapStart[SMART_HEAP] - 32) + (u8*)wp->ptr - (u8*)entry->address - entry->size;
+		entry->spaceAfter = SMART_SIZE + (u8*)wp->ptr - (u8*)entry->address - entry->size;
 	}
-	DCFlushRange(wp->ptr, (u8*)heapEnd[SMART_HEAP] - (u8*)heapStart[SMART_HEAP] - 32);
+	DCFlushRange(wp->ptr, SMART_SIZE);
 }
 
 GXTexObj* smartTexObj(GXTexObj* obj, void** image_ptr) {

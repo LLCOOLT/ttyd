@@ -40,6 +40,7 @@ static GXColor col_mini[] = {
     {0xAE, 0x69, 0xE0, 0xFF}, {0xBF, 0x7C, 0xF0, 0xFF}, {0xCD, 0x97, 0xF5, 0xFF}, {0xF3, 0xC0, 0xFA, 0xFF}, {0x81, 0x31, 0xBB, 0xFF},
 };
 static GXColor* col_tbl[] = {col_normal, col_poison, col_mega, col_cold, col_confu, col_sleep, col_mini, col_normal};
+#ifndef VERSION_G8ME01_DEMO
 #pragma force_active on
 #ifdef VERSION_G8ME01
 u32 gap_07_8041E0A4_sdata[7] = {0,0,0,0,0,0,0};
@@ -47,6 +48,7 @@ u32 gap_07_8041E0A4_sdata[7] = {0,0,0,0,0,0,0};
 u32 gap_07_80417E8C_sdata[5] = {0,0,0,0,0};
 #endif
 #pragma force_active reset
+#endif
 
 // cheap polynomial approximations, valid for x in [0, 2pi]
 static inline f32 _sinf(f32 x) {

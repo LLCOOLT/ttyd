@@ -20,5 +20,9 @@ HitEntry* marioSearchHead_roll(Vec* pos, f32* h, f32 d);
 HitEntry* searchFrontWall(Vec* pos, f32* h, f32 dx, f32 dz, f32 w);
 
 void marioChkGnd(void);
+#ifdef VERSION_G8ME01_DEMO
+BOOL marioChkWallAround(Vec* pos, f32 unused, f32 dir, f32 w, f32 h); // no mode argument in the demo
+#else
 BOOL marioChkWallAround(Vec* pos, s32 mode, f32 unused, f32 dir, f32 w, f32 h);
+#endif
 HitEntry* searchUnder2(f32* out, f32 x, f32 y, f32 z);

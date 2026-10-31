@@ -189,7 +189,9 @@ static EVT_BEGIN(init_0)
 EVT_END()
 
 static EVT_BEGIN(main_0)
+#ifndef VERSION_G8ME01_DEMO
     SET_TYPE(239)
+#endif
     CALL(evt_mobj_hitevt_onoff, STRING("me"), 0)
     IF_INT_NOT_EQUAL(1, 0)
         SET_VALUE(LW(10), 0)
@@ -406,7 +408,11 @@ static s32 key_tbl[] = {
 static EVT_BEGIN(evt_chk)
     CALL(evt_pouch_check_item, 15, LW(0))
     IF_INT_GREATER(LW(0), 0)
+#ifdef VERSION_G8ME01_DEMO
+        CALL(evt_win_item_select, PTR(key_tbl), LW(0))
+#else
         CALL(evt_win_item_select, 0, PTR(key_tbl), LW(0), 0)
+#endif
         IF_INT_EQUAL(LW(0), -1)
             CALL(evt_mobj_exec_cancel, STRING("me"))
         END_IF
@@ -443,6 +449,7 @@ EVT_BEGIN(nokkosu_talk)
 #else
     CALL(evt_msg_print, 0, STRING("irai_07_00"), 0, STRING("me"))
 #endif
+#ifndef VERSION_G8ME01_DEMO
     LOOP(0)
         CALL(evt_mario_party_use_check, LW(0))
         IF_INT_EQUAL(LW(0), 0)
@@ -462,6 +469,7 @@ EVT_BEGIN(nokkosu_talk)
         CALL(evt_party_set_pos, 0, LW(0), LW(1), LW(2))
 #endif
     END_IF
+#endif
 #ifdef VERSION_G8ME01
     CALL(evt_party_move_pos2, 0, -228, -130, FLOAT(120.0f))
     CALL(evt_party_set_dir, 0, 90, 200)
@@ -499,7 +507,11 @@ EVT_BEGIN(nokkosu_talk)
     CALL(evt_npc_wait_pera, STRING("me"))
     CALL(evt_party_run, 0)
 #endif
+#ifdef VERSION_G8ME01_DEMO
+    CALL(evt_item_entry, STRING("irai_item"), 91, 0, -1000, 0, 15, -1, 0)
+#else
     CALL(evt_item_entry, STRING("irai_item"), 91, 0, -1000, 0, 16, -1, 0)
+#endif
     CALL(evt_item_flag_on, STRING("irai_item"), 2)
     CALL(evt_item_get_item, STRING("irai_item"))
     CALL(evt_msg_print, 0, STRING("irai_07_07"), 0, STRING("me"))
@@ -569,7 +581,11 @@ EVT_BEGIN(gon_08_init_evt)
     CALL(evt_npc_set_width, STRING("\"カロン02\""), 30)
     CALL(evt_npc_set_height, STRING("\"カロン02\""), 7)
     CALL(evt_npc_change_fbat_mode, 1)
+#ifdef VERSION_G8ME01_DEMO
+    CALL(evt_item_entry, STRING("item_00"), 151, -215, 500, 10, 15, GSWF(1505), 0)
+#else
     CALL(evt_item_entry, STRING("item_00"), 151, -215, 500, 10, 16, GSWF(1505), 0)
+#endif
     CALL(evt_mobj_float_blk, STRING("blk_0"), 0, 0, 0, 0, 2, 0, LSWF(3))
     CALL_CHILD(PTR(init_0))
     CALL(evt_mobj_switch_float_blk, STRING("sw_0"), 0, 100, -185, STRING("blk_0"), 0, PTR(main_0), LSWF(3))

@@ -67,6 +67,13 @@ s16 journal_icon_tbl[6] = { 0x218, 0x239, 0x239, 0x239, 0x23A, 0x23B };
 //.sbss
 static SWork* wp;
 
+// The demo draws the status window icons with icon flag 0x4, retail with 0x10.
+#ifdef VERSION_G8ME01_DEMO
+#define SW_ICON_FLAGS 0x4
+#else
+#define SW_ICON_FLAGS 0x10
+#endif
+
 void statusWinDisp(CameraId camId, void* param);
 void gaugeDisp(s32 sp, f32 x, f32 y);
 void statusGetValue(SVal* values);
@@ -150,7 +157,9 @@ void statusWinMain(void) {
                         wp->idle = gp->framerate * 10;
                         if (!wp->forcedClose && !wp->forceTimer && !statusWinCheck()) {
                             statusWinOpen();
+#ifndef VERSION_G8ME01_DEMO
                             wp->flags |= 0x100;
+#endif
                         }
                     }
                 } else {
@@ -267,7 +276,7 @@ void gaugeDisp(s32 sp, f32 x, f32 y) {
         pos.x = x + (f32)(full * 32);
         pos.y = y;
         pos.z = 0.0f;
-        iconDispGxScaleFirst(1.0f, &pos, 0x10, gauge_wakka[part]);
+        iconDispGxScaleFirst(1.0f, &pos, SW_ICON_FLAGS, gauge_wakka[part]);
     }
     for (i = 0; i < sizeof(gauge_back) / sizeof(gauge_back[0]); i++) {
         Vec pos2;
@@ -277,7 +286,7 @@ void gaugeDisp(s32 sp, f32 x, f32 y) {
         pos2.x = x + (f32)(i * 32);
         pos2.y = 12.0f + y;
         pos2.z = 0.0f;
-        iconDispGxScaleFirst(1.0f, &pos2, 0x10, i < full ? gauge_back[i] : ICON_1BF);
+        iconDispGxScaleFirst(1.0f, &pos2, SW_ICON_FLAGS, i < full ? gauge_back[i] : ICON_1BF);
     }
 }
 
@@ -328,7 +337,7 @@ void statusWinDisp(CameraId camId, void* param) {
         MTXTrans(m, x + (f32)e->xpos, y - (f32)e->ypos, 0.0f);
         MTXScale(s, e->scale, e->scale, e->scale);
         MTXConcat(m, s, m);
-        iconDispGxCol(m, 0x10, e->iconId, (GXColor){ 0xFF, 0xFF, 0xFF, 0xFF });
+        iconDispGxCol(m, SW_ICON_FLAGS, e->iconId, (GXColor){ 0xFF, 0xFF, 0xFF, 0xFF });
     }
 
     if (!(wp->blink & 1) || blinkOn) {
@@ -383,7 +392,7 @@ void statusWinDisp(CameraId camId, void* param) {
             MTXTrans(m, x + (f32)e->xpos, y - (f32)e->ypos, 0.0f);
             MTXScale(s, e->scale, e->scale, e->scale);
             MTXConcat(m, s, m);
-            iconDispGxCol(m, 0x10, e->iconId, (GXColor){ 0xFF, 0xFF, 0xFF, 0xFF });
+            iconDispGxCol(m, SW_ICON_FLAGS, e->iconId, (GXColor){ 0xFF, 0xFF, 0xFF, 0xFF });
         }
         if (!(wp->blink & 8) || blinkOn) {
             numDisp(120.0f + x - 6.0f - 10.0f, 4.0f + (2.0f + (y - 78.0f)), wp->cur.partyHp, 0);
@@ -391,6 +400,7 @@ void statusWinDisp(CameraId camId, void* param) {
         numDisp(186.0f + x - 6.0f - 10.0f, 4.0f + (2.0f + (y - 78.0f)), wp->cur.partyMaxHp, 1);
     }
 
+#ifndef VERSION_G8ME01_DEMO
     if (wp->flags & 0x100 && !gp->inBattle) {
         y2 = -180.0f + (wp->openY - wp->y);
         MTXTrans(m2, -190.0f, y2, 0.0f);
@@ -443,6 +453,7 @@ void statusWinDisp(CameraId camId, void* param) {
         iconDispGxCol(m2, 0x10, 0x216, (GXColor){ 0xFF, 0xFF, 0xFF, 0xFF });
 #endif
     }
+#endif
 }
 
 void statusGetValue(SVal* values) {
@@ -460,9 +471,25 @@ void statusGetValue(SVal* values) {
         values->maxAp = pouchGetMaxAP();
         values->starPoints = pouchGetStarPoint();
         values->coins = pouchGetCoin();
+#ifdef VERSION_G8ME01_DEMO
+        // the demo remembers the last partner in cur.pad16 and shows it while in bg mode
+        if (!marioBgmodeChk()) {
+            values->party = marioGetParty();
+            values->partyHp = pouchGetPtr()->partyData[values->party].currentHP;
+            values->partyMaxHp = pouchGetPtr()->partyData[values->party].maximumHP;
+            if (values->party) {
+                wp->cur.pad16 = values->party;
+            }
+        } else {
+            values->party = wp->cur.pad16;
+            values->partyHp = pouchGetPtr()->partyData[values->party].currentHP;
+            values->partyMaxHp = pouchGetPtr()->partyData[values->party].maximumHP;
+        }
+#else
         values->party = !marioBgmodeChk() ? (s16)marioGetParty() : marioGetPtr()->prevPartyMemberId[0];
         values->partyHp = pouchGetPtr()->partyData[values->party].currentHP;
         values->partyMaxHp = pouchGetPtr()->partyData[values->party].maximumHP;
+#endif
     } else {
         bw = _battleWorkPointer;
         mario = BattleGetMarioPtr(bw);
@@ -571,7 +598,11 @@ void valueUpdate(void) {
         return;
     }
     d = calcStep(v.coins, wp->cur.coins);
+#ifdef VERSION_G8ME01_DEMO
+    if (d && !(count % 6)) {
+#else
     if (d && !(count % 8)) {
+#endif
         psndSFXOn("SFX_COUNT_COIN1");
     }
     wp->cur.hp += calcStep(v.hp, wp->cur.hp);
@@ -692,9 +723,12 @@ void statusAPBlink(s32 frames) {
     wp->blinkTimer = frames;
 }
 
+// The demo has no N_statusClearBlink.
+#ifndef VERSION_G8ME01_DEMO
 void N_statusClearBlink(void) {
     wp->blink = 0;
 }
+#endif
 
 void statusFPBlink(s32 frames) {
     wp->blink |= 2;

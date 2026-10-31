@@ -188,7 +188,11 @@ static BattleWeapon weapon = {
     0, 0, 0, 0, 0, 0, 0, 0, // poisonTime..dodgyTime
     0, 0, 0, 0, 0, 0, 0, 0, // burnChance..atkChangeChance
     0, 0, 0, 0, 0, 0, 0, // atkChangeTime..allergicTime
+#ifdef VERSION_G8ME01_DEMO
+    0, // ohkoChance
+#else
     100, // ohkoChance
+#endif
     0, 0, 0, 0, 0, 0, 0, 0, // chargeStrength..paybackTime
     0, 0, 0, 0, 0, 0, 0, // holdFastTime..fpRegenStrength
     {0}, // pad_AE
@@ -516,29 +520,164 @@ static void disp_2D(CameraId cam, void* param) {
 
     PSMTXScale(m, 26.0f, 1.0f, 1.0f);
     PSMTXTransApply(m, m, w->pos.x, 60.0f + w->pos.y, w->pos.z);
-    iconDispGx2(m, 0x10, ICON_08E);
+    iconDispGx2(m, ICON_DISP_2D, ICON_08E);
     {
         Vec a = {0.0f, 0.0f, 0.0f};
         a.x = 215.0f + w->pos.x;
         a.y = 60.0f + w->pos.y;
         a.z = w->pos.z;
-        iconDispGx(&a, 0x10, ICON_090, 1.0f);
+        iconDispGx(&a, ICON_DISP_2D, ICON_090, 1.0f);
     }
     {
         Vec b = {0.0f, 0.0f, 0.0f};
         b.x = w->pos.x - 215.0f;
         b.y = 60.0f + w->pos.y;
         b.z = w->pos.z;
-        iconDispGx(&b, 0x10, ICON_08F, 1.0f);
+        iconDispGx(&b, ICON_DISP_2D, ICON_08F, 1.0f);
     }
     GXSetScissor(0, 0x91, gp->fbWidth, 0x50);
+#ifdef VERSION_G8ME01_DEMO
+    for (i = 0; i < 7; i++) {
+        u16 icon;
+        if (w->btn2[i].state != 0) {
+            if (i < w->prev) {
+                switch (w->btn2[i].button) {
+                case 0x100:
+                    icon = ICON_065;
+                    break;
+                case 0x200:
+                    icon = ICON_067;
+                    break;
+                case 0x400:
+                    icon = ICON_069;
+                    break;
+                case 0x800:
+                    icon = ICON_06B;
+                    break;
+                case 0x40:
+                    icon = ICON_07F;
+                    break;
+                case 0x20:
+                    icon = ICON_081;
+                    break;
+                case 0x10:
+                    icon = ICON_083;
+                    break;
+                default:
+                    icon = 0;
+                    break;
+                }
+            } else {
+                switch (w->btn2[i].button) {
+                case 0x100:
+                    icon = ICON_064;
+                    break;
+                case 0x200:
+                    icon = ICON_066;
+                    break;
+                case 0x400:
+                    icon = ICON_068;
+                    break;
+                case 0x800:
+                    icon = ICON_06A;
+                    break;
+                case 0x40:
+                    icon = ICON_07E;
+                    break;
+                case 0x20:
+                    icon = ICON_080;
+                    break;
+                case 0x10:
+                    icon = ICON_082;
+                    break;
+                default:
+                    icon = 0;
+                    break;
+                }
+            }
+            if (icon) {
+                Vec pos = {0.0f, 0.0f, 0.0f};
+                pos.x = w->btn2[i].pos.x;
+                pos.y = 60.0f + ((80.0f + w->btn2[i].pos.y) + w->offsetY);
+                pos.z = w->btn2[i].pos.z;
+                iconDispGx(&pos, ICON_DISP_2D, icon, 1.0f);
+            }
+        }
+        if (w->btn[i].state == 2) {
+            if (i < w->cur) {
+                switch (w->btn[i].button) {
+                case 0x100:
+                    icon = ICON_065;
+                    break;
+                case 0x200:
+                    icon = ICON_067;
+                    break;
+                case 0x400:
+                    icon = ICON_069;
+                    break;
+                case 0x800:
+                    icon = ICON_06B;
+                    break;
+                case 0x40:
+                    icon = ICON_07F;
+                    break;
+                case 0x20:
+                    icon = ICON_081;
+                    break;
+                case 0x10:
+                    icon = ICON_083;
+                    break;
+                default:
+                    icon = 0;
+                    break;
+                }
+            } else {
+                switch (w->btn[i].button) {
+                case 0x100:
+                    icon = ICON_064;
+                    break;
+                case 0x200:
+                    icon = ICON_066;
+                    break;
+                case 0x400:
+                    icon = ICON_068;
+                    break;
+                case 0x800:
+                    icon = ICON_06A;
+                    break;
+                case 0x40:
+                    icon = ICON_07E;
+                    break;
+                case 0x20:
+                    icon = ICON_080;
+                    break;
+                case 0x10:
+                    icon = ICON_082;
+                    break;
+                default:
+                    icon = 0;
+                    break;
+                }
+            }
+            if (icon) {
+                Vec pos = {0.0f, 0.0f, 0.0f};
+                pos.x = w->btn[i].pos.x;
+                pos.y = 60.0f + (w->btn[i].pos.y + w->offsetY);
+                pos.z = w->btn[i].pos.z;
+                iconDispGx(&pos, ICON_DISP_2D, icon, 1.0f);
+            }
+        }
+    }
+#else
     for (i = 0; i < 7; i++) {
         N__disp_2D(0, i);
         N__disp_2D(1, i);
     }
+#endif
     GXSetScissor(0, 0, gp->fbWidth, gp->efbHeight);
 }
 
+#ifndef VERSION_G8ME01_DEMO
 void N__disp_2D(s32 side, s32 idx) {
     SukiWork* w = get_ptr();
     SukiBtn* b;
@@ -618,11 +757,15 @@ void N__disp_2D(s32 side, s32 idx) {
         pos.x = b->pos.x;
         pos.y = 60.0f + (w->offsetY + (b->pos.y + yoff));
         pos.z = b->pos.z;
-        iconDispGx(&pos, 0x10, icon, 1.0f);
+        iconDispGx(&pos, ICON_DISP_2D, icon, 1.0f);
     }
 }
+#endif
 
 static void disp_3D(CameraId cam, void* param) {
+#ifdef VERSION_G8ME01_DEMO
+    get_ptr();
+#endif
 }
 
 static void disp_3D_alpha(CameraId cam, void* param) {
@@ -710,9 +853,9 @@ USER_FUNC(aud_set_draw) {
     EvtWord* args = event->args;
     BattleAudience* a = BattleAudienceBaseGetPtr();
     if (evtGetValue(event, args[0]) == 0) {
-        a->flags |= 0x20000;
+        a->flags |= AUDIENCE_FLAG(0x20000);
     } else {
-        a->flags &= ~0x20000;
+        a->flags &= ~AUDIENCE_FLAG(0x20000);
     }
     return 2;
 }

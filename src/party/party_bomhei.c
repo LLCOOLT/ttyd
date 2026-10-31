@@ -19,6 +19,7 @@
 #include "eff/eff_sandars.h"
 #include "driver/npcdrv.h"
 #include "evt/evt_cmd.h"
+#include "party/party_bomhei.h"
 
 #ifdef VERSION_G8ME01
 // US has no local duplicate: this is the global bomhei_init
@@ -41,7 +42,9 @@ extern u8* caseCheckHitObj2(void* hit);
 
 extern s32 evt_cam_shake(void* evt, BOOL isFirstCall);
 
+#ifndef VERSION_G8ME01_DEMO
 s32 m_w_7_sync[] = {0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 9, 9, 8, 7, 5, 3, 1, 0, 0, 0, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 10, 10, 9, 8, 6, 4, 3, 2, 1, 0, 0, 0, 0, 0};
+#endif
 
 EVT_BEGIN(longQuake_evt)
     CALL(evt_cam_shake, 4, PTR(0xF24A7A8F), PTR(0xF24A7A8F), 600)
@@ -52,6 +55,11 @@ static EVT_BEGIN(quake_evt)
     CALL(evt_cam_shake, 4, PTR(0xF24A7A8F), PTR(0xF24A7A8F), 200)
     RETURN
 EVT_END()
+
+#ifdef VERSION_G8ME01_DEMO
+// The demo defines the sync table after the quake scripts.
+s32 m_w_7_sync[] = {0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 9, 9, 8, 7, 5, 3, 1, 0, 0, 0, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 10, 10, 9, 8, 6, 4, 3, 2, 1, 0, 0, 0, 0, 0};
+#endif
 
 static inline BOOL isBombRock(HitEntry* hit) {
     u8* c;
@@ -82,6 +90,13 @@ static inline BOOL isBombRock(HitEntry* hit) {
         (p)->work.bomhei.sfxId2 = -1;                \
     }
 
+#ifdef VERSION_G8ME01_DEMO
+// The demo keeps a third sound id in liftSfxId and stops it with the other two.
+#define BOMHEI_CLEAN_SFX3(p)                       if ((u32)(p)->work.bomhei.liftSfxId != 0xFFFFFFFFU) {              psndSFXOff((p)->work.bomhei.liftSfxId);          (p)->work.bomhei.liftSfxId = -1;             }                                              BOMHEI_CLEAN_SFX(p)
+#else
+#define BOMHEI_CLEAN_SFX3(p) BOMHEI_CLEAN_SFX(p)
+#endif
+
 #define BOMHEI_CLEAN_FLAGS(p)                  \
     (p)->flags2 &= ~(1 << 4);                  \
     (p)->flags &= ~(1 << 25);                  \
@@ -99,7 +114,7 @@ void bomhei_bye(PartyEntry* party) {
         party->trigFlags &= ~8;
         partyGoodbyeInit(party);
         party->playerPtr->flags &= ~(1 << 13);
-        BOMHEI_CLEAN_SFX(party);
+        BOMHEI_CLEAN_SFX3(party);
     }
     if (partyGoodbyeMain(party)) {
         partyChgRunMode(party, 14);
@@ -112,7 +127,7 @@ void bomhei_init_800BFBB0(PartyEntry* party) {
     party->height = 28.0f;
     party->width = 28.0f;
     party->work.bomhei.state = 100;
-    party->work.bomhei.reserved_17C = -1;
+    party->work.bomhei.liftSfxId = -1;
     party->work.bomhei.sfxId = -1;
     party->work.bomhei.sfxId2 = -1;
 }
@@ -131,6 +146,83 @@ u8 bomheiGetStatus() {
     return status;
 }
 
+#ifdef VERSION_G8ME01_DEMO
+void bomhei_exit(PartyEntry* party) {
+    party->playerPtr->flags &= ~(1 << 13);
+    BOMHEI_CLEAN_SFX3(party);
+    BOMHEI_FREE(party);
+}
+
+void bomhei_use_cancel() {
+    PartyEntry* p = partyGetPtr(marioGetPartyId());
+    if (p != NULL && p->currentMemberId == PARTY_MEMBER_BOBBERY && (p->flags & PARTY_FLAG_IS_BEING_USED)) {
+        if (p->runMode != 9) {
+            partyChgRunMode(p, 2);
+            p->moveMode = 0;
+        }
+        BOMHEI_CLEAN_FLAGS(p);
+        BOMHEI_FREE(p);
+    }
+}
+
+void bomhei_use_cancel2() {
+    PartyEntry* p = partyGetPtr(marioGetPartyId());
+    if (p != NULL && p->currentMemberId == PARTY_MEMBER_BOBBERY && (p->flags & PARTY_FLAG_IS_BEING_USED) && (p->playerPtr->flags & (1 << 13))) {
+        p->playerPtr->flags &= ~(1 << 13);
+        marioChgPose("M_S_1");
+        if (p->runMode != 9) {
+            partyChgRunMode(p, 2);
+            p->moveMode = 0;
+        }
+        BOMHEI_CLEAN_FLAGS(p);
+        BOMHEI_CLEAN_SFX3(p);
+        BOMHEI_FREE(p);
+    }
+}
+
+void bomhei_use_post(PartyEntry* party) {
+    MarioWork* player = party->playerPtr;
+    if (player->flags & (1 << 13)) {
+        player->flags &= ~(1 << 13);
+        marioChgPose("M_S_1");
+    }
+    BOMHEI_CLEAN_SFX3(party);
+    BOMHEI_FREE(party);
+}
+
+void bomhei_use_main(PartyEntry* party);
+void mario_controll(PartyEntry* party);
+HitEntry* check_front(PartyEntry* party);
+
+void bomhei_use(PartyEntry* party) {
+    MarioWork* mario;
+
+    bomhei_use_main(party);
+    if ((party->useMotionId >= 30 && party->useMotionId <= 32) ||
+        (party->useMotionId >= 50 && party->useMotionId <= 51) || party->useMotionId == 60) {
+        partyChkGnd(party);
+        if (party->flags & 2) {
+            partyChgMot(party, 0);
+            party->velY = 0.0f;
+        }
+        if (strcmp(gp->currentMapName, "muj_05") == 0 && party->hitobjStandOn != NULL &&
+            strcmp(hitGetName(party->hitobjStandOn), "A_dokuro_bero") == 0) {
+            party->targetDir = angleABf(party->position.x, party->position.z, 638.0f, 12.5f);
+            party->moveDir = party->targetDir;
+        }
+    }
+    if (party->flags & PARTY_FLAG_IS_BEING_USED) {
+        mario = party->playerPtr;
+        if (party->work.bomhei.state != 0x66) {
+            if (mario->currMotionId == 0x1F || mario->currMotionId == 0x20) {
+                party->work.bomhei.state = 0x66;
+            } else {
+                mario_controll(party);
+            }
+        }
+    }
+}
+#else
 void bomhei_exit(PartyEntry* party) {
     PartyEntry* p;
     party->playerPtr->flags &= ~(1 << 13);
@@ -254,6 +346,7 @@ void bomhei_use(PartyEntry* party) {
         }
     }
 }
+#endif
 
 typedef struct BomheiWork {
     u32 flags;  // 0x0
@@ -273,6 +366,29 @@ static inline s16 bomheiToS16(f32 x) {
 
 #define BWORK(p) ((BomheiWork*)(p)->useStruct)
 
+#ifdef VERSION_G8ME01_DEMO
+// The demo checks only the first hit object present.
+static inline void bomheiChkHitAttr(PartyEntry* party) {
+    u32 attr;
+
+    if (party->hitobjFront != NULL) {
+        if (hitGetAttr(party->hitobjFront) & 0xC00) {
+            party->useMotionId = 60;
+        }
+    } else if (party->hitobjHead != NULL) {
+        if (hitGetAttr(party->hitobjHead) & 0xC00) {
+            party->useMotionId = 60;
+        }
+    } else if (party->hitobjStandOn != NULL) {
+        attr = hitGetAttr(party->hitobjStandOn);
+        if (attr & 0xC00) {
+            party->useMotionId = 60;
+        } else if (attr & 0x200) {
+            party->useMotionId = 40;
+        }
+    }
+}
+#else
 static inline BOOL bomheiChkHitAttr(PartyEntry* party) {
     HitEntry* hit;
     u32 attr;
@@ -301,6 +417,7 @@ static inline BOOL bomheiChkHitAttr(PartyEntry* party) {
     }
     return FALSE;
 }
+#endif
 
 static inline void bomheiSetHoldPos(PartyEntry* party) {
     MarioWork* mario = party->playerPtr;
@@ -325,9 +442,11 @@ void bomhei_use_main(PartyEntry* party) {
 
     if (party->trigFlags & 8) {
         party->trigFlags &= ~8;
+#ifndef VERSION_G8ME01_DEMO
         party->flags &= ~0x70;
         party->flags &= ~0x3000000;
         party->flags &= ~0x4000000;
+#endif
         party->useStruct = __memAlloc(HEAP_DEFAULT, sizeof(BomheiWork));
         memset(party->useStruct, 0, sizeof(BomheiWork));
         party->useMotionId = 0;
@@ -383,8 +502,12 @@ void bomhei_use_main(PartyEntry* party) {
         }
         bomheiSetHoldPos(party);
         bomheiChkHitAttr(party);
+#ifdef VERSION_G8ME01_DEMO
+        if ((party->flags & 0x80000000) || !(mario->buttonHold & 0x400)) {
+#else
         if ((party->flags & 0x80000000) ||
             (mario->hitobjStandOn != NULL && mario->airTimer == 0 && !(mario->buttonHold & 0x400))) {
+#endif
             party->useMotionId = 20;
         }
         break;
@@ -392,7 +515,11 @@ void bomhei_use_main(PartyEntry* party) {
 
     switch (party->useMotionId) {
     case 20:
+#ifdef VERSION_G8ME01_DEMO
+        party->work.bomhei.liftSfxId = psndSFXOn_3D((const char*)0x939, &party->playerPtr->position);
+#else
         psndSFXOn_3D((const char*)0x939, &party->playerPtr->position);
+#endif
         party->work.bomhei.state = 30;
         party->useMotionId = 21;
         x = party->position.x;
@@ -430,9 +557,16 @@ void bomhei_use_main(PartyEntry* party) {
         break;
     case 22:
         partyMoveNoHosei(party);
+#ifdef VERSION_G8ME01_DEMO
+        if (party->hitobjStandOn != NULL) {
+            party->useMotionId = !(BWORK(party)->flags & 4) ? 30 : 50;
+        }
+        bomheiChkHitAttr(party);
+#else
         if (party->hitobjStandOn != NULL && !bomheiChkHitAttr(party)) {
             party->useMotionId = !(BWORK(party)->flags & 4) ? 30 : 50;
         }
+#endif
         break;
     case 30:
         party->moveFrames = sysMsec2Frame(200);
@@ -462,6 +596,13 @@ void bomhei_use_main(PartyEntry* party) {
         break;
     }
 
+#ifdef VERSION_G8ME01_DEMO
+    if (BWORK(party)->timer > 0) {
+        BWORK(party)->timer--;
+        if (BWORK(party)->timer == (s16)sysMsec2Frame(2500)) {
+            BWORK(party)->flags |= 2;
+            party->work.bomhei.sfxId = psndSFXOn_3D((const char*)0x93C, &party->playerPtr->position);
+#else
     if (party->useMotionId < 50 && BWORK(party)->timer > 0) {
         BWORK(party)->timer--;
         if (BWORK(party)->timer == (s16)sysMsec2Frame(2500)) {
@@ -469,6 +610,7 @@ void bomhei_use_main(PartyEntry* party) {
             if ((u32)party->work.bomhei.sfxId2 == 0xFFFFFFFFU) {
                 party->work.bomhei.sfxId = psndSFXOn_3D((const char*)0x93C, &party->playerPtr->position);
             }
+#endif
         } else if (BWORK(party)->timer == (s16)sysMsec2Frame(500)) {
             party->useMotionId = 50;
             if (mario->flags & 0x2000) {
@@ -516,9 +658,13 @@ void bomhei_use_main(PartyEntry* party) {
             psndSFXOff(party->work.bomhei.sfxId);
             party->work.bomhei.sfxId = -1;
         }
+#ifdef VERSION_G8ME01_DEMO
+        party->work.bomhei.sfxId2 = psndSFXOn_3D((const char*)0x93D, &party->playerPtr->position);
+#else
         if ((u32)party->work.bomhei.sfxId2 == 0xFFFFFFFFU) {
             party->work.bomhei.sfxId2 = psndSFXOn_3D((const char*)0x93D, &party->playerPtr->position);
         }
+#endif
         partyChgPose(party, "A_3");
         party->useMotionId = 51;
         party->moveFrames = 40;
@@ -554,7 +700,9 @@ void bomhei_use_main(PartyEntry* party) {
     case 60: {
         EffectEntry* eff;
         BOMHEI_CLEAN_SFX(party);
+#ifndef VERSION_G8ME01_DEMO
         psndSFXOn_3D((const char*)0x93B, &party->position);
+#endif
         BWORK(party)->timer = 0;
         party->moveSpeed = 0.0f;
         partyMove(party);
@@ -563,6 +711,9 @@ void bomhei_use_main(PartyEntry* party) {
         } else {
             evtEntryType(quake_evt, 0, 0, 0);
         }
+#ifdef VERSION_G8ME01_DEMO
+        psndSFXOn_3D((const char*)0x93B, &party->position);
+#endif
         eff = effSandarsEntry(pouchGetPartyAttackLv((PartyId)3), party->position.x,
                               party->position.y + party->height, party->position.z, 0.0f);
         ((EffSandarsWork*)eff->userdata)->camId = party->camId;
@@ -589,7 +740,11 @@ void bomhei_use_main(PartyEntry* party) {
     case 80:
         if (--party->moveFrames <= 0) {
             Vec pos;
+#ifdef VERSION_G8ME01_DEMO
+            partyGetReturnPos(&pos);
+#else
             partyGetAppearPos(party, &pos);
+#endif
             party->position.x = pos.x;
             party->position.y = 200.0f + pos.y;
             party->position.z = pos.z;
@@ -606,11 +761,18 @@ void bomhei_use_main(PartyEntry* party) {
     case 81: {
         HitEntry* hit;
         f32 limit;
+#ifdef VERSION_G8ME01_DEMO
+        f32 groundY, dropDepth;
+#endif
         f32 sx, sy, sz;
         if (37.0f + mario->position.y > party->position.y) {
             party->flags &= ~0x2000000;
         }
+#ifdef VERSION_G8ME01_DEMO
+        hit = partySearchGround(party, &groundY, &dropDepth, 11.0f, party->velY);
+#else
         hit = partySearchGround(party, 11.0f, party->velY);
+#endif
         limit = mario->screenY - 25.0f;
         marioGetScreenPos(party->position, &sx, &sy, &sz);
         if (sy > limit) {
@@ -746,6 +908,29 @@ void mario_controll(PartyEntry* party) {
     }
 }
 
+#ifdef VERSION_G8ME01_DEMO
+// The demo probes straight down from the moved point and keeps the point itself.
+static inline BOOL bomheiChkReturnGround(Vec* pos, f32 dist, f32 angle) {
+    f32 x, y, z;
+    f32 hx, hy, hz, d, nx, ny, nz;
+    HitEntry* hit;
+
+    marioGetPtr();
+    x = pos->x;
+    y = pos->y;
+    z = pos->z;
+    movePos(&x, &z, dist, angle);
+    d = 4.0f;
+    hit = hitCheckFilter(NULL, &hx, &hy, &hz, &d, &nx, &ny, &nz, x, 2.0f + y, z, 0.0f, -1.0f, 0.0f);
+    if (hit != NULL && !(hitGetAttr(hit) & 0xE00)) {
+        pos->x = x;
+        pos->y = y;
+        pos->z = z;
+        return TRUE;
+    }
+    return FALSE;
+}
+#else
 static inline BOOL bomheiChkReturnGround(Vec* pos, f32 dist, f32 angle) {
     HitCheckQuery query;
     HitEntry* hit;
@@ -790,6 +975,7 @@ static inline BOOL bomheiChkReturnGround(Vec* pos, f32 dist, f32 angle) {
     }
     return FALSE;
 }
+#endif
 
 void partyGetReturnPos(Vec* out) {
     MarioWork* mario = marioGetPtr();

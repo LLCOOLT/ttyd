@@ -1233,8 +1233,8 @@ s32 puniPositionCheck(PuniData* p) {
         return 1;
     }
     pos = p->pos;
-    dir = puni_fall_dir;
     pos.y += 1.0f;
+    dir = puni_fall_dir;
     dist = 3.0f;
     if (hitCheckFilter(NULL, &hit.x, &hit.y, &hit.z, &dist, &nrm.x, &nrm.y, &nrm.z, pos.x, pos.y, pos.z, dir.x, dir.y, dir.z) == NULL) {
         return 2;
@@ -1299,6 +1299,7 @@ int puniMoveAtari(PuniData* p, Vec start, Vec dir, int reflect, f32 dist) {
     return ret;
 }
 
+#ifndef VERSION_G8ME01_DEMO
 static const Vec puni_fall_dir;
 /* FAKE: hitCheckFilter called through a cast with the three start floats listed first. EABI assigns float and
    pointer args to f1-f6 and r3-r10 independently, so the registers and the call are identical; the reorder makes
@@ -1383,7 +1384,80 @@ void puniMoveHit(PuniData* p, Vec start, Vec dir, f32 dist) {
         }
     }
 }
+#endif
 
+#ifdef VERSION_G8ME01_DEMO
+void puniMoveDecel(PuniData* p) {
+    Vec start;
+    Vec dir;
+    f32 dist = PSVECMag(&p->vel);
+    if (!dist) {
+        return;
+    }
+    if (dist > 1.0f) {
+        if (p->vel.x < 0.0f) {
+            p->dir = 270.0f;
+        } else {
+            p->dir = 90.0f;
+        }
+    }
+    if (dist > p->maxSpeed) {
+        PSVECScale(&p->vel, &p->vel, p->maxSpeed / dist);
+        dist = p->maxSpeed;
+    }
+    start = p->pos;
+    start.y += 1.0f;
+    PSVECNormalize(&p->vel, &dir);
+    if (puniMoveAtari(p, start, dir, 1, dist)) {
+        PSVECScale(&p->vel, &p->vel, 0.6f);
+    }
+    if (p->hitMove != NULL || p->hitCheck != NULL) {
+        p->flags |= 0x400000;
+    } else {
+        p->flags &= ~0x400000;
+    }
+}
+
+void puniMoveLimitedNormal(PuniData* p) {
+    Vec start;
+    Vec dir;
+    f32 dist = PSVECMag(&p->vel);
+    if (!dist) {
+        return;
+    }
+    if (dist > p->maxSpeed) {
+        PSVECScale(&p->vel, &p->vel, p->maxSpeed / dist);
+        dist = p->maxSpeed;
+    }
+    start = p->pos;
+    start.y += 1.0f;
+    PSVECNormalize(&p->vel, &dir);
+    puniMoveAtari(p, start, dir, 1, dist);
+    if (p->hitMove != NULL || p->hitCheck != NULL) {
+        p->flags |= 0x400000;
+    } else {
+        p->flags &= ~0x400000;
+    }
+}
+
+void puniMoveNormal(PuniData* p) {
+    Vec start;
+    Vec dir;
+    f32 dist = PSVECMag(&p->vel);
+    if (!dist) {
+        return;
+    }
+    start = p->pos;
+    start.y += 1.0f;
+    PSVECNormalize(&p->vel, &dir);
+    puniMoveAtari(p, start, dir, 1, dist);
+    if (p->hitMove != NULL || p->hitCheck != NULL) {
+        p->flags |= 0x400000;
+    } else {
+        p->flags &= ~0x400000;
+    }
+}
+#else
 void puniMoveDecel(PuniData* p) {
     Vec start;
     Vec dir;
@@ -1571,6 +1645,7 @@ void puniMoveNormal(PuniData* p) {
         p->flags &= ~0x400000;
     }
 }
+#endif
 
 void puniMoveSimple(PuniData* p) {
     if (PSVECMag(&p->vel)) {
@@ -2376,9 +2451,11 @@ void puniModeMass(PuniData* p) {
     }
     a = gp->retraceCount & 0xF;
     b = *(s16*)( &p->index ) & 0xF;
+#ifndef VERSION_G8ME01_DEMO
     if (Punigp->floor == 18) {
         a = b;
     }
+#endif
     if (a == b && p->breathPower > 10.0f) {
         PuniDokuritsu(p);
         p->target = Punigp->marioPuni;
@@ -2847,10 +2924,18 @@ void puniModeRecover(PuniData* p) {
     }
 }
 
+#ifdef VERSION_G8ME01_DEMO
+static inline void puniModeDeadSfx(PuniData* p, const char* sfx) {
+#else
 void puniModeDead(PuniData* p) {
+#endif
     switch (p->modeStep) {
         case 0:
+#ifdef VERSION_G8ME01_DEMO
+            psndSFXOn_3D(sfx, &p->pos);
+#else
             psndSFXOn_3D("SFX_STG2_FIGHT_TOGE3", &p->pos);
+#endif
             {
                 Vec v = {0.0f, 0.0f, 0.0f};
                 p->vel = v;
@@ -2862,6 +2947,12 @@ void puniModeDead(PuniData* p) {
             break;
     }
 }
+#ifdef VERSION_G8ME01_DEMO
+
+void puniModeDead(PuniData* p) {
+    puniModeDeadSfx(p, "SFX_STG2_FIGHT_TOGE3");
+}
+#endif
 
 int puniMoveAtari(PuniData* p, Vec start, Vec dir, int reflect, f32 dist);
 int puniModeWind_sub(PuniData* p) {
@@ -3051,8 +3142,13 @@ void puniModeWind(PuniData* p) {
 }
 
 void puniModeFall(PuniData* p) {
+#ifdef VERSION_G8ME01_DEMO
+    Vec dir;
+    Vec start;
+#else
     Vec start;
     Vec dir;
+#endif
     f32 mag;
     PuniTarget* t = Punigp->targets;
     HitEntry* h0;
@@ -3072,10 +3168,14 @@ void puniModeFall(PuniData* p) {
     case 1:
         p->vel.x = 0.0f;
         p->vel.y -= 0.45f;
+#ifdef VERSION_G8ME01_DEMO
+        PSVECNormalize(&p->vel, &dir);
+#else
         {
             Vec v = {0.0f, -1.0f, 0.0f};
             dir = v;
         }
+#endif
         mag = PSVECMag(&p->vel);
         start = p->pos;
         puniMoveAtari(p, start, dir, 0, mag);
@@ -3133,11 +3233,13 @@ void puniModeFall(PuniData* p) {
             } else {
                 p->modeVar0 = 0xF;
             }
+#ifndef VERSION_G8ME01_DEMO
             if (Punigp->floor == 0x12 && p->pos.y < -300.0f) {
                 s32 zero = 0;
                 puniswTrapSetindex(*(s16 *) (&p->index), &zero);
                 p->flags &= ~0x00800000;
             }
+#endif
             {
                 Vec v = {0.0f, 0.0f, 0.0f};
                 p->vel = v;
@@ -3335,12 +3437,20 @@ void puniModeUpdraft(PuniData *p)
   }
 }
 
+#ifdef VERSION_G8ME01_DEMO
+static inline void puniModeWonderSfx(PuniData* p, const char* sfx) {
+#else
 void puniModeWonder(PuniData* p) {
+#endif
     Vec pos;
 
     switch (p->modeStep) {
         case 0:
+#ifdef VERSION_G8ME01_DEMO
+            psndSFXOn_3D(sfx, &p->pos);
+#else
             psndSFXOn_3D("SFX_STG2_SOAPBALL_BREAK1", &p->pos);
+#endif
             if (p->effect != NULL) {
                 effDelete(p->effect);
                 p->effect = NULL;
@@ -3369,6 +3479,12 @@ void puniModeWonder(PuniData* p) {
             break;
     }
 }
+#ifdef VERSION_G8ME01_DEMO
+
+void puniModeWonder(PuniData* p) {
+    puniModeWonderSfx(p, "SFX_STG2_SOAPBALL_BREAK1");
+}
+#endif
 
 static inline void puniMoveHitLimitedInl(PuniData* p, Vec* s2, Vec* d2, f32 dist) {
     Vec pa;
@@ -4162,7 +4278,9 @@ void puniModeFall(PuniData* p);
 void puniModeUpdraft(PuniData* p);
 
 
+#ifndef VERSION_G8ME01_DEMO
 void puniModeMain(PuniData* p);
+#endif
 static const Vec puni_fall_dir;
 static inline void puniModeCheckPos(PuniData* p) {
     switch (p->modeStep) {
@@ -4184,6 +4302,7 @@ static inline void puniModeCheckPos(PuniData* p) {
     }
 }
 
+#ifndef VERSION_G8ME01_DEMO
 void puniModeMain(PuniData* p) {
     switch (p->mode) {
         case 0:
@@ -4329,6 +4448,7 @@ void puniModeMain(PuniData* p) {
             break;
     }
 }
+#endif
 
 
 void puniMoveMain(PuniData* p);
@@ -4374,6 +4494,7 @@ static inline void puniMoveHitInl(PuniData* p, Vec* s2, Vec* d2, f32 dist) {
     }
 }
 
+#ifndef VERSION_G8ME01_DEMO
 void puniMoveMain(PuniData* p) {
     switch (p->mode) {
         case 0:
@@ -4532,6 +4653,7 @@ void puniMoveMain(PuniData* p) {
     }
 }
 
+#endif
 void puniOption(void) {
     PuniData* p;
     PuniData* q;
@@ -4540,8 +4662,15 @@ void puniOption(void) {
     Vec diff;
     f32 dist, r2, r;
 
+#ifdef VERSION_G8ME01_DEMO
     for (p = Punidat; p < Punidat + PUNI_DATA_MAX; p++) {
         p->flags &= ~0x20000000;
+    }
+    for (p = Punidat; p < Punidat + PUNI_DATA_MAX; p++) {
+#else
+    for (p = Punidat; p < Punidat + PUNI_DATA_MAX; p++) {
+        p->flags &= ~0x20000000;
+#endif
         if (!(p->flags & 0x400) || !(p->flags & 0x100000)) {
             continue;
         }
@@ -4599,13 +4728,16 @@ void puniOption(void) {
         if (!(p->flags & 0x20000000)) {
             p->flags &= ~0x10000000;
         }
+#ifndef VERSION_G8ME01_DEMO
         if (PSVECMag(&p->vel) >= 8.0f) {
             PSVECNormalize(&p->vel, &p->vel);
             PSVECScale(&p->vel, &p->vel, 8.0f);
         }
+#endif
     }
 }
 
+#ifndef VERSION_G8ME01_DEMO
 void puniCollideAll(void) {
     PuniData* p;
     PuniData* q;
@@ -4673,6 +4805,7 @@ void puniCollideAll(void) {
     }
 }
 
+#endif
 
 void psndSFX_pos(s32 id, Vec* pos);
 void puniSound(void)
@@ -4872,6 +5005,277 @@ void puniSound(void)
 f32 cloudGetBreathPower(Vec pos, f32 r);
 extern double fabs(double);
 
+#ifdef VERSION_G8ME01_DEMO
+// The demo runs the mode and move dispatch inline here, without the 0x20 (floor 9/12) path.
+void puni_puni_main(void) {
+    PuniTarget* tg; s32 i, k, j;
+    MarioWork* mario;
+    PuniData* p;
+    PuniData* t;
+    Vec diff;
+
+    mario = marioGetPtr();
+    t = Punigp->marioPuni;
+    t->pos = mario->position;
+    puniMapFindbuff(t->pos);
+    puniModeALLCheck();
+    for (i = 0, p = Punidat + 1; i < 210; i++, p++) {
+        p->modeHistIdx++;
+        p->modeHistIdx &= 0x7F;
+        p->modeHist[p->modeHistIdx] = p->mode;
+    }
+    for (i = 1, p = Punidat + 1; i < 211; i++, p++) {
+        PSVECSubtract(&p->pos, &p->prevPos, &diff);
+        p->moveDist = PSVECMag(&diff);
+        if (!(p->flags & 0x400)) continue;
+        p->flags &= ~0x6000000;
+        p->flags2 &= ~4;
+        p->attacked = 0;
+        puniParaRecover(p);
+    }
+    for (k = 0; k < 2; k++) {
+        for (i = 1, p = Punidat + 1; i < 211; i++, p++) {
+            if (!(p->flags & 0x400)) continue;
+            if (k == 0) {
+                if (p->mode != 7) continue;
+                p->flags |= 0x2000000;
+            } else {
+                if (p->flags & 0x2000000) continue;
+                p->flags |= 0x2000000;
+            }
+            if (!(p->flags & 0x4000000)) {
+                p->flags |= 0x4000000;
+                if (p->flags2 & 0x10) {
+                    p->flags2 &= ~0x10;
+                    p->mode = 12;
+                    p->modeStep = 0;
+                }
+                {
+                    PartyEntry* party = partyGetPtr(marioGetPartyId());
+                    p->breathPower = 0.0f;
+                    if (Punigp->windDisabled == 0 && party != NULL) {
+                        p->breathPower = cloudGetBreathPower(p->pos, 10.0f);
+                    }
+                }
+                if (32.0 < __fabs(p->pos.y - mario->position.y)) {
+                    p->marioDist = 1000.0f;
+                } else {
+                    p->marioDist = PSVECDistance(&p->pos, &mario->position);
+                }
+                tg = Punigp->targets;
+                p->massTarget = -1;
+                p->massTargetDistSq = 1000000.0f;
+                p->awayTarget = -1;
+                p->awayTargetDistSq = 1000000.0f;
+                for (j = 0; j < 10; j++, tg++) {
+                    if (tg->flags & 1) {
+                        if (!(32.0 < __fabs(p->pos.y - tg->pos.y))) {
+                            if (tg->flags & 4) {
+                                f32 d = PSVECSquareDistance(&p->pos, &tg->pos);
+                                if (p->awayTargetDistSq > d) {
+                                    p->awayTarget = j;
+                                    p->awayTargetDistSq = d;
+                                }
+                            }
+                            if (tg->flags & 2) {
+                                f32 d = PSVECSquareDistance(&p->pos, &tg->pos);
+                                if (p->massTargetDistSq > d) {
+                                    p->massTarget = j;
+                                    p->massTargetDistSq = d;
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+            switch (p->mode) {
+                case 0:
+                    p->flags &= ~0x8000;
+                    puniModeNormal(p);
+                    break;
+                case 1:
+                    p->flags &= ~0x8000;
+                    puniModeParentpre(p);
+                    break;
+                case 2:
+                    p->flags &= ~0x8000;
+                    puniModeParent(p);
+                    break;
+                case 3:
+                    p->flags &= ~0x8000;
+                    puniModeSearch(p);
+                    break;
+                case 4:
+                    p->flags |= 0x8000;
+                    puniModeMass(p);
+                    break;
+                case 5:
+                    p->flags |= 0x8000;
+                    puniModeAwayjump(p);
+                    break;
+                case 6:
+                    p->flags |= 0x8000;
+                    puniModeAway(p);
+                    break;
+                case 7:
+                    p->flags &= ~0x8000;
+                    puniModeAttack(p);
+                    break;
+                case 9:
+                    p->flags &= ~0x8000;
+                    puniModeDamage(p);
+                    break;
+                case 10:
+                    p->flags &= ~0x8000;
+                    puniModePiyori(p);
+                    break;
+                case 8:
+                    p->flags &= ~0x8000;
+                    puniModeEscape(p);
+                    break;
+                case 11:
+                    p->flags &= ~0x8000;
+                    puniModeRecover(p);
+                    break;
+                case 12:
+                    p->flags &= ~0x8000;
+                    // FAKE: the (u32) round trip keeps the name out of constant propagation, so the address is
+                    // hoisted into a saved register before the loop as in the demo (no runtime effect).
+                    puniModeDeadSfx(p, (const char*)(u32)"SFX_STG2_FIGHT_TOGE3");
+                    break;
+                case 13:
+                    p->flags &= ~0x8000;
+                    puniModeWind(p);
+                    break;
+                case 14:
+                    break;
+                case 15:
+                    p->flags |= 0x8000;
+                    puniModeCheckPos(p);
+                    break;
+                case 16:
+                    p->flags |= 0x8000;
+                    puniModeHagure(p);
+                    break;
+                case 18:
+                    p->flags |= 0x8000;
+                    puniModePreupdraft(p);
+                    break;
+                case 19:
+                    p->flags |= 0x8000;
+                    puniModeUpdraft(p);
+                    break;
+                case 20:
+                    p->flags |= 0x8000;
+                    // FAKE: same (u32) round trip as case 12.
+                    puniModeWonderSfx(p, (const char*)(u32)"SFX_STG2_SOAPBALL_BREAK1");
+                    break;
+                case 21:
+                    p->flags |= 0x8000;
+                    puniModeFunbari(p);
+                    break;
+                case 22:
+                    p->flags |= 0x8000;
+                    puniModeWater(p);
+                    break;
+                case 17:
+                    p->flags |= 0x8000;
+                    puniModeFall(p);
+                    break;
+                case 23:
+                    p->flags |= 0x8000;
+                    puniModeDodai(p);
+                    break;
+                case 24:
+                    p->flags &= ~0x8000;
+                    puniModeTrap(p);
+                    break;
+                case 25:
+                    p->flags &= ~0x8000;
+                    puniModeEnter(p);
+                    break;
+                case 26:
+                    p->flags &= ~0x8000;
+                    puniModeExit(p);
+                    break;
+                case 28:
+                    p->flags &= ~0x8000;
+                    puniModeDokan(p);
+                    break;
+                case 27:
+                    p->flags &= ~0x8000;
+                    puniModePoint(p);
+                    break;
+                case 29:
+                    p->flags &= ~0x8000;
+                    puniModeCustom(p);
+                    break;
+            }
+        }
+    }
+    puniOption();
+    {
+        s32 ii; PuniData* q; PunidrvPose* ps;
+        ps = puniGetPosePtr();
+        for (ii = 1, q = Punidat + 1; ii < 211; ii++, ps++, q++) {
+            if (q->flags & 0x400) {
+                if (!(q->flags & 0x200)) {
+                    q->prevPos = q->pos;
+                    switch (q->mode) {
+                        case 0:
+                        case 1:
+                        case 2:
+                        case 3:
+                        case 7:
+                        case 8:
+                        case 10:
+                        case 14:
+                        case 16:
+                        case 23:
+                        case 25:
+                        case 26:
+                        case 27:
+                            puniMoveDecel(q);
+                            puniSetYPosition(q);
+                            break;
+                        case 4:
+                            puniMoveLimitedNormal(q);
+                            puniSetYPosition(q);
+                            break;
+                        case 9:
+                            puniMoveNormal(q);
+                            puniSetYPosition(q);
+                            break;
+                        case 29:
+                            puniMoveCustom(q);
+                            puniSetYPosition(q);
+                            break;
+                        case 5:
+                        case 6:
+                        case 13:
+                            puniSetYPosition(q);
+                            break;
+                        case 24:
+                            puniMoveDecel(q);
+                            puniSetYPosition(q);
+                            break;
+                    }
+                }
+                puniAnimation(q, ps);
+            }
+        }
+    }
+    puniSound();
+    switch (Punigp->allMode) {
+        case 2:
+            if (Punigp->prevAllMode == 2) Punigp->allMode = 0;
+            break;
+        case 1: break;
+        case 3: break;
+    }
+    Punigp->prevAllMode = Punigp->allMode;
+}
+#else
 void puni_puni_main(void) {
     PuniTarget* tg; s32 i, k, j;
     MarioWork* mario;
@@ -5045,6 +5449,7 @@ void puni_puni_main(void) {
     }
     Punigp->prevAllMode = Punigp->allMode;
 }
+#endif
 
 void puni_puni_dispent(void) {
     PunidrvPose* pose;
@@ -5469,9 +5874,11 @@ USER_FUNC(evt_puni_setup) {
                 break;
         }
     }
+#ifndef VERSION_G8ME01_DEMO
     if (Punigp->floor == 9 || Punigp->floor == 12) {
         Punigp->flags |= 0x20;
     }
+#endif
     if (swByteGet(0x299) == 1) {
         return EVT_RETURN_DONE;
     }
@@ -6408,7 +6815,11 @@ USER_FUNC(evt_puni_landon_check) {
     count = 0;
     for (i = start; i < end; i++) {
         p = &Punidat[i];
+#ifdef VERSION_G8ME01_DEMO
+        if ((p->flags & 0x400) && p->pos.y != y) {
+#else
         if ((p->flags & 0x400) && p->pos.y > y) {
+#endif
             count++;
         }
     }
@@ -6633,9 +7044,17 @@ void puniCountDisp(CameraId unused, void* param) {
     c2.a = c2.a * Punigp->puniCounterAlpha / 255;
     c3.a = c3.a * Punigp->puniCounterAlpha / 255;
     PSMTXTrans(m, -160.0f, -180.0f, 0.0f);
+#ifdef VERSION_G8ME01_DEMO
+    iconDispGxCol(m, 4, VERSION_PICK(0x203, 0x20A), c1);
+#else
     iconDispGxCol(m, 0x10, VERSION_PICK(0x203, 0x20A), c1);
+#endif
     PSMTXTrans(m, -232.0f, -178.0f, 0.0f);
+#ifdef VERSION_G8ME01_DEMO
+    iconDispGxCol(m, 4, VERSION_PICK(0x204, 0x20B), c2);
+#else
     iconDispGxCol(m, 0x10, VERSION_PICK(0x204, 0x20B), c2);
+#endif
     PSMTXTrans(m, -160.0f, -178.0f, 0.0f);
     if (Punigp->showRemaining) {
         if (gp->retraceCount & 0x10) {
@@ -6645,7 +7064,11 @@ void puniCountDisp(CameraId unused, void* param) {
         iconNumberDispGx(m, num2, FALSE, c3);
     }
     PSMTXTrans(m, -140.0f, -178.0f, 0.0f);
+#ifdef VERSION_G8ME01_DEMO
+    iconDispGxCol(m, 4, VERSION_PICK(0x1D8, 0x1E0), c3);
+#else
     iconDispGxCol(m, 0x10, VERSION_PICK(0x1D8, 0x1E0), c3);
+#endif
     PSMTXTrans(m, -90.0f, -178.0f, 0.0f);
     iconNumberDispGx(m, num1, TRUE, c3);
 }

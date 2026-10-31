@@ -329,10 +329,12 @@ EVT_BEGIN(subsetevt_dead)
                     CALL(btlevtcmd_DispItemIcon, LW(0), LW(1), LW(2), 151, 90)
                 END_SIBLING_EVENT
                 WAIT_FRAMES(90)
+#ifndef VERSION_G8ME01_DEMO
                 CALL(btlevtcmd_CheckDataOfDataTable, LW(10), LW(0), 67)
                 IF_INT_NOT_EQUAL(LW(0), 0)
                     CALL(btlevtcmd_RunDataEventChild, LW(10), 67)
                 END_IF
+#endif
                 CALL(btlevtcmd_OnOffStatus, LW(10), 27, 0, 0, 0)
                 CALL(btlevtcmd_SetHp, LW(10), 0)
                 CALL(btlevtcmd_RecoverHp, LW(10), LW(11), 10)
@@ -1243,10 +1245,12 @@ EVT_BEGIN(subsetevt_damage)
         END_IF
         RETURN
     ELSE
+#ifndef VERSION_G8ME01_DEMO
         CALL(btlevtcmd_CheckDamageCode, LW(10), 256, LW(0))
         IF_INT_NOT_EQUAL(LW(0), 0)
             CALL(_set_hp_gauge_fade_flag, LW(10))
         END_IF
+#endif
         CALL(btlevtcmd_GetDamageCode, LW(10), LW(0))
         SWITCH(LW(0))
             CASE_EQUAL(23)
@@ -1388,12 +1392,16 @@ EVT_BEGIN(subsetevt_counter_damage)
         CASE_EQUAL(43)
         CALL(evt_snd_sfxon, STRING("SFX_BTL_ATTACK_MISS3"), 0)
         SET_VALUE(LW(14), 36)
+#ifdef VERSION_G8ME01_DEMO
+        CASE_OR_EQUAL(46)
+#else
         CASE_EQUAL(46)
         CALL(btlevtcmd_GetUnitKind, LW(10), LW(2))
         IF_INT_EQUAL(LW(2), 222)
             CALL(btlevtcmd_snd_se, LW(10), STRING("SFX_VOICE_MARIO_DAMAGED1"), -250000000, 0, -250000000)
         END_IF
         SET_VALUE(LW(14), 29)
+#endif
         CASE_OR_EQUAL(49)
         CASE_OR_EQUAL(50)
         CASE_OR_EQUAL(54)
@@ -1421,6 +1429,13 @@ EVT_BEGIN(subsetevt_counter_damage)
     CALL(btlevtcmd_JumpPosition, LW(10), LW(2), LW(3), LW(4), 10, -1)
     WAIT_FRAMES(30)
     CALL(evt_btl_camera_set_mode, 0, 0)
+    RETURN
+EVT_END()
+#endif
+
+#ifdef VERSION_G8ME01_DEMO
+EVT_BEGIN(subsetevt_nodamage_motion)
+    CALL(evt_snd_sfxon, STRING("SFX_BTL_ATTACK_MISS2"), 0)
     RETURN
 EVT_END()
 #endif
@@ -1464,12 +1479,18 @@ EVT_BEGIN(btldefaultevt_ChangePosition)
             WAIT_FRAMES(1)
             GOTO(10)
         END_IF
+#ifdef VERSION_G8ME01_DEMO
+        CALL(btlevtcmd_RunDataEventChild, LW(10), 59)
+        CALL(btlevtcmd_GetPos, LW(10), LW(0), LW(1), LW(2))
+        CALL(btlevtcmd_SetHomePos, LW(10), LW(0), LW(1), LW(2))
+#else
         CALL(btlevtcmd_GetHp, LW(10), LW(0))
         IF_INT_GREATER(LW(0), 0)
             CALL(btlevtcmd_RunDataEventChild, LW(10), 59)
             CALL(btlevtcmd_GetPos, LW(10), LW(0), LW(1), LW(2))
             CALL(btlevtcmd_SetHomePos, LW(10), LW(0), LW(1), LW(2))
         END_IF
+#endif
     END_IF
     CALL(btlevtcmd_SortPhaseMoveTable)
     CALL(btlevtcmd_StartWaitEvent, -3)
@@ -1479,6 +1500,13 @@ EVT_END()
 
 EVT_BEGIN(subsetevt_happy_heart)
     CALL(btlevtcmd_GetBodyId, -2, LW(5))
+#ifdef VERSION_G8ME01_DEMO
+    CALL(btlevtcmd_CheckDefinePosetype, -2, LW(5), 60, LW(0))
+    IF_INT_NOT_EQUAL(LW(0), 0)
+        CALL(btlevtcmd_AnimeChangePoseType, -2, LW(5), 60)
+    END_IF
+    WAIT_FRAMES(120)
+#else
     CALL(btlevtcmd_CheckDefinePosetype, -2, LW(5), 62, LW(0))
     IF_INT_NOT_EQUAL(LW(0), 0)
         CALL(btlevtcmd_CheckStatus, LW(3), 9, LW(0))
@@ -1493,12 +1521,20 @@ EVT_BEGIN(subsetevt_happy_heart)
         END_IF
     END_IF
     WAIT_FRAMES(60)
+#endif
     CALL(btlevtcmd_StartWaitEvent, -2)
     RETURN
 EVT_END()
 
 EVT_BEGIN(subsetevt_happy_flower)
     CALL(btlevtcmd_GetBodyId, -2, LW(5))
+#ifdef VERSION_G8ME01_DEMO
+    CALL(btlevtcmd_CheckDefinePosetype, -2, LW(5), 61, LW(0))
+    IF_INT_NOT_EQUAL(LW(0), 0)
+        CALL(btlevtcmd_AnimeChangePoseType, -2, LW(5), 61)
+    END_IF
+    WAIT_FRAMES(120)
+#else
     CALL(btlevtcmd_CheckDefinePosetype, -2, LW(5), 63, LW(0))
     IF_INT_NOT_EQUAL(LW(0), 0)
         CALL(btlevtcmd_CheckStatus, LW(3), 9, LW(0))
@@ -1513,9 +1549,17 @@ EVT_BEGIN(subsetevt_happy_flower)
         END_IF
     END_IF
     WAIT_FRAMES(60)
+#endif
     CALL(btlevtcmd_StartWaitEvent, -2)
     RETURN
 EVT_END()
+
+#ifdef VERSION_G8ME01_DEMO
+EVT_BEGIN(subsetevt_regeneration)
+    WAIT_FRAMES(120)
+    RETURN
+EVT_END()
+#endif
 
 #ifdef VERSION_G8ME01
 EVT_BEGIN(subsetevt_terror)
@@ -1800,12 +1844,18 @@ EVT_BEGIN(subsetevt_shot_damage_ultra)
     CALL(btlevtcmd_GetPos, LW(10), LW(0), -250000000, -250000000)
     CALL(_check_through_pos, LW(10), LW(2), LW(0), LW(1), LW(2))
     IF_INT_EQUAL(LW(2), 0)
+#ifdef VERSION_G8ME01_DEMO
+        SET_VALUE(LW(1), LW(0))
+        WAIT_FRAMES(1)
+        GOTO(32)
+#else
         IS_EVENT_RUNNING(LW(5), LW(6))
         IF_INT_EQUAL(LW(6), 1)
             SET_VALUE(LW(1), LW(0))
             WAIT_FRAMES(1)
             GOTO(32)
         END_IF
+#endif
     END_IF
     CALL(btlevtcmd_PreCheckDamage, LW(10), LW(3), LW(4), LW(12), 256, LW(0))
     SWITCH(LW(0))
@@ -1917,7 +1967,9 @@ EVT_BEGIN(subsetevt_swallow_shot_damage)
         GOTO(0)
     END_IF
     CALL(btlevtcmd_GetSelectNextEnemy, LW(3), LW(4))
+#ifndef VERSION_G8ME01_DEMO
     DEBUG_PUT_REG(LW(3))
+#endif
     IF_INT_EQUAL(LW(3), -1)
         CALL(btlevtcmd_AnimeChangePoseType, LW(10), LW(11), 39)
         CALL(btlevtcmd_GetPos, LW(10), LW(0), LW(1), LW(2))
@@ -2122,6 +2174,7 @@ EVT_BEGIN(subsetevt_status_recovery)
     RETURN
 EVT_END()
 
+#ifndef VERSION_G8ME01_DEMO
 EVT_BEGIN(subsetevt_check_target_movable)
     CALL(btlevtcmd_CheckStatus, LW(3), 27, LW(0))
     IF_INT_NOT_EQUAL(LW(0), 0)
@@ -2156,6 +2209,7 @@ EVT_BEGIN(subsetevt_regeneration)
     WAIT_FRAMES(60)
     RETURN
 EVT_END()
+#endif
 
 EVT_BEGIN(subset_attack_ready_jump_event)
     RETURN
@@ -2212,6 +2266,7 @@ USER_FUNC(_add_star_point_disp_offset) {
     return EVT_RETURN_DONE;
 }
 
+#ifndef VERSION_G8ME01_DEMO
 USER_FUNC(_set_hp_gauge_fade_flag) {
     BattleWork* wp = _battleWorkPointer;
     s32 id;
@@ -2224,6 +2279,7 @@ USER_FUNC(_set_hp_gauge_fade_flag) {
     }
     return EVT_RETURN_DONE;
 }
+#endif
 
 USER_FUNC(_check_through_pos) {
     BattleWork* wp = _battleWorkPointer;

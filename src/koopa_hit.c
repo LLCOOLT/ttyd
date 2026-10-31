@@ -15,6 +15,20 @@
 #include "eff/eff_magic1_n64.h"
 #include "koopa_hit.h"
 #include <math.h>
+#ifdef VERSION_G8ME01_DEMO
+#include "mario/mario_balloon.h"
+#include "mario/mario_hit.h"
+
+// wall-slide offset: half of the move vector minus its component along the wall normal
+// FAKE: the normal components are passed as values in the order vx, nx, vz, nz, which gives the demo's float
+// register order in kpaSearchWallFront; taking Vec* n and reading n->x, n->z in the body swaps nx and nz.
+static inline void sfwSlide2(f32 vx, f32 nx, f32 vz, f32 nz, f32* mx, f32* mz) {
+    f32 dot = vx * nx + vz * nz;
+    *mx = 0.5f * (vx - dot * nx);
+    *mz = 0.5f * (vz - dot * nz);
+}
+#define sfwSlide(n, vx, vz, mx, mz) sfwSlide2(vx, (n)->x, vz, (n)->z, mx, mz)
+#endif
 s32 kpaEnemyFireHitChk(f32 x, f32 y, f32 z, f32 h, f32 w);
 void _restfpr_28(void);
 void _savefpr_28(void);
@@ -460,6 +474,12 @@ typedef struct HeadSphere { s32 forward; s32 y; s32 radius; s32 mode; } HeadSphe
 typedef struct HeadSphereSet1 { s32 count; HeadSphere spheres[1]; } HeadSphereSet1;
 typedef struct HeadSphereSet3 { s32 count; HeadSphere spheres[3]; } HeadSphereSet3;
 typedef struct HeadSphereSet4 { s32 count; HeadSphere spheres[4]; } HeadSphereSet4;
+static HeadSphereSet1 head_sphere_data_lv0 = {
+    1,
+    {
+    {10, 15, 6, 0},
+    },
+};
 static HeadSphereSet3 head_sphere_data_lv1 = {
     3,
     {
@@ -483,12 +503,6 @@ static HeadSphereSet4 head_sphere_data_lv3 = {
     {90, 75, 30, 2},
     {50, 40, 30, 3},
     {-43, 142, 74, 1},
-    },
-};
-static HeadSphereSet1 head_sphere_data_lv0 = {
-    1,
-    {
-    {10, 15, 6, 0},
     },
 };
 static s32* head_sphere_data[] = {(s32*)&head_sphere_data_lv0, (s32*)&head_sphere_data_lv1, (s32*)&head_sphere_data_lv2, (s32*)&head_sphere_data_lv3};
@@ -576,6 +590,78 @@ HitEntry* kpaFlameHitCheck(f32 x, f32 y, f32 z, f32 r) {
 // map shows the head of koopa_hit.o as kpaSearchWallFront (kept there, 0x320 bytes) and the stripped
 // _reflect2/_reflect; the demo kpaSearchWallFront's literals are 45, 0.75, 0.25, 0.5, so the US original
 // (whose only literal left is 0.5) was a different version and cannot be taken from the demo.
+#ifdef VERSION_G8ME01_DEMO
+// demo only: Koopa's front-wall search (two rays at 3/4 and 1/4 of the body height), called from searchFrontWall
+HitEntry* kpaSearchWallFront(Vec* pos, f32* h, f32 dx, f32 dz) {
+    Vec p;
+    Vec dir;
+    Vec hp;
+    Vec nrm;
+    f32 s, c;
+    f32 bestDist;
+    f32 dist;
+    f32 range;
+    f32 h2;
+    f32 mx, mz;
+    f32 half;
+    f32 h1;
+    HitEntry* hit;
+    HitEntry* hit2;
+    MarioWork* mp;
+
+    mp = marioGetPtr();
+    sincosf(&s, &c, dz);
+    if (marioChkSts(0x10) && (__fabsf(mp->groundRot.x) >= 45.0f || __fabsf(mp->groundRot.z) >= 45.0f)) {
+        pos->x += dx * s;
+        pos->z += dx * c;
+        return NULL;
+    }
+    half = 0.5f * mp->wPlayerCollisionBox.x;
+    h1 = 0.75f * mp->wPlayerCollisionBox.y;
+    h2 = 0.25f * mp->wPlayerCollisionBox.y;
+    range = half + dx;
+    bestDist = range;
+    p = *pos;
+    p.y += h1;
+    dir = (Vec){s, 0.0f, c};
+    hit = marioHitCheckVec(&p, &dir, &hp, &nrm, &bestDist);
+    if (hit) {
+        if (chkBalloon(hit)) {
+            mp->hitobjFrontWall = hit;
+        }
+        sfwSlide(&nrm, s * dx, c * dx, &mx, &mz);
+    }
+    dist = range;
+    p.y = pos->y + h2;
+    hit2 = marioHitCheckVec(&p, &dir, &hp, &nrm, &dist);
+    if (hit2) {
+        if (chkBalloon(hit2)) {
+            mp->hitobjFrontWall = hit2;
+        }
+        if (hit) {
+            if (dist < bestDist) {
+                hit = hit2;
+                bestDist = dist;
+                sfwSlide(&nrm, s * dx, c * dx, &mx, &mz);
+            }
+        } else {
+            hit = hit2;
+            bestDist = dist;
+            sfwSlide(&nrm, s * dx, c * dx, &mx, &mz);
+        }
+    }
+    if (hit) {
+        *h = bestDist;
+        pos->x += mx;
+        pos->z += mz;
+        return hit;
+    }
+    pos->x += dx * s;
+    pos->z += dx * c;
+    return NULL;
+}
+#else
 static f32 kpaHalf(f32 v) {
     return 0.5f * v;
 }
+#endif

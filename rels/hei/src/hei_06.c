@@ -98,7 +98,11 @@ EVT_BEGIN(hei_06_init_evt)
     CALL_CHILD(PTR(evt_sub_kusa_access_entry))
     CALL(evt_mobj_recovery_blk, STRING("mobj_recover"), 5, 375, 160, -75, 0, 0)
     CALL(evt_mobj_badgeblk, STRING("mobj_hatenablk"), -25, 110, -75, 132, 0, GSWF(1795), 0)
+#ifdef VERSION_G8ME01_DEMO
+    CALL(evt_item_entry, STRING("item_00"), 164, 50, 50, 105, 15, GSWF(1806), 0)
+#else
     CALL(evt_item_entry, STRING("item_00"), 164, 50, 50, 105, 16, GSWF(1806), 0)
+#endif
     RETURN
 EVT_END()
 

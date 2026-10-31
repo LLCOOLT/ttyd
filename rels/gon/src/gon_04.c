@@ -251,7 +251,9 @@ EVT_BEGIN(evt_gon_04flowblock_updown1_init)
 EVT_END()
 
 EVT_BEGIN(evt_gon_04flowblock_updown1)
+#ifndef VERSION_G8ME01_DEMO
     SET_TYPE(239)
+#endif
     CALL(evt_mobj_hitevt_onoff, STRING("me"), 0)
     IF_INT_NOT_EQUAL(1, 0)
         SET_VALUE(LW(10), 0)
@@ -479,7 +481,9 @@ EVT_BEGIN(evt_gon_04flowblock_updown2_init)
 EVT_END()
 
 EVT_BEGIN(evt_gon_04flowblock_updown2)
+#ifndef VERSION_G8ME01_DEMO
     SET_TYPE(239)
+#endif
     CALL(evt_mobj_hitevt_onoff, STRING("me"), 0)
     IF_INT_NOT_EQUAL(GSWF(1485), 0)
         SET_VALUE(LW(10), 0)
@@ -952,7 +956,11 @@ static s32 key_tbl[] = {
 static EVT_BEGIN(evt_chk)
     CALL(evt_pouch_check_item, 13, LW(0))
     IF_INT_GREATER(LW(0), 0)
+#ifdef VERSION_G8ME01_DEMO
+        CALL(evt_win_item_select, PTR(key_tbl), LW(0))
+#else
         CALL(evt_win_item_select, 0, PTR(key_tbl), LW(0), 0)
+#endif
         IF_INT_EQUAL(LW(0), -1)
             CALL(evt_mobj_exec_cancel, STRING("me"))
         END_IF
@@ -1030,13 +1038,25 @@ EVT_BEGIN(gon_04_init_evt)
     CALL(evt_mobj_switch_float_blk, STRING("mobj_fltsw01"), 550, 75, 137, STRING("mobj_fltbl01"), 1, PTR(evt_gon_04flowblock_updown1), LSWF(6))
     CALL(evt_mobj_switch_float_blk, STRING("mobj_fltsw02"), 450, 75, 60, STRING("mobj_fltbl02"), 2, PTR(evt_gon_04flowblock_updown2), LSWF(7))
     IF_INT_LESS(GSW(0), 41)
+#ifdef VERSION_G8ME01_DEMO
+        CALL(evt_item_entry, STRING("key00"), 13, -150, 150, -125, 15, -1, PTR(key_get))
+#else
         CALL(evt_item_entry, STRING("key00"), 13, -150, 150, -125, 16, -1, PTR(key_get))
+#endif
     END_IF
+#ifdef VERSION_G8ME01_DEMO
+    CALL(evt_item_entry, STRING("item00"), 125, 150, 400, -125, 15, GSWF(5604), 0)
+#else
     CALL(evt_item_entry, STRING("item00"), 125, 150, 400, -125, 16, GSWF(5604), 0)
+#endif
 #ifdef VERSION_G8ME01
     CALL(evt_item_entry, STRING("item01"), 125, 420, 910, -175, 16, GSWF(5605), 0)
 #else
+#ifdef VERSION_G8ME01_DEMO
+    CALL(evt_item_entry, STRING("item01"), 125, 400, 900, -175, 15, GSWF(5605), 0)
+#else
     CALL(evt_item_entry, STRING("item01"), 125, 400, 900, -175, 16, GSWF(5605), 0)
+#endif
 #endif
     CALL(evt_mobj_lv_blk, STRING("mobj_blk00"), 395, 200, -125, 0, GSWF(1485), STRING("MOBJ_Lv1BigBlock"))
     CALL(evt_mobj_lv_blk, STRING("mobj_blk01"), 445, 150, -125, 0, GSWF(1486), STRING("MOBJ_Lv2BigBlock"))

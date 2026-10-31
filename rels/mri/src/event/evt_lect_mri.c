@@ -223,7 +223,11 @@ static void lecture_button_disp(CameraId camera, void* param) {
             }
             pos = disp->pos;
             pos.y += ofs;
+#ifdef VERSION_G8ME01_DEMO
+            iconDispGxAlpha(&pos, 0x84, btn->iconId, btn->alpha, 1.0f);
+#else
             iconDispGxAlpha(&pos, 0x50, btn->iconId, btn->alpha, 1.0f);
+#endif
         }
     }
 }
@@ -452,14 +456,22 @@ static USER_FUNC(juyoitem_end) {
 
     effSoftDelete((EffectEntry*)event->lwData[9]);
     marioSetCamId(4);
+#ifdef VERSION_G8ME01_DEMO
+    iconFlagOff(item->name, 0x100);
+#else
     iconFlagOff(item->name, 0x200);
+#endif
     return EVT_RETURN_DONE;
 }
 
 static USER_FUNC(juyoitem_gogo) {
     ItemEntry* item = (ItemEntry*)event->lwData[8];
 
+#ifdef VERSION_G8ME01_DEMO
+    iconFlagOff(item->name, 0x100);
+#else
     iconFlagOff(item->name, 0x200);
+#endif
     itemSetPosition(item, 0.0f, -1000.0f, 0.0f);
     marioChgStayMotion();
     marioStSystemLevel(0);
@@ -596,8 +608,13 @@ EVT_BEGIN(boots_lv2_juyoitem_lecture)
         CALL(evt_mario_get_pos, 0, LW(0), LW(1), LW(2))
         SET_VALUE(LW(7), 0)
         CALL(mainwindow_opendisable)
+#ifdef VERSION_G8ME01_DEMO
+        CALL(evt_mario_trigflag_onoff, 1, 0x80000000)
+        CALL(evt_mario_trigflag_onoff, 1, 0x40000000)
+#else
         CALL(evt_mario_trigflag_onoff, 1, 134217728)
         CALL(evt_mario_trigflag_onoff, 1, 67108864)
+#endif
         CALL(evt_mario_set_enable_key, 256)
         CALL(evt_mario_key_onoff, 1)
         CALL(evt_mario_key_onoff, 1)
@@ -624,8 +641,13 @@ EVT_BEGIN(boots_lv2_juyoitem_lecture)
         CALL(evt_mario_key_onoff, 0)
         CALL(evt_mario_key_onoff, 0)
         CALL(lect_status_on)
+#ifdef VERSION_G8ME01_DEMO
+        CALL(evt_mario_trigflag_onoff, 0, 0x80000000)
+        CALL(evt_mario_trigflag_onoff, 0, 0x40000000)
+#else
         CALL(evt_mario_trigflag_onoff, 0, 134217728)
         CALL(evt_mario_trigflag_onoff, 0, 67108864)
+#endif
         CALL(evt_mario_set_enable_key, 0)
         CALL(mainwindow_openenable)
         CALL(x_flag_set, 0, 2)

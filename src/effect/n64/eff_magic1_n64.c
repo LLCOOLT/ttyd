@@ -69,10 +69,12 @@ void effMagic1Main(EffectEntry* effect) {
     tmp.y = work->offset.y;
     tmp.z = work->offset.z;
     position = tmp;
+#ifndef VERSION_G8ME01_DEMO
     if ((u32)marioStGetSystemLevel() != 0) {
         dispEntry(CAMERA_3D, dispCalcZ(&position), 2, (DispCallback)effMagic1Disp, effect);
         return;
     }
+#endif
     if (effect->flags & 4) {
         effect->flags &= ~4;
         work->life = 0;

@@ -132,8 +132,13 @@ USER_FUNC(evt_party_force_reset_outofscreen) {
 #ifdef VERSION_G8MP01
 	Vec marioPos;
 #endif
+#ifdef VERSION_G8ME01_DEMO
+	f32 h;
+	f32 sx, sy, sz;
+#else
 	f32 sx, sy, sz;
 	f32 h;
+#endif
 	f32 ang;
 	if (p == NULL) {
 		return EVT_RETURN_DONE;
@@ -487,7 +492,11 @@ USER_FUNC(evt_party_jump_pos) {
 		if (__fabsf(dy) < 1.0f) {
 			dy = hgt;
 		} else if (dy >= 0.0f) {
+#ifdef VERSION_G8ME01_DEMO
+			dy += 0.5f * p->height;
+#else
 			dy += 37.0f;
+#endif
 		} else if (searchUnder2(tmp, x, y, z) != NULL) {
 			dy = hgt;
 		}
@@ -516,6 +525,17 @@ USER_FUNC(evt_party_jump_pos) {
 		mode = 0;
 		ff = p->velY;
 		{
+#ifdef VERSION_G8ME01_DEMO
+			f32 groundY, dropDepth;
+			HitEntry* hit = partySearchGround(
+				p, &groundY, &dropDepth, __fabsf(ff), __fabsf(ff));
+			if (hit != NULL && p->position.y + ff <= groundY) {
+				p->hitobjStandOn = hit;
+				mode = 1;
+				p->position.y = groundY;
+				p->flags &= ~0x70;
+			}
+#else
 			HitEntry* hit = partySearchGround(p, __fabsf(ff), __fabsf(ff));
 			if (hit != NULL && p->position.y + ff <= p->groundY) {
 				p->hitobjStandOn = hit;
@@ -523,6 +543,7 @@ USER_FUNC(evt_party_jump_pos) {
 				p->position.y = p->groundY;
 				p->flags &= ~0x70;
 			}
+#endif
 		}
 		if (mode) {
 			event->userdata[2] = 0;
@@ -988,6 +1009,8 @@ void evtPartyStrippedPool(f32* f) {
     f[1] = 0.5f;
     f[2] = 20.0f;
     f[3] = 0.0f;
+#ifndef VERSION_G8ME01_DEMO
     f[4] = 37.0f;
+#endif
     f[5] = -1000.0f;
 }

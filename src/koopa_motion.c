@@ -224,11 +224,26 @@ void kpa_walk(void) {
         m->flags &= ~0xF0000;
         m->currSubMotionId = 0;
         m->multiTimer = 0;
+#ifdef VERSION_G8ME01_DEMO
+        // the demo walks with W_1 in the side view or when the stick is pushed
+        if (kpaGetStageViewType() == 0) {
+            if (m->controlStickSensitivity) {
+                kpaChgPose("KPA_W_1", "KPA2_W_1");
+            } else if (!(KPW(m)->flags & 0x1000000)) {
+                kpaChgPose("KPA_W_1", "KPA2_W_1");
+            } else {
+                kpaChgPose("KPA_W_2", "KPA2_W_1");
+            }
+        } else {
+            kpaChgPose("KPA_W_1", "KPA2_W_1");
+        }
+#else
         if (!(KPW(m)->flags & 0x1000000)) {
             kpaChgPose("KPA_W_1", "KPA2_W_1");
         } else {
             kpaChgPose("KPA_W_2", "KPA2_W_1");
         }
+#endif
         m->mot.kpa.animFrame = 0;
         m->mot.kpa.reserved_2 = 0;
         KPW(m)->standParamA = 0.02f;
@@ -417,9 +432,13 @@ void kpa_fall_80213C38(void) {
         m->currSubMotionId = 0;
         if (m->currMotionId != 0xB) {
             if ((s32)(u8)m->characterId == 2) {
+#ifdef VERSION_G8ME01_DEMO
+                kpaChgPose("KPA_J_1B", "KPA2_J_1B");
+#else
                 if (!kpaFireAttackCheck()) {
                     kpaChgPose("KPA_J_1B", "KPA2_J_1B");
                 }
+#endif
             } else if (!(m->flags & 0x2000)) {
                 marioChgPose("M_J_1C");
             }
@@ -482,9 +501,15 @@ void kpa_hip(void) {
         m->baseSpeed = 0.0f;
         marioChgPose("KPA2_J_1C");
     }
+#ifdef VERSION_G8ME01_DEMO
+    if (m->fallStartPos.y >= m->position.y && ((u32)m->dispFlags & 0x20000) && m->position.y > 75.0f) {
+        camFollowYOn();
+    }
+#else
     if (m->fallStartPos.y >= m->position.y && ((u32)m->dispFlags & 0x20000)) {
         camFollowYOn();
     }
+#endif
     switch ((s32)m->currSubMotionId) {
     case 10:
         marioChkLandon(&y, 0.0f);
@@ -714,10 +739,17 @@ void kpaSwimMove(void) {
         }
     }
     m->kpaSpeed = spd;
+#ifdef VERSION_G8ME01_DEMO
+    f31 = 0.03f * __fabsf(spd);
+    if (f31 >= 1.0f) {
+        f31 = 1.0f;
+    }
+#else
     f31 = 0.06f * __fabsf(spd);
     if (f31 >= 2.0f) {
         f31 = 2.0f;
     }
+#endif
     {
         f32 a = angleABf(0.0f, 0.0f, spd, 0.0f);
         if (f31 < 0.01f) {
@@ -729,6 +761,9 @@ void kpaSwimMove(void) {
         }
     }
     m->moveDist = f31;
+#ifdef VERSION_G8ME01_DEMO
+    movePos(&m->position.x, &m->position.z, m->baseSpeed, m->directionView);
+#endif
 }
 
 #pragma dont_inline reset
@@ -929,7 +964,11 @@ void kpa_swim(void) {
         m->currSubMotionId = 0x29;
         m->multiTimer = 0x18;
     case 0x29:
+#ifdef VERSION_G8ME01_DEMO
+        if (m->buttonTrg & 0x100) {
+#else
         if ((m->buttonTrg & 0x100) && !kpaFireAttackCheck()) {
+#endif
             m->currSubMotionId = 0x14;
         } else {
             m->multiTimer = (s32)m->multiTimer - 1;

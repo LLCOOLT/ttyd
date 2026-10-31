@@ -107,7 +107,11 @@ static inline void __DEMOInitRenderMode(GXRenderModeObj* mode) {
 				rmode = &GXMpal480IntDf;
 				break;
 			default:
+#ifdef VERSION_G8ME01_DEMO
+				OSPanic(demo_file, 0x203, demo_msg);
+#else
 				OSPanic(demo_file, 0x206, demo_msg);
+#endif
 				break;
 		}
 		GXAdjustForOverscan(rmode, &rmodeobj, 0, 16);
@@ -125,8 +129,13 @@ void DEMOInit(GXRenderModeObj* mode) {
 	__DEMOInitMem();
 	memInit();
 	VIConfigure(rmode);
+#ifdef VERSION_G8ME01_DEMO
+	DefaultFifo = __memAlloc(HEAP_DEFAULT, 0x60000);
+	DefaultFifoObj = GXInit(DefaultFifo, 0x60000);
+#else
 	DefaultFifo = __memAlloc(HEAP_DEFAULT, 0x64000);
 	DefaultFifoObj = GXInit(DefaultFifo, 0x64000);
+#endif
 	__DEMOInitGX();
 	__DEMOInitVI();
 }

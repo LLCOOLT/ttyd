@@ -10,6 +10,13 @@
 #include <string.h>
 #include "icon_ids.h"
 
+// The demo draws the action command icons with icon flag 4; retail uses 0x10.
+#ifdef VERSION_G8ME01_DEMO
+#define AC_ICON_FLAGS 4
+#else
+#define AC_ICON_FLAGS 0x10
+#endif
+
 #pragma optimize_for_size on
 
 typedef struct TimingAEntry {
@@ -57,12 +64,12 @@ static void actionCommandDisp(f32 x, f32 y) {
         Vec pos = {0.0f, 0.0f, 0.0f};
         pos.x = -200.0f + x;
         pos.y = 50.0f + y;
-        iconDispGx(&pos, 0x10, ICON_065, 1.0f);
+        iconDispGx(&pos, AC_ICON_FLAGS, ICON_065, 1.0f);
     } else {
         Vec pos = {0.0f, 0.0f, 0.0f};
         pos.x = -200.0f + x;
         pos.y = 50.0f + y;
-        iconDispGx(&pos, 0x10, ICON_064, 1.0f);
+        iconDispGx(&pos, AC_ICON_FLAGS, ICON_064, 1.0f);
     }
     (*frame)++;
 }
@@ -80,7 +87,9 @@ void battleAcDisp_TimingA(CameraId cameraId, void* param) {
         case 99:
             disp->iconX = intplGetValue(4, 20 - disp->slideTimer, 20, -300.0f, 30.0f);
         case 100:
+#ifndef VERSION_G8ME01_DEMO
             disp->iconX = 30.0f;
+#endif
             actionCommandDisp(disp->iconX, disp->iconY);
             if (disp->slideTimer > 0) {
                 disp->slideTimer--;

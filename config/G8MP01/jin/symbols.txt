@@ -1716,7 +1716,6 @@ atmic_teresa_scale = .data:0x00016950; // type:object size:0x4 scope:global alig
 teresa_ext_entry_data = .data:0x00016954; // type:object size:0xCC scope:global
 teresa_entry = .data:0x00016A20; // type:object size:0x4C scope:global
 @589 = .data:0x00016A6C; // type:object size:0x120 scope:local
-lbl_14_data_16B8C = .data:0x00016B8C; // type:object size:0x4
 negone_one$42 = .data:0x00016B90; // type:object size:0x8 scope:local
 neg_one$44 = .data:0x00016B98; // type:object size:0x4 scope:local
 __local_PI$45 = .data:0x00016B9C; // type:object size:0x4 scope:local

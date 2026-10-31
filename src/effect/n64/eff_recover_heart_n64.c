@@ -35,6 +35,9 @@ typedef struct EffRecoverHeartN64Work {
 #ifdef __MWERKS__
 #endif
 
+f32 scale_w_dat[] = {0.25f, 0.5f, 0.75f, 1.0f, 0.9f, 1.1f, 1.0f};
+f32 scale_h_dat[] = {0.25f, 0.5f, 0.75f, 1.0f, 1.2f, 0.9f, 1.0f};
+
 effN64Vtx size32x32_tex32x32_heart_vtx[] = {
     {-16, -16, 0, 0, 0, 255, 255, 255, 255},
     {16, -16, 0, 1024, 0, 255, 255, 255, 255},
@@ -90,9 +93,6 @@ effN64Vtx size16x24_tex32x32_r_flower_vtx[] = {
     {16, 9, 0, 1024, 1024, 36, 190, 20, 255},
     {-4, 9, 0, 0, 1024, 36, 190, 20, 255},
 };
-
-f32 scale_w_dat[] = {0.25f, 0.5f, 0.75f, 1.0f, 0.9f, 1.1f, 1.0f};
-f32 scale_h_dat[] = {0.25f, 0.5f, 0.75f, 1.0f, 1.2f, 0.9f, 1.0f};
 
 void effRecoverHeartMain(EffectEntry* effect);
 void effRecoverHeartDisp(CameraId cameraId, EffectEntry* effect);

@@ -135,12 +135,19 @@ const char* latin_tbl[] = {
 };
 #endif
 
+// The demo still loads the name entry textures from the old window folder.
+#ifdef VERSION_G8ME01_DEMO
+#define NAME_TPL_JP "%s/window/jp/name.tpl"
+#else
+#define NAME_TPL_JP "%s/w/jp/name.tpl"
+#endif
+
 BOOL nameEntPrepare(void) {
 #ifdef VERSION_G8ME01
 	const char* lang[6] = {"jp", "us", "ge", "fr", "sp", "it"};
 	return fileAsyncf(4, NULL, "%s/w/%s/name.tpl", getMarioStDvdRoot(), lang[gp->language]) != 0;
 #else
-	return fileAsyncf(4, NULL, "%s/w/jp/name.tpl", getMarioStDvdRoot()) != 0;
+	return fileAsyncf(4, NULL, NAME_TPL_JP, getMarioStDvdRoot()) != 0;
 #endif
 }
 
@@ -267,12 +274,12 @@ static inline BOOL nameEntLoad(void) {
 #ifdef VERSION_G8ME01
 	if (fileAsyncf(4, NULL, "%s/w/%s/name.tpl", getMarioStDvdRoot(), lang[gp->language]) != 0U) {
 #else
-	if (fileAsyncf(4, NULL, "%s/w/jp/name.tpl", getMarioStDvdRoot()) != 0U) {
+	if (fileAsyncf(4, NULL, NAME_TPL_JP, getMarioStDvdRoot()) != 0U) {
 #endif
 #ifdef VERSION_G8ME01
 		wp->tplFile = fileAllocf(4, "%s/w/%s/name.tpl", getMarioStDvdRoot(), lang[gp->language]);
 #else
-		wp->tplFile = fileAllocf(4, "%s/w/jp/name.tpl", getMarioStDvdRoot());
+		wp->tplFile = fileAllocf(4, NAME_TPL_JP, getMarioStDvdRoot());
 #endif
 		return TRUE;
 	}
@@ -303,6 +310,169 @@ void nameEntMain(void) {
 	}
 }
 
+#ifdef VERSION_G8ME01_DEMO
+// The demo has no cursor travel check, no all-blank name check and no default partner name.
+s32 nameMain(void) {
+	s32 off;
+	s32 idx;
+
+	switch (wp->state) {
+		case 0:
+			if ((wp->flags & 1) && gp->debugFlag == 0) {
+				if (keyGetButtonTrg(0) & 0x100) {
+					off = wp->cursorX;
+					if (off >= 10 && wp->cursorY >= 4) {
+						switch (wp->cursorY) {
+							case 4:
+								wp->charTable = hiragana_tbl;
+								psndSFXOn((const char*)0x2000C);
+								break;
+							case 5:
+								wp->charTable = katakana_tbl;
+								psndSFXOn((const char*)0x2000C);
+								break;
+							case 6:
+								if (wp->nameLen > 0) {
+									wp->nameLen--;
+									psndSFXOn((const char*)0x2000B);
+								}
+								break;
+							case 7:
+								wp->confirmSel = 1;
+								wp->state = 100;
+								psndSFXOn((const char*)0x20012);
+								break;
+						}
+					} else if (wp->nameLen < 8) {
+						((u16*)wp->name)[wp->nameLen] = *(u16*)wp->charTable[wp->cursorY * NAMEENT_COLS + off];
+						wp->nameLen++;
+						if (wp->nameLen >= 8) {
+							wp->cursorX = 10;
+							wp->cursorY = 7;
+						}
+						psndSFXOn((const char*)0xA);
+					} else if (wp->nameLen == 8) {
+						((u16*)wp->name)[wp->nameLen - 1] = *(u16*)wp->charTable[wp->cursorY * NAMEENT_COLS + off];
+						wp->cursorX = 10;
+						wp->cursorY = 7;
+						psndSFXOn((const char*)0xA);
+					}
+				} else if (keyGetButtonTrg(0) & 0x1000) {
+					wp->cursorX = 10;
+					wp->cursorY = 7;
+					wp->confirmSel = 1;
+					wp->state = 100;
+					psndSFXOn((const char*)0x12);
+				} else if (keyGetButtonTrg(0) & 0x200) {
+					if (wp->nameLen > 0) {
+						wp->nameLen--;
+						((u16*)wp->name)[wp->nameLen] = *(u16*)"\x81\x40";
+						psndSFXOn((const char*)0xB);
+					} else if (wp->nameLen == 0 && wp->type == 0) {
+						psndSFXOn((const char*)0x13);
+						wp->state = 0x65;
+						wp->flags |= 2;
+					}
+				} else if (keyGetDirRep(0) & 0x4000) {
+					wp->cursorX--;
+					if (wp->cursorY > 3) {
+						if (wp->cursorX < 0) {
+							wp->cursorX = 10;
+							if (wp->cursorY > 7) {
+								wp->cursorY = 7;
+							}
+						}
+					} else if (wp->cursorX < 0) {
+						wp->cursorX = 13;
+					}
+					psndSFXOn((const char*)5);
+				} else if (keyGetDirRep(0) & 0x8000) {
+					wp->cursorX++;
+					if (wp->cursorY > 3) {
+						if (wp->cursorX >= 10 && wp->cursorY > 7) {
+							wp->cursorY = 7;
+						}
+						if (wp->cursorX >= 11) {
+							wp->cursorX = 0;
+						}
+					} else if (wp->cursorX >= NAMEENT_COLS) {
+						wp->cursorX = 0;
+					}
+					psndSFXOn((const char*)5);
+				} else if (keyGetDirRep(0) & 0x1000) {
+					wp->cursorY--;
+					if (wp->cursorY < 0) {
+						wp->cursorY = wp->cursorX > 9 ? 7 : 8;
+					}
+					psndSFXOn((const char*)5);
+				} else if (keyGetDirRep(0) & 0x2000) {
+					wp->cursorY++;
+					if (wp->cursorX > 9) {
+						if (wp->cursorY >= 4) {
+							wp->cursorX = 10;
+						}
+						if (wp->cursorY >= 8) {
+							wp->cursorY = 0;
+						}
+					} else if (wp->cursorY >= 9) {
+						wp->cursorY = 0;
+					}
+					psndSFXOn((const char*)5);
+				}
+			}
+			idx = wp->cursorX;
+			if (idx > 9 && wp->cursorY > 3) {
+				wp->x2 = 100.0f;
+				wp->y2 = (f32)(-20 - (wp->cursorY - 4) * 34);
+				wp->x2 -= 6.0f;
+				wp->y2 += 6.0f;
+			} else {
+				wp->x2 = (f32)(idx * 24 - 190 + (idx / 5) * 30);
+				wp->y2 = (f32)(112 - wp->cursorY * 28);
+				wp->x2 -= 16.0f;
+				wp->y2 -= 12.0f;
+			}
+			wp->maskAlpha -= 0.05f;
+			if (wp->maskAlpha <= 0.0f) {
+				wp->maskAlpha = 0.0f;
+			}
+			break;
+		case 100:
+			if (keyGetButtonTrg(0) & 0x100) {
+				if (wp->confirmSel == 0) {
+					wp->state++;
+					psndSFXOn((const char*)0x12);
+				} else {
+					wp->state = 0;
+					psndSFXOn((const char*)0x13);
+				}
+			} else if (keyGetButtonTrg(0) & 0x200) {
+				wp->state = 0;
+				psndSFXOn((const char*)0x13);
+			} else if (keyGetDirRep(0) & 0x3000) {
+				wp->confirmSel = 1 - wp->confirmSel;
+				psndSFXOn((const char*)5);
+			}
+			wp->x2 = -60.0f;
+			wp->y2 = -30.0f - 40.0f * (f32)wp->confirmSel;
+			wp->maskAlpha += 0.05f;
+			if (wp->maskAlpha >= 1.0f) {
+				wp->maskAlpha = 1.0f;
+			}
+			break;
+	}
+	wp->x1 += (wp->x2 - wp->x1) / FPS_EASE(4.0f);
+	wp->y1 += (wp->y2 - wp->y1) / FPS_EASE(4.0f);
+	wp->x1 += __fabs(2.0f * (f32)sin(gp->retraceCount / 8.0f));
+	idx = wp->nameLen >= 8 ? wp->nameLen - 1 : wp->nameLen;
+	wp->caretTargetX = idx * 32 - 106;
+	wp->caretTargetY = 135.0f;
+	wp->caretX += (wp->caretTargetX - wp->caretX) / FPS_EASE(4.0f);
+	wp->caretY += (wp->caretTargetY - wp->caretY) / FPS_EASE(4.0f);
+	wp->caretY += __fabs(2.0f * (f32)sin(gp->retraceCount / 8.0f));
+	return 0;
+}
+#else
 s32 nameMain(void) {
 	s32 len;
 	s32 j;
@@ -675,6 +845,8 @@ s32 nameMain(void) {
 	return 0;
 }
 
+#endif
+
 void nameEntDisp(CameraId cameraId, void* param) {
 	GXColor white2;
 	GXColor white;
@@ -716,7 +888,11 @@ void nameEntDisp(CameraId cameraId, void* param) {
 	for (j = 0; j < 9; j++) {
 		for (n = 0; n < NAMEENT_COLS; n++) {
 			if (wp->charTable[j * NAMEENT_COLS + n]) {
+#ifdef VERSION_G8ME01_DEMO
+				FontDrawString((f32)(n * 24 - 190 + (n / 5) * 30), (f32)(112 - j * 28), wp->charTable[j * NAMEENT_COLS + n]);
+#else
 				FontDrawString((f32)(n * 24 - 190 + (n / 5) * 30 + (24 - FontGetMessageWidth(wp->charTable[j * NAMEENT_COLS + n])) / 2), (f32)(112 - j * 28), wp->charTable[j * NAMEENT_COLS + n]);
+#endif
 			}
 		}
 	}

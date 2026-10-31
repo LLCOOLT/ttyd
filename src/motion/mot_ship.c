@@ -1,3 +1,8 @@
+#ifdef VERSION_G8ME01_DEMO
+// the demo unit is built without the main precompiled header: only the dtrigf constants lead its data
+#define DTRIGF_WITH_INITIAL_VALUES
+#include <dtrigf.h>
+#endif
 #include "dolphin/types.h"
 #include "evt/evt_cmd.h"
 #include "evt/evt_snd.h"
@@ -35,6 +40,11 @@ typedef struct MotShipWork {
 	Vec harborPos;                // 0x3C: docking target (checkHarbor)
 } MotShipWork;                    // size 0x48
 
+#ifdef VERSION_G8ME01_DEMO
+// the demo's small-data limit puts shipData in .data, ahead of the events
+f32 shipData[6] = {-0.05f, -0.7f, 0.02f, 0.02f, 2.0f, 0.01f};
+#endif
+
 static EVT_BEGIN(sound_evt)
 CALL(evt_snd_sfxon_3d, STRING("SFX_MARIO_SHIP1_1"), LW(0), LW(1), LW(2), 0)
 WAIT_FRAMES(12)
@@ -57,7 +67,9 @@ CALL(evt_snd_sfxon_3d, STRING("SFX_MARIO_SHIP2"), LW(0), LW(1), LW(2), 0)
 RETURN
 EVT_END()
 
+#ifndef VERSION_G8ME01_DEMO
 f32 shipData[6] = {-0.05f, -0.7f, 0.02f, 0.02f, 2.0f, 0.01f};
+#endif
 const char* paper_ship[4] = {"p_hune", "p_hune_g", "p_hune_y", "p_hune_v"};
 
 void sincosf(f32* s, f32* c, f32 a);
@@ -221,6 +233,39 @@ void marioReInit_ship(void) {
 	allPartyForceRideOn();
 }
 
+#ifdef VERSION_G8ME01_DEMO
+// the demo keeps Mario's collision box and resets only the draw offset and rotation
+void mot_ship_post(void) {
+	MarioWork* m = marioGetPtr();
+	s32 t;
+	allPartyRideOff();
+	if (m->dispFlags & 0x40000000) {
+		marioPaperOff();
+	}
+	m->dispFlags &= ~4;
+	m->dispFlags &= ~0x100;
+	marioGetPtr();
+	if (marioGetPtr()->motStruct != NULL) {
+		if ((u32)marioGetPtr()->motShip->sfxId != 0xFFFFFFFFU) {
+			psndSFXOff(marioGetPtr()->motShip->sfxId);
+			t = -1;
+			marioGetPtr()->motShip->sfxId = t;
+		}
+	}
+	{
+		Vec zero = {0.0f, 0.0f, 0.0f};
+		m->dispOfs = zero;
+	}
+	{
+		Vec zero = {0.0f, 0.0f, 0.0f};
+		m->rot = zero;
+	}
+	if (marioGetPtr()->motStruct != NULL) {
+		__memFree(HEAP_DEFAULT, marioGetPtr()->motStruct);
+		marioGetPtr()->motStruct = NULL;
+	}
+}
+#else
 void mot_ship_post(void) {
 	MarioWork* m = marioGetPtr();
 	s32 t;
@@ -247,6 +292,14 @@ void mot_ship_post(void) {
 		marioGetPtr()->motStruct = NULL;
 	}
 }
+#endif
+
+// The demo tests trigger flag 0x1000000 where retail tests 4.
+#ifdef VERSION_G8ME01_DEMO
+#define SHIP_TRIG_FLAG 0x1000000
+#else
+#define SHIP_TRIG_FLAG 4
+#endif
 
 static inline void shipLerpWake(f32 t, f32 k) {
 	marioGetPtr()->motShip->wakeScale += k * (t - marioGetPtr()->motShip->wakeScale);
@@ -324,7 +377,7 @@ void mot_ship(void) {
 		marioGetPtr()->motShip->bobAngle = 0.0f;
 		marioGetPtr()->motShip->bobSpeed = 4.25f;
 		m->currSubMotionId = 0;
-		if (!(m->trigFlags & 4)) {
+		if (!(m->trigFlags & SHIP_TRIG_FLAG)) {
 			camGetPtr(8)->flags |= 0x200;
 		}
 	}
@@ -343,7 +396,9 @@ void mot_ship(void) {
 		m->jumpPeakAirTime = 0;
 		m->baseSpeed = 0.0f;
 		marioGetPtr()->motShip->turnSpeed = 0.0f;
+#ifndef VERSION_G8ME01_DEMO
 		N_marioSetBottomlessRespawnPosOnBeroEntry(m->position.x, m->position.y, m->position.z);
+#endif
 		shipDecideDir(m, &p1, &p2);
 		/* fallthrough */
 	case 1:
@@ -563,14 +618,14 @@ void mot_ship(void) {
 			marioGetPtr()->motShip->bobAngle = 0.0f;
 			marioGetPtr()->motShip->bobSpeed = 4.25f;
 			m->currSubMotionId = 50;
-			if (!(m->trigFlags & 4)) {
+			if (!(m->trigFlags & SHIP_TRIG_FLAG)) {
 				camGetPtr(8)->flags &= ~0x200;
 			}
 		}
 		break;
 	}
 	case 30:
-		if (!(m->trigFlags & 4)) {
+		if (!(m->trigFlags & SHIP_TRIG_FLAG)) {
 			camGetPtr(8)->flags |= 0x200;
 		}
 		m->currSubMotionId = 31;
@@ -758,8 +813,13 @@ void mot_ship(void) {
 				r27 = 1;
 			}
 		} else {
+#ifdef VERSION_G8ME01_DEMO
+			if (m->displayDirection <= -540.0f) {
+				m->displayDirection = -540.0f;
+#else
 			if (m->displayDirection <= -360.0f) {
 				m->displayDirection = -360.0f;
+#endif
 				r27 = 1;
 			}
 		}
@@ -784,13 +844,15 @@ void mot_ship(void) {
 		marioChgMot(10);
 		marioSetFallPara();
 		allPartyRideOff();
+#ifndef VERSION_G8ME01_DEMO
 		N_marioSetBottomlessRespawnPosOnBeroEntry(m->position.x, m->position.y, m->position.z);
 		N_marioReloadMapOnBottomlessOff();
+#endif
 		if (marioGetPtr()->motStruct != NULL) {
 			__memFree(HEAP_DEFAULT, marioGetPtr()->motStruct);
 			marioGetPtr()->motStruct = NULL;
 		}
-		if (!(m->trigFlags & 4)) {
+		if (!(m->trigFlags & SHIP_TRIG_FLAG)) {
 			camGetPtr(8)->flags &= ~0x200;
 		}
 		break;
@@ -903,6 +965,23 @@ double cos(double);
 void shipMove(void)
 {
   MarioWork *m = marioGetPtr();
+#ifdef VERSION_G8ME01_DEMO
+  // the demo keeps the swirl clamp in its own variable (m2) and the negative limit in nmax, declared in this order
+  f32 spd;
+  f32 m2;
+  f32 max;
+  f32 len;
+  f32 tx;
+  f32 nmax;
+  f32 tz;
+  f32 vx;
+  f32 vz;
+  f32 fr;
+  f32 dx;
+  f32 dz;
+  unsigned long long rateIdx;
+#define SHIP_SWIRL_MAX m2
+#else
   f32 len;
   unsigned long long rateIdx;
   f32 spd;
@@ -914,6 +993,8 @@ void shipMove(void)
   f32 dx;
   f32 dz;
   f32 fr;
+#define SHIP_SWIRL_MAX max
+#endif
   s32 snd;
   spd = m->controlStickSensitivity;
   dx = 0.0f;
@@ -924,21 +1005,21 @@ void shipMove(void)
     movePos(&dx, &dz, marioGetPtr()->motShip->swirlX, marioGetPtr()->motShip->swirlY);
     marioGetPtr()->motShip->dispX += dx;
     marioGetPtr()->motShip->dispY += dz;
-    max = shipData[4];
-    if (marioGetPtr()->motShip->dispX > max)
+    SHIP_SWIRL_MAX = shipData[4];
+    if (marioGetPtr()->motShip->dispX > SHIP_SWIRL_MAX)
     {
-      max = shipData[4];
-      marioGetPtr()->motShip->dispX = max;
+      SHIP_SWIRL_MAX = shipData[4];
+      marioGetPtr()->motShip->dispX = SHIP_SWIRL_MAX;
     }
     if (marioGetPtr()->motShip->dispX < (-shipData[4]))
     {
       marioGetPtr()->motShip->dispX = -shipData[4];
     }
-    max = shipData[4];
-    if (marioGetPtr()->motShip->dispY > max)
+    SHIP_SWIRL_MAX = shipData[4];
+    if (marioGetPtr()->motShip->dispY > SHIP_SWIRL_MAX)
     {
-      max = shipData[4];
-      marioGetPtr()->motShip->dispY = max;
+      SHIP_SWIRL_MAX = shipData[4];
+      marioGetPtr()->motShip->dispY = SHIP_SWIRL_MAX;
     }
     if (marioGetPtr()->motShip->dispY < (-shipData[4]))
     {
@@ -972,10 +1053,18 @@ void shipMove(void)
     else
     {
       vx += ((tx - 1.0f) - vx) * shipData[rateIdx];
+#ifdef VERSION_G8ME01_DEMO
+      nmax = -max;
+      if (vx <= nmax)
+      {
+        vx = nmax;
+      }
+#else
       if (vx <= (-max))
       {
         vx = -max;
       }
+#endif
     }
     if (tz > vz)
     {
@@ -988,10 +1077,18 @@ void shipMove(void)
     else
     {
       vz += ((tz - 1.0f) - vz) * shipData[rateIdx];
+#ifdef VERSION_G8ME01_DEMO
+      nmax = -max;
+      if (vz <= nmax)
+      {
+        vz = nmax;
+      }
+#else
       if (vz <= (-max))
       {
         vz = -max;
       }
+#endif
     }
   }
   if (!spd)
@@ -1055,10 +1152,12 @@ void shipMove(void)
       marioGetPtr()->motShip->sfxId = snd;
     }
   }
+#ifndef VERSION_G8ME01_DEMO
   if (((u32) (marioGetPtr()->motShip->sfxId)) != 0xFFFFFFFFU)
   {
     psndSFX_pos(marioGetPtr()->motShip->sfxId, (&m->position));
   }
+#endif
   m->moveDist = len;
 }
 void shipStrippedPool(f32* p) { p[0] = 15.0f; p[1] = 50.0f; p[2] = 30.30303f; p[3] = 180.0f; p[4] = 3.1415927f; }

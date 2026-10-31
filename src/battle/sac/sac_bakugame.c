@@ -216,8 +216,13 @@ static BattleWeapon weapon = {
     0x20088, // special
     0x7FF, // counterResistFlags
     0, 0, 0, // targetWeightFlags..sleepTime
+#ifdef VERSION_G8ME01_DEMO
+    0, // stopChance
+    0, // stopTime
+#else
     100, // stopChance
     1, // stopTime
+#endif
     0, 0, 0, 0, 0, 0, 0, 0, // dizzyChance..electricChance
     0, 0, 0, 0, 0, 0, 0, 0, // electricTime..sizeChangeChance
     0, 0, 0, 0, 0, 0, 0, 0, // sizeChangeTime..defChangeStrength
@@ -573,11 +578,19 @@ state_end:
         w->hstate = 2;
         w->hflag = -1;
         w->texIdx = 0x5A;
+#ifdef VERSION_G8ME01_DEMO
+        w->hpos = (Vec){300.0f, 0.0f, 100.0f};
+        w->hfrom = w->hpos;
+        w->hto = (Vec){125.0f, 0.0f, -30.0f};
+        w->hpos.y = 0.0f;
+        w->hto.z = 100.0f;
+#else
         w->hpos = (Vec){125.0f, 0.0f, 100.0f};
         w->hfrom = w->hpos;
         w->hpos.x = 300.0f;
         w->hfrom.x = 300.0f;
         w->hto = (Vec){125.0f, 0.0f, 100.0f};
+#endif
         w->htimer = 0;
         w->hsteps = 30;
     case 2:
@@ -736,6 +749,19 @@ state_end:
         w->s80 = 0;
         w->c0 = 70.0f;
     case 11:
+#ifdef VERSION_G8ME01_DEMO
+        if (w->cc == 2 && !(w->flags & 2)) {
+            w->c0 = 70.0f;
+        } else if (w->s80 < 14) {
+            w->c0 -= 0.7f;
+        } else if (w->s80 < 28) {
+            w->c0 += 0.7f;
+        }
+        w->s80++;
+        if (w->s80 >= 28) {
+            w->s80 = 0;
+        }
+#endif
         for (i = 0; i < 3; i++) {
             b = &w->btn[i];
             if (b->hp <= 0.0f) {
@@ -848,7 +874,11 @@ state_end:
                     if (u != NULL && !(u->mAttributeFlags & 0x20000) && !BtlUnit_CheckStatus(u, 27) &&
                         u->mAlliance == 1 && BtlUnit_CanActStatus(u)) {
                         if (w->s80 == 0) {
+#ifdef VERSION_G8ME01_DEMO
+                            BtlUnit_SetBodyAnimType(u, 0x3F);
+#else
                             BtlUnit_SetBodyAnimType(u, 0x41);
+#endif
                         }
                         if (w->s80 == 26) {
                             btlDispPoseAnime(BtlUnit_GetPartsPtr(u, BtlUnit_GetBodyPartsId(u)));
@@ -957,8 +987,13 @@ state_end:
         case 1:
             w->to = (Vec){125.0f, 0.0f, -30.0f};
             if (w->flags & 1) {
+#ifdef VERSION_G8ME01_DEMO
+                w->to = w->hpos;
+                w->to.y = 30.0f + w->hpos.y;
+#else
                 w->to = (Vec){125.0f, 0.0f, 100.0f};
                 w->to.y += 30.0f;
+#endif
             }
             bakuGameEnemySurprise();
             break;
@@ -1368,7 +1403,7 @@ void bakuGameDisp2D(CameraId cam, void* param) {
         }
         if (icon) {
             btlGetScreenPoint(&b->pos, &scr);
-            iconDispGx(&scr, 0x10, icon, b->scale);
+            iconDispGx(&scr, ICON_DISP_2D, icon, b->scale);
         }
     }
     full = 0;

@@ -116,6 +116,8 @@ static struct {
     {0, 42, 120, 54, 90, 40, 0},
 }, 0};
 
+static s32 jetw_ry_tbl[] = {0, 40, 55, 190, 20, 130, 270, 300};
+
 static effN64Vtx size16x16_tex32x32_vtx[] = {
     {-8, -8, 0, 0, 0, 255, 255, 255, 255},
     {8, -8, 0, 1024, 0, 255, 255, 255, 255},
@@ -130,8 +132,6 @@ effN64Vtx size6x22_tex32x32_vtx[] = {
     {-3, 22, 0, 0, 1024, 255, 255, 255, 255},
 };
 
-
-static s32 jetw_ry_tbl[] = {0, 40, 55, 190, 20, 130, 270, 300};
 
 
 void effOpukuJetwMain(EffectEntry* effect);

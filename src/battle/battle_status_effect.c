@@ -26,6 +26,37 @@ typedef struct StChgMsgData {
 	const char* msg0;
 } StChgMsgData;
 
+// Status Type Priority Data. The demo defines it first; its .data follows that order (retail keeps it in .sdata).
+#ifdef VERSION_G8ME01_DEMO
+s8 _st_pri_data[] = {
+	STATUS_CHARGE, //charge is elevated
+	STATUS_POISON, //poison is elevated
+	STATUS_SLEEP,
+	STATUS_STOP,
+	STATUS_DIZZY,
+	STATUS_CONFUSE,
+	STATUS_ELECTRIC,
+	STATUS_DODGY,
+	STATUS_BURN,
+	STATUS_FREEZE,
+	STATUS_HUGE,
+	STATUS_TINY,
+	STATUS_ATTACK_UP,
+	STATUS_ATTACK_DOWN,
+	STATUS_DEFENSE_UP,
+	STATUS_DEFENSE_DOWN,
+	STATUS_ALLERGIC,
+	STATUS_INVISIBLE,
+	STATUS_FAST,
+	STATUS_SLOW,
+	STATUS_PAYBACK,
+	STATUS_HOLD_FAST,
+	STATUS_HP_REGEN,
+	STATUS_FP_REGEN,
+	-1,
+};
+#endif
+
 StChgMsgData _st_chg_msg_data[] = {
 	{ 4, "どく", "msg_st_chg_poison", "msg_st_chg_poison" },
 	{ 16, "チャージ", "msg_st_chg_charge", "msg_st_chg_charge3" },
@@ -55,6 +86,7 @@ StChgMsgData _st_chg_msg_data[] = {
 };
 
 
+#ifndef VERSION_G8ME01_DEMO
 //.sdata
 //Status Type Priority Data
 s8 _st_pri_data[] = {
@@ -84,6 +116,7 @@ s8 _st_pri_data[] = {
 	STATUS_FP_REGEN,
 	-1,
 };
+#endif
 
 //local prototypes
 void BSE_Sleep(BattleUnit* unit);
@@ -604,12 +637,14 @@ BOOL BattleStatusChangeMsgMain(BattleWork* wp) {
 		dispEntry(8, 900.0f, 1, (DispCallback)_st_chg_msg_disp, 0);
 		break;
 	}
+#ifndef VERSION_G8ME01_DEMO
 	if (ret) {
 		for (i = 0; i < 64; i++) {
 			BattleUnit* unit = BattleGetUnitPtr(wp, i);
 			if (unit) BattleStatusChangeInfoWorkInit(unit);
 		}
 	}
+#endif
 	return ret;
 }
 

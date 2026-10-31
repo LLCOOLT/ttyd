@@ -186,8 +186,13 @@ s32 _get_item_announce(EventEntry* event, BOOL isFirstCall) {
         f32 z;
 
         BtlUnit_GetPos(unit, &x, &y, &z);
+#ifdef VERSION_G8ME01_DEMO
+        y = y + (f32)(BtlUnit_GetHeight(unit) + 10);
+        event->userdatap[1] = itemEntry(NULL, item, 0x10, -1, 0, x, y, z);
+#else
         y = y + (unit->mSizeMultiplier * (f32)BtlUnit_GetHeight(unit) + 8.0f);
         event->userdatap[1] = itemEntry(NULL, item, 0x11, -1, 0, x, y, z);
+#endif
         event->userdata[2] = 90;
     } else {
         if (event->userdata[2] > 0) {
@@ -209,12 +214,12 @@ s32 _damage(EventEntry* event, BOOL isFirstCall) {
     BattleUnit* unit = BattleGetUnitPtr(wp, id);
     s32 body = BtlUnit_GetBodyPartsId(unit);
     BattleUnitPart* part = BtlUnit_GetPartsPtr(unit, body);
-    u8* aud;
+    BattleAudience* aud;
 
     evtGetValue(event, args[0]);
-    aud = (u8*)BattleAudienceBaseGetPtr();
+    aud = BattleAudienceBaseGetPtr();
     BattleActionCommandResetDefenceResult();
-    BattleCheckDamage(BattleGetSystemPtr(wp), unit, (struct BattleWorkUnitPart*)part, (BattleWeapon*)(aud + 0x137FC), 0x100);
+    BattleCheckDamage(BattleGetSystemPtr(wp), unit, (struct BattleWorkUnitPart*)part, &aud->presentWeapon, 0x100);
     return 2;
 }
 

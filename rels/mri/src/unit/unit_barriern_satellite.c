@@ -56,8 +56,13 @@ BattleUnitKind unit_barriern_satellite = {
     0.0f,
     0.0f,
     0.0f,
+#ifdef VERSION_G8ME01_DEMO
+    0,
+    -16,
+#else
     -3,
     -6,
+#endif
     0.0f,
     0.0f,
     0.0f,
@@ -114,7 +119,11 @@ static BattleUnitKindPart parts[] = {
     {6, "btl_un_barriern_satellite", "c_baria", 0.0f, 0.0f, 0.0f, 0.0f, 5.0f, 0.0f, 0.0f, 10.0f, 0.0f, 20, 30, 255, &defence, &defence_attr, 0x13010000, 0, pose_table},
 };
 
+#ifdef VERSION_G8ME01_DEMO
+static StatusVulnerability regist = {80, 100, 100, 0, 90, 100, 0, 0, 100, 90, 100, 90, 100, 90, 90, 0, 100, 100, 90, 100, 100, 100};
+#else
 static StatusVulnerability regist = {80, 100, 100, 0, 90, 100, 0, 0, 100, 90, 100, 90, 100, 95, 90, 0, 100, 100, 90, 100, 100, 100};
+#endif
 
 static PoseTableEntry pose_table[] = {
     {1, "N_2"},
@@ -133,7 +142,11 @@ static PoseTableEntry pose_table[] = {
     {40, "W_2"},
     {56, "X_2"},
     {57, "X_2"},
+#ifdef VERSION_G8ME01_DEMO
+    {67, "S_2"},
+#else
     {69, "S_2"},
+#endif
 };
 
 static BattleDataEntry data_table[] = {

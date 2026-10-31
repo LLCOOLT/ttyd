@@ -82,7 +82,9 @@ typedef struct KinopioWork {
 	s32 fromBedEvt;    // 0x94
 } KinopioWork;
 
+#ifndef VERSION_G8ME01_DEMO
 USER_FUNC(N_cameraman_on);
+#endif
 USER_FUNC(snd_on);
 USER_FUNC(snd_off);
 USER_FUNC(breakfast);
@@ -225,8 +227,12 @@ static USER_FUNC(paper_on) {
 		marioPaperOn("p_slit");
 		marioChgPose("M_S_1");
 		marioChgPaper("PM_S_3A");
+#ifndef VERSION_G8ME01_DEMO
 		event->userdata[0] = 0;
+#endif
 	}
+#ifndef VERSION_G8ME01_DEMO
+	// the demo only turns Mario, without the 30-frame slide
 	if (event->userdata[0] < 30) {
 		f32 ang;
 		if (strcmp(gp->currentMapName, "pik_04") == 0) {
@@ -240,6 +246,7 @@ static USER_FUNC(paper_on) {
 		}
 		event->userdata[0]++;
 	}
+#endif
 	mario->displayDirectionTarget = amount;
 	mario->displayDirection = amount;
 	return 0;
@@ -264,8 +271,13 @@ USER_FUNC(breakfast) {
 	if (item == NULL || !(item->flags & 1)) {
 		KinopioWork* w = *wp;
 		if (w->breakfastItem != 0) {
+#ifdef VERSION_G8ME01_DEMO
+			itemEntry("breakfast", w->breakfastItem, 0xF, -1, 0, w->breakfastPos.x, w->breakfastPos.y,
+			          w->breakfastPos.z);
+#else
 			itemEntry("breakfast", w->breakfastItem, 0x10, -1, 0, w->breakfastPos.x, w->breakfastPos.y,
 			          w->breakfastPos.z);
+#endif
 		}
 	}
 	return 2;
@@ -281,13 +293,203 @@ USER_FUNC(snd_on) {
 	return 2;
 }
 
+#ifndef VERSION_G8ME01_DEMO
 USER_FUNC(N_cameraman_on) {
 	NpcEntry* npc = npcNameToPtr("宿屋のカメラマン");
 	animPoseSetMaterialFlagOn(npc->poseId, 0x1800);
 	return 2;
 }
+#endif
 
 //.data
+#ifdef VERSION_G8ME01_DEMO
+EVT_BEGIN(kinopio_house_talk_evt)
+    CALL(evt_mario_key_onoff, 0)
+    CALL(get_ryoukin, LW(10))
+    CALL(get_npcname, LW(11))
+    CALL(evt_win_coin_on, 0, LW(12))
+    CALL(msg_no, 0, LW(0))
+    CALL(evt_msg_print_insert, 0, LW(0), 0, LW(11), LW(10))
+    CALL(msg_no, 6, LW(0))
+    CALL(evt_msg_select, 0, LW(0))
+    IF_INT_EQUAL(LW(0), 1)
+        CALL(msg_no, 2, LW(0))
+        CALL(evt_msg_print_add, 0, LW(0))
+        CALL(evt_mario_key_onoff, 1)
+        CALL(evt_win_coin_off, LW(12))
+        RETURN
+    END_IF
+    CALL(power_chk, LW(0))
+    IF_INT_EQUAL(LW(0), 1)
+        CALL(msg_no, 1, LW(0))
+        CALL(evt_msg_print_add, 0, LW(0))
+        CALL(msg_no, 6, LW(0))
+        CALL(evt_msg_select, 0, LW(0))
+        IF_INT_EQUAL(LW(0), 1)
+            CALL(msg_no, 2, LW(0))
+            CALL(evt_msg_print_add, 0, LW(0))
+            CALL(evt_mario_key_onoff, 1)
+            CALL(evt_win_coin_off, LW(12))
+            RETURN
+        END_IF
+    END_IF
+    SET_VALUE(LF(0), 0)
+    CALL(evt_pouch_check_item, 164, LW(0))
+    IF_INT_GREATER(LW(0), 0)
+        CALL(msg_no, 7, LW(0))
+        CALL(evt_msg_print_add, 0, LW(0))
+        CALL(msg_no, 8, LW(0))
+        CALL(evt_msg_select, 0, LW(0))
+        IF_INT_EQUAL(LW(0), 0)
+            SET_VALUE(LF(0), 1)
+            CALL(evt_pouch_remove_item, 164, LW(0))
+        END_IF
+    END_IF
+    IF_INT_EQUAL(LF(0), 0)
+        CALL(coin_chk, LW(0))
+        IF_INT_EQUAL(LW(0), 1)
+            CALL(msg_no, 4, LW(0))
+            CALL(evt_msg_print_add, 0, LW(0))
+            CALL(evt_mario_key_onoff, 1)
+            CALL(evt_win_coin_off, LW(12))
+            RETURN
+        END_IF
+        CALL(get_ryoukin, LW(10))
+        MULTIPLY(LW(10), -1)
+        CALL(evt_pouch_add_coin, LW(10))
+        WAIT_MS(1000)
+    END_IF
+    CALL(evt_win_coin_off, LW(12))
+    CALL(msg_no, 3, LW(0))
+    CALL(evt_msg_print_add, 0, LW(0))
+    CALL(get_npcname, LW(0))
+    CALL(evt_npc_flag_onoff, 1, LW(0), 32)
+    CALL(evt_mario_get_party, LW(11))
+    CALL(evt_mario_get_exparty, LW(12))
+    CALL(evt_mario_get_pos, 0, LW(13), LW(14), LW(15))
+    CALL(evt_mario_goodbye_party, 1)
+    CALL(evt_mario_goodbye_party, 0)
+    CALL(get_to_bed_evt, LW(0))
+    IF_INT_EQUAL(LW(0), 0)
+        BEGIN_INLINE_EVENT
+            WAIT_MS(1000)
+            CALL(get_cam, LW(0), LW(1), LW(2), LW(3), LW(4), LW(5))
+            CALL(evt_cam3d_evt_set, LW(0), LW(1), LW(2), LW(3), LW(4), LW(5), 0, 11)
+        END_INLINE_EVENT
+        CALL(get_bedside, LW(0), LW(1), LW(2))
+        CALL(evt_mario_mov_pos2, LW(0), LW(2), FLOAT(60.0f))
+    ELSE
+        BEGIN_INLINE_EVENT_GET_ID(LW(0))
+            CALL_CHILD(LW(0))
+        END_INLINE_EVENT
+        LOOP(0)
+            IS_EVENT_RUNNING(LW(0), LW(1))
+            IF_INT_EQUAL(LW(1), 0)
+                BREAK_LOOP
+            END_IF
+            WAIT_FRAMES(1)
+        END_LOOP
+        CALL(get_cam, LW(0), LW(1), LW(2), LW(3), LW(4), LW(5))
+        CALL(evt_cam3d_evt_set, LW(0), LW(1), LW(2), LW(3), LW(4), LW(5), 0, 11)
+        WAIT_MS(500)
+    END_IF
+    CALL(evt_mario_get_pos, 0, LW(0), LW(1), LW(2))
+    CALL(evt_snd_sfxon_3d, STRING("SFX_VOICE_MARIO_FLD_JUMP2"), LW(0), LW(1), LW(2), 0)
+    CALL(evt_mario_flag_onoff, 1, 768)
+    CALL(get_bed, LW(0), LW(1), LW(2))
+    CALL(evt_mario_jump_pos, LW(0), LW(1), LW(2), FLOAT(400.0f), 0, -1000)
+    CALL(evt_mario_set_pos, LW(0), LW(1), LW(2))
+    CALL(evt_mario_adjust_dir)
+    WAIT_MS(200)
+    BEGIN_INLINE_EVENT_GET_ID(LW(10))
+        CALL(get_beddeg, LW(0))
+        CALL(paper_on, LW(0))
+    END_INLINE_EVENT
+    BEGIN_INLINE_EVENT
+        CALL(evt_mario_get_pos, 0, LW(0), LW(1), LW(2))
+        CALL(evt_snd_sfxon_3d, STRING("SFX_OFF_MARIO_SLEEP1"), LW(0), LW(1), LW(2), 0)
+        WAIT_MS(200)
+        CALL(evt_snd_sfxon_3d, STRING("SFX_OFF_MARIO_SLEEP2"), LW(0), LW(1), LW(2), 0)
+    END_INLINE_EVENT
+    CALL(snd_off)
+    CALL(evt_snd_bgmoff, 1024)
+    CALL(evt_snd_bgmon, 1, STRING("BGM_FF_GO_SLEEPING1"))
+    CALL(evt_fade_entry, 4, 3000, 0, 0, 0)
+    CALL(evt_mario_get_pos, 0, LW(0), LW(1), LW(2))
+    CALL(evt_fade_set_spot_pos, LW(0), LW(1), LW(2))
+    CALL(evt_fade_end_wait)
+    CALL(evt_fade_entry, 10, 0, 0, 0, 0)
+    CALL(evt_fade_end_wait)
+    CALL(evt_pouch_mario_recovery)
+    CALL(evt_pouch_all_party_recovery)
+    CALL(breakfast)
+    WAIT_MS(3000)
+    DELETE_EVENT(LW(10))
+    CALL(paper_off)
+    IF_INT_NOT_EQUAL(LW(11), 0)
+        CALL(get_bed, LW(0), LW(1), LW(2))
+        CALL(evt_mario_set_party_pos, 0, LW(11), LW(0), LW(1), LW(2))
+    END_IF
+    IF_INT_NOT_EQUAL(LW(12), 0)
+        CALL(get_bed, LW(0), LW(1), LW(2))
+        CALL(offset, FLOAT(30.0f), LW(3), LW(4))
+        ADD_FLOAT(LW(0), LW(3))
+        ADD_FLOAT(LW(2), LW(4))
+        CALL(evt_mario_set_party_pos, 1, LW(12), LW(0), LW(1), LW(2))
+    END_IF
+    CALL(evt_mario_flag_onoff, 0, 768)
+    CALL(get_bedside, LW(0), LW(1), LW(2))
+    CALL(evt_mario_set_pos, LW(0), LW(1), LW(2))
+    CALL(get_npcname, LW(0))
+    CALL(evt_set_dir_to_target, LW(0), STRING("mario"))
+    CALL(evt_mario_set_dir_npc, LW(0))
+    CALL(evt_party_set_dir_npc, 0, LW(0))
+    CALL(evt_party_set_dir_npc, 1, LW(0))
+    CALL(evt_mario_adjust_dir)
+    CALL(evt_npc_flag_onoff, 1, LW(0), 32768)
+    CALL(evt_cam3d_evt_off, 0, 11)
+    WAIT_FRAMES(1)
+    CALL(evt_npc_flag_onoff, 0, LW(0), 32768)
+    ADD(GSW(1), 1)
+    IF_INT_GREATER(GSW(1), 100)
+        SET_VALUE(GSW(1), 100)
+    END_IF
+    IF_INT_EQUAL(GSW(1), 50)
+        CALL_CHILD(evt_50)
+        RETURN
+    END_IF
+    CALL(evt_snd_bgmoff, 513)
+    CALL(evt_snd_bgmon, 288, 0)
+    CALL(snd_on)
+    CALL(evt_fade_entry, 9, 1000, 0, 0, 0)
+    CALL(evt_fade_end_wait)
+    CALL(get_from_bed_evt, LW(0))
+    IF_INT_NOT_EQUAL(LW(0), 0)
+        BEGIN_INLINE_EVENT_GET_ID(LW(10))
+            CALL_CHILD(LW(0))
+        END_INLINE_EVENT
+        LOOP(0)
+            IS_EVENT_RUNNING(LW(10), LW(11))
+            IF_INT_EQUAL(LW(11), 0)
+                BREAK_LOOP
+            END_IF
+            WAIT_FRAMES(1)
+        END_LOOP
+    END_IF
+    CALL(evt_party_run, 0)
+    CALL(evt_party_run, 1)
+    CALL(get_npctalk, LW(0), LW(1), LW(2))
+    CALL(evt_mario_mov_pos2, LW(0), LW(2), FLOAT(60.0f))
+    CALL(evt_fade_end_wait)
+    CALL(get_npcname, LW(11))
+    CALL(msg_no, 5, LW(0))
+    CALL(evt_msg_print, 0, LW(0), 0, LW(11))
+    CALL(get_npcname, LW(0))
+    CALL(evt_npc_flag_onoff, 0, LW(0), 32)
+    CALL(evt_mario_key_onoff, 1)
+    RETURN
+EVT_END()
+#else
 EVT_BEGIN(kinopio_house_talk_evt)
     CALL(evt_mario_key_onoff, 0)
     CALL(get_ryoukin, 4264967306)
@@ -485,7 +687,50 @@ EVT_BEGIN(kinopio_house_talk_evt)
     CALL(evt_mario_key_onoff, 1)
     RETURN
 EVT_END()
+#endif
 
+#ifdef VERSION_G8ME01_DEMO
+EVT_BEGIN(evt_50)
+    CALL(get_npcname, LW(10))
+    CALL(msg_no, 9, LW(0))
+    CALL(evt_msg_print, 0, LW(0), 0, LW(10))
+    CALL(evt_snd_bgmoff, 513)
+    CALL(evt_snd_bgmon, 288, 0)
+    CALL(get_bed, LW(0), LW(1), LW(2))
+    CALL(evt_mario_set_pos, LW(0), LW(1), LW(2))
+    ADD(LW(2), 5)
+    CALL(evt_party_set_pos, 0, LW(0), LW(1), LW(2))
+    CALL(evt_fade_entry, 7, 1000, 0, 0, 0)
+    CALL(evt_fade_end_wait)
+    WAIT_MS(500)
+    CALL(evt_mario_get_pos, 0, LW(0), LW(1), LW(2))
+    ADD(LW(1), 100)
+    CALL(evt_eff, 0, STRING("confetti"), 3, LW(0), LW(1), LW(2), 600, 0, 0, 0, 0, 0, 0, 0)
+    CALL(evt_eff_fukidashi, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0)
+    CALL(evt_eff_fukidashi, 3, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0)
+    WAIT_MS(1000)
+    CALL(msg_no, 10, LW(0))
+    CALL(evt_msg_print, 0, LW(0), 0, LW(10))
+    CALL(get_bedside, LW(0), LW(1), LW(2))
+    CALL(evt_mario_mov_pos2, LW(0), LW(2), FLOAT(60.0f))
+    CALL(get_npctalk, LW(0), LW(1), LW(2))
+    CALL(evt_mario_mov_pos2, LW(0), LW(2), FLOAT(60.0f))
+    CALL(msg_no, 11, LW(0))
+    CALL(evt_msg_print, 0, LW(0), 0, LW(10))
+    CALL(evt_fade_entry, 4, 100, 255, 255, 255)
+    CALL(evt_fade_end_wait)
+    CALL(evt_fade_entry, 3, 100, 255, 255, 255)
+    CALL(evt_fade_end_wait)
+    CALL(msg_no, 12, LW(0))
+    CALL(evt_msg_print, 0, LW(0), 0, LW(10))
+    CALL(evt_sub_get_coin, 200)
+    CALL(msg_no, 13, LW(0))
+    CALL(evt_msg_print, 0, LW(0), 0, LW(10))
+    CALL(evt_party_run, 0)
+    CALL(evt_mario_key_onoff, 1)
+    RETURN
+EVT_END()
+#else
 EVT_BEGIN(evt_50)
     CALL(get_npcname, 4264967306)
     CALL(evt_npc_get_position, 4264967306, 4264967309, 4264967310, 4264967311)
@@ -575,4 +820,5 @@ EVT_BEGIN(evt_50)
     CALL(evt_mario_key_onoff, 1)
     RETURN
 EVT_END()
+#endif
 

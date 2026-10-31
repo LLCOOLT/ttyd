@@ -148,11 +148,13 @@ s32 battleAcMain_PowerGaugeLv2(BattleWork* work) {
             if ((s32)ac->outputParams[0] >= ac->params[3]) {
                 ac->outputParams[0] = ac->params[3] - 1;
             }
+#ifndef VERSION_G8ME01_DEMO
             if (!((s32)ac->acFlags & 1)) {
                 if (g->gauge >= 100.0f) {
                     ac->outputParams[0]++;
                 }
             }
+#endif
             break;
         case 1001:
             ac->setupParam--;
@@ -249,7 +251,7 @@ static void actionCommandDisp(f32 x, f32 y) {
         Vec pos = {0.0f, 0.0f, 0.0f};
         pos.x = px;
         pos.y = py;
-        ICON(&pos, 0x10, ICON_08C, 1.0f);
+        ICON(&pos, ICON_DISP_2D, ICON_08C, 1.0f);
     }
     full = 0;
     ratio = AC_WORK(ac)->gauge / 100.0f;
@@ -292,7 +294,7 @@ static void actionCommandDisp(f32 x, f32 y) {
             Vec pos = {0.0f, 0.0f, 0.0f};
             pos.x = px;
             pos.y = 70.0f + y;
-            ICON(&pos, 0x10, icon, 1.0f);
+            ICON(&pos, ICON_DISP_2D, icon, 1.0f);
             break;
         }
         case 1000:
@@ -300,12 +302,12 @@ static void actionCommandDisp(f32 x, f32 y) {
                 Vec pos = {0.0f, 0.0f, 0.0f};
                 pos.x = px;
                 pos.y = 70.0f + y;
-                ICON(&pos, 0x10, pressedIcon, 1.0f);
+                ICON(&pos, ICON_DISP_2D, pressedIcon, 1.0f);
             } else {
                 Vec pos = {0.0f, 0.0f, 0.0f};
                 pos.x = px;
                 pos.y = 70.0f + y;
-                ICON(&pos, 0x10, icon, 1.0f);
+                ICON(&pos, ICON_DISP_2D, icon, 1.0f);
             }
             break;
     }
@@ -321,7 +323,7 @@ static void actionCommandDisp(f32 x, f32 y) {
         }
         pos.x = 120.0f + px;
         pos.y = py;
-        ICON(&pos, 0x10, id, 1.0f);
+        ICON(&pos, ICON_DISP_2D, id, 1.0f);
     }
 }
 

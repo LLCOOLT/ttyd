@@ -15,7 +15,9 @@
 #include "driver/mobjdrv.h"
 #include "pmario_sound.h"
 
+#ifndef VERSION_G8ME01_DEMO
 double cos(float);
+#endif
 void sincosf(f32* s, f32* c, f32 deg);
 f32 revise360(f32);
 void marioVoiceGlareOn(void);
@@ -183,7 +185,9 @@ void mot_hammer(void) {
 			}
 			psndSFXOn_3D(SFX_NAME_WORD(snd), &m->position);
 		}
+#ifndef VERSION_G8ME01_DEMO
 		mario->mot.hammer.hitKind = kind;
+#endif
 	}
 	{
 		f32 a = mario->mot.hammer.dir;
@@ -225,6 +229,7 @@ void mot_hammer(void) {
 		}
 		mario->currSubMotionId = 1;
 		mario->hitobjHammer = mario->hitobjHammerNew;
+#ifndef VERSION_G8ME01_DEMO
 		px = mario->position.x;
 		py = mario->position.y;
 		pz = mario->position.z;
@@ -282,6 +287,7 @@ void mot_hammer(void) {
 		if (efType > 0) {
 			effKemuTestEntry(efType, px, py + ez, pz, 1.0f);
 		}
+#endif
 		{
 			MarioWork* m = marioGetPtr();
 			snd = 0x161;
@@ -296,7 +302,11 @@ void mot_hammer(void) {
 				psndSFXOn_3D(SFX_NAME_WORD(0x160), &m->position);
 				break;
 			}
+#ifdef VERSION_G8ME01_DEMO
+			for (i = 0; i < 5; i++) {
+#else
 			for (i = 0; (u32)i < 10; i++) {
+#endif
 				if (pouchEquipCheckBadge(se_data[m->hammerSfxIdx])) {
 					snd = se_data[m->hammerSfxIdx + 1];
 					m->hammerSfxIdx += 2;
@@ -667,9 +677,13 @@ void mot_ham2_post(void) {
 	marioPaperLightOn();
 #endif
 	mario->dispFlags &= ~0x100;
+#ifdef VERSION_G8ME01_DEMO
+	mario->dispFlags &= ~0x4;
+#else
 	mario->dispFlags &= ~0x8;
 	mario->dispFlags &= ~0x10;
 	mario->dispFlags &= ~0x4;
+#endif
 	mario->flags &= ~0x80;
 	marioAdjustMoveDir();
 }
@@ -688,6 +702,9 @@ HitEntry *hitEstimate(s32 *out)
   f32 h;
   s32 i;
   f32 k5 = 5.0f;
+#ifdef VERSION_G8ME01_DEMO
+  f32 ang;
+#endif
   mario = marioGetPtr();
   *out = 0;
   a = mario->displayDirection;
@@ -704,7 +721,12 @@ HitEntry *hitEstimate(s32 *out)
   }
   sincosf(&s, &c, a);
   h = mario->wPlayerCollisionBox.y;
+#ifdef VERSION_G8ME01_DEMO
+  ang = 3.14159265f;
+  cy = (f32) cos(ang);
+#else
   cy = (f32) cos(3.14159265f);
+#endif
   pos = mario->position;
   {
     Vec dir1 = {0.0f, 0.0f, 0.0f};
@@ -722,7 +744,12 @@ HitEntry *hitEstimate(s32 *out)
       return hit;
     }
   }
+#ifdef VERSION_G8ME01_DEMO
+  ang = 1.2217306f;
+  cy = (f32) cos(ang);
+#else
   cy = (f32) cos(1.2217306f);
+#endif
   {
     Vec dir2 = {0.0f, 0.0f, 0.0f};
     pos.x = (s * k5) + mario->position.x;
@@ -741,7 +768,12 @@ HitEntry *hitEstimate(s32 *out)
       return hit;
     }
   }
+#ifdef VERSION_G8ME01_DEMO
+  ang = 0.78539816f;
+  cy = (f32) cos(ang);
+#else
   cy = (f32) cos(0.78539816f);
+#endif
   {
     Vec dir3 = {0.0f, 0.0f, 0.0f};
     pos.x = (s * k5) + mario->position.x;
@@ -760,7 +792,12 @@ HitEntry *hitEstimate(s32 *out)
       return hit;
     }
   }
+#ifdef VERSION_G8ME01_DEMO
+  ang = 0.0f;
+  cy = (f32) cos(ang);
+#else
   cy = (f32) cos(0.0f);
+#endif
   {
     Vec dir4 = {0.0f, 0.0f, 0.0f};
     dir4.y = -cy;
@@ -806,6 +843,35 @@ HitEntry *hitEstimate(s32 *out)
   }
   return hit;
 }
+
+#ifdef VERSION_G8ME01_DEMO
+// The demo has a table of the mobj kinds the hammer interacts with; no code reads it.
+const char* hammerMobjNames[] = {
+    "MOBJ_RedJumpStand",
+    "MOBJ_RedJumpStand2",
+    "MOBJ_BlueJumpStand",
+    "MOBJ_BlueJumpStand2",
+    "MOBJ_MapJumpStand",
+    "MOBJ_SaveBlock",
+    "MOBJ_RecoverBlock",
+    "MOBJ_Lv1BigBigBlock",
+    "MOBJ_Lv2BigBigBlock",
+    "MOBJ_Lv3BigBigBlock",
+    "MOBJ_green_FlowBlock",
+    "MOBJ_IceBlock",
+    "MOBJ_PowerBlock",
+    "MOBJ_TreasureBox",
+    "MOBJ_BigTreasureBox",
+    "MOBJ_Lock",
+    "MOBJ_GreenPipeL",
+    "MOBJ_GreenPipeW",
+    "MOBJ_Singboard",
+    "MOBJ_Arrow",
+    "MOBJ_HardWoodBox",
+    "MOBJ_BombRock",
+    NULL,
+};
+#endif
 
 static const char isS1_str[] = "MOBJ_Lv1Block";
 static const char isB1_str[] = "MOBJ_Lv1BigBlock";

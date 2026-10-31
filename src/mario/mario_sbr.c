@@ -38,6 +38,43 @@ f32 toMovedirSimple(f32 angle);
 
 RubWork rubwork;
 
+#ifdef VERSION_G8ME01_DEMO
+// The demo has no respawn position in MarioWork: falling out of eki_04, gon_10 or muj_00 puts Mario at a fixed
+// spot for that map, and anywhere else at (0, 74, 0) with the partners.
+void marioBottomless(void) {
+    MarioWork* mp = marioGetPtr();
+    PartyEntry* party;
+
+    if (mp->position.y > -2000.0f) {
+        return;
+    }
+    if (marioBgmodeChk() == TRUE) {
+        marioChgMot(MARIO_MOTION_BOTTOMLESS);
+        return;
+    }
+    if (strcmp(gp->currentMapName, "eki_04") == 0) {
+        mp->position = (Vec){ 344.0f, 840.0f, 30.0f };
+    } else if (strcmp(gp->currentMapName, "gon_10") == 0) {
+        mp->position = (Vec){ 980.0f, 74.0f, -17.0f };
+    } else if (strcmp(gp->currentMapName, "muj_00") == 0) {
+        mp->position = (Vec){ -182.0f, 25.0f, -104.0f };
+    } else {
+        mp->position = (Vec){ 0.0f, 74.0f, 0.0f };
+        party = partyGetPtr(marioGetPartyId());
+        if (party) {
+            party->position = mp->position;
+        }
+        party = partyGetPtr(marioGetExtraPartyId());
+        if (party) {
+            party->position = mp->position;
+        }
+        if (marioBgmodeChk() == TRUE) {
+            mp->position.z = -450.0f;
+        }
+    }
+    marioChgMot(MARIO_MOTION_FORCE_RESET);
+}
+#else
 void marioBottomless(void) {
     MarioWork* mp = marioGetPtr();
     PartyEntry* party;
@@ -91,6 +128,7 @@ void N_marioReloadMapOnBottomlessOff(void) {
     MarioWork* mp = marioGetPtr();
     mp->bottomlessReload = 0;
 }
+#endif
 
 BOOL marioSetDirEventMain(void) {
     MarioWork* mp = marioGetPtr();
@@ -307,10 +345,12 @@ void marioSetForceMove(f32 dir, s32 time, f32 speed) {
 #else
             marioChgMot(speed > mp->mBaseWalkSpeed ? MARIO_MOTION_DASH : MARIO_MOTION_WALK);
 #endif
+#ifndef VERSION_G8ME01_DEMO
             mp->moveDirection = dir;
             mp->directionView = dir;
             mp->forceMoveTimer = time;
             mp->baseSpeed = speed;
+#endif
     }
 }
 
@@ -332,6 +372,28 @@ void marioUpdateKeyData(void) {
     mp->buttonTrg = gp->buttonNew[0] & mask;
     mp->buttonRepeat = gp->buttonRepeat[0] & mask;
     mp->buttonUp = gp->buttonUp[0] & mask;
+#ifdef VERSION_G8ME01_DEMO
+    // The demo's input locks are trigFlags 0x80000000..0x10000000, and flag 4 does not lock the keys.
+    if (!(mp->flags & 0xA)) {
+        if (mp->trigFlags & 0x80000000) {
+            mp->wStickDir1 = 0;
+            mp->wStickDir2 = 0;
+        }
+        if (mp->trigFlags & 0x40000000) {
+            mp->substickX = 0;
+            mp->substickY = 0;
+        }
+        if (mp->trigFlags & 0x20000000) {
+            mp->triggerL = 0;
+            mp->triggerR = 0;
+        }
+        if (mp->trigFlags & 0x10000000) {
+            mp->analogA = 0;
+            mp->analogB = 0;
+        }
+    }
+    if ((mp->flags & 0xA) || !marioChkKey()) {
+#else
     if (!(mp->flags & 0xE)) {
         if (mp->trigFlags & 0x08000000) {
             mp->wStickDir1 = 0;
@@ -351,6 +413,7 @@ void marioUpdateKeyData(void) {
         }
     }
     if ((mp->flags & 0xE) || !marioChkKey()) {
+#endif
         mp->wStickDir1 = 0;
         mp->wStickDir2 = 0;
         mp->substickX = 0;
@@ -404,6 +467,7 @@ void marioGetStick(f32* dir, f32* mag) {
     *mag = m;
 }
 
+#ifndef VERSION_G8ME01_DEMO
 s32 N_marioGetMovementSpeed(void) {
     MarioWork* mp = marioGetPtr();
     s8 x = mp->wStickDir1;
@@ -416,6 +480,7 @@ s32 N_marioGetMovementSpeed(void) {
     }
     return 1;
 }
+#endif
 
 void marioGetRubInit(void) {
     memset(&rubwork, 0, sizeof(rubwork));

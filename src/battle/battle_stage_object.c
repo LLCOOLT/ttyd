@@ -27,6 +27,13 @@
 #include "unit/unit_object_tree.h"
 #include "unit/unit_object_switch.h"
 
+// DEMO_PICK(demo, retail): the value in the 2004 demo, or the retail value.
+#ifdef VERSION_G8ME01_DEMO
+#define DEMO_PICK(demo, retail) (demo)
+#else
+#define DEMO_PICK(demo, retail) (retail)
+#endif
+
 #pragma optimize_for_size on
 #pragma dont_inline on
 
@@ -1347,7 +1354,7 @@ BattleStageFallObjectData battle_stage_fall_object_data[] = {
 				0, 0, 100, 0, 100, 0, 0, 0, // poisonTime..dodgyTime
 				100, 0, 100, 0, 0, 0, 0, 0, // burnChance..atkChangeChance
 				0, 0, 0, 0, 0, 0, 0, 0, // atkChangeTime..ohkoChance
-				-99, 0, 0, 0, 0, 0, 0, -99, // chargeStrength..paybackTime
+				-99, 0, 0, 0, 0, 0, 0, DEMO_PICK(0, -99), // chargeStrength..paybackTime
 				0, 0, 0, 0, 0, 0, 0, // holdFastTime..fpRegenStrength
 				{0}, // pad_AE
 				NULL, // mAttackEvtScript
@@ -1662,7 +1669,7 @@ BattleStageFallObjectData battle_stage_fall_object_data[] = {
 				0, 0, 100, 0, 100, 0, 0, 0, // poisonTime..dodgyTime
 				100, 0, 100, 0, 0, 0, 0, 0, // burnChance..atkChangeChance
 				0, 0, 0, 0, 0, 0, 0, 0, // atkChangeTime..ohkoChance
-				-99, 0, 0, 0, 0, 0, 0, -99, // chargeStrength..paybackTime
+				-99, 0, 0, 0, 0, 0, 0, DEMO_PICK(0, -99), // chargeStrength..paybackTime
 				0, 0, 0, 0, 0, 0, 0, // holdFastTime..fpRegenStrength
 				{0}, // pad_AE
 				NULL, // mAttackEvtScript
@@ -1977,7 +1984,7 @@ BattleStageFallObjectData battle_stage_fall_object_data[] = {
 				0, 0, 100, 0, 100, 0, 0, 0, // poisonTime..dodgyTime
 				100, 0, 100, 0, 0, 0, 0, 0, // burnChance..atkChangeChance
 				0, 0, 0, 0, 0, 0, 0, 0, // atkChangeTime..ohkoChance
-				-99, 0, 0, 0, 0, 0, 0, -99, // chargeStrength..paybackTime
+				-99, 0, 0, 0, 0, 0, 0, DEMO_PICK(0, -99), // chargeStrength..paybackTime
 				0, 0, 0, 0, 0, 0, 0, // holdFastTime..fpRegenStrength
 				{0}, // pad_AE
 				NULL, // mAttackEvtScript
@@ -2292,7 +2299,7 @@ BattleStageFallObjectData battle_stage_fall_object_data[] = {
 				0, 0, 100, 0, 100, 0, 0, 0, // poisonTime..dodgyTime
 				100, 0, 100, 0, 0, 0, 0, 0, // burnChance..atkChangeChance
 				0, 0, 0, 0, 0, 0, 0, 0, // atkChangeTime..ohkoChance
-				-99, 0, 0, 0, 0, 0, 0, -99, // chargeStrength..paybackTime
+				-99, 0, 0, 0, 0, 0, 0, DEMO_PICK(0, -99), // chargeStrength..paybackTime
 				0, 0, 0, 0, 0, 0, 0, // holdFastTime..fpRegenStrength
 				{0}, // pad_AE
 				NULL, // mAttackEvtScript
@@ -2401,6 +2408,37 @@ BattleStageObjectData _object_nozzle_data[] = {
 	{"nozzle_r", 3, 4, {120.0f, 0.0f, 90.0f}, 0, 0},
 };
 
+extern EvtWord _object_turn_event_core[];
+
+BattleStageObjectData _object_wall_data = {"escape_wall", 4, 5, {-175.0f, 0.0f, 0.0f}, 0, 0};
+
+BattleStageObjectData _object_spot_light_data[] = {
+	{"spotlight", 6, 7, {0.0f, 240.0f, 0.0f}, 0, 0},
+	{NULL, 6, 7, {0.0f, 0.0f, 0.0f}, 0, 0},
+};
+
+BattleUnitSetup _entry_tree_data = {&unit_object_tree, 2, {0}, 0x04000005, {-1000.0f, -1000.0f, -1000.0f}, 0, {0, 0, 0, 0}, NULL};
+
+BattleUnitSetup _entry_switch_data = {&unit_object_switch, 2, {0}, 0x04000005, {-1000.0f, -1000.0f, -1000.0f}, 0, {0, 0, 0, 0}, NULL};
+
+EVT_BEGIN(_object_turn_event_A1)
+    SET_VALUE(LW(9), 0)
+    CALL_CHILD(PTR(_object_turn_event_core))
+    RETURN
+EVT_END()
+
+EVT_BEGIN(_object_turn_event_A2)
+    SET_VALUE(LW(9), 1)
+    CALL_CHILD(PTR(_object_turn_event_core))
+    RETURN
+EVT_END()
+
+EVT_BEGIN(_object_turn_event_B)
+    SET_VALUE(LW(9), 2)
+    CALL_CHILD(PTR(_object_turn_event_core))
+    RETURN
+EVT_END()
+
 EVT_BEGIN(_object_turn_event_core)
     CALL(_set_mobj_shake_init, LW(9))
     CALL(_set_mobj_shake, LW(9))
@@ -2466,6 +2504,19 @@ EVT_BEGIN(_object_turn_event_core)
     RETURN
 EVT_END()
 
+EVT_BEGIN(_nozzle_turn_event)
+    CALL(_nozzle_turn)
+    RETURN
+EVT_END()
+
+#ifndef VERSION_G8ME01
+EVT_BEGIN(_close_wall_event)
+    CALL(btlevtcmd_WaitAttackEnd)
+    CALL(_announce_wall_message)
+    RETURN
+EVT_END()
+#endif
+
 EVT_BEGIN(_fall_frame_event)
     CALL(_fall_frame_wait)
     CALL(_fall_frame_wait_unit_ready)
@@ -2493,6 +2544,20 @@ EVT_BEGIN(_fall_frame_event)
     CALL(_fall_frame_delete)
     RETURN
 EVT_END()
+
+#ifndef VERSION_G8ME01
+EVT_BEGIN(_nozzle_work_event_0)
+    SET_VALUE(LW(10), 0)
+    CALL_CHILD(PTR(_nozzle_work_event_core))
+    RETURN
+EVT_END()
+
+EVT_BEGIN(_nozzle_work_event_1)
+    SET_VALUE(LW(10), 1)
+    CALL_CHILD(PTR(_nozzle_work_event_core))
+    RETURN
+EVT_END()
+#endif
 
 EVT_BEGIN(_nozzle_work_event_core)
     CALL(_nozzle_work_wait)
@@ -2575,61 +2640,6 @@ EVT_BEGIN(_object_fall_event)
     RETURN
 EVT_END()
 
-BattleStageObjectData _object_wall_data = {"escape_wall", 4, 5, {-175.0f, 0.0f, 0.0f}, 0, 0};
-
-BattleStageObjectData _object_spot_light_data[] = {
-	{"spotlight", 6, 7, {0.0f, 240.0f, 0.0f}, 0, 0},
-	{NULL, 6, 7, {0.0f, 0.0f, 0.0f}, 0, 0},
-};
-
-BattleUnitSetup _entry_tree_data = {&unit_object_tree, 2, {0}, 0x04000005, {-1000.0f, -1000.0f, -1000.0f}, 0, {0, 0, 0, 0}, NULL};
-
-BattleUnitSetup _entry_switch_data = {&unit_object_switch, 2, {0}, 0x04000005, {-1000.0f, -1000.0f, -1000.0f}, 0, {0, 0, 0, 0}, NULL};
-
-EVT_BEGIN(_object_turn_event_A1)
-    SET_VALUE(LW(9), 0)
-    CALL_CHILD(PTR(_object_turn_event_core))
-    RETURN
-EVT_END()
-
-EVT_BEGIN(_object_turn_event_A2)
-    SET_VALUE(LW(9), 1)
-    CALL_CHILD(PTR(_object_turn_event_core))
-    RETURN
-EVT_END()
-
-EVT_BEGIN(_object_turn_event_B)
-    SET_VALUE(LW(9), 2)
-    CALL_CHILD(PTR(_object_turn_event_core))
-    RETURN
-EVT_END()
-
-EVT_BEGIN(_nozzle_turn_event)
-    CALL(_nozzle_turn)
-    RETURN
-EVT_END()
-
-#ifndef VERSION_G8ME01
-EVT_BEGIN(_close_wall_event)
-    CALL(btlevtcmd_WaitAttackEnd)
-    CALL(_announce_wall_message)
-    RETURN
-EVT_END()
-#endif
-
-#ifndef VERSION_G8ME01
-EVT_BEGIN(_nozzle_work_event_0)
-    SET_VALUE(LW(10), 0)
-    CALL_CHILD(PTR(_nozzle_work_event_core))
-    RETURN
-EVT_END()
-
-EVT_BEGIN(_nozzle_work_event_1)
-    SET_VALUE(LW(10), 1)
-    CALL_CHILD(PTR(_nozzle_work_event_core))
-    RETURN
-EVT_END()
-#endif
 USER_FUNC(_set_mobj_rotate_x) {
 	const char* fall1;
 	const char* fall3;
@@ -3150,7 +3160,11 @@ USER_FUNC(_fall_frame_wait_unit_ready) {
 	if (isFirstCall) {
 		for (i = 0; i < 64; i++) {
 			unit = BattleGetUnitPtr(wp, i);
+#ifdef VERSION_G8ME01_DEMO
+			if (unit && !(unit->flags & 0x80000000) && unit->ceilFallEventCode) {
+#else
 			if (unit && !(unit->flags & 0x80000000) && !BtlUnit_CheckStatus(unit, 0x1B) && unit->ceilFallEventCode) {
+#endif
 				evt = evtEntry(unit->ceilFallEventCode, 10, 0);
 				if (evt) {
 					evt->unitId = unit->unitId;
@@ -3750,7 +3764,9 @@ s32 _object_fall_attack(EventEntry *event, BOOL isFirstCall)
   s32 k;
   const char *sfxTub2;
   FallObjectEntry *o2;
+#ifndef VERSION_G8ME01_DEMO
   const char *sfxRest;
+#endif
   s32 i;
   s32 sum;
   s32 r;
@@ -3834,7 +3850,7 @@ s32 _object_fall_attack(EventEntry *event, BOOL isFirstCall)
       }
       weapon = &e->weapon.weapon;
       e->kind = 0;
-      if (((pouchGetPtr()->mStarPowersObtained && (!(BattleAudienceBaseGetPtr()->flags & 0x4000))) && (e->type != 6)) && (e->type != 7))
+      if (((pouchGetPtr()->mStarPowersObtained && (!(BattleAudienceBaseGetPtr()->flags & AUDIENCE_FLAG(0x4000)))) && (e->type != 6)) && (e->type != 7))
       {
         if (((u32)wp->debug.flags & 2) || (irand(100) < 10))
         {
@@ -3915,7 +3931,9 @@ s32 _object_fall_attack(EventEntry *event, BOOL isFirstCall)
   }
   sfxTub2 = (0, "SFX_BTL_STAGE_DAMAGE_TUB1"); // FAKE: comma expr makes the literal an early @ temp (same pointer)
   sfxNormal = "SFX_BTL_STAGE_DAMAGE_NORMAL1";
+#ifndef VERSION_G8ME01_DEMO
   sfxRest = "SFX_REST_CONDITION1";
+#endif
   w = event->userdatap[0];
   done = 1;
   for (i = 0; i < w->count; i++)
@@ -4007,7 +4025,7 @@ s32 _object_fall_attack(EventEntry *event, BOOL isFirstCall)
           break;
 
         case 4:
-          e3->effect = effFallEntry(2, pos.x, pos.y, 5.0f + pos.z, width, hit.y - pos.y, dir, 1, 90);
+          e3->effect = effFallEntry(2, pos.x, pos.y, DEMO_PICK(pos.z, 5.0f + pos.z), width, hit.y - pos.y, dir, 1, 90);
           break;
 
         case 8:
@@ -4021,16 +4039,16 @@ s32 _object_fall_attack(EventEntry *event, BOOL isFirstCall)
         case 6:
           if (BtlUnit_GetBelong(unit) == 0)
         {
-          e3->effect = effFallEntry(6, -300.0f, pos.y, 15.0f + pos.z, 0.0f, 0.0f, dir, 1, 180);
+          e3->effect = effFallEntry(6, -300.0f, pos.y, DEMO_PICK(pos.z, 15.0f + pos.z), 0.0f, 0.0f, dir, 1, 180);
         }
         else
         {
-          e3->effect = effFallEntry(6, 300.0f, pos.y, 15.0f + pos.z, 0.0f, 0.0f, dir, 1, 180);
+          e3->effect = effFallEntry(6, 300.0f, pos.y, DEMO_PICK(pos.z, 15.0f + pos.z), 0.0f, 0.0f, dir, 1, 180);
         }
           break;
 
         case 7:
-          e3->effect = effFallEntry(7, pos.x, pos.y, 5.0f + pos.z, width, hit.y - pos.y, dir, 1, 180);
+          e3->effect = effFallEntry(7, pos.x, pos.y, DEMO_PICK(pos.z, 5.0f + pos.z), width, hit.y - pos.y, dir, 1, 180);
           break;
 
       }
@@ -4112,7 +4130,9 @@ s32 _object_fall_attack(EventEntry *event, BOOL isFirstCall)
                 break;
 
               case 5:
+#ifndef VERSION_G8ME01_DEMO
                 psndSFXOn_3D(sfxRest, &sfxPos);
+#endif
                 break;
 
               default:

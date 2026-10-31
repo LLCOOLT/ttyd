@@ -209,7 +209,9 @@ EVT_BEGIN(tsuritenjo_event)
     CALL(evt_mario_normalize)
     CALL(evt_mario_set_pos, 620, 0, 0)
     CALL(evt_party_set_pos, 0, 670, 0, 0)
+#ifndef VERSION_G8ME01_DEMO
     CALL(evt_cam_road_reset)
+#endif
     CALL(evt_bero_mario_go_init)
     CALL(evt_seq_wait, 2)
     SET_VALUE(LW(1), 1)
@@ -244,7 +246,9 @@ EVT_BEGIN(tsuritenjo_event)
     SET_VALUE(GSW(0), 44)
     CALL(evt_npc_change_fbat_mode, 1)
     CALL(evt_npc_start_for_event)
+#ifndef VERSION_G8ME01_DEMO
     CALL(N_evt_bero_set_mario_bottomless_respawn_pos_to_current_mario_pos)
+#endif
     CALL(evt_mario_key_onoff, 1)
     CALL(evt_party_run, 0)
     RETURN
@@ -354,7 +358,11 @@ static EVT_BEGIN(evt_majin)
                     CALL(evt_mario_set_dir, 270, 200, 0)
                 END_IF
             END_INLINE_EVENT
+#ifdef VERSION_G8ME01_DEMO
+            CALL(evt_win_item_select, PTR(key_tbl), LW(0))
+#else
             CALL(evt_win_item_select, 0, PTR(key_tbl), LW(0), 0)
+#endif
             IF_INT_EQUAL(LW(0), -1)
                 CALL(evt_mobj_get_position, STRING("box"), LW(0), LW(1), LW(2))
                 ADD(LW(1), 30)
@@ -374,7 +382,9 @@ static EVT_BEGIN(evt_majin)
                 ADD(LW(1), 50)
                 CALL(evt_msg_toge, 2, LW(0), LW(1), LW(2))
                 CALL(evt_msg_print, 0, STRING("stg1_gon_12_11"), PTR(majin_callback), 0)
+#ifndef VERSION_G8ME01_DEMO
                 CALL(evt_mario_set_pose, STRING("M_I_N"))
+#endif
                 CALL(evt_cam3d_evt_set, 380, 110, 330, 380, 57, 23, 500, 11)
             END_IF
         END_IF
@@ -387,6 +397,9 @@ static EVT_BEGIN(evt_majin2)
     CALL(evt_npc_change_fbat_mode, 7)
     CALL(evt_npc_stop_for_event)
     CALL(evt_mario_key_onoff, 0)
+#ifdef VERSION_G8ME01_DEMO
+    CALL(evt_mario_normalize)
+#endif
     CALL(evt_mobj_wait_animation_end, STRING("box"))
     CALL(evt_pouch_add_item, 2, LW(0))
     CALL(evt_snd_bgmoff, 1024)
@@ -525,7 +538,11 @@ EVT_BEGIN(gon_06_init_evt)
     CALL(evt_npc_set_width, STRING("\"カロン05\""), 30)
     CALL(evt_npc_set_height, STRING("\"カロン05\""), 7)
     CALL(evt_mobj_switch_red, 0, STRING("mobj_switch1"), 92, 0, 120, PTR(evt_ori_open), GSWF(1491))
+#ifdef VERSION_G8ME01_DEMO
+    CALL(evt_item_entry, STRING("item01"), 315, -100, 0, -100, 15, GSWF(1504), 0)
+#else
     CALL(evt_item_entry, STRING("item01"), 315, -100, 0, -100, 16, GSWF(1504), 0)
+#endif
     CALL(evt_sub_rumble_onoff, 1, 0)
     WAIT_FRAMES(1)
     CALL(evt_npc_change_fbat_mode, 1)

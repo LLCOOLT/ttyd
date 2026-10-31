@@ -136,7 +136,11 @@ static BattleUnitDefense defence = {{0, 0, 0, 0, 0}};
 
 static BattleUnitDefenseAttr defence_attr = {{0, 0, 0, 0, 0}};
 
+#ifdef VERSION_G8ME01_DEMO
+static StatusVulnerability regist = {100, 120, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 120, 120, 100, 100, 100, 100, 150};
+#else
 static StatusVulnerability regist = {100, 110, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 110, 110, 100, 100, 100, 100, 150};
+#endif
 
 static BattleUnitKindPart parts[] = {
     {1, "btl_un_togekuri", "c_kuribo", 0.0f, 0.0f, 0.0f, 0.0f, 25.0f, 0.0f, 0.0f, 30.0f, 0.0f, 20, 30, 255, &defence, &defence_attr, 0x9, 0x1, pose_table},
@@ -196,8 +200,13 @@ static PoseTableEntry pose_table[] = {
     {40, "TGK_W_1"},
     {56, "TGK_I_1"},
     {57, "TGK_I_1"},
+#ifdef VERSION_G8ME01_DEMO
+    {63, "TGK_T_1"},
+    {67, "TGK_S_1"},
+#else
     {65, "TGK_T_1"},
     {69, "TGK_S_1"},
+#endif
 };
 
 static BattleDataEntry data_table[] = {

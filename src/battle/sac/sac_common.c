@@ -78,11 +78,13 @@ EVT_BEGIN(sac_mario_item_on_evt)
     RETURN
 EVT_END()
 
+#ifndef VERSION_G8ME01_DEMO
 EVT_BEGIN(sac_mario_item_on_end_evt)
     CALL(evt_eff_delete, STRING("sac_itemget"))
     CALL(evt_eff_delete, STRING("sac_treasure"))
     RETURN
 EVT_END()
+#endif
 
 EVT_BEGIN(sac_start_stardust)
     LOOP(6)
@@ -93,6 +95,14 @@ EVT_BEGIN(sac_start_stardust)
     END_LOOP
     RETURN
 EVT_END()
+
+#ifdef VERSION_G8ME01_DEMO
+EVT_BEGIN(sac_mario_item_on_end_evt)
+    CALL(evt_eff_delete, STRING("sac_itemget"))
+    CALL(evt_eff_delete, STRING("sac_treasure"))
+    RETURN
+EVT_END()
+#endif
 
 EVT_BEGIN(sac_mario_back_home)
     CALL(btlevtcmd_AnimeChangePoseType, -2, 1, 40)

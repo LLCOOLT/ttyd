@@ -235,9 +235,11 @@ void winMain(void) {
                         if (keyGetButton(0) & PAD_TRIGGER_Z) {
                             break;
                         }
+#ifndef VERSION_G8ME01_DEMO
                         if (strcmp(gp->currentAreaName, "yuu") == 0) {
                             break;
                         }
+#endif
                         if ((wp->buttonTrg & PAD_BUTTON_LEFT) && (swByteGet(0) >= 7 || partyChkJoin(1))) {
                             wp->menuSel = 1;
                         } else if (wp->buttonTrg & PAD_BUTTON_UP) {
@@ -258,9 +260,12 @@ void winMain(void) {
                         break;
                     }
 #endif
-                } else {
+                }
+#ifndef VERSION_G8ME01_DEMO
+                else {
                     wp->menuSel = 0;
                 }
+#endif
                 camGetPtr((CameraId)8)->flags |= 0x200;
                 if (gp->flags & 0x1000) {
                     wp->menuSel = 1;
@@ -271,6 +276,9 @@ void winMain(void) {
                     npcStopForEvent();
                 }
                 fbatChangeMode(7);
+#ifdef VERSION_G8ME01_DEMO
+                marioCtrlOff2();
+#else
                 if (mario->characterId == 2) {
                     if (!kpaGetStageViewType()) {
                         marioCtrlOff();
@@ -280,6 +288,7 @@ void winMain(void) {
                 } else {
                     marioCtrlOff2();
                 }
+#endif
                 partyCtrlOff();
                 psndSetFlag(0x80);
                 if (mario->characterId == 2) {
@@ -294,16 +303,16 @@ void winMain(void) {
                     padRumbleHardOff(i);
                 }
 #ifdef VERSION_G8ME01
-                fileAsyncf(4, 0, "%s/w/%s/mail.tpl", getMarioStDvdRoot(), (u32)gp->language == 0 ? "jp" : "us");
+                fileAsyncf(4, 0, WIN_DIR "%s/mail.tpl", getMarioStDvdRoot(), (u32)gp->language == 0 ? "jp" : "us");
 #else
-                fileAsyncf(4, 0, "%s/w/jp/mail.tpl", getMarioStDvdRoot());
+                fileAsyncf(4, 0, WIN_DIR "jp/mail.tpl", getMarioStDvdRoot());
 #endif
                 {
 #ifdef VERSION_G8ME01
-                    fileAsyncf(4, 0, "%s/w/%s/%s", getMarioStDvdRoot(), (u32)gp->language == 0 ? "jp" : "us", winGetMapTplName());
+                    fileAsyncf(4, 0, WIN_DIR "%s/%s", getMarioStDvdRoot(), (u32)gp->language == 0 ? "jp" : "us", winGetMapTplName());
 #else
                     const char* name = winGetMapTplName();
-                    fileAsyncf(4, 0, "%s/w/jp/%s", getMarioStDvdRoot(), name);
+                    fileAsyncf(4, 0, WIN_DIR "jp/%s", getMarioStDvdRoot(), name);
 #endif
                 }
                 wp->active = 0;
@@ -318,10 +327,10 @@ void winMain(void) {
                 WinLangTbl lang = winLangTbl;
                 BOOL ok;
 
-                if (fileAsyncf(4, 0, "%s/w/%s/win.tpl", getMarioStDvdRoot(), lang.s[gp->language]) == 0U) {
+                if (fileAsyncf(4, 0, WIN_DIR "%s/win.tpl", getMarioStDvdRoot(), lang.s[gp->language]) == 0U) {
                     ok = FALSE;
                 } else {
-                    wp->res = fileAllocf(4, "%s/w/%s/win.tpl", getMarioStDvdRoot(), lang.s[gp->language]);
+                    wp->res = fileAllocf(4, WIN_DIR "%s/win.tpl", getMarioStDvdRoot(), lang.s[gp->language]);
                     ok = TRUE;
                 }
                 if (ok) {
@@ -355,6 +364,9 @@ void winMain(void) {
 
             case 3:
                 camGetPtr((CameraId)8)->flags &= ~0x200;
+#ifdef VERSION_G8ME01_DEMO
+                marioCtrlOn2();
+#else
                 if (mario->characterId == 2) {
                     if (!kpaGetStageViewType()) {
                         marioCtrlOn();
@@ -364,6 +376,7 @@ void winMain(void) {
                 } else {
                     marioCtrlOn2();
                 }
+#endif
                 partyCtrlOn();
                 fbatChangeMode(1);
                 psndClearFlag(0x80);
@@ -519,10 +532,12 @@ static const WinLangTbl winLangTbl = { { "jp", "us" } };
 
 
 EVT_BEGIN(kime_pose)
+#ifndef VERSION_G8ME01_DEMO
     CALL(evt_party_nokotaro_get_status, 0, LW(0))
     IF_INT_NOT_EQUAL(LW(0), 0)
         RETURN
     END_IF
+#endif
     CALL(evt_mario_get_party, LW(0))
     SWITCH(LW(0))
         CASE_EQUAL(0)
@@ -545,10 +560,12 @@ EVT_BEGIN(kime_pose)
 EVT_END()
 
 EVT_BEGIN(kime_pose2)
+#ifndef VERSION_G8ME01_DEMO
     CALL(evt_party_nokotaro_get_status, 0, LW(0))
     IF_INT_NOT_EQUAL(LW(0), 0)
         RETURN
     END_IF
+#endif
     CALL(evt_mario_get_party, LW(0))
     SWITCH(LW(0))
         CASE_EQUAL(0)
@@ -570,6 +587,7 @@ EVT_BEGIN(kime_pose2)
     RETURN
 EVT_END()
 
+#ifndef VERSION_G8ME01_DEMO
 EVT_BEGIN(win_main_child_evt)
     CALL(evt_party_nokotaro_get_status, 0, LW(0))
     IF_INT_NOT_EQUAL(LW(0), 0)
@@ -578,12 +596,15 @@ EVT_BEGIN(win_main_child_evt)
     CALL(evt_party_set_breed_pose, 0, 1)
     RETURN
 EVT_END()
+#endif
 
 EVT_BEGIN(kime_pose_famicom)
+#ifndef VERSION_G8ME01_DEMO
     CALL(evt_party_nokotaro_get_status, 0, LW(0))
     IF_INT_NOT_EQUAL(LW(0), 0)
         RETURN
     END_IF
+#endif
     CALL(evt_mario_get_party, LW(0))
     SWITCH(LW(0))
         CASE_EQUAL(0)
@@ -621,18 +642,30 @@ EVT_BEGIN(kime_pose_famicom)
     RETURN
 EVT_END()
 
+// The item shown over the user's head: the demo uses entry type 16.
+#ifdef VERSION_G8ME01_DEMO
+#define ITEM_USE_KIND 16
+#else
+#define ITEM_USE_KIND 17
+#endif
+
 EVT_BEGIN(evt_item_use)
     SET_TYPE(0)
     CALL(evt_mario_normalize)
+#ifdef VERSION_G8ME01_DEMO
+    WAIT_FRAMES(1)
+    CALL(evt_mario_adjust_dir)
+#else
     CALL(all_party_slit_off)
     WAIT_FRAMES(1)
     CALL(evt_mario_adjust_dir)
     CALL(evt_mario_set_pose, STRING("M_S_1"))
     CALL_CHILD(PTR(win_main_child_evt))
+#endif
     IF_INT_EQUAL(LW(11), 0)
         CALL(evt_mario_get_pos, 0, LW(0), LW(1), LW(2))
         ADD(LW(1), 50)
-        CALL(evt_item_entry, STRING("menu_dummy"), LW(10), LW(0), LW(1), LW(2), 17, -1, 0)
+        CALL(evt_item_entry, STRING("menu_dummy"), LW(10), LW(0), LW(1), LW(2), ITEM_USE_KIND, -1, 0)
         ADD(LW(1), 10)
         CALL(evt_eff, 0, STRING("itemget"), 10, LW(0), LW(1), LW(2), 0, 0, 0, 0, 0, 0, 0, 0)
         CALL(evt_snd_sfxon_3d, STRING("SFX_ITEM_MARIO_USE1"), LW(0), LW(1), LW(2), 0)
@@ -654,7 +687,7 @@ EVT_BEGIN(evt_item_use)
     IF_INT_EQUAL(LW(0), LW(11))
         CALL(evt_party_get_pos, 0, LW(0), LW(1), LW(2))
         ADD(LW(1), 50)
-        CALL(evt_item_entry, STRING("menu_dummy"), LW(10), LW(0), LW(1), LW(2), 17, -1, 0)
+        CALL(evt_item_entry, STRING("menu_dummy"), LW(10), LW(0), LW(1), LW(2), ITEM_USE_KIND, -1, 0)
         ADD(LW(1), 10)
         CALL(evt_eff, 0, STRING("itemget"), 10, LW(0), LW(1), LW(2), 0, 0, 0, 0, 0, 0, 0, 0)
         CALL(evt_snd_sfxon_3d, STRING("SFX_ITEM_MARIO_USE1"), LW(0), LW(1), LW(2), 0)
@@ -679,8 +712,12 @@ EVT_BEGIN(evt_item_use)
         CALL(itemUseFunc)
         WAIT_MS(1500)
         CALL(itemUseFunc2)
+#ifdef VERSION_G8ME01_DEMO
+        CALL(evt_party_set_breed_pose, 0, 1)
+#else
         CALL_CHILD(PTR(win_main_child_evt))
         CALL(evt_mario_set_normal_pose)
+#endif
         RETURN
     END_IF
     RETURN
@@ -714,7 +751,9 @@ EVT_BEGIN(evt_diary_read)
     END_IF
     CALL(evt_msg_continue)
     CALL(evt_snd_bgmoff_f, 512, 2000)
+#ifndef VERSION_G8ME01_DEMO
     CALL(evt_mario_dispflag_onoff, 1, 2)
+#endif
     CALL(evt_mario_adjust_dir)
     CALL(evt_mario_set_pose, STRING("M_L_2"))
     CALL(evt_msg_print, 0, STRING("stg6_rsh_diary_04"), 0, 0)
@@ -753,7 +792,11 @@ EVT_BEGIN(evt_diary_read)
     ADD(LW(1), 20)
     ADD(LW(2), 20)
     CALL(evt_npc_set_position, STRING("ゆうれい"), LW(0), LW(1), LW(2))
+#ifdef VERSION_G8ME01_DEMO
+    CALL(evt_snd_sfxon_3d, STRING("SFX_STG6_GHOST_APPEAR1"), LW(0), LW(1), LW(2), 0)
+#else
     CALL(evt_snd_sfxon_3d, 132773, LW(0), LW(1), LW(2), 0)
+#endif
     WAIT_MS(200)
     CALL(evt_mario_set_pose, STRING("M_I_O"))
     CALL(evt_msg_print, 0, STRING("stg6_rsh_diary_05"), 0, STRING("ゆうれい"))
@@ -762,7 +805,12 @@ EVT_BEGIN(evt_diary_read)
     BEGIN_INLINE_EVENT
         CALL(evt_env_blur_on, 0, 0)
     END_INLINE_EVENT
+#ifdef VERSION_G8ME01_DEMO
+    CALL(evt_mario_get_pos, 0, LW(0), LW(1), LW(2))
+    CALL(evt_snd_sfxon_3d, STRING("SFX_STG6_GHOST_SHAKE1"), LW(0), LW(1), LW(2), LW(3))
+#else
     CALL(evt_snd_sfxon, 132770, LW(3))
+#endif
     BEGIN_INLINE_EVENT
         CALL(cam_r)
     END_INLINE_EVENT
@@ -817,11 +865,13 @@ EVT_BEGIN(evt_lecture_msg)
     END_LOOP
 #endif
     WAIT_MS(500)
+#ifndef VERSION_G8ME01_DEMO
     CALL(lecture_key_mask_off)
+#endif
     RETURN
-#ifdef VERSION_G8ME01
+#if defined(VERSION_G8ME01) || defined(VERSION_G8ME01_DEMO)
     OPCODE_END_SCRIPT,
-    0 // US: the object is 0x1E4 bytes (trailing zero word, the JP gap_05 data word)
+    0 // US and demo: a trailing zero word in the object (the JP gap_05 data word)
 };
 #else
 EVT_END()
@@ -832,7 +882,9 @@ USER_FUNC(itemUseFunc) {
     PartyEntry* party;
     MarioWork* mario;
     ItemData* item;
+#ifndef VERSION_G8ME01_DEMO
     EffectEntry* eff;
+#endif
 
     item = &itemDataTable[event->lwData[10]];
     mario = marioGetPtr();
@@ -886,8 +938,12 @@ USER_FUNC(itemUseFunc) {
                 cnt = 300;
                 break;
             }
+#ifdef VERSION_G8ME01_DEMO
+            effRecoveryEntry(0, item->hp_restored, party->position.x, party->position.y + party->height, party->position.z);
+#else
             eff = effRecoveryEntry(0, item->hp_restored, party->position.x, party->position.y + party->height, party->position.z);
             ((RecoveryWork*)eff->userdata)->baseY = -party->height * HALF_F;
+#endif
             cnt++;
             break;
         case 230:
@@ -940,10 +996,12 @@ USER_FUNC(party_color) {
     return EVT_RETURN_DONE;
 }
 
+#ifndef VERSION_G8ME01_DEMO
 USER_FUNC(all_party_slit_off) {
     allPartyForceSlitOff();
     return EVT_RETURN_DONE;
 }
+#endif
 
 USER_FUNC(cam_r) {
     CameraEntry* cam;
@@ -969,7 +1027,7 @@ BOOL winGhostDiaryChk(void) {
 }
 
 const char* winMainStrippedTpl(void) {
-    return "%s/w/%s/win.tpl";
+    return WIN_DIR "%s/win.tpl";
 }
 
 void winFontInit(void) {
@@ -1254,6 +1312,7 @@ void winTexSet(u32 textureId, Vec translate, Vec scale, GXColor color) {
     GXTexCoord2f32(0.0f, 0.0f);
 }
 
+#ifndef VERSION_G8ME01_DEMO
 void winTexSetNearest(u32 textureId, Vec translate, Vec scale, GXColor color) {
     Mtx trans;
     Mtx scl;
@@ -1286,6 +1345,7 @@ void winTexSetNearest(u32 textureId, Vec translate, Vec scale, GXColor color) {
     GXPosition3f32(-0.5f, HALF_F, 0.0f);
     GXTexCoord2f32(0.0f, 0.0f);
 }
+#endif
 
 void winTexSetRot(u32 textureId, Vec translate, Vec scale, GXColor color, f32 rot) {
     Mtx trans;
@@ -1478,6 +1538,13 @@ void winIconSet(s32 iconId, Vec translate, Vec scale, GXColor color) {
 USER_FUNC(lecture_step_wait) {
     s32 n = evtGetValue(event, event->args[0]);
 
+#ifdef VERSION_G8ME01_DEMO
+    // The demo has no key mask flag.
+    if (wp->lectureStep < n) {
+        return EVT_RETURN_BLOCK;
+    }
+    return EVT_RETURN_DONE;
+#else
     if (isFirstCall) {
         wp->flags &= ~0x800;
     }
@@ -1486,15 +1553,19 @@ USER_FUNC(lecture_step_wait) {
     }
     wp->flags |= 0x800;
     return EVT_RETURN_DONE;
+#endif
 }
 
+#ifndef VERSION_G8ME01_DEMO
 USER_FUNC(lecture_key_mask_off) {
     wp->flags &= ~0x800;
     return EVT_RETURN_DONE;
 }
+#endif
 
 void winLectureKeyMask(void) {
     if (wp->flags & 0x1000) {
+#ifndef VERSION_G8ME01_DEMO
         if (wp->flags & 0x800) {
             wp->buttonTrg = 0;
             wp->buttonRep = 0;
@@ -1502,6 +1573,7 @@ void winLectureKeyMask(void) {
             wp->dirRep = 0;
             return;
         }
+#endif
         switch (wp->lectureStep) {
             case 0:
             case 1:
@@ -1551,7 +1623,9 @@ void winLectureKeyMask(void) {
 
 void winLectureOn(void) {
     wp->flags |= 0x1000;
+#ifndef VERSION_G8ME01_DEMO
     wp->flags |= 0x800;
+#endif
     wp->lectureStep = 0;
     wp->lectureEvent = evtEntry(evt_lecture_msg, 0, 0);
 }
