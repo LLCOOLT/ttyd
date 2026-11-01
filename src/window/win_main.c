@@ -905,7 +905,9 @@ EVT_BEGIN(evt_lecture_msg)
     RETURN
 #if VERSION == VERSION_DEMO_US || VERSION >= VERSION_US
     OPCODE_END_SCRIPT,
-    0 // US and the US demo: a trailing zero word in the object (the JP gap_05 data word)
+    // the June US demo and the US code line (US, PAL, the September demos): a trailing zero word in the object (the
+    // JP gap_05 data word)
+    0
 };
 #else
 EVT_END()

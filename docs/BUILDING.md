@@ -1,6 +1,6 @@
 # Building
 
-This page covers everything needed to build the five supported versions and check them against the originals. For a one-version quick start, see the [README](../README.md#quick-build).
+This page covers everything needed to build the seven supported versions and check them against the originals. For a one-version quick start, see the [README](../README.md#quick-build).
 
 ## Versions
 
@@ -11,7 +11,7 @@ This page covers everything needed to build the five supported versions and chec
 | `G8MP01` | Europe, Rev 0 | the disc image | `MarioSt.dol` + 32 RELs (with `tst.rel`) | `33 files OK` |
 | `G8ME01_DEMO` | US demo, June 2004 | `zz_PaperMario2_game.tgc` from the Interactive Multi-Game Demo Disc Version 17 (USA) | `MarioSt.dol` + 6 RELs | `7 files OK` |
 | `G8MJ01_DEMO` | Japanese store demo, 2004 | `PaperMarioRPG.tgc` from Gekkan Nintendo Tentou Demo 2004.7.1 (Japan) | `MarioSt.dol` + 32 RELs (with `tst.rel`) | `33 files OK` |
-| `G8ME01_DEMO2` | US demo, September 2004 | `zz_PaperMario2_game.tgc` from the Interactive Multi-Game Demo Disc Version 19 (USA) | `MarioSt.dol` + 7 RELs | `8 files OK` |
+| `G8ME01_DEMO2` | US demo, September 2004 | `zz_PaperMario2_game.tgc` from the Interactive Multi-Game Demo Disc Version 19 (USA) (also 20-22 and 35) | `MarioSt.dol` + 7 RELs | `8 files OK` |
 | `G8MP01_DEMO` | European demo, September 2004 | `zz_PaperMario2_PALDEMO_20040924.tgc` from the Interactive Multi-Game Demo Disk - November 2004 (Europe) | `MarioSt.dol` + 7 RELs | `8 files OK` |
 
 The expected hashes are in `config/<version>/build.sha1`; the counts above are the number of lines in each of those files. [VERSIONS.md](VERSIONS.md) lists which RELs each version has.
@@ -51,11 +51,11 @@ The disc image can be ISO (GCM), RVZ, WIA, WBFS, CISO, NFS, GCZ or TGC. Put one 
 
 - `orig/G8MJ01/`: the Japanese disc.
 - `orig/G8ME01/`: the North American disc.
-- `orig/G8MP01/`: the European disc. This release is the only one that ships the developer test REL `files/rel/tst.rel`; nothing extra is needed, it is read from the disc.
-- `orig/G8ME01_DEMO/`: the demo is not a disc of its own. It is the file `zz_PaperMario2_game.tgc` inside the Interactive Multi-Game Demo Disc Version 17 (USA). Extract that file from the demo disc (for example in Dolphin: right-click the demo disc, **Properties → Filesystem**, right-click `zz_PaperMario2_game.tgc`, **Extract File**) and copy it into `orig/G8ME01_DEMO/`. Do not put the whole demo disc image there.
+- `orig/G8MP01/`: the European disc. This release and the Japanese demo ship the developer test REL `files/rel/tst.rel`; nothing extra is needed, it is read from the disc.
+- `orig/G8ME01_DEMO/`: the June 2004 US demo is not a disc of its own. It is the file `zz_PaperMario2_game.tgc` inside the Interactive Multi-Game Demo Disc Version 17 (USA). Extract that file from the demo disc (for example in Dolphin: right-click the demo disc, **Properties → Filesystem**, right-click `zz_PaperMario2_game.tgc`, **Extract File**) and copy it into `orig/G8ME01_DEMO/`. Do not put the whole demo disc image there.
 - `orig/G8MJ01_DEMO/`: the same for the Japanese store demo: the file `files/local/tgc/PaperMarioRPG.tgc` inside Gekkan Nintendo Tentou Demo 2004.7.1 (Japan). Extract it the same way and copy it into `orig/G8MJ01_DEMO/`.
-- `orig/G8ME01_DEMO2/`: the September 2004 US demo, the file `zz_PaperMario2_game.tgc` inside the Interactive Multi-Game Demo Disc Version 19 (USA). It has the same name as the June demo's file on Version 17, so check the disc (the same file is also on discs 20-22 and 35).
-- `orig/G8MP01_DEMO/`: the European demo, the file `zz_PaperMario2_PALDEMO_20040924.tgc` inside the Interactive Multi-Game Demo Disk - November 2004 (Europe).
+- `orig/G8ME01_DEMO2/`: the September 2004 US demo: the file `zz_PaperMario2_game.tgc` inside the Interactive Multi-Game Demo Disc Version 19 (USA) (also on Versions 20-22 and 35). Version 17 has a file of the same name, the June demo: take it from one of these discs. Extract it the same way and copy it into `orig/G8ME01_DEMO2/`.
+- `orig/G8MP01_DEMO/`: the European demo: the file `zz_PaperMario2_PALDEMO_20040924.tgc` inside the Interactive Multi-Game Demo Disk - November 2004 (Europe). Extract it the same way and copy it into `orig/G8MP01_DEMO/`.
 
 On the first build, decomp-toolkit extracts `sys/main.dol` and `files/rel/*.rel` from the image into the same folder. After that the image can be deleted to save space. Instead of an image, you can also provide an already extracted `sys/main.dol` and `files/rel/` directly.
 
@@ -83,6 +83,8 @@ Outputs, per version in its own folder (`build/G8MJ01/`, `build/G8ME01/`, `build
 `python configure.py --map` also writes linker map files.
 
 Each REL is linked into a partially linked module (`build/<version>/<area>/<area>.plf`), and `dtk rel make` turns all of them into RELs at once. One REL needs a step in between: the Japanese demo's `tst.rel` references `tst_nakayama_init_evt`, which that version does not define, and the original linker left the reference as 0 with no relocation, which `dtk rel make` cannot produce from an undefined symbol. For that REL, the linker writes `tst.linked.plf`, and `tools/drop_relocations.py` copies it to `tst.plf` without the relocations against the symbols in `config/G8MJ01_DEMO/unresolved_symbols.txt`. `configure.py` sets this up through `config.rel_dropped_relocations`; no other version or REL uses it.
+
+Every unit of every version links from C. While a new version is being added, `configure.py` can build some of its units from the original code instead: they are listed in `config/<version>/not_linked.txt` (`<rel>/<path>` for REL units, `<path>` for main executable units) and leave the list once they link from C and the hashes hold. The two September demos keep the file, empty.
 
 ### Switching versions and building all seven
 
@@ -119,7 +121,7 @@ After a build, `objdiff.json` exists in the project root. Download [objdiff](htt
 
 ## Troubleshooting
 
-- **A file fails the hash check on an unmodified tree.** Check that the disc is the right version and revision (Rev 0 for the three releases) and that `--version` matches the folder you put it in. For the US demo, check that `orig/G8ME01_DEMO/` holds `zz_PaperMario2_game.tgc` (or its extracted files), and for the Japanese demo that `orig/G8MJ01_DEMO/` holds `PaperMarioRPG.tgc`, not the whole demo disc.
+- **A file fails the hash check on an unmodified tree.** Check that the disc is the right version and revision (Rev 0 for the three releases) and that `--version` matches the folder you put it in. For the June US demo, check that `orig/G8ME01_DEMO/` holds `zz_PaperMario2_game.tgc` (or its extracted files), and for the Japanese demo that `orig/G8MJ01_DEMO/` holds `PaperMarioRPG.tgc`, not the whole demo disc. For the September demos, `orig/G8ME01_DEMO2/` and `orig/G8MP01_DEMO/` hold their `.tgc` (a hash failure on `G8ME01_DEMO2` usually means the June demo's file from Version 17).
 - **Two builds at once.** `build.ninja`, `objdiff.json` and ninja's own log belong to the last `configure.py` run in that checkout. Do not run two `ninja` processes, or `configure.py` while `ninja` runs, in the same checkout; build the versions one after another, or use a separate clone or `git worktree` for each parallel build.
 - **Japanese text in sources.** Sources are UTF-8 and may contain Japanese text (strings, comments). The compilers read Shift-JIS, so the build runs them through sjiswrap, which converts on the fly. Keep files UTF-8; an editor that re-saves a file in another encoding changes the bytes of its strings.
 - **"wine: command not found" or the compilers do not start** (macOS, non-x86 Linux): install Wine as above, or pass a wrapper with `--wrapper`.

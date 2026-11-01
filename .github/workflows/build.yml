@@ -4,9 +4,9 @@ name: Build
 #
 # The build job runs only when started by hand, on main, by the repository owner, on the owner's
 # self-hosted runner. The game files never leave that machine: the runner's .env sets TTYD_ORIG to a
-# folder holding G8MJ01/, G8ME01/, G8MP01/ and G8ME01_DEMO/, each with that version's extracted
-# sys/main.dol and files/rel/ (for the demo: the contents of zz_PaperMario2_game.tgc, i.e. its
-# main.dol and its six RELs).
+# folder holding one folder per version (G8MJ01/, G8ME01/, G8MP01/, G8ME01_DEMO/, G8MJ01_DEMO/,
+# G8ME01_DEMO2/, G8MP01_DEMO/), each with that version's extracted sys/main.dol and files/rel/ (for a
+# demo: the contents of its .tgc file, i.e. its main.dol and its RELs).
 on:
   workflow_dispatch:
   push:
@@ -45,7 +45,7 @@ jobs:
       fail-fast: false
       max-parallel: 1
       matrix:
-        version: [G8MJ01, G8ME01, G8MP01, G8ME01_DEMO]
+        version: [G8MJ01, G8ME01, G8MP01, G8ME01_DEMO, G8MJ01_DEMO, G8ME01_DEMO2, G8MP01_DEMO]
     defaults:
       run:
         shell: powershell

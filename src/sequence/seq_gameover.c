@@ -450,8 +450,8 @@ void seq_gameOverMain(SequenceWork* work) {
             if (!fadeIsFinish()) {
                 break;
             }
-            // every demo resets the game here instead of returning to the title
 #if VERSION <= VERSION_DEMO_JP || VERSION == VERSION_DEMO_US2 || VERSION == VERSION_DEMO_EU
+            // every demo resets the game here instead of returning to the title
             gp->resetType = 1;
 #else
             _relUnLoad();

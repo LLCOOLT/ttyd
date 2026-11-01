@@ -24,7 +24,7 @@ from typing import Dict, List, Optional, Tuple
 ROOT = os.path.abspath(os.path.join(os.path.dirname(os.path.realpath(__file__)), ".."))
 VERSIONS = ["G8MJ01", "G8ME01", "G8MP01", "G8ME01_DEMO", "G8MJ01_DEMO", "G8ME01_DEMO2", "G8MP01_DEMO"]
 # Pairs to compare: every version against JP, PAL against US (PAL is built from the US code), the two early demos
-# against each other (the Japanese and the US demo are builds of the same code), the September 2004 demos against
+# against each other (the Japanese and the June US demo are builds of the same code), the September 2004 demos against
 # the release each was built from and against each other.
 PAIRS = [("G8MJ01", "G8ME01"), ("G8MJ01", "G8MP01"), ("G8MJ01", "G8ME01_DEMO"), ("G8MJ01", "G8MJ01_DEMO"),
          ("G8ME01", "G8MP01"), ("G8ME01_DEMO", "G8MJ01_DEMO"), ("G8MJ01", "G8ME01_DEMO2"), ("G8MJ01", "G8MP01_DEMO"),

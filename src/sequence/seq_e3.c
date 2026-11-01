@@ -183,9 +183,9 @@ static void alarm_handler(OSAlarm* alarm, OSContext* context) {
 }
 
 /**
- * Enters the kiosk menu: loads its textures (monthry.tpl; the US demo's e3.tpl plus its four title characters),
- * starts the play-time alarm (5 min in the US release, 10 min otherwise; the US demo arms it when a scenario starts),
- * sets the kiosk and save-blocks-off flags and plays the file menu BGM.
+ * Enters the kiosk menu: loads its textures (monthry.tpl; the June US demo's e3.tpl plus its four title
+ * characters), starts the play-time alarm (5 min in the US release, 10 min otherwise; the June US demo arms it when
+ * a scenario starts), sets the kiosk and save-blocks-off flags and plays the file menu BGM.
  */
 void seq_e3Init(SequenceWork* seq) {
 #if VERSION == VERSION_DEMO_US
@@ -208,7 +208,7 @@ void seq_e3Init(SequenceWork* seq) {
     wp->scenario = 0;
     wp->poseRotY = 270.0f;
 #if VERSION == VERSION_DEMO_US
-    // The US demo starts the timeout when a scenario is picked.
+    // The June US demo starts the timeout when a scenario is picked.
     OSCancelAlarm(&wp->alarm);
     wp->initTime = 0;
 #else

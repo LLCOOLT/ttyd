@@ -63,7 +63,7 @@ static void mapDispMapObj_off(CameraId cam, MapObject* obj);
 
 #define TWO_PI 6.28318530717958647692528676655900576839433879875021f
 
-/** Frames per second of the map animation clock. PAL keeps it at 60 even when the display runs at 50 Hz. */
+/** Frames per second of the map animation clock: PAL and the EU demo keep 60 even when the display runs at 50 Hz. */
 static inline s32 mapAnimFps(void) {
 #if VERSION >= VERSION_DEMO_EU
     return 60;

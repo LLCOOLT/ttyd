@@ -8,7 +8,7 @@ Paper Mario: The Thousand-Year Door
 [Data Progress]: https://img.shields.io/badge/Data-100.00%25-blue
 [Linked Progress]: https://img.shields.io/badge/Linked-100.00%25-blue
 
-A matching decompilation of Paper Mario: The Thousand-Year Door for the GameCube. One C source tree builds five versions of the game, and each build reproduces its original files byte for byte: the main executable and every area module (REL).
+A matching decompilation of Paper Mario: The Thousand-Year Door for the GameCube. One C source tree builds seven versions of the game, and each build reproduces its original files byte for byte: the main executable and every area module (REL).
 
 This repository does **not** contain any game assets or disassembled game code. You need your own copy of the game to build it.
 
@@ -16,19 +16,21 @@ This repository does **not** contain any game assets or disassembled game code. 
 
 | Version | Release | Units linked from C | Build check |
 |---|---|---|---|
-| `G8MJ01` | Japan (the default) | 1234 / 1234 | `32 files OK` |
+| `G8MJ01` | Japan (the default) | 1233 / 1233 | `32 files OK` |
 | `G8ME01` | North America | 1226 / 1226 | `30 files OK` |
 | `G8MP01` | Europe (English, German, French, Spanish, Italian), with the developer test REL `tst.rel` | 1378 / 1378 | `33 files OK` |
-| `G8ME01_DEMO` | June 2004 demo from the Interactive Multi-Game Demo Disc Version 17 (USA) | 746 / 746 | `7 files OK` |
+| `G8ME01_DEMO` | June 2004 US demo from the Interactive Multi-Game Demo Disc Version 17 (USA) | 746 / 746 | `7 files OK` |
 | `G8MJ01_DEMO` | 2004 Japanese store demo from Gekkan Nintendo Tentou Demo 2004.7.1 (Japan), with `tst.rel` | 1377 / 1377 | `33 files OK` |
+| `G8ME01_DEMO2` | September 2004 US demo from the Interactive Multi-Game Demo Disc Version 19 (USA) (also 20-22 and 35) | 806 / 806 | `8 files OK` |
+| `G8MP01_DEMO` | September 2004 European demo from the Interactive Multi-Game Demo Disk - November 2004 (Europe) | 811 / 811 | `8 files OK` |
 
-All five builds are byte-identical to the originals, and every unit of every version is compiled from C and linked. All source is C; the only assembly is what the original sources had in assembly (a few SDK, runtime and debugger routines, the hardware helpers in `include/hwaccess.h` and the word copy `memcpy_as4` in `src/system.c`).
+All seven builds are byte-identical to the originals, and every unit of every version is compiled from C and linked. All source is C; the only assembly is what the original sources had in assembly (a few SDK, runtime and debugger routines, the hardware helpers in `include/hwaccess.h` and the word copy `memcpy_as4` in `src/system.c`).
 
 Some functions use small behaviour-identical tricks to reach a byte-identical build. Each is marked in the code with a `FAKE` comment and listed in [docs/FAKES.md](docs/FAKES.md).
 
 ![Progress treemap: one cell per file, sized by code bytes, colored by match percent](docs/progress.svg)
 
-Live progress maps (interactive versions of the treemap above): [JP (G8MJ01)](https://claude.ai/artifact/74tZKbcCQ7WUWFM577oqmY), [US (G8ME01)](https://claude.ai/artifact/1Hdacn3R1wrwjtwDQRuwKJ), [PAL (G8MP01)](https://claude.ai/artifact/6dk3TYTCor6vVNTijmaoHD), [US demo (G8ME01_DEMO)](https://claude.ai/artifact/ACXuRr5dqsvZvvr4DPs1nK) and [Japanese demo (G8MJ01_DEMO)](https://claude.ai/artifact/DNusFNsGHupS3nQeUceNjf)
+Live progress maps (interactive versions of the treemap above): [JP (G8MJ01)](https://claude.ai/artifact/74tZKbcCQ7WUWFM577oqmY), [US (G8ME01)](https://claude.ai/artifact/1Hdacn3R1wrwjtwDQRuwKJ), [PAL (G8MP01)](https://claude.ai/artifact/6dk3TYTCor6vVNTijmaoHD), [June US demo (G8ME01_DEMO)](https://claude.ai/artifact/ACXuRr5dqsvZvvr4DPs1nK), [Japanese demo (G8MJ01_DEMO)](https://claude.ai/artifact/DNusFNsGHupS3nQeUceNjf), [September US demo (G8ME01_DEMO2)](https://claude.ai/artifact/H8Zt7ccViYhWUm84F7kyTX), [European demo (G8MP01_DEMO)](https://claude.ai/artifact/8iu2BwzdGkYxyqBaaRmQwY)
 
 ## Quick build
 
@@ -42,16 +44,16 @@ python configure.py
 ninja
 ```
 
-A matching build ends with `32 files OK`. For another version, run `python configure.py --version G8ME01` (or `G8MP01`, `G8ME01_DEMO`, `G8MJ01_DEMO`) with that disc in `orig/<version>/`. [docs/BUILDING.md](docs/BUILDING.md) has the details: which file goes where for each version (including the demos' `zz_PaperMario2_game.tgc` and `PaperMarioRPG.tgc`), building all five, running a build in Dolphin, objdiff and troubleshooting.
+A matching build ends with `32 files OK`. For another version, run `python configure.py --version G8ME01` (or `G8MP01`, `G8ME01_DEMO`, `G8MJ01_DEMO`, `G8ME01_DEMO2`, `G8MP01_DEMO`) with that disc, or for a demo its `.tgc` file, in `orig/<version>/`. [docs/BUILDING.md](docs/BUILDING.md) has the details: which file goes where for each version (including the demos' `zz_PaperMario2_game.tgc`, `PaperMarioRPG.tgc` and `zz_PaperMario2_PALDEMO_20040924.tgc`), building all seven, running a build in Dolphin, objdiff and troubleshooting.
 
 ## Documentation
 
 | Document | What it covers |
 |---|---|
-| [docs/BUILDING.md](docs/BUILDING.md) | Dependencies, disc files per version, building and checking all five versions, running a build, objdiff, troubleshooting |
-| [docs/VERSIONS.md](docs/VERSIONS.md) | What differs between JP, US, PAL and the two demos, and how the sources express it (`VERSION_*` macros, `VERSION_PICK`, `FPS_FRAMES`, small-data thresholds, REL sets) |
+| [docs/BUILDING.md](docs/BUILDING.md) | Dependencies, disc files per version, building and checking all seven versions, running a build, objdiff, troubleshooting |
+| [docs/VERSIONS.md](docs/VERSIONS.md) | What differs between JP, US, PAL and the four demos, and how the sources express it (`VERSION_*` macros, `VERSION_PICK`, `FPS_FRAMES`, small-data thresholds, REL sets) |
 | [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) | How the game is put together: boot, frame loop, sequences, the event script system, maps and RELs, drivers, battle, memory, sound, and where each lives |
-| [docs/CONTRIBUTING.md](docs/CONTRIBUTING.md) | Code standards, the five-version check, fakes, adding a version difference, commit style |
+| [docs/CONTRIBUTING.md](docs/CONTRIBUTING.md) | Code standards, the seven-version check, fakes, adding a version difference, commit style |
 | [docs/GLOSSARY.md](docs/GLOSSARY.md) | Romanised Japanese names used in the code, every REL area code, common abbreviations |
 | [docs/KNOWN_GAME_BUGS.md](docs/KNOWN_GAME_BUGS.md) | Bugs of the original game that the code reproduces, with file and line |
 | [docs/FAKES.md](docs/FAKES.md) | Every behaviour-identical matching trick, per function |
@@ -123,7 +125,7 @@ Per category, JP (G8MJ01) (generated by `tools/update_readme.py`):
 | SDK Code | 100.00% | 100.00% | 182 / 182 | 1130 / 1130 |
 | MusyX Code | 100.00% | 100.00% | 31 / 31 | 367 / 367 |
 
-**US demo (G8ME01_DEMO)**, data matched 100.00%:
+**June US demo (G8ME01_DEMO)**, data matched 100.00%:
 
 | Category | Matched code | Linked code | Linked files | Matched functions |
 |---|---|---|---|---|
@@ -142,6 +144,28 @@ Per category, JP (G8MJ01) (generated by `tools/update_readme.py`):
 | DOL | 100.00% | 100.00% | 633 / 633 | 6905 / 6905 |
 | Modules | 100.00% | 100.00% | 744 / 744 | 3127 / 3127 |
 | Game Code | 100.00% | 100.00% | 1164 / 1164 | 8535 / 8535 |
+| SDK Code | 100.00% | 100.00% | 182 / 182 | 1130 / 1130 |
+| MusyX Code | 100.00% | 100.00% | 31 / 31 | 367 / 367 |
+
+**September US demo (G8ME01_DEMO2)**, data matched 100.00%:
+
+| Category | Matched code | Linked code | Linked files | Matched functions |
+|---|---|---|---|---|
+| All | 100.00% | 100.00% | 806 / 806 | 7947 / 7947 |
+| DOL | 100.00% | 100.00% | 630 / 630 | 6967 / 6967 |
+| Modules | 100.00% | 100.00% | 176 / 176 | 980 / 980 |
+| Game Code | 100.00% | 100.00% | 596 / 596 | 6482 / 6482 |
+| SDK Code | 100.00% | 100.00% | 179 / 179 | 1098 / 1098 |
+| MusyX Code | 100.00% | 100.00% | 31 / 31 | 367 / 367 |
+
+**European demo (G8MP01_DEMO)**, data matched 100.00%:
+
+| Category | Matched code | Linked code | Linked files | Matched functions |
+|---|---|---|---|---|
+| All | 100.00% | 100.00% | 811 / 811 | 8020 / 8020 |
+| DOL | 100.00% | 100.00% | 635 / 635 | 7040 / 7040 |
+| Modules | 100.00% | 100.00% | 176 / 176 | 980 / 980 |
+| Game Code | 100.00% | 100.00% | 598 / 598 | 6523 / 6523 |
 | SDK Code | 100.00% | 100.00% | 182 / 182 | 1130 / 1130 |
 | MusyX Code | 100.00% | 100.00% | 31 / 31 | 367 / 367 |
 <!-- progress-end -->

@@ -34,8 +34,10 @@ VERSIONS = [
     "G8MP01",  # 2
     "G8ME01_DEMO",  # 3: the June 2004 prerelease from the Interactive Multi-Game Demo Disc Version 17 (disc ID G8MJ01)
     "G8MJ01_DEMO",  # 4: the Japanese store demo from Gekkan Nintendo Tentou Demo 2004.7.1 (disc ID G8MJ01)
-    "G8ME01_DEMO2",  # 5: the September 2004 US demo from the Interactive Multi-Game Demo Disc Version 19 (disc ID G8ME01)
+    "G8ME01_DEMO2",  # 5: the September 2004 US demo from the Interactive Multi-Game Demo Disc Version 19
+    # (disc ID G8ME01)
     "G8MP01_DEMO",  # 6: the September 2004 European demo from the Interactive Multi-Game Demo Disk - November 2004
+    # (Europe) (disc ID G8MP01)
 ]
 
 parser = argparse.ArgumentParser()
@@ -233,29 +235,28 @@ cflags_base = [
 ]
 # The game code tests the version through include/version.h (VERSION_DEMO_US < VERSION_DEMO_JP < VERSION_JP <
 # VERSION_US < VERSION_DEMO_US2 < VERSION_DEMO_EU < VERSION_EU; tools/check_versions.py keeps the per-version macros
-# below out of it). The library code
-# under libs/ tests those: the European release is built from the US code, so G8MP01 defines VERSION_G8ME01 as well,
-# and VERSION_G8MP01 marks what differs in PAL.
+# below out of it). The library code under libs/ tests those: the European release is built from the US code, so
+# G8MP01 defines VERSION_G8ME01 as well, and VERSION_G8MP01 marks what differs in PAL.
 if config.version == "G8MP01":
     cflags_base.append("-DVERSION_G8ME01")
-# The September 2004 demos were built from the release code a few days after it (the US demo from the US code, the
-# European demo from the PAL code): of their main.dol functions, all but a few dozen have the same code as US or
+# The September 2004 demos were built from the release code a few days after it (the US one from the US code, the
+# European one from the PAL code): of their main.dol functions, all but a few dozen have the same code as US or
 # PAL (relocations masked). version.h gives them their own values (VERSION_DEMO_US2, VERSION_DEMO_EU); the library
 # code under libs/ sees them as US and PAL.
 if config.version == "G8ME01_DEMO2":
     cflags_base.append("-DVERSION_G8ME01")
 if config.version == "G8MP01_DEMO":
     cflags_base.extend(["-DVERSION_G8ME01", "-DVERSION_G8MP01"])
-# The US demo (build MarioSt_MN7_NOA_20040619a) is English, but its code is the JP code before localization: of
+# The June US demo (build MarioSt_MN7_NOA_20040619a) is English, but its code is the JP code before localization: of
 # the main.dol functions where JP and US differ, 373 match JP and none match US. So it takes the JP code paths (no
 # VERSION_G8ME01).
 
-# The Japanese store demo has the US demo's pre-final code a little later (in five places it already has the
-# release code): 6,890 of its 6,905 main.dol functions have the same code as the US demo's (relocations masked). The library code marks what the two demos
-# share with VERSION_G8ME01_DEMO || VERSION_G8MJ01_DEMO.
+# The Japanese store demo has the June US demo's pre-final code a little later (in five places it already has the
+# release code): 6,890 of its 6,905 main.dol functions have the same code as the June US demo's (relocations
+# masked). The library code marks what the two early demos share with VERSION_G8ME01_DEMO || VERSION_G8MJ01_DEMO.
 DEMO_VERSIONS = ("G8ME01_DEMO", "G8MJ01_DEMO")
 
-# Small-data thresholds of the game code. The demos put no variable over 8 bytes in .sdata/.sbss (PadChanMask[4]
+# Small-data thresholds of the game code. The early demos put no variable over 8 bytes in .sdata/.sbss (PadChanMask[4]
 # of sdk/DEMOPad.c is in .data) and no constant over 4 bytes in .sdata2 (the 6-byte string "title" is in .rodata).
 if config.version in DEMO_VERSIONS:
     cflags_sdata = ["-sdata 8", "-sdata2 4"]
@@ -2290,13 +2291,13 @@ config.libs = [
 
 # main.dol game units built with msl_main.pch: the units that keep the dtrigf mask block and the sqrtf users
 MAIN_PCH = {"battle/ac/ac_air_gauge.c", "battle/battle_audience.c", "battle/battle_break_slot.c", "battle/battle_event_cmd.c", "battle/battle_seq.c", "battle/battle_seq_end.c", "battle/battle_stage_object.c", "battle/battle_status_icon.c", "cam_road.c", "driver/envdrv.c", "driver/itemdrv.c", "driver/mapdrv.c", "driver/mobjdrv.c", "driver/npcdrv.c", "driver/shadowdrv.c", "effect/eff_fall.c", "effect/eff_fukidashi.c", "effect/eff_funemizu.c", "effect/eff_ibuki.c", "effect/eff_nozle.c", "effect/eff_particle.c", "effect/eff_starstone.c", "effect/eff_toiki.c", "effect/eff_ultra_hammer.c", "effect/n64/eff_akari_charge_n64.c", "effect/n64/eff_blow_n64.c", "effect/n64/eff_booboo_n64.c", "effect/n64/eff_broken_barrier_n64.c", "effect/n64/eff_butterfly_n64.c", "effect/n64/eff_cloud_n64.c", "effect/n64/eff_fireflower_n64.c", "effect/n64/eff_flame_n64.c", "effect/n64/eff_hokori_n64.c", "effect/n64/eff_kemuri10_n64.c", "effect/n64/eff_kumokumo_chip_n64.c", "effect/n64/eff_kumokumo_n64.c", "effect/n64/eff_magic3_n64.c", "effect/n64/eff_opuku_jetw_n64.c", "effect/n64/eff_pokopi_pcharge_n64.c", "effect/n64/eff_pokopi_thunder_n64.c", "effect/n64/eff_pturn_n64.c", "effect/n64/eff_recover_heart_n64.c", "effect/n64/eff_release_n64.c", "effect/n64/eff_small_star_n64.c", "effect/n64/eff_snow_dust_n64.c", "effect/n64/eff_sstar_n64.c", "effect/n64/eff_water_damage_n64.c", "event/evt_cam.c", "event/evt_mobj.c", "event/evt_npc.c", "event/evt_snd.c", "himo.c", "koopa_hit.c", "mario/mario.c", "mario/mario_hit.c", "motion/mot_roll.c", "nameent.c", "party/party_hit.c", "party/party_motion.c", "party/party_move.c", "pmario_sound.c", "sequence/seq_gameover.c", "sequence/seq_load.c", "sequence/seq_title.c", "system.c", "unit/party/unit_party_christine.c", "unit/party/unit_party_chuchurina.c", "unit/party/unit_party_clauda.c", "unit/party/unit_party_nokotarou.c", "unit/party/unit_party_sanders.c", "unit/party/unit_party_vivian.c", "unit/party/unit_party_yoshi.c"}
-# The demos keep the dtrigf constants in a different set of units (msl_main.pch).
+# The early demos keep the dtrigf constants in a different set of units (msl_main.pch).
 MAIN_PCH_DEMO_ADD = {"effect/n64/eff_akari_pose_n64.c", "effect/n64/eff_timestamp_n64.c", "effect/n64/eff_snowman_n64.c", "effect/n64/eff_horao_spell_n64.c", "effect/n64/eff_dogabon_attack_n64.c", "effect/n64/eff_confetti_n64.c", "effect/eff_kiss.c", "effect/eff_levelup.c", "effect/eff_minigame.c", "effect/eff_spark.c", "effect/eff_stageclear.c", "statuswindow.c", "motion/mot_hammer.c", "battle/battle_seq_command.c", "motion/mot_damage.c", "motion/mot_plane.c", "party/party_bomhei.c", "window/win_mario.c", "effect/eff_splash.c"}
-# These units use the math header without the dtrigf constants in the demos.
+# These units use the math header without the dtrigf constants in the early demos.
 MATH_PCH_DEMO = {"party/party_hit.c", "party/party_move.c", "party/party_motion.c", "event/evt_snd.c", "effect/n64/eff_akari_charge_n64.c", "effect/n64/eff_kemuri10_n64.c", "effect/n64/eff_small_star_n64.c", "nameent.c", "system.c", "mario/mario.c", "mario/mario_hit.c", "driver/npcdrv.c", "driver/itemdrv.c"}
 if config.version in DEMO_VERSIONS:
     MAIN_PCH = (MAIN_PCH - MATH_PCH_DEMO) | MAIN_PCH_DEMO_ADD | {"battle/battle_seq_command.c", "motion/mot_damage.c", "motion/mot_plane.c", "event/evt_shop.c", "driver/camdrv.c"}
-    # the demos' shadowdrv has neither the dtrigf block nor the sqrtf statics
+    # the early demos' shadowdrv has neither the dtrigf block nor the sqrtf statics
     MAIN_PCH -= {"driver/shadowdrv.c"}
 else:
     MATH_PCH_DEMO = set()
@@ -2306,7 +2307,8 @@ if config.version == "G8MJ01_DEMO":
     config.rel_dropped_relocations = {"tst": Path("config/G8MJ01_DEMO/unresolved_symbols.txt")}
 # Units of a new version that do not link from C yet (they build from the original code): one per line in
 # config/<version>/not_linked.txt, `<rel>/<path>` for REL objects and `<path>` for main.dol objects. A unit leaves
-# the list once it links from C and the hashes hold; a version without the file links every unit.
+# the list once it links from C and the hashes hold; a version without the file, or with an empty one (every
+# version today), links every unit.
 not_linked_path = Path("config") / config.version / "not_linked.txt"
 if not_linked_path.exists():
     with open(not_linked_path, encoding="utf-8") as f:

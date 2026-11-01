@@ -68,7 +68,8 @@ static s16* mario_status_point_table[3];
 //.sdata
 static WinMgrWork* wp = &work;
 #if VERSION <= VERSION_DEMO_JP
-// Unreferenced; every demo TU that had it carries its own copy at the start of .data.
+// Unreferenced; the early demos carry a copy at the start of this TU's .data (the September US demo one in
+// mariost.c).
 static f32 unusedSignTbl[16] = {-1.0f, 1.0f, -1.0f, 1.0f, 1.0f, -1.0f, 1.0f, -1.0f, -1.0f, 1.0f, -1.0f, 1.0f, 1.0f, -1.0f, 1.0f, -1.0f};
 #endif
 static u16 party_id_table[] = {1, 2, 5, 4, 6, 3, 7, 0};

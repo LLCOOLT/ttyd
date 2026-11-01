@@ -171,8 +171,8 @@ static f32 randf(f32 min, f32 max) {
 }
 
 /**
- * EU only: seeds the boss swarm's own random generator (two-word state),
- * so the EU version gets the same swarm placement on every run.
+ * PAL only: seeds the boss swarm's own random generator (two-word state),
+ * so the PAL version gets the same swarm placement on every run.
  */
 #if VERSION >= VERSION_DEMO_EU
 void moamoa_srand(u32 seed) {
@@ -180,7 +180,7 @@ void moamoa_srand(u32 seed) {
     moamoa_rand_cur = seed + 0x37E35F7D;
 }
 
-/** EU only: returns a float between min and max from the boss swarm's own generator seeded by moamoa_srand. */
+/** PAL only: returns a float between min and max from the boss swarm's own generator seeded by moamoa_srand. */
 f32 moamoa_randf(f32 min, f32 max) {
     s32 cur = moamoa_rand_cur;
     s32 next = moamoa_rand_prev + cur + 0x195B31B7;

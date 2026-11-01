@@ -518,7 +518,9 @@ class Module:
         k = bisect.bisect_right(starts, t) - 1
         if k < 0 or t >= ends[k] or t + s.size == ends[k]:
             return None
-        if self._bytes_agree(s.sec, s, t, sec) and (starts[k] != t or t + s.size < ends[k] or self._tail_unnamed(sec, ends[k], t + s.size)):
+        if self._bytes_agree(s.sec, s, t, sec) and (
+            starts[k] != t or t + s.size < ends[k] or self._tail_unnamed(sec, ends[k], t + s.size)
+        ):
             return None
         return ends[k] - t
 

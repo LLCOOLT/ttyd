@@ -36,7 +36,8 @@ f32 sysFrame2SecFloat(f32 frame);
 s32 sysMsec2Frame(s32 msec);
 f32 sysMsec2FrameFloat(f32 msec);
 void mtxGetRotationElement(Mtx src, Mtx dst, s8 firstAxis, s8 secondAxis);
-// PAL only (the functions exist only in the European build; declared for every build so unused PAL-only code reads normally)
+// PAL and the EU demo only (the functions exist only in the European builds; declared for every build so unused
+// PAL-only code reads normally)
 void sysDebugReport(const char* file, s32 line, const char* fmt, ...);                           // OSReport "[file:line] message"
 BOOL __assert2(const char* filename, s32 line, const char* assertion, const char* message, ...); // panics with the message
 s32 LZ77Decode(u8* input, u8* output);

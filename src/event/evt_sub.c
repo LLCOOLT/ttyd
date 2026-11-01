@@ -2666,7 +2666,7 @@ USER_FUNC(evt_sub_animgroup_async) {
 }
 
 #if VERSION >= VERSION_DEMO_EU
-/** Returns the display frame rate (50 or 60) in args[0]. PAL only. */
+/** Returns the display frame rate (50 or 60) in args[0]. PAL and the EU demo only. */
 USER_FUNC(evt_sub_get_framerate) {
     evtSetValue(event, event->args[0], gp->framerate);
     return EVT_RETURN_DONE;

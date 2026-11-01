@@ -92,10 +92,10 @@ static USER_FUNC(alpha_init_func);
 static USER_FUNC(alpha_set_func);
 #if VERSION >= VERSION_DEMO_EU
 /**
- * Declaration of the PAL-only helper in evt_sub.c that writes gp->framerate (50 or 60) to its script
+ * Declaration of the PAL helper in evt_sub.c that writes gp->framerate (50 or 60) to its script
  * argument.
  */
-USER_FUNC(evt_sub_get_framerate); // evt_sub.c (PAL only): writes gp->framerate (50 or 60) to arg 0
+USER_FUNC(evt_sub_get_framerate); // evt_sub.c (PAL): writes gp->framerate (50 or 60) to arg 0
 #endif
 static USER_FUNC(scale_func);
 #if VERSION >= VERSION_US

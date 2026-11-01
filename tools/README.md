@@ -8,7 +8,7 @@ Scripts for building, checking and reporting. Run them from the repository root.
 
 | Option | Effect |
 |---|---|
-| `--version G8MJ01` / `G8ME01` / `G8MP01` / `G8ME01_DEMO` / `G8MJ01_DEMO` | version to build (default `G8MJ01`) |
+| `--version G8MJ01` / `G8ME01` / `G8MP01` / `G8ME01_DEMO` / `G8MJ01_DEMO` / `G8ME01_DEMO2` / `G8MP01_DEMO` | version to build (default `G8MJ01`) |
 | `--map` | also write linker map files |
 | `--non-matching` | link units that are equivalent but not matching (for modified builds) |
 | `--debug` | build with debug information (not matching) |
@@ -33,7 +33,7 @@ Scripts for building, checking and reporting. Run them from the repository root.
 | `tools/update_readme.py` | refreshes the README badges and the "Detailed progress" tables from each version's `build/<version>/report.json` | build the versions, then `python tools/update_readme.py` |
 | `tools/progress_treemap.py` | renders a `report.json` as a self-contained HTML progress page (and optionally `docs/progress.svg`): headline figures, per-category bars and a treemap with one cell per unit | `python tools/progress_treemap.py build/G8MJ01/report.json -o build/progress.html [--svg docs/progress.svg]` |
 | `tools/check_versions.py` | checks the version conditions of the game code: `VERSION` compared with the ordered values of `include/version.h`, never configure.py's `VERSION_G8M*` macros, and `version.h` included before the first test. Needs no game files; the lint job runs it | `python tools/check_versions.py [-v]` |
-| `tools/check_symbols.py` | lines up each source file's functions across the five versions' `symbols.txt` and `splits.txt` and fails if the same function has different names (known different functions in the same slot are listed in the script). Needs no game files; the lint job runs it | `python tools/check_symbols.py [-v]` (`-v` also lists functions only one version has) |
+| `tools/check_symbols.py` | lines up each source file's functions across the seven versions' `symbols.txt` and `splits.txt` and fails if the same function has different names (known different functions in the same slot are listed in the script). Needs no game files; the lint job runs it | `python tools/check_symbols.py [-v]` (`-v` also lists functions only one version has) |
 | `tools/format_check.py` | checks the formatting of `include/`, `src/` and `rels/`: clang-format with `.clang-format` for C code, script blocks indented by nesting, data tables and assert lines left as laid out; skips with a message when clang-format (major version 23) is not installed. The lint job runs it | `python tools/format_check.py [paths...]` (`--write` reformats) |
 | `tools/port_symbols.py` | carries one version's `symbols.txt` and `splits.txt` over to another release of the game: pairs functions by their instructions, places data by the references to it, and writes a report of what it could not place. Used to set up a new version's configuration from an existing one | see the usage text at the top of the script |
 

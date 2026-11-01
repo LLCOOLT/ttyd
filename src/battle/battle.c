@@ -233,8 +233,8 @@ BOOL Btl_UnitSetup(BattleWork* wp) {
     }
 
     enemyData = groupSetup->enemyData;
-    // Every demo (the early ones and the 2004-09 ones): the enemies carry no held or stolen items.
 #if VERSION <= VERSION_DEMO_JP || VERSION == VERSION_DEMO_US2 || VERSION == VERSION_DEMO_EU
+    // Every demo (the early ones and the 2004-09 ones): the enemies carry no held or stolen items.
     heldItem = ITEM_NULL;
 #endif
     for (i = 0; i < groupSetup->numEnemies; enemyData++, i++) {

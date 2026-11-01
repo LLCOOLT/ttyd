@@ -2,7 +2,7 @@
 .file "targsupp.s"
 
 .text
-# US and PAL (BUILD_VERSION 1, 2): the TRK file stubs start on a 16-byte boundary; JP keeps 4.
+# Every version but JP (BUILD_VERSION >= 1): the TRK file stubs start on a 16-byte boundary; JP keeps 4.
 .if BUILD_VERSION >= 1
 .balign 16
 .else

@@ -103,7 +103,7 @@ GXRenderModeObj sRMObjHReso =
     MARIOST_RENDER_MODE(VI_TVMODE_NTSC_INT, 0x1C0, 0x1C0, 0x1B, 0x10, 0x29A, 0x1C0, VI_XFBMODE_DF);
 #endif
 #if VERSION == VERSION_DEMO_US2
-/** sRMObjHReso's PAL twin (50Hz). */
+/** sRMObjHReso's PAL twin (50Hz); the same values as PAL's mode below. */
 GXRenderModeObj sRMObjHResoPal =
     MARIOST_RENDER_MODE(VI_TVMODE_PAL_INT, 0x1C0, 0x212, 0x1B, 0x16, 0x29A, 0x212, VI_XFBMODE_DF);
 #elif VERSION >= VERSION_DEMO_EU
@@ -118,7 +118,7 @@ GXRenderModeObj sRMObjHReso_prog =
     MARIOST_RENDER_MODE(VI_TVMODE_NTSC_PROG, 0x1C0, 0x1C0, 0x1B, 0x10, 0x29A, 0x1C0, VI_XFBMODE_SF);
 #endif
 #if VERSION == VERSION_DEMO_US2
-/** sRMObjHReso_prog's PAL twin (EURGB60). */
+/** sRMObjHReso_prog's PAL twin (EURGB60); the same values as PAL's mode below. */
 GXRenderModeObj sRMObjHReso_progPal =
     MARIOST_RENDER_MODE(VI_TVMODE_EURGB60_INT, 0x1C0, 0x1C0, 0x1B, 0x10, 0x29A, 0x1C0, VI_XFBMODE_DF);
 #elif VERSION >= VERSION_DEMO_EU
@@ -133,7 +133,7 @@ GXRenderModeObj GXNtsc480IntDfMarioSt =
     MARIOST_RENDER_MODE(VI_TVMODE_NTSC_INT, 0x1E0, 0x1E0, 0x1E, 0x0, 0x294, 0x1E0, VI_XFBMODE_DF);
 #endif
 #if VERSION == VERSION_DEMO_US2
-/** GXNtsc480IntDfMarioSt's PAL twin (50Hz). */
+/** GXNtsc480IntDfMarioSt's PAL twin (50Hz); the same values as PAL's mode below. */
 GXRenderModeObj GXNtsc480IntDfMarioStPal =
     MARIOST_RENDER_MODE(VI_TVMODE_PAL_INT, 0x1E0, 0x238, 0x1E, 0x6, 0x294, 0x238, VI_XFBMODE_DF);
 #elif VERSION >= VERSION_DEMO_EU
@@ -148,7 +148,7 @@ GXRenderModeObj GXNtsc480ProgMarioSt =
     MARIOST_RENDER_MODE(VI_TVMODE_NTSC_PROG, 0x1E0, 0x1E0, 0x1E, 0x0, 0x294, 0x1E0, VI_XFBMODE_SF);
 #endif
 #if VERSION == VERSION_DEMO_US2
-/** GXNtsc480ProgMarioSt's PAL twin (EURGB60). */
+/** GXNtsc480ProgMarioSt's PAL twin (EURGB60); the same values as PAL's mode below. */
 GXRenderModeObj GXNtsc480ProgMarioStPal =
     MARIOST_RENDER_MODE(VI_TVMODE_EURGB60_INT, 0x1E0, 0x1E0, 0x1E, 0x0, 0x294, 0x1E0, VI_XFBMODE_DF);
 #elif VERSION >= VERSION_DEMO_EU
@@ -156,6 +156,7 @@ GXRenderModeObj GXNtsc480ProgMarioStPal =
 GXRenderModeObj GXNtsc480ProgMarioSt =
     MARIOST_RENDER_MODE(VI_TVMODE_EURGB60_INT, 0x1E0, 0x1E0, 0x1E, 0x0, 0x294, 0x1E0, VI_XFBMODE_DF);
 #endif
+#undef MARIOST_RENDER_MODE
 
 // local prototypes
 static void viPostCallback(u32 retraceCount);
@@ -221,8 +222,8 @@ void marioStInit(void) {
         gp->flags |= GLOBAL_FLAG_VIDEO_MODE_SET;
     }
 #endif
-    // every demo runs in kiosk mode
 #if VERSION <= VERSION_DEMO_JP || VERSION == VERSION_DEMO_US2 || VERSION == VERSION_DEMO_EU
+    // every demo runs in kiosk mode
     gp->flags |= GLOBAL_FLAG_KIOSK;
 #endif
     gp->rumbleEnabled = 1;
@@ -371,7 +372,7 @@ void marioStInit(void) {
  * waits out a disc error, reads the pads, then runs every system's per-frame update in a fixed order
  * and checks for a reset.
  * In kiosk mode it also watches for idle pads and raises GLOBAL_FLAG_KIOSK_TIMEOUT
- * (the demos after one minute, resetting the game outside the field and battle; the releases after two).
+ * (every demo after one minute, resetting the game outside the field and battle; the releases after two).
  */
 void marioStMain(void) {
     int i;
@@ -432,9 +433,8 @@ void marioStMain(void) {
                 break;
         }
         if (i >= 4) {
-            // every demo has the June demo's one-minute timeout and reset
 #if VERSION <= VERSION_DEMO_JP || VERSION == VERSION_DEMO_US2 || VERSION == VERSION_DEMO_EU
-            // After a minute without input: in the field or in battle, raise the kiosk timeout flag
+            // Every demo, after a minute without input: in the field or in battle, raise the kiosk timeout flag
             // (seq_game and seq_battle then end the session through SEQ_GAME_OVER in kiosk mode);
             // anywhere else, reset the game. The June US demo restarts the idle timer after raising the flag.
             if (OSTicksToSeconds(OSGetTime() - none_key) > 60) {

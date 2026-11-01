@@ -16,8 +16,20 @@ import datetime
 import html
 import json
 import os
+import re
 import subprocess
 import sys
+
+
+def read_versions():
+    """The version names of configure.py's VERSIONS list ("G8MJ01", ..., "G8MP01_DEMO")."""
+    path = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "configure.py")
+    with open(path, encoding="utf-8") as f:
+        block = re.search(r"^VERSIONS = \[(.*?)^\]", f.read(), re.M | re.S)
+    return set(re.findall(r'^\s*"(\w+)",', block.group(1), re.M)) if block else set()
+
+
+VERSIONS = read_versions()
 
 
 def num(m, key):
@@ -302,9 +314,9 @@ def main():
     report = load(args.report)
     baseline = load(args.baseline) if args.baseline else None
     commit = args.commit or git_head(root)
-    # the demo names first: "G8MJ01" and "G8ME01" are substrings of them
-    version = next((v for v in ("G8MJ01_DEMO", "G8ME01_DEMO", "G8MJ01", "G8ME01", "G8MP01")
-                    if v in os.path.abspath(args.report)), "G8MJ01")
+    # the version is the name of a folder on the report's path (build/<version>/report.json)
+    parts = os.path.normpath(os.path.abspath(args.report)).split(os.sep)
+    version = next((p for p in reversed(parts) if p in VERSIONS), "G8MJ01")
     # true C uses the JP source scan and the JP 10-16 baseline, so it only applies to the G8MJ01 report
     jp = version == "G8MJ01"
     payload = build_payload(report, commit, baseline, args.baseline_label, None if args.raw or not jp else root)

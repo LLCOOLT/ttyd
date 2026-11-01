@@ -42,7 +42,8 @@ static void capture(CameraId camera, void* param);
 static void monosiri_disp(CameraId camera, void* param);
 
 #if VERSION <= VERSION_DEMO_JP
-// Unreferenced; every demo TU that had it carries its own copy at the start of .data.
+// Unreferenced; the early demos carry a copy at the start of this TU's .data (the September US demo one in
+// mariost.c).
 static f32 unusedSignTbl[16] = {-1.0f, 1.0f, -1.0f, 1.0f, 1.0f, -1.0f, 1.0f, -1.0f, -1.0f, 1.0f, -1.0f, 1.0f, 1.0f, -1.0f, 1.0f, -1.0f};
 
 /**

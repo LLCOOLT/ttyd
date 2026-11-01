@@ -1071,7 +1071,7 @@ static s32 mobj_rideswitch_lightblue(MapObjectEntry* mobj) {
     f32 mag;
     Vec size;
 #if !MOBJ_EXTRA_OBJS
-    // FAKE: JP and US strip the A/B ride switch code but keep the four zeroed 12-byte
+    // FAKE: JP, US and the September US demo strip the A/B ride switch code but keep the four zeroed 12-byte
     // .rodata templates its Vec compound literals left behind; these dead zero literals emit them.
     {
         Vec d1 = (Vec){0.0f, 0.0f, 0.0f};
@@ -1136,7 +1136,10 @@ static s32 mobj_rideswitch_lightblue(MapObjectEntry* mobj) {
 }
 
 #if !MOBJ_EXTRA_OBJS
-/** JP and US keep this uncalled stub so the stripped ride-switch and red tornado-switch names stay in .rodata. */
+/**
+ * JP, US and the September US demo keep this uncalled stub so the stripped ride-switch and red tornado-switch names
+ * stay in .rodata.
+ */
 // FAKE: uncalled stand-in for the stripped switch objects; keeps their names in .rodata
 void evt_mobj_rideswitch(void) {
     mobjNameToPtr("MOBJ_RideSwitchB");
@@ -2453,7 +2456,7 @@ USER_FUNC(evt_mobj_arrow) {
     return EVT_RETURN_DONE;
 }
 #else
-/** Never called: JP and US keep this stub so the stripped "MOBJ_Arrow" name stays in .rodata. */
+/** Never called: JP, US and the September US demo keep this stub so the stripped "MOBJ_Arrow" name stays in .rodata. */
 // FAKE: uncalled stand-in for the stripped arrow object; keeps its name in .rodata
 void mobj_sign(void) {
     mobjNameToPtr("MOBJ_Arrow");
@@ -3797,7 +3800,7 @@ USER_FUNC(evt_mobj_kururing_floor) {
     mobjCalcMtx2(mobj);
 #if !MOBJ_EXTRA_OBJS
     // FAKE: dead locals that emit the .rodata templates (a zeroed Vec and the "o_"/"i_" name
-    // buffers) left by the objects JP and US strip (see MOBJ_EXTRA_OBJS).
+    // buffers) left by the objects JP, US and the September US demo strip (see MOBJ_EXTRA_OBJS).
     {
         Vec dz = (Vec){x, y, z};
         char oname[16] = "o_";
@@ -4039,7 +4042,8 @@ static s32 mobj_koopa_ojama_blk_evt(MapObjectEntry* mobj) {
     BOOL ok = FALSE;
     ItemEntry* item;
 #if !MOBJ_EXTRA_OBJS
-    // FAKE: a dead local that emits the .rodata Vec template left by the objects JP and US strip.
+    // FAKE: a dead local that emits the .rodata Vec template left by the objects JP, US and the September US demo
+    // strip.
     {
         Vec dv = (Vec){0.0f, -2000.0f, 0.0f};
     }
@@ -4144,7 +4148,10 @@ USER_FUNC(evt_mobj_koopa_ojama_blk) {
 }
 
 #if !MOBJ_EXTRA_OBJS
-/** Never called: JP and US keep this stub so the stripped bomb-rock and trap names stay in .rodata. */
+/**
+ * Never called: JP, US and the September US demo keep this stub so the stripped bomb-rock and trap names stay in
+ * .rodata.
+ */
 // FAKE: uncalled stand-in for the stripped rock and trap objects; keeps their names in .rodata
 void mobj_koopa_stone_blk(void) {
     mobjNameToPtr("MOBJ_BombRock");

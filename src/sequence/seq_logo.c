@@ -156,7 +156,6 @@ void seq_logoInit(SequenceWork* work) {
 void seq_logoInit(SequenceWork* work) {
 #if VERSION == VERSION_DEMO_US2 || VERSION == VERSION_DEMO_EU
     s32 i;
-
 #endif
     memset(wp, 0, sizeof(LogoWork));
     wp->logoId = LOGO_NONE;
@@ -167,8 +166,8 @@ void seq_logoInit(SequenceWork* work) {
     if (!OSIsRestart() || OSGetResetCode() & OS_RESET_SHUTDOWN) {
 #if VERSION == VERSION_DEMO_US2 || VERSION == VERSION_DEMO_EU
         // The 2004-09 demos ask nothing: a PAL TV is switched to 60Hz (EURGB60), an NTSC TV on a component
-        // cable to progressive scan unless B is held. On a PAL TV sRMObjHReso_prog is the EURGB60 mode (the US
-        // demo's marioStInit has copied the PAL modes into the NTSC slots).
+        // cable to progressive scan unless B is held. On a PAL TV sRMObjHReso_prog is the EURGB60 mode (the September
+        // US demo's marioStInit has copied the PAL modes into the NTSC slots).
         if (VIGetTvFormat() != VI_NTSC || (VIGetDTVStatus() && !(keyGetButton(0) & PAD_BUTTON_B))) {
             if (VIGetTvFormat() != VI_NTSC) {
                 OSSetEuRgb60Mode(1);

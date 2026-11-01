@@ -991,7 +991,7 @@ u16 point_disp_icons[] = {0x226, 0x227, 0x228, 0x227, 0x229, 0x22A};
 #if VERSION >= VERSION_JP
 /**
  * Shows the shop point prize list window until B is pressed, with Mario's input off.
- * evt_shop_setup runs it from the a_shop_keihin case (the prize list sign) in every release but the US demo.
+ * evt_shop_setup runs it from the a_shop_keihin case (the prize list sign) in every version but the June US demo.
  */
 EVT_BEGIN(evt_shoplist)
     CALL(evt_mario_key_onoff, 0)

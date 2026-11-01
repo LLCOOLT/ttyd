@@ -850,7 +850,7 @@ typedef struct BattleUnit {
     EvtWord* actEndEvent;             // 0x2C4 (US 0x2C8), run when the unit's action ends (battle_seq)
     s32 actEndEventId;                // 0x2C8 (US 0x2CC)
 #if VERSION >= VERSION_DEMO_EU
-    s32 slideReturnEventId; // PAL only (+4 from here): enemy_slide_return_evt of sac_enemy_slide_return, waited on by BattleWaitAllActiveEvtEnd_NoBgSetEndWait
+    s32 slideReturnEventId; // PAL and the EU demo (+4 from here): enemy_slide_return_evt of sac_enemy_slide_return, waited on by BattleWaitAllActiveEvtEnd_NoBgSetEndWait
 #endif
     EvtWord* hitEventCode; // 0x2CC (US 0x2D0), run on the attacker by BattleRunHitEventDirect
     s32 talkPartId;        // 0x2D0 (US 0x2D4)

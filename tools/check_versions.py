@@ -6,7 +6,8 @@ include/version.h: `#if VERSION >= VERSION_US`, `#if VERSION <= VERSION_DEMO_JP`
 fails if a file
 
   1. uses one of configure.py's per-version macros (VERSION_G8MJ01, VERSION_G8ME01, VERSION_G8MP01,
-     VERSION_G8ME01_DEMO, VERSION_G8MJ01_DEMO, VERSION_G8ME01_DEMO2, VERSION_G8MP01_DEMO) instead; only include/version.h turns those into VERSION;
+     VERSION_G8ME01_DEMO, VERSION_G8MJ01_DEMO, VERSION_G8ME01_DEMO2, VERSION_G8MP01_DEMO) instead; only
+     include/version.h turns those into VERSION;
   2. tests one of the ordered values with #ifdef/#ifndef/defined() (VERSION_JP and the others are always
      defined, so such a test is true in every version);
   3. tests VERSION in an #if before include/version.h is included (directly or through another header):
@@ -30,10 +31,20 @@ VERSION_HEADER = "include/version.h"
 # Include search paths of the game code (configure.py), plus each REL's own include folder.
 INCLUDE_DIRS = ["include", "libs/dolsdk2004/include", "libs/dolsdk2004/include/libc", "libs/musyx/include"]
 
-OLD_MACRO = re.compile(r"\bVERSION_G8M(?:J01|E01|P01)(?:_DEMO2?)?\b")
-ORDERED = r"VERSION_(?:DEMO_US2|DEMO_US|DEMO_JP|DEMO_EU|JP|US|EU)\b"
+# configure.py's per-version macros: VERSION_ and a game ID (VERSION_G8MJ01, VERSION_G8ME01_DEMO2, ...).
+OLD_MACRO = re.compile(r"\bVERSION_G8M[A-Z]01\w*\b")
 VERSION_NAME = re.compile(r"\bVERSION_\w+")
 DEFINE_VALUE = re.compile(r"^\s*#\s*define\s+(VERSION_\w+)\s+\d")
+
+
+def read_ordered() -> List[str]:
+    """The ordered values include/version.h defines (`#define VERSION_US 3`), longest name first."""
+    with open(os.path.join(ROOT, VERSION_HEADER), encoding="utf-8") as f:
+        names = [m.group(1) for m in map(DEFINE_VALUE.match, f) if m]
+    return sorted(names, key=len, reverse=True)
+
+
+ORDERED = r"(?:" + "|".join(read_ordered()) + r")\b"
 DEFINED_TEST = re.compile(r"^\s*#\s*(?:ifdef|ifndef)\s+" + ORDERED + r"|\bdefined\s*\(?\s*" + ORDERED)
 IF_LINE = re.compile(r"^\s*#\s*(?:if|elif)\b(.*)")
 USES_VERSION = re.compile(r"\bVERSION\b")

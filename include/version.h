@@ -1,7 +1,7 @@
-// VERSION and VERSION_PICK: selects the demo, JP, US or EU code and data from one source tree.
+// VERSION and VERSION_PICK: selects the code and data of one of the seven versions from one source tree.
 #pragma once
 
-// Building one source tree for seven releases
+// Building one source tree for seven versions
 //
 // configure.py defines one VERSION_<id> macro for the version being built (and BUILD_VERSION, its index in
 // configure.py's VERSIONS list). This header turns that into VERSION, one of seven ordered values:
@@ -18,8 +18,8 @@
 //   VERSION_EU        European release (G8MP01). It is built from the US code, so everything the US release
 //                     changed applies to it as well.
 //
-// The order follows the code's history (the demos, JP, US localisation, PAL on top of US), so a range test says
-// which line of the code a block belongs to:
+// The order follows the code's history (the early demos, JP, US localisation, the 2004-09 demos, PAL on top of
+// US), so a range test says which line of the code a block belongs to:
 //   US, both 2004-09 demos and PAL  #if VERSION >= VERSION_US
 //   JP and both early demos         #if VERSION <= VERSION_JP
 //   both early demos                #if VERSION <= VERSION_DEMO_JP
@@ -34,6 +34,13 @@
 //   all but JP                      #if VERSION != VERSION_JP
 //   June US demo, US onwards        #if VERSION == VERSION_DEMO_US || VERSION >= VERSION_US  (where the June
 //                                   US demo already has the US localisation)
+//   every demo                      #if VERSION <= VERSION_DEMO_JP || VERSION == VERSION_DEMO_US2 ||
+//                                       VERSION == VERSION_DEMO_EU  (kiosk code the 2004-09 demos took from
+//                                       the June demo)
+//   the three releases              #if VERSION == VERSION_JP || VERSION == VERSION_US || VERSION == VERSION_EU
+//   both 2004-09 demos              #if VERSION == VERSION_DEMO_US2 || VERSION == VERSION_DEMO_EU
+//   both 2004-09 demos and PAL      #if VERSION >= VERSION_DEMO_US2
+//   the US and PAL releases         #if VERSION == VERSION_US || VERSION == VERSION_EU  (not the 2004-09 demos)
 // configure.py's per-version macros (VERSION_G8MJ01, VERSION_G8ME01, VERSION_G8MP01, VERSION_G8ME01_DEMO,
 // VERSION_G8MJ01_DEMO, VERSION_G8ME01_DEMO2, VERSION_G8MP01_DEMO; PAL and both 2004-09 demos also define
 // VERSION_G8ME01, the EU demo VERSION_G8MP01 too) are read only here and in the library code under libs/.

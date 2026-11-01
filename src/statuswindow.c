@@ -417,8 +417,8 @@ static void statusWinDisp(CameraId camId, void* param) {
         numDisp(186.0f + x - 6.0f - 10.0f, 4.0f + (2.0f + (y - 78.0f)), wp->cur.partyMaxHp, 1);
     }
 
-    // Only the releases draw the menu hints; no demo has them (the 2004-09 demos still set the flag).
 #if VERSION == VERSION_JP || VERSION == VERSION_US || VERSION == VERSION_EU
+    // Only the releases draw the menu hints; no demo has them (the 2004-09 demos still set the flag).
     if (wp->flags & STATUSWIN_FLAG_MENU_HINTS && !gp->inBattle) {
         y2 = -180.0f + (wp->openY - wp->y);
         MTXTrans(m2, -190.0f, y2, 0.0f);

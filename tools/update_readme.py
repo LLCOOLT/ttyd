@@ -1,7 +1,8 @@
 #!/usr/bin/env python3
-"""Refresh the README progress badges and status table from build/G8MJ01/report.json.
+"""Refresh the README progress badges and tables from build/<version>/report.json.
 
-Run after `python -m ninja` (which writes the report):  python tools/update_readme.py
+The badges and the first table come from G8MJ01; every other version that has been built gets its own table.
+Run after `python -m ninja` for each version (it writes the report):  python tools/update_readme.py
 """
 import json
 import os
@@ -109,7 +110,9 @@ def main():
     us = ""
     # Other versions, each once it has been built (L 2026-10-26: PAL and the demo get tables too)
     for ver, label in (("G8ME01", "US (G8ME01)"), ("G8MP01", "Europe (G8MP01)"),
-                       ("G8ME01_DEMO", "US demo (G8ME01_DEMO)"), ("G8MJ01_DEMO", "Japanese demo (G8MJ01_DEMO)")):
+                       ("G8ME01_DEMO", "June US demo (G8ME01_DEMO)"), ("G8MJ01_DEMO", "Japanese demo (G8MJ01_DEMO)"),
+                       ("G8ME01_DEMO2", "September US demo (G8ME01_DEMO2)"),
+                       ("G8MP01_DEMO", "European demo (G8MP01_DEMO)")):
         vr_path = os.path.join(ROOT, "build", ver, "report.json")
         if not os.path.exists(vr_path):
             continue

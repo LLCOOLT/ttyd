@@ -37,9 +37,11 @@ The order follows the history of the code, so one comparison names a code line:
 - **Both early demos: `#if VERSION <= VERSION_DEMO_JP`**, and the releases and the September demos: `#if VERSION >= VERSION_JP`. The two early demos are one code line: the Japanese demo is the demo code a little later, without the US demo's English text and a few kiosk changes, so a demo difference covers both unless the Japanese demo's own code shows otherwise.
 - **June US demo only: `#if VERSION == VERSION_DEMO_US`** (or `!=` for every other version): what the June US demo has on top of the demo code, mostly for its English text (see [below](#the-japanese-demo-compared-with-the-us-demo-g8mj01_demo)). Where it already has the US code, the condition is `#if VERSION == VERSION_DEMO_US || VERSION >= VERSION_US`.
 - **One version: `#if VERSION == VERSION_JP`** (and the same for the others).
+- **Every demo: `#if VERSION <= VERSION_DEMO_JP || VERSION == VERSION_DEMO_US2 || VERSION == VERSION_DEMO_EU`**, and the three releases only: `#if VERSION == VERSION_JP || VERSION == VERSION_US || VERSION == VERSION_EU` (kiosk code the September demos took from the June demo).
+- **The September demos: `#if VERSION == VERSION_DEMO_US2 || VERSION == VERSION_DEMO_EU`**; with PAL: `#if VERSION >= VERSION_DEMO_US2` (`seq_e3Main`); the US and PAL releases without them: `#if VERSION == VERSION_US || VERSION == VERSION_EU`.
 - **Every version but one: `#if VERSION != VERSION_JP`.** JP is the only version without a change that both early demos and the US code line have (for example the battle work allocation in `src/battle/battle.c`), so `!= VERSION_JP` covers every other version. `#if VERSION != VERSION_DEMO_US` is every version except the June US demo.
 
-In comments, "the demo" means code both early demos share and "the US demo" what only the June US demo has.
+In comments, "the demo" and "the demos" mean the two early demos (the code both share), "the US demo" the June US demo, "the September demos" (or "the 2004-09 demos") `G8ME01_DEMO2` and `G8MP01_DEMO`, and "every demo" or "all four demos" all of them. "The releases" or "retail" (also "the retail versions", "the retail builds", "the later releases", "later versions") on code under `VERSION >= VERSION_JP` means the release code line, which the September demos build as well: "retail only" there means "not in the early demos". "PAL" on code under `VERSION >= VERSION_DEMO_EU` means the PAL code line, the European demo included.
 
 `tools/check_versions.py` (run by the lint job on every push and pull request) fails if a file in the game code uses the per-version macros, tests an ordered value with `#ifdef`/`defined()` (always true), tests `VERSION` before `version.h` is included, or names a `VERSION_` value that `version.h` does not define (an undefined name is 0 in `#if`, which would make `VERSION == VERSION_DEMO_JP` true everywhere). The library code under `libs/` still tests the per-version macros directly; for it, `configure.py` also defines `VERSION_G8ME01` when building `G8MP01` and both September demos (and `VERSION_G8MP01` for the European demo), and what the two early demos share is written `defined(VERSION_G8ME01_DEMO) || defined(VERSION_G8MJ01_DEMO)`.
 
@@ -51,7 +53,7 @@ Assembly files get the same index as `BUILD_VERSION` through `--defsym` (for exa
 - `FPS_FRAMES(n)`: an integer frame count. In the US code line it is `n * gp->framerate / 60`, so a count written for 60 Hz becomes the right count at 50 Hz in the European release; in JP and the early demos it is just `n`.
 - `FPS_EASE(n)` and `FPS_EASE_D(jp, us)`: the same scaling for easing divisors (`FPS_EASE_D` covers JP sites that were written with a double literal where US writes a float).
 
-`gp->framerate` is set at boot in `src/mario/mariost.c`: always 60 in JP and the early demos, 60 or 50 from the video mode in US and PAL (PAL also picks 60 for EURGB60).
+`gp->framerate` is set at boot in `src/mario/mariost.c`: always 60 in JP and the early demos, 60 or 50 from the video mode in US, PAL and the September demos (PAL also picks 60 for EURGB60).
 
 ## What differs
 
@@ -70,14 +72,14 @@ Assembly files get the same index as `BUILD_VERSION` through `--defsym` (for exa
 - **Battle and story changes** found in the European code, for example an extra event-hit command and a slide-return event id in the battle unit (`include/battle/battle_event_cmd.h`, `include/battle/battle_unit.h`), longer mail scripts (`include/evt/evt_sub.h`), and `sysDebugReport` (`include/system.h`).
 - **RELs.** `dig` and `qiz` are back, and `tst.rel`, a developer test REL with test battles, test maps and SGI's GLU tessellator, ships only in this release and the Japanese demo (`rels/tst/`).
 
-### The demos compared with JP (`G8MJ01_DEMO`, `G8ME01_DEMO`)
+### The early demos compared with JP (`G8MJ01_DEMO`, `G8ME01_DEMO`)
 
-- **Kiosk behaviour.** After a minute without input the demo ends the session: in the field or in a battle it raises the kiosk timeout flag, which sends the game to the game-over sequence, and in any other sequence it resets (`src/mario/mariost.c`). The retail games raise the same flag after two minutes in the field or a battle, but only the kiosk mode of the show build acts on it. The demo has an extra sequence, `seq_demo` (`src/sequence/seq_demo.c`, listed in `src/sequence/seqdef.c`).
+- **Kiosk behaviour.** After a minute without input the early demos end the session (the September demos do the same): in the field or in a battle they raise the kiosk timeout flag, which sends the game to the game-over sequence, and in any other sequence they reset (`src/mario/mariost.c`). The retail games raise the same flag after two minutes in the field or a battle, but only the kiosk mode of the show build acts on it. The demo has an extra sequence, `seq_demo` (`src/sequence/seq_demo.c`, listed in `src/sequence/seqdef.c`).
 - **Older code.** Many functions are earlier versions of the JP code: the differences of the demo code are marked `VERSION <= VERSION_DEMO_JP` (or `VERSION >= VERSION_JP` for what only the releases and the later demos have) throughout `src/`, the largest group of version conditionals in the tree.
 - **Memory.** The smart heap is a fixed 7 MiB block from the default heap (`src/memory.c`).
 - **Small-data thresholds.** The retail main executables are compiled with `-sdata 48 -sdata2 6`; the demo's with `-sdata 8 -sdata2 4`. The demo puts no variable over 8 bytes in `.sdata`/`.sbss` (`PadChanMask[4]` of `src/sdk/DEMOPad.c` is in `.data`) and no constant over 4 bytes in `.sdata2` (the 6-byte string `"title"` is in `.rodata`). RELs use `-sdata 0 -sdata2 0` in every version.
 - **Precompiled headers.** Main-executable units get the MSL math constants from `include/msl_main.pch` (the `MAIN_PCH` set in `configure.py`); the demo keeps those constants in a different set of units (`MAIN_PCH_DEMO_ADD`), and a few demo units use `include/msl_math.pch`, the math header without the constants (`MATH_PCH_DEMO`).
-- **RELs.** The US demo has six areas: Petal Meadows (`hei`), Petalburg (`nok`), Hooktail Castle (`gon`), the Great Tree (`mri`), Bowser's stage (`kpa`) and the system REL (`sys`).
+- **RELs.** The June US demo has six areas: Petal Meadows (`hei`), Petalburg (`nok`), Hooktail Castle (`gon`), the Great Tree (`mri`), Bowser's stage (`kpa`) and the system REL (`sys`).
 
 ### The Japanese demo compared with the US demo (`G8MJ01_DEMO`)
 
@@ -94,34 +96,34 @@ Both are kiosk builds of the release code, made a few days after the US release 
 
 - **`G8ME01_DEMO2` is the US code.** 6,947 of its 6,967 main executable functions have the US code; where US and PAL differ it follows US in all 209 functions, and none of PAL's changes. Its seven RELs have the US code (980 of 980 functions).
 - **`G8MP01_DEMO` is the PAL code.** 7,023 of its 7,041 main executable functions have the PAL code; where US and PAL differ it follows PAL in 212 functions and US in 2. It predates three PAL changes: `mot_slit` and `mot_slit_post` (`src/motion/mot_slit.c`), `kpa_cancel_attack_mode` and its call from `jumpstand_evt` (`rels/kpa`), and the longer `shopper_talk_evt` (`src/event/evt_shop.c`). Its seven RELs have the PAL code otherwise.
-- **The demo changes** (in both unless noted, the same code in both where US and PAL agree): the kiosk timeout in `marioStMain` and the idle timer start in `marioStInit` (`src/mario/mariost.c`), the logo sequence (`src/sequence/seq_logo.c`) and, in the US demo only, the attract screens (`src/sequence/seq_e3.c`); the US demo also has no progressive-scan screen and picks its video mode from the TV format and the EURGB60 setting as PAL does (`OSGetEuRgb60Mode`, render-mode tables copied in `marioStInit`), the game-over sequence (`seq_gameOverMain`), the status window (`statusWinDisp`, `statusWinMain`), the pad input of `makeKey` (`src/system.c`), the level-up help in `btlseqEnd_DispMain`, the drop item of `evt_npc_get_drop_item` (the June demo's code), `Btl_UnitSetup`, and the event data of `gon_01` and `gon_10`. The build date is in `src/R_build.c`.
-- **Build.** Retail flags (`-sdata 48 -sdata2 6`, the retail precompiled-header sets). `VERSION_DEMO_US2` and `VERSION_DEMO_EU` come after `VERSION_US`, so both take the US code (`>= VERSION_US`); the European demo also takes PAL's changes (`>= VERSION_DEMO_EU`) except the three it predates (`== VERSION_EU`), and the US demo the US-only code (`== VERSION_DEMO_US2`). For the library code `configure.py` defines `VERSION_G8ME01` for both and `VERSION_G8MP01` for the European demo. The units that do not link from C yet are listed in `config/<version>/not_linked.txt` (they build from the original code); the main executables need a `force_active` list in `config.yml`, since their seven RELs leave many of the full game's functions and data unreferenced.
+- **The demo changes** (in both unless noted, the same code in both where US and PAL agree): the kiosk timeout in `marioStMain` and the idle timer start in `marioStInit` (`src/mario/mariost.c`), the logo sequence (`src/sequence/seq_logo.c`) and, in the September US demo only, the attract screens (`src/sequence/seq_e3.c`); that demo also has no progressive-scan screen and picks its video mode from the TV format and the EURGB60 setting as PAL does (`OSGetEuRgb60Mode`, render-mode tables copied in `marioStInit`), the game-over sequence (`seq_gameOverMain`), the status window (`statusWinDisp` and the per-language menu icon tables), the pad input of `makeKey` (`src/system.c`), the level-up help in `btlseqEnd_DispMain`, the drop item of `evt_npc_get_drop_item` (the June demo's code), `Btl_UnitSetup`, and the event data of `gon_01` and `gon_10`. The build date is in `src/R_build.c`.
+- **Build.** Retail flags (`-sdata 48 -sdata2 6`, the retail precompiled-header sets). `VERSION_DEMO_US2` and `VERSION_DEMO_EU` come after `VERSION_US`, so both take the US code (`>= VERSION_US`); the European demo also takes PAL's changes (`>= VERSION_DEMO_EU`) except the three it predates (`== VERSION_EU`), and the September US demo the US-only code (`VERSION == VERSION_US || VERSION == VERSION_DEMO_US2`). For the library code `configure.py` defines `VERSION_G8ME01` for both and `VERSION_G8MP01` for the European demo. Every unit links from C; `config/<version>/not_linked.txt` (see [below](#which-units-build-for-which-version)) is empty for both. The main executables need a `force_active` list in `config.yml`, since their seven RELs leave many of the full game's functions and data unreferenced.
 - **RELs.** `gon`, `gor`, `hei`, `kpa`, `mri`, `nok` and `tik`; no `sys`.
 
 ## REL sets
 
-| Area | JP | US | PAL | Demo | JP demo | | Area | JP | US | PAL | Demo | JP demo |
-|---|---|---|---|---|---|---|---|---|---|---|---|---|
-| `aaa` | ✓ | ✓ | ✓ | | ✓ | | `kpa` | ✓ | ✓ | ✓ | ✓ | ✓ |
-| `aji` | ✓ | ✓ | ✓ | | ✓ | | `las` | ✓ | ✓ | ✓ | | ✓ |
-| `bom` | ✓ | ✓ | ✓ | | ✓ | | `moo` | ✓ | ✓ | ✓ | | ✓ |
-| `dig` | ✓ | | ✓ | | ✓ | | `mri` | ✓ | ✓ | ✓ | ✓ | ✓ |
-| `dmo` | ✓ | ✓ | ✓ | | ✓ | | `muj` | ✓ | ✓ | ✓ | | ✓ |
-| `dou` | ✓ | ✓ | ✓ | | ✓ | | `nok` | ✓ | ✓ | ✓ | ✓ | ✓ |
-| `eki` | ✓ | ✓ | ✓ | | ✓ | | `pik` | ✓ | ✓ | ✓ | | ✓ |
-| `end` | ✓ | ✓ | ✓ | | ✓ | | `qiz` | ✓ | | ✓ | | ✓ |
-| `gon` | ✓ | ✓ | ✓ | ✓ | ✓ | | `rsh` | ✓ | ✓ | ✓ | | ✓ |
-| `gor` | ✓ | ✓ | ✓ | | ✓ | | `sys` | ✓ | ✓ | ✓ | ✓ | ✓ |
-| `gra` | ✓ | ✓ | ✓ | | ✓ | | `tik` | ✓ | ✓ | ✓ | | ✓ |
-| `hei` | ✓ | ✓ | ✓ | ✓ | ✓ | | `tou` | ✓ | ✓ | ✓ | | ✓ |
-| `hom` | ✓ | ✓ | ✓ | | ✓ | | `tou2` | ✓ | ✓ | ✓ | | ✓ |
-| `jin` | ✓ | ✓ | ✓ | | ✓ | | `tst` | | | ✓ | | ✓ |
-| `jon` | ✓ | ✓ | ✓ | | ✓ | | `usu` | ✓ | ✓ | ✓ | | ✓ |
-| | | | | | | | `win` | ✓ | ✓ | ✓ | | ✓ |
-| | | | | | | | `yuu` | ✓ | ✓ | ✓ | | ✓ |
-| **Total** | 31 | 29 | 32 | 6 | 32 | | | | | | | |
+| Area | JP | US | PAL | June US demo | JP demo | Sept. demos | | Area | JP | US | PAL | June US demo | JP demo | Sept. demos |
+|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|
+| `aaa` | ✓ | ✓ | ✓ | | ✓ | | | `kpa` | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ |
+| `aji` | ✓ | ✓ | ✓ | | ✓ | | | `las` | ✓ | ✓ | ✓ | | ✓ | |
+| `bom` | ✓ | ✓ | ✓ | | ✓ | | | `moo` | ✓ | ✓ | ✓ | | ✓ | |
+| `dig` | ✓ | | ✓ | | ✓ | | | `mri` | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ |
+| `dmo` | ✓ | ✓ | ✓ | | ✓ | | | `muj` | ✓ | ✓ | ✓ | | ✓ | |
+| `dou` | ✓ | ✓ | ✓ | | ✓ | | | `nok` | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ |
+| `eki` | ✓ | ✓ | ✓ | | ✓ | | | `pik` | ✓ | ✓ | ✓ | | ✓ | |
+| `end` | ✓ | ✓ | ✓ | | ✓ | | | `qiz` | ✓ | | ✓ | | ✓ | |
+| `gon` | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | | `rsh` | ✓ | ✓ | ✓ | | ✓ | |
+| `gor` | ✓ | ✓ | ✓ | | ✓ | ✓ | | `sys` | ✓ | ✓ | ✓ | ✓ | ✓ | |
+| `gra` | ✓ | ✓ | ✓ | | ✓ | | | `tik` | ✓ | ✓ | ✓ | | ✓ | ✓ |
+| `hei` | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | | `tou` | ✓ | ✓ | ✓ | | ✓ | |
+| `hom` | ✓ | ✓ | ✓ | | ✓ | | | `tou2` | ✓ | ✓ | ✓ | | ✓ | |
+| `jin` | ✓ | ✓ | ✓ | | ✓ | | | `tst` | | | ✓ | | ✓ | |
+| `jon` | ✓ | ✓ | ✓ | | ✓ | | | `usu` | ✓ | ✓ | ✓ | | ✓ | |
+| | | | | | | | | `win` | ✓ | ✓ | ✓ | | ✓ | |
+| | | | | | | | | `yuu` | ✓ | ✓ | ✓ | | ✓ | |
+| **Total** | 31 | 29 | 32 | 6 | 32 | 7 | | | | | | | | |
 
-The two September 2004 demos (`G8ME01_DEMO2`, `G8MP01_DEMO`) have seven: `gon`, `gor`, `hei`, `kpa`, `mri`, `nok` and `tik`.
+The two September 2004 demos (`G8ME01_DEMO2`, `G8MP01_DEMO`) have the same seven RELs.
 
 Each version's set is the list of REL folders in `config/<version>/` and the lines of `config/<version>/build.sha1` (one per REL plus `MarioSt.dol`). [GLOSSARY.md](GLOSSARY.md#area-codes) says what each area is.
 

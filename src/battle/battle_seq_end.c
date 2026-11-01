@@ -84,7 +84,7 @@ enum SeqEndDispFlags {
     SEQ_END_DISP_MARIO_EXP = 0x4,     // Mario's Star Point counter
     SEQ_END_DISP_LVUP_OBJECTS = 0x8,  // the HP/FP/BP level-up choices
     SEQ_END_DISP_LVUP_CONFIRM = 0x10, // the level-up confirmation
-    SEQ_END_DISP_LVUP_HELP = 0x20,    // the level-up help message (not in the demos)
+    SEQ_END_DISP_LVUP_HELP = 0x20,    // the level-up help message (no demo draws it)
 };
 
 typedef struct SeqEndWork {
@@ -944,8 +944,8 @@ static void btlseqEnd_DispMain(CameraId camId, void* param) {
         if (work->flags & SEQ_END_DISP_LVUP_CONFIRM) {
             dispEntry(camId, 900.0f, 1, _LvupParamConfirmDisp, wp);
         }
-        // Only the three releases draw the level-up help; no demo has it.
 #if VERSION == VERSION_JP || VERSION == VERSION_US || VERSION == VERSION_EU
+        // Only the three releases draw the level-up help; no demo has it.
         if (work->flags & SEQ_END_DISP_LVUP_HELP) {
             dispEntry(camId, 900.0f, 1, L__LvupParamHelpMsgDisp, wp);
         }
@@ -1010,7 +1010,7 @@ static void _LvupParamConfirmDisp(CameraId camId, void* param) {
     iconDispGx(&pos, ICON_DISP_2D, ICON_18C, 1.0f);
 }
 
-/** The demos have this function but never call it (the linker strips it; its strings stay). */
+/** Every demo has this function but never calls it (the linker strips it; its strings stay). */
 void L__LvupParamHelpMsgDisp(CameraId camId, void* param) {
     SeqEndWork* work = SEW((BattleWork*)param);
     PouchData* pouch;
