@@ -103,15 +103,15 @@ static USER_FUNC(demo_init) {
 #if VERSION <= VERSION_DEMO_JP
         // the map fades in from black after the logo sequence and from white after the title screen
         if (seqGetPrevSeq() == SEQ_LOGO) {
-            gp->areaFadeOutType = FADE_IN_BLACK;
-            gp->areaFadeOutDuration = 500;
+            gp->areaFadeInType = FADE_IN_BLACK;
+            gp->areaFadeInDuration = 500;
         } else {
-            gp->areaFadeOutType = FADE_IN_WHITE;
-            gp->areaFadeOutDuration = 500;
+            gp->areaFadeInType = FADE_IN_WHITE;
+            gp->areaFadeInDuration = 500;
         }
 #else
-        gp->areaFadeOutType = FADE_IN_BLACK;
-        gp->areaFadeOutDuration = 500;
+        gp->areaFadeInType = FADE_IN_BLACK;
+        gp->areaFadeInDuration = 500;
 #endif
         return EVT_RETURN_DONE;
     }

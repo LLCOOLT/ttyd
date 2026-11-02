@@ -104,7 +104,7 @@ static USER_FUNC(setYoshiColor) {
     for (i = 0; i < 8; i++) {
         ((u8*)&start)[i] = swByteGet(i + GSW_TOU_EGG_TIME);
     }
-    minutes = (s32)OSTicksToSeconds(gp->retraceLocalTime - start) / 60;
+    minutes = (s32)OSTicksToSeconds(gp->playTime - start) / 60;
     minutes %= 20;
     if (minutes <= 5) {
         pouchSetPartyColor(4, 0);

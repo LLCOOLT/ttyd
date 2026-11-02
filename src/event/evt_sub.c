@@ -2609,7 +2609,7 @@ USER_FUNC(N_evt_sub_status_gauge_force_update) {
 USER_FUNC(evt_sub_save_playtime) {
     s32 base = event->args[0];
     u8 buf[8];
-    *(s64*)buf = gp->retraceLocalTime;
+    *(s64*)buf = gp->playTime;
     swByteSet(base + 0xA21FE80, buf[0]);
     swByteSet(base + 0xA21FE81, buf[1]);
     swByteSet(base + 0xA21FE82, buf[2]);
@@ -2638,7 +2638,7 @@ USER_FUNC(evt_sub_load_progresstime) {
     buf[5] = swByteGet(base + 0xA21FE85);
     buf[6] = swByteGet(base + 0xA21FE86);
     buf[7] = swByteGet(base + 0xA21FE87);
-    ms = (gp->retraceLocalTime - *(s64*)buf) / (OS_TIMER_CLOCK / 1000);
+    ms = (gp->playTime - *(s64*)buf) / (OS_TIMER_CLOCK / 1000);
     if (ms > 86400000) {
         ms = 86400000;
     }
@@ -3065,18 +3065,18 @@ USER_FUNC(evt_sub_check_intersect) {
     return EVT_RETURN_DONE;
 }
 
-#define IRAI_CHECK(flag, done, base, mail)                         \
-    if (swGet(flag) && !swGet(done)) {                             \
-        for (i = 0; i < 8; i++) {                                  \
-            u.b[i] = swByteGet(base + i);                          \
-        }                                                          \
-        if (OSTicksToSeconds(gp->retraceLocalTime - u.t) > 7200) { \
-            ret = 1;                                               \
-            if (arg) {                                             \
-                swSet(done);                                       \
-                pouchReceiveMail(mail);                            \
-            }                                                      \
-        }                                                          \
+#define IRAI_CHECK(flag, done, base, mail)                 \
+    if (swGet(flag) && !swGet(done)) {                     \
+        for (i = 0; i < 8; i++) {                          \
+            u.b[i] = swByteGet(base + i);                  \
+        }                                                  \
+        if (OSTicksToSeconds(gp->playTime - u.t) > 7200) { \
+            ret = 1;                                       \
+            if (arg) {                                     \
+                swSet(done);                               \
+                pouchReceiveMail(mail);                    \
+            }                                              \
+        }                                                  \
     }
 /**
  * Trouble Center follow-up mail ("irai" is request): the thank-you letters irai_af_mail_00 to 05

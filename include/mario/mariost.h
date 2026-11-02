@@ -44,10 +44,10 @@ typedef struct GlobalWork {
     s32 inBattle;                   // 0x14, verified s32
     s32 systemLevelFlags;           // 0x18
     u32 retraceCount;               // 0x1C
-    OSTime retraceLocalTime;        // 0x20
+    OSTime playTime;                // 0x20, saved; capped at 99:59:59
     OSTime retraceDeltaTime;        // 0x28
     OSTime retraceTime;             // 0x30
-    OSTime renderTime;              // 0x38, time since boot, minus menus
+    OSTime renderTime;              // 0x38, animation clock: game time minus menus, saved and kept across sessions
     OSTime renderFieldTime;         // 0x40, time outside battle, minus menus
     OSTime systemLv0Time;           // 0x48
     OSTime systemLv1Time;           // 0x50
@@ -56,18 +56,19 @@ typedef struct GlobalWork {
     CountdownWork countdown;        // 0x68
     lottery_info lotteryInfo;       // 0xA8
     u8 pad_E8[0xF8 - 0xE8];         // 0xE8
-    FadeType mapFadeOutType;        // 0xF8
-    s32 mapFadeOutDuration;         // 0xFC
-    FadeType mapFadeInType;         // 0x100
-    s32 mapFadeInDuration;          // 0x104
-    FadeType areaFadeOutType;       // 0x108
-    s32 areaFadeOutDuration;        // 0x10C
-    FadeType areaFadeInType;        // 0x110
-    s32 areaFadeInDuration;         // 0x114
+    FadeType mapFadeInType;         // 0xF8, fade into the next map (seq_game)
+    s32 mapFadeInDuration;          // 0xFC
+    FadeType mapFadeOutType;        // 0x100, fade out of the current map (seq_mapchange)
+    s32 mapFadeOutDuration;         // 0x104
+    FadeType areaFadeInType;        // 0x108, as mapFadeInType, on an area change
+    s32 areaFadeInDuration;         // 0x10C
+    FadeType areaFadeOutType;       // 0x110, as mapFadeOutType, on an area change
+    s32 areaFadeOutDuration;        // 0x114
     BOOL didAreaChange;             // 0x118
     char beroEnterName[0x10];       // 0x11C
     char currentMapName[0x10];      // 0x12C
-    char currentAreaName[0x20];     // 0x13C
+    char currentAreaName[0x10];     // 0x13C
+    char preTitleMapName[0x10];     // 0x14C, map the game was on when it last went to the title (seq_mapchange, seq_gameover)
     void* relocationBase;           // 0x15C
     void* mapAlloc;                 // 0x160
     s32 mapEventId;                 // 0x164, map init event id (seq_mapchange.c)

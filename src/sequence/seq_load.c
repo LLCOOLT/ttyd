@@ -295,8 +295,8 @@ static inline void loadNewGameSetup(void) {
         m->prevPartyMemberId[0] = 0;
         m->prevPartyMemberId[1] = 0;
     }
-    gp->areaFadeInType = FADE_NONE;
-    gp->areaFadeOutType = FADE_CURTAIN_SIDES_A2_3D;
+    gp->areaFadeOutType = FADE_NONE;
+    gp->areaFadeInType = FADE_CURTAIN_SIDES_A2_3D;
     swInit();
     swByteSet(GSW_STORY_PROGRESS, STORY_STG0_00_PROLOGUE);
 }
@@ -1053,14 +1053,14 @@ static void loadDraw(CameraId camera, void* param) {
         s32 mins;
         flags = save->data.flags;
         level = save->data.pouch.level;
-        time = save->data.global.retraceLocalTime;
+        time = save->data.global.playTime;
         stars = save->data.pouch.starPowersObtained;
         gsw0 = save->data.global.gsw0;
         name = (char*)save->data.global.playerName;
 #else
         u16 flags = save->data.flags;
         s16 level = save->data.pouch.level;
-        OSTime time = save->data.global.retraceLocalTime;
+        OSTime time = save->data.global.playTime;
         u16 stars = save->data.pouch.starPowersObtained;
         s32 gsw0 = save->data.global.gsw0;
 #endif
@@ -1387,137 +1387,137 @@ static void continueGame(void) {
     gp->flags |= GLOBAL_FLAG_LOADED;
     switch (swByteGet(GSW_SAVE_RESUME_KIND)) {
         case 0:
-            gp->areaFadeInType = FADE_NONE;
-            gp->areaFadeOutType = FADE_CURTAIN_SIDES_A2;
+            gp->areaFadeOutType = FADE_NONE;
+            gp->areaFadeInType = FADE_CURTAIN_SIDES_A2;
             seqSetSeq(SEQ_MAP_CHANGE, gp->currentMapName, 0);
             break;
         case 1:
-            gp->areaFadeInType = FADE_STORY_PEACH_A2;
-            gp->areaFadeOutType = FADE_STORY_PEACH_A3;
+            gp->areaFadeOutType = FADE_STORY_PEACH_A2;
+            gp->areaFadeInType = FADE_STORY_PEACH_A3;
             seqSetSeq(SEQ_MAP_CHANGE, "aji_10", 0);
             break;
         case 2:
-            gp->areaFadeInType = FADE_STORY_BOWSER_A2;
-            gp->areaFadeOutType = FADE_STORY_BOWSER_A3;
+            gp->areaFadeOutType = FADE_STORY_BOWSER_A2;
+            gp->areaFadeInType = FADE_STORY_BOWSER_A3;
             seqSetSeq(SEQ_MAP_CHANGE, "kpa_00", 0);
             break;
         case 3:
-            gp->areaFadeInType = FADE_STORY_MARIO_A2;
-            gp->areaFadeOutType = FADE_STORY_MARIO_A3;
+            gp->areaFadeOutType = FADE_STORY_MARIO_A2;
+            gp->areaFadeInType = FADE_STORY_MARIO_A3;
             seqSetSeq(SEQ_MAP_CHANGE, "nok_01", "nokotarou");
             break;
         case 4:
-            gp->areaFadeInType = FADE_STORY_PEACH_A2;
-            gp->areaFadeOutType = FADE_STORY_PEACH_A3;
+            gp->areaFadeOutType = FADE_STORY_PEACH_A2;
+            gp->areaFadeInType = FADE_STORY_PEACH_A3;
             seqSetSeq(SEQ_MAP_CHANGE, "aji_10", 0);
             break;
         case 5:
-            gp->areaFadeInType = FADE_STORY_BOWSER_A2;
-            gp->areaFadeOutType = FADE_STORY_BOWSER_A3;
+            gp->areaFadeOutType = FADE_STORY_BOWSER_A2;
+            gp->areaFadeInType = FADE_STORY_BOWSER_A3;
             seqSetSeq(SEQ_MAP_CHANGE, "hei_00", 0);
             break;
         case 6:
-            gp->areaFadeInType = FADE_STORY_MARIO_A2;
-            gp->areaFadeOutType = FADE_STORY_MARIO_A3;
+            gp->areaFadeOutType = FADE_STORY_MARIO_A2;
+            gp->areaFadeInType = FADE_STORY_MARIO_A3;
             seqSetSeq(SEQ_MAP_CHANGE, "mri_00", 0);
             break;
         case 7:
-            gp->areaFadeInType = FADE_STORY_PEACH_A2;
-            gp->areaFadeOutType = FADE_STORY_PEACH_A3;
+            gp->areaFadeOutType = FADE_STORY_PEACH_A2;
+            gp->areaFadeInType = FADE_STORY_PEACH_A3;
             seqSetSeq(SEQ_MAP_CHANGE, "aji_10", 0);
             break;
         case 8:
-            gp->areaFadeInType = FADE_STORY_BOWSER_A2;
-            gp->areaFadeOutType = FADE_STORY_BOWSER_A3;
+            gp->areaFadeOutType = FADE_STORY_BOWSER_A2;
+            gp->areaFadeInType = FADE_STORY_BOWSER_A3;
             seqSetSeq(SEQ_MAP_CHANGE, "mri_01", 0);
             break;
         case 9:
-            gp->areaFadeInType = FADE_STORY_MARIO_A2;
-            gp->areaFadeOutType = FADE_STORY_MARIO_A3;
+            gp->areaFadeOutType = FADE_STORY_MARIO_A2;
+            gp->areaFadeInType = FADE_STORY_MARIO_A3;
             seqSetSeq(SEQ_MAP_CHANGE, "tou_02", 0);
             break;
         case 10:
 #if VERSION <= VERSION_DEMO_JP
-            gp->areaFadeInType = FADE_STORY_PEACH_A2;
-            gp->areaFadeOutType = FADE_STORY_PEACH_A3;
+            gp->areaFadeOutType = FADE_STORY_PEACH_A2;
+            gp->areaFadeInType = FADE_STORY_PEACH_A3;
 #else
-            gp->areaFadeInType = FADE_NONE;
-            gp->areaFadeOutType = FADE_CURTAIN_SIDES_A2;
+            gp->areaFadeOutType = FADE_NONE;
+            gp->areaFadeInType = FADE_CURTAIN_SIDES_A2;
 #endif
             seqSetSeq(SEQ_MAP_CHANGE, "usu_00", 0);
             break;
         case 11:
-            gp->areaFadeInType = FADE_STORY_BOWSER_A2;
-            gp->areaFadeOutType = FADE_STORY_BOWSER_A3;
+            gp->areaFadeOutType = FADE_STORY_BOWSER_A2;
+            gp->areaFadeInType = FADE_STORY_BOWSER_A3;
             seqSetSeq(SEQ_MAP_CHANGE, "gor_04", 0);
             break;
         case 12:
-            gp->areaFadeInType = FADE_STORY_MARIO_A2;
-            gp->areaFadeOutType = FADE_STORY_MARIO_A3;
+            gp->areaFadeOutType = FADE_STORY_MARIO_A2;
+            gp->areaFadeInType = FADE_STORY_MARIO_A3;
             seqSetSeq(SEQ_MAP_CHANGE, "usu_00", 0);
             break;
         case 13:
 #if VERSION <= VERSION_DEMO_JP
-            gp->areaFadeInType = FADE_STORY_MARIO_A2;
-            gp->areaFadeOutType = FADE_STORY_MARIO_A3;
+            gp->areaFadeOutType = FADE_STORY_MARIO_A2;
+            gp->areaFadeInType = FADE_STORY_MARIO_A3;
 #else
-            gp->areaFadeInType = FADE_NONE;
-            gp->areaFadeOutType = FADE_CURTAIN_SIDES_A2;
+            gp->areaFadeOutType = FADE_NONE;
+            gp->areaFadeInType = FADE_CURTAIN_SIDES_A2;
 #endif
             seqSetSeq(SEQ_MAP_CHANGE, "muj_12", 0);
             break;
         case 14:
-            gp->areaFadeInType = FADE_STORY_BOWSER_A2;
-            gp->areaFadeOutType = FADE_STORY_BOWSER_A3;
+            gp->areaFadeOutType = FADE_STORY_BOWSER_A2;
+            gp->areaFadeInType = FADE_STORY_BOWSER_A3;
             seqSetSeq(SEQ_MAP_CHANGE, "usu_00", 0);
             break;
         case 15:
-            gp->areaFadeInType = FADE_STORY_MARIO_A2;
-            gp->areaFadeOutType = FADE_STORY_MARIO_A3;
+            gp->areaFadeOutType = FADE_STORY_MARIO_A2;
+            gp->areaFadeInType = FADE_STORY_MARIO_A3;
             seqSetSeq(SEQ_MAP_CHANGE, "muj_00", 0);
             break;
         case 16:
 #if VERSION <= VERSION_DEMO_JP
-            gp->areaFadeInType = FADE_STORY_MARIO_A2;
-            gp->areaFadeOutType = FADE_STORY_MARIO_A3;
+            gp->areaFadeOutType = FADE_STORY_MARIO_A2;
+            gp->areaFadeInType = FADE_STORY_MARIO_A3;
 #else
-            gp->areaFadeInType = FADE_NONE;
-            gp->areaFadeOutType = FADE_CURTAIN_SIDES_A2;
+            gp->areaFadeOutType = FADE_NONE;
+            gp->areaFadeInType = FADE_CURTAIN_SIDES_A2;
 #endif
             seqSetSeq(SEQ_MAP_CHANGE, "pik_03", "next");
             break;
         case 17:
-            gp->areaFadeInType = FADE_STORY_BOWSER_A2;
-            gp->areaFadeOutType = FADE_STORY_BOWSER_A3;
+            gp->areaFadeOutType = FADE_STORY_BOWSER_A2;
+            gp->areaFadeInType = FADE_STORY_BOWSER_A3;
             seqSetSeq(SEQ_MAP_CHANGE, "gor_01", 0);
             break;
         case 18:
-            gp->areaFadeInType = FADE_STORY_MARIO_A2;
-            gp->areaFadeOutType = FADE_STORY_MARIO_A3;
+            gp->areaFadeOutType = FADE_STORY_MARIO_A2;
+            gp->areaFadeInType = FADE_STORY_MARIO_A3;
             seqSetSeq(SEQ_MAP_CHANGE, "gor_04", "resha_return");
             break;
         case 19:
-            gp->areaFadeInType = FADE_STORY_BOWSER_A2;
-            gp->areaFadeOutType = FADE_STORY_BOWSER_A3;
+            gp->areaFadeOutType = FADE_STORY_BOWSER_A2;
+            gp->areaFadeInType = FADE_STORY_BOWSER_A3;
             seqSetSeq(SEQ_MAP_CHANGE, "pik_01", 0);
             break;
         case 20:
-            gp->areaFadeInType = FADE_STORY_MARIO_A2;
-            gp->areaFadeOutType = FADE_STORY_MARIO_A3;
+            gp->areaFadeOutType = FADE_STORY_MARIO_A2;
+            gp->areaFadeInType = FADE_STORY_MARIO_A3;
             seqSetSeq(SEQ_MAP_CHANGE, "aji_18", "e_bero");
             break;
         case 21:
-            gp->areaFadeInType = FADE_STORY_MARIO_A2;
-            gp->areaFadeOutType = FADE_STORY_MARIO_A3;
+            gp->areaFadeOutType = FADE_STORY_MARIO_A2;
+            gp->areaFadeInType = FADE_STORY_MARIO_A3;
             seqSetSeq(SEQ_MAP_CHANGE, "gor_00", 0);
             break;
         case 22:
 #if VERSION <= VERSION_DEMO_JP
-            gp->areaFadeInType = FADE_STORY_MARIO_A2;
-            gp->areaFadeOutType = FADE_STORY_MARIO_A3;
+            gp->areaFadeOutType = FADE_STORY_MARIO_A2;
+            gp->areaFadeInType = FADE_STORY_MARIO_A3;
 #else
-            gp->areaFadeInType = FADE_NONE;
-            gp->areaFadeOutType = FADE_CURTAIN_SIDES_A2;
+            gp->areaFadeOutType = FADE_NONE;
+            gp->areaFadeInType = FADE_CURTAIN_SIDES_A2;
 #endif
             seqSetSeq(SEQ_MAP_CHANGE, "jin_04", 0);
             break;
@@ -1526,8 +1526,8 @@ static void continueGame(void) {
             seqSetSeq(SEQ_MAP_CHANGE, "aaa_00", "prologue");
             break;
         case 24:
-            gp->areaFadeInType = FADE_STORY_PEACH_A2;
-            gp->areaFadeOutType = FADE_STORY_PEACH_A3;
+            gp->areaFadeOutType = FADE_STORY_PEACH_A2;
+            gp->areaFadeInType = FADE_STORY_PEACH_A3;
             seqSetSeq(SEQ_MAP_CHANGE, "aji_10", 0);
             break;
     }

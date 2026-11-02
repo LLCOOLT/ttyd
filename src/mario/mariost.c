@@ -229,7 +229,7 @@ void marioStInit(void) {
     gp->rumbleEnabled = 1;
     gp->soundMode = 0;
 
-    gp->retraceLocalTime = 0;
+    gp->playTime = 0;
     gp->retraceDeltaTime = 0;
     gp->retraceTime = OSGetTime();
 
@@ -241,14 +241,14 @@ void marioStInit(void) {
     gp->systemLv1Time = 0;
     gp->systemLv0Time = 0;
 
-    gp->mapFadeOutType = FADE_IN_BLACK;
-    gp->mapFadeOutDuration = 300;
-    gp->mapFadeInType = FADE_OUT_BLACK;
+    gp->mapFadeInType = FADE_IN_BLACK;
     gp->mapFadeInDuration = 300;
-    gp->areaFadeOutType = FADE_IN_BLACK;
-    gp->areaFadeOutDuration = 300;
-    gp->areaFadeInType = FADE_OUT_BLACK;
+    gp->mapFadeOutType = FADE_OUT_BLACK;
+    gp->mapFadeOutDuration = 300;
+    gp->areaFadeInType = FADE_IN_BLACK;
     gp->areaFadeInDuration = 300;
+    gp->areaFadeOutType = FADE_OUT_BLACK;
+    gp->areaFadeOutDuration = 300;
 #if VERSION >= VERSION_DEMO_EU
     if (VIGetTvFormat() == VI_NTSC)
         gp->framerate = 60;
@@ -525,9 +525,9 @@ static void viPostCallback(u32 retraceCount) {
 
     time = OSGetTime();
     gp->retraceDeltaTime = time - gp->retraceTime;
-    gp->retraceLocalTime += gp->retraceDeltaTime;
-    if (gp->retraceLocalTime > (OS_TIMER_CLOCK * (OSTime)359999999)) {
-        gp->retraceLocalTime = (OS_TIMER_CLOCK * (OSTime)359999999);
+    gp->playTime += gp->retraceDeltaTime;
+    if (gp->playTime > (OS_TIMER_CLOCK * (OSTime)359999999)) {
+        gp->playTime = (OS_TIMER_CLOCK * (OSTime)359999999);
     }
     // US and PAL also stop the system-level clocks during a disc error or while a window is open
 #if VERSION >= VERSION_US
