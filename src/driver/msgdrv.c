@@ -913,7 +913,7 @@ void msgAnalize(smartEntry* smart, const char* msg) {
     u16 ih;
     f32 maxScale;
     const char* next;
-#if VERSION != VERSION_DEMO_US
+#if VERSION != VERSION_DEMO_US_1
     BOOL isHM;
 #endif
     s32 i;
@@ -1301,14 +1301,14 @@ void msgAnalize(smartEntry* smart, const char* msg) {
                     }
 #endif
                 } else if (strcmp(tag, "icon") == 0) {
-#if VERSION != VERSION_DEMO_US
+#if VERSION != VERSION_DEMO_US_1
                     isHM = FALSE;
 #endif
                     if ((((s8)args[0]) >= '0') && (((s8)args[0]) <= '9')) {
                         sscanf(args, "%d%f%d%d%d", &iconId, &iconScale, &iconOfsX, &iconOfsY, &iconAdvance);
                     } else {
                         sscanf(args, "%s%f%d%d%d", name, &iconScale, &iconOfsX, &iconOfsY, &iconAdvance);
-#if VERSION != VERSION_DEMO_US
+#if VERSION != VERSION_DEMO_US_1
                         if (strcmp(name, "HM") == 0) {
                             isHM = TRUE;
                         }
@@ -1318,7 +1318,7 @@ void msgAnalize(smartEntry* smart, const char* msg) {
                             iconId = 0;
                         }
                     }
-#if VERSION != VERSION_DEMO_US
+#if VERSION != VERSION_DEMO_US_1
                     if (!isHM)
 #endif
                     {
@@ -1341,7 +1341,7 @@ void msgAnalize(smartEntry* smart, const char* msg) {
                         time += step;
                         data->charCount++;
                     }
-#if VERSION != VERSION_DEMO_US
+#if VERSION != VERSION_DEMO_US_1
                     else {
 #if VERSION >= VERSION_US
                         if ((u32)gp->language == 0) {

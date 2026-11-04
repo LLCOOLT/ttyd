@@ -1,9 +1,9 @@
 name: MarioSt
 object: sys/main.dol
 hash: bf85263b466d2e31a65154d858d3f076fdb40058
-object_base: orig/G8ME01_DEMO
-symbols: config/G8ME01_DEMO/symbols.txt
-splits: config/G8ME01_DEMO/splits.txt
+object_base: orig/G8ME01_DEMO_1
+symbols: config/G8ME01_DEMO_1/symbols.txt
+splits: config/G8ME01_DEMO_1/splits.txt
 mw_comment_version: 10
 force_active:
 # Unreferenced in the demo dol and its six RELs, but kept by the original link (the full game's RELs use them)
@@ -621,30 +621,30 @@ extract:
 modules:
 - object: files/rel/gon.rel
   hash: d0b82527cf2518dd8cdbaab61c6e106237e09943
-  symbols: config/G8ME01_DEMO/gon/symbols.txt
-  splits: config/G8ME01_DEMO/gon/splits.txt
+  symbols: config/G8ME01_DEMO_1/gon/symbols.txt
+  splits: config/G8ME01_DEMO_1/gon/splits.txt
 
 - object: files/rel/hei.rel
   hash: 3285058881af565ef2166d0cc8e22e5bd9c5838e
-  symbols: config/G8ME01_DEMO/hei/symbols.txt
-  splits: config/G8ME01_DEMO/hei/splits.txt
+  symbols: config/G8ME01_DEMO_1/hei/symbols.txt
+  splits: config/G8ME01_DEMO_1/hei/splits.txt
 
 - object: files/rel/kpa.rel
   hash: b0457aa6fcb9d673916dee7edabfff595e26d0f2
-  symbols: config/G8ME01_DEMO/kpa/symbols.txt
-  splits: config/G8ME01_DEMO/kpa/splits.txt
+  symbols: config/G8ME01_DEMO_1/kpa/symbols.txt
+  splits: config/G8ME01_DEMO_1/kpa/splits.txt
 
 - object: files/rel/mri.rel
   hash: 868354f65137c965f5c0bce687d0bb752eadc5d9
-  symbols: config/G8ME01_DEMO/mri/symbols.txt
-  splits: config/G8ME01_DEMO/mri/splits.txt
+  symbols: config/G8ME01_DEMO_1/mri/symbols.txt
+  splits: config/G8ME01_DEMO_1/mri/splits.txt
 
 - object: files/rel/nok.rel
   hash: 9fee0ce05499b1d7e61ce4524984dcc342155273
-  symbols: config/G8ME01_DEMO/nok/symbols.txt
-  splits: config/G8ME01_DEMO/nok/splits.txt
+  symbols: config/G8ME01_DEMO_1/nok/symbols.txt
+  splits: config/G8ME01_DEMO_1/nok/splits.txt
 
 - object: files/rel/sys.rel
   hash: 0e5db8f9911ab3da6f21692d2628138b9c944a69
-  symbols: config/G8ME01_DEMO/sys/symbols.txt
-  splits: config/G8ME01_DEMO/sys/splits.txt
+  symbols: config/G8ME01_DEMO_1/sys/symbols.txt
+  splits: config/G8ME01_DEMO_1/sys/splits.txt

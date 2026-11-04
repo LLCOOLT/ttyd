@@ -8,7 +8,7 @@ Scripts for building, checking and reporting. Run them from the repository root.
 
 | Option | Effect |
 |---|---|
-| `--version G8MJ01` / `G8ME01` / `G8MP01` / `G8ME01_DEMO` / `G8MJ01_DEMO` / `G8ME01_DEMO2` / `G8MP01_DEMO` | version to build (default `G8MJ01`) |
+| `--version G8MJ01` / `G8ME01` / `G8MP01` / `G8ME01_DEMO_1` / `G8MJ01_DEMO` / `G8ME01_DEMO_2` / `G8MP01_DEMO` | version to build (default `G8MJ01`) |
 | `--map` | also write linker map files |
 | `--non-matching` | link units that are equivalent but not matching (for modified builds) |
 | `--debug` | build with debug information (not matching) |

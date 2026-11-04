@@ -250,7 +250,7 @@ static void titleMain(SequenceWork* work) {
             wp2->counter++;
             if (wp2->counter > VERSION_PICK(60, gp->framerate)) {
                 titleLoadDemo();
-#if VERSION == VERSION_US || VERSION == VERSION_DEMO_US2
+#if VERSION == VERSION_US || VERSION == VERSION_DEMO_US_2
                 wp2->counter = 0;
 #endif
 #if VERSION >= VERSION_JP

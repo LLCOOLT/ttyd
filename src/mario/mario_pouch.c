@@ -21,7 +21,7 @@ static PouchData* mpp;
 static s32 comp_aiueo(const void* a, const void* b);
 static s32 comp_kind(const void* a, const void* b);
 
-#if VERSION == VERSION_DEMO_US
+#if VERSION == VERSION_DEMO_US_1
 /**
  * Max HP of each partner by partner id (row) and HP level
  * (column: levels 0 to 2, then 200 for the cap).
@@ -42,7 +42,7 @@ s16 _party_max_hp_table[8][4] = {
     {15, 25, 35, 200},
     {15, 20, 30, 200},
     {15, 20, 25, 200},
-#if VERSION == VERSION_DEMO_US
+#if VERSION == VERSION_DEMO_US_1
     {0, 0, 0, 0},
 #endif
 };

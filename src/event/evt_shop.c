@@ -1397,7 +1397,7 @@ USER_FUNC(evt_shop_setup) {
         wp->win[i] = winMgrEntry(&window_desc[i]);
     }
     wp->sel = -1;
-#if VERSION != VERSION_DEMO_US
+#if VERSION != VERSION_DEMO_US_1
     evtRunCaseEntry(9, TRUE, "a_shop_keihin", 0, evt_shoplist, 0);
 #endif
     return EVT_RETURN_DONE;

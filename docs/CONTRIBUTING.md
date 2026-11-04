@@ -7,7 +7,7 @@ Contributions are welcome: clearer names and types, comments that explain what c
 Every change must keep all seven versions byte-identical. Before you commit, build each version whose game files you have and confirm the check line:
 
 ```sh
-for v in G8MJ01 G8ME01 G8MP01 G8ME01_DEMO G8MJ01_DEMO G8ME01_DEMO2 G8MP01_DEMO; do
+for v in G8MJ01 G8ME01 G8MP01 G8ME01_DEMO_1 G8MJ01_DEMO G8ME01_DEMO_2 G8MP01_DEMO; do
     python configure.py --version $v && ninja || break
 done
 ```
@@ -17,9 +17,9 @@ done
 | `G8MJ01` | `32 files OK` |
 | `G8ME01` | `30 files OK` |
 | `G8MP01` | `33 files OK` |
-| `G8ME01_DEMO` | `7 files OK` |
+| `G8ME01_DEMO_1` | `7 files OK` |
 | `G8MJ01_DEMO` | `33 files OK` |
-| `G8ME01_DEMO2` | `8 files OK` |
+| `G8ME01_DEMO_2` | `8 files OK` |
 | `G8MP01_DEMO` | `8 files OK` |
 
 This applies to every kind of change, including comment-only and header-only edits:
@@ -59,7 +59,7 @@ Replacing a fake with natural C that still matches is always welcome; then delet
 
 When code differs between versions (see [VERSIONS.md](VERSIONS.md)):
 
-- **Pick the right condition.** Compare `VERSION` with the ordered values from `include/version.h`: US-and-PAL code (with the September demos) goes inside `#if VERSION >= VERSION_US`, PAL code the European demo shares inside `#if VERSION >= VERSION_DEMO_EU`, code of JP and both early demos inside `#if VERSION <= VERSION_JP`, code of both early demos inside `#if VERSION <= VERSION_DEMO_JP`, and code for one version inside `#if VERSION == VERSION_EU` (or `_JP`, `_DEMO_US` and the others). The two early demos share their code, so a demo difference covers both unless the Japanese demo shows otherwise; `VERSION == VERSION_DEMO_US` is for what only the June US demo has, mostly its English text. US-only code is also in the September US demo: `#if VERSION == VERSION_US || VERSION == VERSION_DEMO_US2`. VERSIONS.md lists every pattern. Include `version.h` before the first condition. `python tools/check_versions.py` checks this (it needs no game files, and the lint job runs it on every push and pull request); configure.py's `VERSION_G8M*` macros are for `version.h` and the library code only.
+- **Pick the right condition.** Compare `VERSION` with the ordered values from `include/version.h`: US-and-PAL code (with the September demos) goes inside `#if VERSION >= VERSION_US`, PAL code the European demo shares inside `#if VERSION >= VERSION_DEMO_EU`, code of JP and both early demos inside `#if VERSION <= VERSION_JP`, code of both early demos inside `#if VERSION <= VERSION_DEMO_JP`, and code for one version inside `#if VERSION == VERSION_EU` (or `_JP`, `_DEMO_US_1` and the others). The two early demos share their code, so a demo difference covers both unless the Japanese demo shows otherwise; `VERSION == VERSION_DEMO_US_1` is for what only the June US demo has, mostly its English text. US-only code is also in the September US demo: `#if VERSION == VERSION_US || VERSION == VERSION_DEMO_US_2`. VERSIONS.md lists every pattern. Include `version.h` before the first condition. `python tools/check_versions.py` checks this (it needs no game files, and the lint job runs it on every push and pull request); configure.py's `VERSION_G8M*` macros are for `version.h` and the library code only.
 - **Keep it small.** Wrap only the statements, members or values that differ, not a whole function, unless most of it differs. For a single value, use `VERSION_PICK(jp, us)` from `include/version.h`; for frame counts and easing that the US code scales by the frame rate, use `FPS_FRAMES(n)` and `FPS_EASE(n)`.
 - **Structs.** A member that exists only in some versions sits inside the `#if` in the struct itself, so every field access stays correct for every version. Put the version's offset in the member's comment when it helps (`// 0x2CC (US 0x2D0)`).
 - **Say why.** Start the block with a short comment when the difference is not obvious (`// PAL: per-language title texture`).

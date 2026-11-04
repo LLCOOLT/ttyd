@@ -554,7 +554,7 @@ static inline DEMOPadStatus* GET_DEMO_PAD_STATUS(u32 i) {
  */
 void makeKey(void) {
     s32 delay;
-#if VERSION <= VERSION_DEMO_JP || VERSION == VERSION_DEMO_US2 || VERSION == VERSION_DEMO_EU
+#if VERSION <= VERSION_DEMO_JP || VERSION == VERSION_DEMO_US_2 || VERSION == VERSION_DEMO_EU
     // All four demos keep button/dirs in 32-bit locals: with no u16 masks to fold, the global optimiser's
     // constant propagation changes nothing in makeKey, so its dead-li deletion never runs and loop 2's count
     // register is colour-coalesced with i's zero (the demos' loop-2 register assignment).

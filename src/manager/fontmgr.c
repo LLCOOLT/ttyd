@@ -133,7 +133,7 @@ void fontmgrInit(void) {
 void fontmgrTexSetup(void) {
 #if VERSION >= VERSION_US
     JUTFontSetup(gp->language);
-#elif VERSION == VERSION_DEMO_US
+#elif VERSION == VERSION_DEMO_US_1
     JUTFontSetup(1);
 #else
     JUTFontSetup(0);

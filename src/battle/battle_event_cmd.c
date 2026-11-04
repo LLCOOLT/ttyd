@@ -5453,7 +5453,7 @@ USER_FUNC(btlevtcmd_ACSuccessEffect) {
     psndSFX_pit(psndSFXOn_3D(name, &pos), 0);
     return EVT_RETURN_DONE;
 }
-#elif VERSION == VERSION_DEMO_US
+#elif VERSION == VERSION_DEMO_US_1
 /** The US demo has fixed widths, a different base scale, and no scaling or clamping of the position. */
 USER_FUNC(btlevtcmd_ACSuccessEffect) {
     EvtWord* args = event->args;

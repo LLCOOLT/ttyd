@@ -2978,7 +2978,7 @@ static EVT_BEGIN(minnnanokoe_evt)
             WAIT_MS(100)
         END_LOOP
     END_SIBLING_EVENT
-#if VERSION == VERSION_US || VERSION == VERSION_DEMO_US2
+#if VERSION == VERSION_US || VERSION == VERSION_DEMO_US_2
     SET_VALUE(GW(6), 0)
 #endif
     BEGIN_SIBLING_EVENT
@@ -3006,7 +3006,7 @@ static EVT_BEGIN(minnnanokoe_evt)
                 SET_VALUE(LW(3), STRING("stg8_las_148_70"))
             END_SWITCH
             BEGIN_INLINE_EVENT
-#if VERSION == VERSION_US || VERSION == VERSION_DEMO_US2
+#if VERSION == VERSION_US || VERSION == VERSION_DEMO_US_2
                 CALL(evt_msg_pri, GW(6))
                 ADD(GW(6), 1)
                 IF_INT_EQUAL(GW(6), 10)

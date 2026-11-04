@@ -103,7 +103,7 @@ const char e3_anim_str10[] = "PWD_A_7";
 // Forward Declarations
 static void e3Disp(CameraId cameraId, void* param);
 static void e3DispOffscreen(CameraId cameraId, void* param);
-#if VERSION == VERSION_DEMO_US
+#if VERSION == VERSION_DEMO_US_1
 static void e3DispShadow(f32 x, f32 y, f32 z);
 static f32 e3BlinkTime(void);
 #else
@@ -188,7 +188,7 @@ static void alarm_handler(OSAlarm* alarm, OSContext* context) {
  * a scenario starts), sets the kiosk and save-blocks-off flags and plays the file menu BGM.
  */
 void seq_e3Init(SequenceWork* seq) {
-#if VERSION == VERSION_DEMO_US
+#if VERSION == VERSION_DEMO_US_1
     s32 type = gp->inBattle != 0;
     s32 i;
 
@@ -207,7 +207,7 @@ void seq_e3Init(SequenceWork* seq) {
     wp->nextScreen = 0;
     wp->scenario = 0;
     wp->poseRotY = 270.0f;
-#if VERSION == VERSION_DEMO_US
+#if VERSION == VERSION_DEMO_US_1
     // The June US demo starts the timeout when a scenario is picked.
     OSCancelAlarm(&wp->alarm);
     wp->initTime = 0;
@@ -234,7 +234,7 @@ void seq_e3Init(SequenceWork* seq) {
 
 /** Leaves the kiosk menu: frees its textures (and the US demo's characters and their script) and fades out sound. */
 void seq_e3Exit(SequenceWork* seq) {
-#if VERSION == VERSION_DEMO_US
+#if VERSION == VERSION_DEMO_US_1
     s32 i;
 
     for (i = 0; i < 4; i++) {
@@ -469,7 +469,7 @@ void seq_e3Main(SequenceWork* seq) {
                 pouchGetPtr()->partyData[i].HPLevel = 1;
             }
 
-#if VERSION >= VERSION_DEMO_US2
+#if VERSION >= VERSION_DEMO_US_2
             // the 2004-09 demos and PAL: the first scenario starts without items or badges
             if (wp->scenario != 0) {
 #endif
@@ -479,26 +479,26 @@ void seq_e3Main(SequenceWork* seq) {
                     pouchGetItem(ITEM_FIRE_FLOWER);
                     pouchGetItem(ITEM_POW_BLOCK);
                 }
-#if VERSION >= VERSION_DEMO_US2
+#if VERSION >= VERSION_DEMO_US_2
             }
 #endif
 
             pouchGetPtr()->availableBP = 20;
             pouchGetPtr()->maximumBP = 20;
-#if VERSION >= VERSION_DEMO_US2
+#if VERSION >= VERSION_DEMO_US_2
             if (wp->scenario != 0) {
 #endif
                 pouchGetItem(ITEM_POWER_BOUNCE);
                 pouchGetItem(ITEM_POWER_SMASH);
                 pouchEquipBadgeID(ITEM_POWER_BOUNCE);
                 pouchEquipBadgeID(ITEM_POWER_SMASH);
-#if VERSION >= VERSION_DEMO_US2
+#if VERSION >= VERSION_DEMO_US_2
             }
 #endif
             pouchReviseMarioParam();
             pouchRevisePartyParam();
             statusWinForceUpdate();
-#if VERSION == VERSION_DEMO_US
+#if VERSION == VERSION_DEMO_US_1
             OSCreateAlarm(&wp->alarm);
             OSSetAlarm(&wp->alarm, (OSTime)OS_TIMER_CLOCK * 600, alarm_handler);
             wp->initTime = OSGetTime();
@@ -525,7 +525,7 @@ typedef enum E3Texture {
     E3_TEX_CURSOR0 = 5,
     E3_TEX_CURSOR1 = 6,
     E3_TEX_BOX = 7,
-#elif VERSION == VERSION_DEMO_US
+#elif VERSION == VERSION_DEMO_US_1
     E3_TEX_BOX = 1,
     E3_TEX_TILE = 4,
     E3_TEX_CURSOR0 = 5,
@@ -585,7 +585,7 @@ static void e3Disp(CameraId cameraId, void* param) {
                   camera->viewport[4], camera->viewport[5]);
 
     if (active == 0) {
-#if VERSION == VERSION_DEMO_US
+#if VERSION == VERSION_DEMO_US_1
         // Title screen: background tiles, the four characters and the title textures
         mode = (s32)((f32)sin(e3BlinkTime()) * 459.0f);
         if (mode < 0) {
@@ -651,7 +651,7 @@ static void e3Disp(CameraId cameraId, void* param) {
 #endif
     } else {
         // Tiled background fill (40 x 32 quads)
-#if VERSION == VERSION_DEMO_US
+#if VERSION == VERSION_DEMO_US_1
         // Same fill as below; the US demo compiles it with the counters held in these variables.
         winTexInit(*wp->handle->data);
         for (col = 0, py = -304; col < 40; col++, py += 16) {
@@ -744,7 +744,7 @@ static void e3Disp(CameraId cameraId, void* param) {
                   viewportBackup[5]);
 }
 
-#if VERSION != VERSION_DEMO_US
+#if VERSION != VERSION_DEMO_US_1
 // FAKE: stand-in for a function the linker stripped; it only creates the 30.0f constant in its place in .sdata2
 // (every build except the US demo has it there) and is dead-stripped at link. The one stripped function the
 // Japanese demo's map lists in this unit is `e3GetTime` (0x10 bytes); its code is in no build.
@@ -769,7 +769,7 @@ static void e3DispOffscreen(CameraId cameraId, void* param) {
     offscreenAddBoundingBox(offscreenNameToId("fOff_peron"), left, top, right, bottom);
 }
 
-#if VERSION == VERSION_DEMO_US
+#if VERSION == VERSION_DEMO_US_1
 /** Phase for the US demo title's blinking prompt: retrace count / 15 (radians for sin). */
 static f32 e3BlinkTime(void) {
     return (f32)gp->retraceCount / 15.0f;

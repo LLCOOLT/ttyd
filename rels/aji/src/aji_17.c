@@ -1552,7 +1552,7 @@ EVT_BEGIN(peach_evt_dance)
                 SPAWN_EVENT(peach_dance_action_fail)
             END_SWITCH
         END_IF
-#if VERSION == VERSION_US || VERSION == VERSION_DEMO_US2
+#if VERSION == VERSION_US || VERSION == VERSION_DEMO_US_2
         BEGIN_INLINE_EVENT
             CALL(dance_flag_check, 4096, LW(5))
             IF_INT_NOT_EQUAL(LW(5), 0)

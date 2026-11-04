@@ -12,7 +12,7 @@ const char R_build_time[] = "15:37:03";
 const char R_build_date[] = "Sep 23 2004";
 /** Build time of the September 2004 European demo (13:32:41). */
 const char R_build_time[] = "13:32:41";
-#elif VERSION == VERSION_DEMO_US2
+#elif VERSION == VERSION_DEMO_US_2
 /** Build date of the September 2004 US demo (18 September 2004), the stamp kept as build info. */
 const char R_build_date[] = "Sep 18 2004";
 /** Build time of the September 2004 US demo (17:37:16). */

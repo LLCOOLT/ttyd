@@ -1,9 +1,9 @@
 name: MarioSt
 object: sys/main.dol
 hash: e70f34a1cb39b6749a1f040c580319f67eebda85
-object_base: orig/G8ME01_DEMO2
-symbols: config/G8ME01_DEMO2/symbols.txt
-splits: config/G8ME01_DEMO2/splits.txt
+object_base: orig/G8ME01_DEMO_2
+symbols: config/G8ME01_DEMO_2/symbols.txt
+splits: config/G8ME01_DEMO_2/splits.txt
 mw_comment_version: 10
 force_active:
 # Unreferenced in this demo's dol and its seven RELs, but kept by the original link (the full game's
@@ -337,35 +337,35 @@ extract:
 modules:
 - object: files/rel/gon.rel
   hash: 6d49d40177ccac317fe53498af71683db1c6fc85
-  symbols: config/G8ME01_DEMO2/gon/symbols.txt
-  splits: config/G8ME01_DEMO2/gon/splits.txt
+  symbols: config/G8ME01_DEMO_2/gon/symbols.txt
+  splits: config/G8ME01_DEMO_2/gon/splits.txt
 
 - object: files/rel/gor.rel
   hash: a31fd74c31e94d0e19c1e8f4d7cc9dfd8cfdf298
-  symbols: config/G8ME01_DEMO2/gor/symbols.txt
-  splits: config/G8ME01_DEMO2/gor/splits.txt
+  symbols: config/G8ME01_DEMO_2/gor/symbols.txt
+  splits: config/G8ME01_DEMO_2/gor/splits.txt
 
 - object: files/rel/hei.rel
   hash: 41e0f6ed4310b09c860757a07960f52c962f2768
-  symbols: config/G8ME01_DEMO2/hei/symbols.txt
-  splits: config/G8ME01_DEMO2/hei/splits.txt
+  symbols: config/G8ME01_DEMO_2/hei/symbols.txt
+  splits: config/G8ME01_DEMO_2/hei/splits.txt
 
 - object: files/rel/kpa.rel
   hash: 1202b317465d522660dc3a8070d430789153a4a8
-  symbols: config/G8ME01_DEMO2/kpa/symbols.txt
-  splits: config/G8ME01_DEMO2/kpa/splits.txt
+  symbols: config/G8ME01_DEMO_2/kpa/symbols.txt
+  splits: config/G8ME01_DEMO_2/kpa/splits.txt
 
 - object: files/rel/mri.rel
   hash: c71f914b4911af66337bb2da86d1398b5cddbf59
-  symbols: config/G8ME01_DEMO2/mri/symbols.txt
-  splits: config/G8ME01_DEMO2/mri/splits.txt
+  symbols: config/G8ME01_DEMO_2/mri/symbols.txt
+  splits: config/G8ME01_DEMO_2/mri/splits.txt
 
 - object: files/rel/nok.rel
   hash: 72f26e117876d1eb292e655b3bf573fc564977d1
-  symbols: config/G8ME01_DEMO2/nok/symbols.txt
-  splits: config/G8ME01_DEMO2/nok/splits.txt
+  symbols: config/G8ME01_DEMO_2/nok/symbols.txt
+  splits: config/G8ME01_DEMO_2/nok/splits.txt
 
 - object: files/rel/tik.rel
   hash: e3125d446c2951551d1fddd423542f4579a536ac
-  symbols: config/G8ME01_DEMO2/tik/symbols.txt
-  splits: config/G8ME01_DEMO2/tik/splits.txt
+  symbols: config/G8ME01_DEMO_2/tik/symbols.txt
+  splits: config/G8ME01_DEMO_2/tik/splits.txt

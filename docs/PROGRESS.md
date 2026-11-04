@@ -2,7 +2,7 @@
 
 ## Matching
 
-One row per commit window, at most 3 per day. Figures come from an objdiff-cli report on each window's final tree. Rows from 2026-10-10 to 2026-10-22 are the Japanese release (G8MJ01); the rows after it are the US (G8ME01) and European (G8MP01) releases and the June 2004 US demo (G8ME01_DEMO).
+One row per commit window, at most 3 per day. Figures come from an objdiff-cli report on each window's final tree. Rows from 2026-10-10 to 2026-10-22 are the Japanese release (G8MJ01); the rows after it are the US (G8ME01) and European (G8MP01) releases and the June 2004 US demo (G8ME01_DEMO_1).
 
 | Window | Code matched | Fully linked | Data matched | Functions | Files matched | Linked this window |
 | --- | --- | --- | --- | --- | --- | --- |
@@ -39,9 +39,9 @@ One row per commit window, at most 3 per day. Figures come from an objdiff-cli r
 | 2026-10-22 16:00-24:00 | **100.00%** | **100.00%** | **100.00%** | **9768 / 9768** | **1234 / 1234** | 31 |
 | 2026-10-23, US (G8ME01) ³ | **100.00%** | **100.00%** | **100.00%** | **9748 / 9748** | **1226 / 1226** | - |
 | 2026-10-26, Europe (G8MP01) ⁴ | **100.00%** | **100.00%** | **100.00%** | **10271 / 10271** | **1378 / 1378** | - |
-| 2026-10-26, demo (G8ME01_DEMO) ⁵ | 99.10% | 93.75% | 90.51% | 7469 / 7478 | 739 / 757 | - |
-| 2026-10-28, demo (G8ME01_DEMO) ⁵ | 99.66% | 99.30% | 90.54% | 7475 / 7478 | 744 / 746 | - |
-| 2026-10-29, demo (G8ME01_DEMO) ⁵ | **100.00%** | **100.00%** | 90.54% | **7478 / 7478** | **746 / 746** | 2 |
+| 2026-10-26, demo (G8ME01_DEMO_1) ⁵ | 99.10% | 93.75% | 90.51% | 7469 / 7478 | 739 / 757 | - |
+| 2026-10-28, demo (G8ME01_DEMO_1) ⁵ | 99.66% | 99.30% | 90.54% | 7475 / 7478 | 744 / 746 | - |
+| 2026-10-29, demo (G8ME01_DEMO_1) ⁵ | **100.00%** | **100.00%** | 90.54% | **7478 / 7478** | **746 / 746** | 2 |
 
 ¹ For these windows the report counted original assembly carried in as a stand-in as "matched", so 100% meant the build was complete and byte-identical, not that it was all C. The C share is in brackets. The data figure was objdiff's name-paired measure; the linked bytes were already identical.
 

@@ -32,9 +32,11 @@ VERSIONS = [
     "G8MJ01",  # 0
     "G8ME01",  # 1
     "G8MP01",  # 2
-    "G8ME01_DEMO",  # 3: the June 2004 prerelease from the Interactive Multi-Game Demo Disc Version 17 (disc ID G8MJ01)
-    "G8MJ01_DEMO",  # 4: the Japanese store demo from Gekkan Nintendo Tentou Demo 2004.7.1 (disc ID G8MJ01)
-    "G8ME01_DEMO2",  # 5: the September 2004 US demo from the Interactive Multi-Game Demo Disc Version 19
+    "G8ME01_DEMO_1",  # 3: the June 2004 prerelease from the Interactive Multi-Game Demo Disc Version 17 or 18
+    # (disc ID G8MJ01)
+    "G8MJ01_DEMO",  # 4: the Japanese store demo from Gekkan Nintendo Tentou Demo 2004.7.1, 2004.8.1 or 2004.9.1
+    # (disc ID G8MJ01)
+    "G8ME01_DEMO_2",  # 5: the September 2004 US demo from the Interactive Multi-Game Demo Disc Version 19
     # (disc ID G8ME01)
     "G8MP01_DEMO",  # 6: the September 2004 European demo from the Interactive Multi-Game Demo Disk - November 2004
     # (Europe) (disc ID G8MP01)
@@ -233,17 +235,17 @@ cflags_base = [
     f"-DVERSION_{config.version}",
     "-DSDK_REVISION=1",
 ]
-# The game code tests the version through include/version.h (VERSION_DEMO_US < VERSION_DEMO_JP < VERSION_JP <
-# VERSION_US < VERSION_DEMO_US2 < VERSION_DEMO_EU < VERSION_EU; tools/check_versions.py keeps the per-version macros
+# The game code tests the version through include/version.h (VERSION_DEMO_US_1 < VERSION_DEMO_JP < VERSION_JP <
+# VERSION_US < VERSION_DEMO_US_2 < VERSION_DEMO_EU < VERSION_EU; tools/check_versions.py keeps the per-version macros
 # below out of it). The library code under libs/ tests those: the European release is built from the US code, so
 # G8MP01 defines VERSION_G8ME01 as well, and VERSION_G8MP01 marks what differs in PAL.
 if config.version == "G8MP01":
     cflags_base.append("-DVERSION_G8ME01")
 # The September 2004 demos were built from the release code a few days after it (the US one from the US code, the
 # European one from the PAL code): of their main.dol functions, all but a few dozen have the same code as US or
-# PAL (relocations masked). version.h gives them their own values (VERSION_DEMO_US2, VERSION_DEMO_EU); the library
+# PAL (relocations masked). version.h gives them their own values (VERSION_DEMO_US_2, VERSION_DEMO_EU); the library
 # code under libs/ sees them as US and PAL.
-if config.version == "G8ME01_DEMO2":
+if config.version == "G8ME01_DEMO_2":
     cflags_base.append("-DVERSION_G8ME01")
 if config.version == "G8MP01_DEMO":
     cflags_base.extend(["-DVERSION_G8ME01", "-DVERSION_G8MP01"])
@@ -253,8 +255,8 @@ if config.version == "G8MP01_DEMO":
 
 # The Japanese store demo has the June US demo's pre-final code a little later (in five places it already has the
 # release code): 6,890 of its 6,905 main.dol functions have the same code as the June US demo's (relocations
-# masked). The library code marks what the two early demos share with VERSION_G8ME01_DEMO || VERSION_G8MJ01_DEMO.
-DEMO_VERSIONS = ("G8ME01_DEMO", "G8MJ01_DEMO")
+# masked). The library code marks what the two early demos share with VERSION_G8ME01_DEMO_1 || VERSION_G8MJ01_DEMO.
+DEMO_VERSIONS = ("G8ME01_DEMO_1", "G8MJ01_DEMO")
 
 # Small-data thresholds of the game code. The early demos put no variable over 8 bytes in .sdata/.sbss (PadChanMask[4]
 # of sdk/DEMOPad.c is in .data) and no constant over 4 bytes in .sdata2 (the 6-byte string "title" is in .rodata).

@@ -80,7 +80,7 @@ BOOL R_bReset; // before DvdCheckTreadOn: .sbss is emitted in reverse
 BOOL DvdCheckTreadOn;
 
 //.data
-#if VERSION == VERSION_DEMO_US2
+#if VERSION == VERSION_DEMO_US_2
 // Unreferenced; the early demos carry the same table at the start of winmgr.c's and win_log.c's .data.
 static f32 unusedSignTbl[16] = {-1.0f, 1.0f, -1.0f, 1.0f, 1.0f, -1.0f, 1.0f, -1.0f, -1.0f, 1.0f, -1.0f, 1.0f, 1.0f, -1.0f, 1.0f, -1.0f};
 #endif
@@ -102,7 +102,7 @@ static f32 unusedSignTbl[16] = {-1.0f, 1.0f, -1.0f, 1.0f, 1.0f, -1.0f, 1.0f, -1.
 GXRenderModeObj sRMObjHReso =
     MARIOST_RENDER_MODE(VI_TVMODE_NTSC_INT, 0x1C0, 0x1C0, 0x1B, 0x10, 0x29A, 0x1C0, VI_XFBMODE_DF);
 #endif
-#if VERSION == VERSION_DEMO_US2
+#if VERSION == VERSION_DEMO_US_2
 /** sRMObjHReso's PAL twin (50Hz); the same values as PAL's mode below. */
 GXRenderModeObj sRMObjHResoPal =
     MARIOST_RENDER_MODE(VI_TVMODE_PAL_INT, 0x1C0, 0x212, 0x1B, 0x16, 0x29A, 0x212, VI_XFBMODE_DF);
@@ -117,7 +117,7 @@ GXRenderModeObj sRMObjHReso =
 GXRenderModeObj sRMObjHReso_prog =
     MARIOST_RENDER_MODE(VI_TVMODE_NTSC_PROG, 0x1C0, 0x1C0, 0x1B, 0x10, 0x29A, 0x1C0, VI_XFBMODE_SF);
 #endif
-#if VERSION == VERSION_DEMO_US2
+#if VERSION == VERSION_DEMO_US_2
 /** sRMObjHReso_prog's PAL twin (EURGB60); the same values as PAL's mode below. */
 GXRenderModeObj sRMObjHReso_progPal =
     MARIOST_RENDER_MODE(VI_TVMODE_EURGB60_INT, 0x1C0, 0x1C0, 0x1B, 0x10, 0x29A, 0x1C0, VI_XFBMODE_DF);
@@ -132,7 +132,7 @@ GXRenderModeObj sRMObjHReso_prog =
 GXRenderModeObj GXNtsc480IntDfMarioSt =
     MARIOST_RENDER_MODE(VI_TVMODE_NTSC_INT, 0x1E0, 0x1E0, 0x1E, 0x0, 0x294, 0x1E0, VI_XFBMODE_DF);
 #endif
-#if VERSION == VERSION_DEMO_US2
+#if VERSION == VERSION_DEMO_US_2
 /** GXNtsc480IntDfMarioSt's PAL twin (50Hz); the same values as PAL's mode below. */
 GXRenderModeObj GXNtsc480IntDfMarioStPal =
     MARIOST_RENDER_MODE(VI_TVMODE_PAL_INT, 0x1E0, 0x238, 0x1E, 0x6, 0x294, 0x238, VI_XFBMODE_DF);
@@ -147,7 +147,7 @@ GXRenderModeObj GXNtsc480IntDfMarioSt =
 GXRenderModeObj GXNtsc480ProgMarioSt =
     MARIOST_RENDER_MODE(VI_TVMODE_NTSC_PROG, 0x1E0, 0x1E0, 0x1E, 0x0, 0x294, 0x1E0, VI_XFBMODE_SF);
 #endif
-#if VERSION == VERSION_DEMO_US2
+#if VERSION == VERSION_DEMO_US_2
 /** GXNtsc480ProgMarioSt's PAL twin (EURGB60); the same values as PAL's mode below. */
 GXRenderModeObj GXNtsc480ProgMarioStPal =
     MARIOST_RENDER_MODE(VI_TVMODE_EURGB60_INT, 0x1E0, 0x1E0, 0x1E, 0x0, 0x294, 0x1E0, VI_XFBMODE_DF);
@@ -177,7 +177,7 @@ void L_gcResetCheck(void);
  */
 void marioStInit(void) {
     static u8 stack[0x1000];
-#if VERSION == VERSION_DEMO_US2
+#if VERSION == VERSION_DEMO_US_2
     // the 2004-09 US demo runs on PAL consoles too: there it switches every video mode to its PAL twin
     VIInit();
     if (VIGetTvFormat() != VI_NTSC) {
@@ -222,7 +222,7 @@ void marioStInit(void) {
         gp->flags |= GLOBAL_FLAG_VIDEO_MODE_SET;
     }
 #endif
-#if VERSION <= VERSION_DEMO_JP || VERSION == VERSION_DEMO_US2 || VERSION == VERSION_DEMO_EU
+#if VERSION <= VERSION_DEMO_JP || VERSION == VERSION_DEMO_US_2 || VERSION == VERSION_DEMO_EU
     // every demo runs in kiosk mode
     gp->flags |= GLOBAL_FLAG_KIOSK;
 #endif
@@ -362,7 +362,7 @@ void marioStInit(void) {
     } else {
         SoundSetOutputMode(1);
     }
-#if VERSION <= VERSION_DEMO_JP || VERSION == VERSION_DEMO_US2 || VERSION == VERSION_DEMO_EU
+#if VERSION <= VERSION_DEMO_JP || VERSION == VERSION_DEMO_US_2 || VERSION == VERSION_DEMO_EU
     none_key = OSGetTime(); // every demo: start the idle timer
 #endif
 }
@@ -433,14 +433,14 @@ void marioStMain(void) {
                 break;
         }
         if (i >= 4) {
-#if VERSION <= VERSION_DEMO_JP || VERSION == VERSION_DEMO_US2 || VERSION == VERSION_DEMO_EU
+#if VERSION <= VERSION_DEMO_JP || VERSION == VERSION_DEMO_US_2 || VERSION == VERSION_DEMO_EU
             // Every demo, after a minute without input: in the field or in battle, raise the kiosk timeout flag
             // (seq_game and seq_battle then end the session through SEQ_GAME_OVER in kiosk mode);
             // anywhere else, reset the game. The June US demo restarts the idle timer after raising the flag.
             if (OSTicksToSeconds(OSGetTime() - none_key) > 60) {
                 if (seqGetSeq() == SEQ_GAME || seqGetSeq() == SEQ_BATTLE) {
                     gp->flags |= GLOBAL_FLAG_KIOSK_TIMEOUT;
-#if VERSION == VERSION_DEMO_US
+#if VERSION == VERSION_DEMO_US_1
                     none_key = OSGetTime();
 #endif
                 } else {
@@ -821,7 +821,7 @@ static inline void L_gcResetCheck(void) {
     u32 code;
 
     if (gp->resetType) {
-#if VERSION == VERSION_DEMO_US
+#if VERSION == VERSION_DEMO_US_1
         OSReport("\x83\x8A\x83\x5A\x83\x62\x83\x67\x8F\x88\x97\x9D\x8A\x4A\x8E\x6E\n");
 #endif
         VISetBlack(TRUE);

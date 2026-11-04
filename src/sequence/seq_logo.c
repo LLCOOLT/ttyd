@@ -76,14 +76,14 @@ void seq_logoInit(SequenceWork* work) {
     wp->texture = fileAllocf(4, "%s/mariost.tpl", getMarioStDvdRoot());
 #endif
     wp->progressive = FALSE;
-#if VERSION == VERSION_DEMO_US
+#if VERSION == VERSION_DEMO_US_1
     work->state = 0;
     logoAsyncFirst();
 #endif
     VIConfigure(&sRMObjHReso);
     VIFlush();
     VIWaitForRetrace();
-#if VERSION == VERSION_DEMO_US
+#if VERSION == VERSION_DEMO_US_1
     animGroupBaseAsync("c_pkr", 0, NULL);
     animGroupBaseAsync("c_pnk", 0, NULL);
     animGroupBaseAsync("c_windy", 0, NULL);
@@ -154,17 +154,17 @@ void seq_logoInit(SequenceWork* work) {
  * themselves, then wait 2 s for the TV.
  */
 void seq_logoInit(SequenceWork* work) {
-#if VERSION == VERSION_DEMO_US2 || VERSION == VERSION_DEMO_EU
+#if VERSION == VERSION_DEMO_US_2 || VERSION == VERSION_DEMO_EU
     s32 i;
 #endif
     memset(wp, 0, sizeof(LogoWork));
     wp->logoId = LOGO_NONE;
     wp->texture = fileAllocf(4, "%s/mariost.tpl", getMarioStDvdRoot());
-#if VERSION == VERSION_DEMO_US2 || VERSION == VERSION_DEMO_EU
+#if VERSION == VERSION_DEMO_US_2 || VERSION == VERSION_DEMO_EU
     wp->progressive = FALSE;
 #endif
     if (!OSIsRestart() || OSGetResetCode() & OS_RESET_SHUTDOWN) {
-#if VERSION == VERSION_DEMO_US2 || VERSION == VERSION_DEMO_EU
+#if VERSION == VERSION_DEMO_US_2 || VERSION == VERSION_DEMO_EU
         // The 2004-09 demos ask nothing: a PAL TV is switched to 60Hz (EURGB60), an NTSC TV on a component
         // cable to progressive scan unless B is held. On a PAL TV sRMObjHReso_prog is the EURGB60 mode (the September
         // US demo's marioStInit has copied the PAL modes into the NTSC slots).
@@ -220,7 +220,7 @@ void seq_logoInit(SequenceWork* work) {
         }
 #endif
     }
-#if VERSION == VERSION_DEMO_US2 || VERSION == VERSION_DEMO_EU
+#if VERSION == VERSION_DEMO_US_2 || VERSION == VERSION_DEMO_EU
     else {
 #else
     if (!OSIsRestart() || OSGetResetCode() & OS_RESET_SHUTDOWN) {
@@ -452,7 +452,7 @@ void seq_logoMain(SequenceWork* work) {
             if (!wp->progressive) {
                 gp->flags |= GLOBAL_FLAG_VIDEO_MODE_SET;
                 time = gp->renderTime;
-#if VERSION == VERSION_DEMO_US2 || VERSION == VERSION_DEMO_EU
+#if VERSION == VERSION_DEMO_US_2 || VERSION == VERSION_DEMO_EU
                 work->state = 8; // the 2004-09 demos skip the story screen
 #else
                 work->state++;
@@ -640,7 +640,7 @@ static void logoDisp(CameraId camId, void* param) {
         } else {
             rmode = &sRMObjHReso_prog;
         }
-#elif VERSION == VERSION_DEMO_US2
+#elif VERSION == VERSION_DEMO_US_2
         // on a PAL TV the NTSC modes hold the PAL ones (marioStInit), _prog the EURGB60 one
         if (VIGetTvFormat() != VI_NTSC) {
             if (OSGetEuRgb60Mode() != 1) {
@@ -909,7 +909,7 @@ static void dummy_draw(CameraId camId, void* param) {
     f32 scale;
     u16 height;
 
-#if VERSION == VERSION_DEMO_US2
+#if VERSION == VERSION_DEMO_US_2
     // as in logoDisp: the PAL and EURGB60 modes sit in the NTSC slots on a PAL TV
     if (VIGetTvFormat() != VI_NTSC) {
         if (OSGetEuRgb60Mode() != 1) {
