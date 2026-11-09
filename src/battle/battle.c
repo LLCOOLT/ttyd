@@ -477,12 +477,12 @@ BattleUnit* BattleGetPartnerPtr(BattleWork* wp, BattleUnit* unit) {
 
 /**
  * Starts loading a partner's animation data in the background (partyId is the unit kind 0xE0-0xE6)
- * so a partner switch is quick.
+ * so a partner switch is quick; returns TRUE once it has loaded (animEffectAsync's result).
  */
-void BattlePartyAnimeLoad(s32 partyId) {
+BOOL BattlePartyAnimeLoad(s32 partyId) {
     BattleUnitSetup* setup = &entryunit_party[partyId - UNIT_GOOMBELLA];
 
-    animEffectAsync(setup->unitKindParams->parts->modelName, 1);
+    return animEffectAsync(setup->unitKindParams->parts->modelName, 1);
 }
 
 /**
