@@ -28,8 +28,6 @@
 #include "battle/battle_message.h"
 #include "evt/evt_eff.h"
 #include "libc_decls.h"
-// FAKE: battle_break_slot.c calls pouchSetAP through this prototype (the types it was compiled with) instead of the one in mario/mario_pouch.h; same registers, behaviour-identical.
-typedef void (*PouchSetAPS32Fn)(s32);
 
 typedef struct {
     s32 v[8];
@@ -537,7 +535,7 @@ void BattleBreakSlot_Main(void) {
                         break;
                     case 4:
                         evtEntry(doku_kinoko_effect, 0, EVENT_START_NOW);
-                        ((PouchSetAPS32Fn)pouchSetAP)(pouchGetAP() / 2);
+                        pouchSetAP(pouchGetAP() / 2);
                         break;
                 }
             }

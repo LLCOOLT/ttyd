@@ -41,12 +41,6 @@
 #include "mario/mario_pouch.h"
 #include "mario/mariost.h"
 #include "win/win_party.h"
-// FAKE: win_main.c calls pouchSetHP through this prototype (the types it was compiled with) instead of the one in mario/mario_pouch.h; same registers, behaviour-identical.
-typedef void (*PouchSetHPS32Fn)(s32);
-// FAKE: win_main.c calls pouchSetFP through this prototype (the types it was compiled with) instead of the one in mario/mario_pouch.h; same registers, behaviour-identical.
-typedef void (*PouchSetFPS32Fn)(s32);
-// FAKE: win_main.c calls pouchSetAP through this prototype (the types it was compiled with) instead of the one in mario/mario_pouch.h; same registers, behaviour-identical.
-typedef void (*PouchSetAPS32Fn)(s32);
 
 // FAKE: the 0.5f that winTexSet and friends load is a named .sdata2 constant defined after winLectureCheck
 // (winConstHalf below); with a plain 0.5f literal the .sdata2 constants come out in a different
@@ -936,13 +930,13 @@ static USER_FUNC(itemUseFunc) {
         case 0:
             statusWinForceOpen();
             if (event->lwData[11] == 0) {
-                ((PouchSetHPS32Fn)pouchSetHP)(pouchGetHP() + item->hp_restored);
-                ((PouchSetFPS32Fn)pouchSetFP)(pouchGetFP() + item->fp_restored);
-                ((PouchSetAPS32Fn)pouchSetAP)(pouchGetAP() + item->sp_restored);
+                pouchSetHP(pouchGetHP() + item->hp_restored);
+                pouchSetFP(pouchGetFP() + item->fp_restored);
+                pouchSetAP(pouchGetAP() + item->sp_restored);
             } else {
                 pouchSetPartyHP(event->lwData[11], pouchGetPartyHP(event->lwData[11]) + item->hp_restored);
-                ((PouchSetFPS32Fn)pouchSetFP)(pouchGetFP() + item->fp_restored);
-                ((PouchSetAPS32Fn)pouchSetAP)(pouchGetAP() + item->sp_restored);
+                pouchSetFP(pouchGetFP() + item->fp_restored);
+                pouchSetAP(pouchGetAP() + item->sp_restored);
             }
             cnt++;
             break;

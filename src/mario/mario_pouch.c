@@ -1117,12 +1117,12 @@ s32 pouchGetHP(void) {
 }
 
 /** Max HP including HP Plus badges. */
-s16 pouchGetMaxHP(void) {
+s32 pouchGetMaxHP(void) {
     return mpp->maximumHP;
 }
 
 /** Sets current HP, clamped to the maximum (not to 0). */
-void pouchSetHP(s16 points) {
+void pouchSetHP(s32 points) {
     mpp->currentHP = points;
     if (mpp->currentHP > mpp->maximumHP) {
         mpp->currentHP = mpp->maximumHP;
@@ -1157,12 +1157,12 @@ s32 pouchGetFP(void) {
 }
 
 /** Max FP including FP Plus badges. */
-s16 pouchGetMaxFP(void) {
+s32 pouchGetMaxFP(void) {
     return mpp->maximumFP;
 }
 
 /** Sets current FP, clamped to the maximum (not to 0). */
-void pouchSetFP(s16 points) {
+void pouchSetFP(s32 points) {
     mpp->currentFP = points;
     if (mpp->currentFP > mpp->maximumFP) {
         mpp->currentFP = mpp->maximumFP;
@@ -1192,7 +1192,7 @@ void pouchAddAP(s32 points) {
 }
 
 /** Sets Star Power, clamped to 0..maximumSP. */
-void pouchSetAP(s16 points) {
+void pouchSetAP(s32 points) {
     mpp->currentSP = points;
     if (mpp->currentSP < 0) {
         mpp->currentSP = 0;
@@ -1203,7 +1203,7 @@ void pouchSetAP(s16 points) {
 }
 
 /** Star Power maximum in hundredths of a gauge unit (100 per Crystal Star). */
-s16 pouchGetMaxAP(void) {
+s32 pouchGetMaxAP(void) {
     return mpp->maximumSP;
 }
 
