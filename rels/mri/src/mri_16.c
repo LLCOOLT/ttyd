@@ -38,18 +38,11 @@ static HitDamageReturn hitDmgRetPoints[5];
 /**
  * Reads the bar-switch state ssf for the script:
  * returns it as a float in args[0] (0 idle, 1 Mario is riding the bar switch, 2 he left it).
- * The odd extra statements only keep the compiled order of the original.
  */
 static USER_FUNC(ss_check) {
-    s32 dest;
-    s32 notSet;
+    EvtWord* args = event->args;
+    s32 dest = *args++;
 
-    // FAKE: the dead condition moves the ssf load ahead of event->args; casts, temps and u32 index variants do not
-    // reproduce it
-    dest = event->args[0];
-    notSet = !ssf;
-    if ((notSet && !ssf) != 0) {
-    }
     evtSetFloat(event, dest, ssf);
     return EVT_RETURN_DONE;
 }
