@@ -1000,11 +1000,11 @@ void _CheckMoveCount(BattleUnit* unit) {
  * for statuses with no strength (sleep, stop, dizzy, ...) both get the turn count.
  * A size, attack or defense change of the other sign reads as 0.
  */
-void BtlUnit_GetStatus(BattleUnit* unit, StatusEffectType type, s8* turns, s8* strength) {
+void BtlUnit_GetStatus(BattleUnit* unit, s8 type, s8* turns, s8* strength) {
     s8 status_turns = 0;
     s8 status_strength = 0;
 
-    switch ((s8)type) {
+    switch (type) {
         case STATUS_SLEEP:
             status_strength = unit->sleepTurns;
             status_turns = status_strength;
@@ -1139,8 +1139,8 @@ void BtlUnit_GetStatus(BattleUnit* unit, StatusEffectType type, s8* turns, s8* s
  * Returns FALSE when nothing was applied; retail versions also return FALSE when Charge drops below 0
  * or Allergic or Payback is set to 0 turns, which the demos treat as set.
  */
-BOOL BtlUnit_SetStatus(BattleUnit* unit, StatusEffectType type, s8 turns, s8 strength) {
-    switch ((s8)type) {
+BOOL BtlUnit_SetStatus(BattleUnit* unit, s8 type, s8 turns, s8 strength) {
+    switch (type) {
         case STATUS_SLEEP:
             unit->sleepTurns = turns;
             unit->sleepStrength = 0;
@@ -1181,7 +1181,7 @@ BOOL BtlUnit_SetStatus(BattleUnit* unit, StatusEffectType type, s8 turns, s8 str
         case STATUS_HUGE:
         case STATUS_TINY:
             if (!strength) {
-                if ((s8)type == STATUS_HUGE) {
+                if (type == STATUS_HUGE) {
                     if (unit->sizeChangeStrength >= 0) {
                         unit->sizeChangeTurns = 0;
                         unit->sizeChangeStrength = 0;
@@ -1230,7 +1230,7 @@ BOOL BtlUnit_SetStatus(BattleUnit* unit, StatusEffectType type, s8 turns, s8 str
                 unit->defChangeTurns = turns;
                 unit->defChangeStrength = strength;
             } else if (strength == 0) {
-                if ((s8)type == STATUS_DEFENSE_DOWN) {
+                if (type == STATUS_DEFENSE_DOWN) {
                     if (unit->defChangeStrength <= 0) {
                         unit->defChangeTurns = 0;
                         unit->defChangeStrength = 0;
@@ -1358,7 +1358,7 @@ void BtlUnit_ClearStatus(BattleUnit* unit) {
  * attack and defense changes, poison and regen), clearing its strength when the turns run out.
  * Returns TRUE when the status just wore off; FALSE when it continues, was not active, or the unit is KO'd.
  */
-BOOL BtlUnit_CheckRecoveryStatus(BattleUnit* unit, StatusEffectType type) {
+BOOL BtlUnit_CheckRecoveryStatus(BattleUnit* unit, s8 type) {
     s8 turns, strength;
 
     if (!unit) {
@@ -1374,7 +1374,7 @@ BOOL BtlUnit_CheckRecoveryStatus(BattleUnit* unit, StatusEffectType type) {
     if (!turns) {
         return FALSE;
     }
-    switch ((s8)type) {
+    switch (type) {
         case STATUS_SLEEP:
             if (turns > 1) {
                 turns--;
@@ -1477,7 +1477,7 @@ BOOL BtlUnit_CheckRecoveryStatus(BattleUnit* unit, StatusEffectType type) {
 }
 
 /** Returns TRUE while the status effect has turns left; Electric also counts as active when the unit wears Zap Tap. */
-BOOL BtlUnit_CheckStatus(BattleUnit* unit, StatusEffectType type) {
+BOOL BtlUnit_CheckStatus(BattleUnit* unit, s8 type) {
     s8 turns, strength;
 
     if (!unit) {
@@ -1487,7 +1487,7 @@ BOOL BtlUnit_CheckStatus(BattleUnit* unit, StatusEffectType type) {
     if (turns) {
         return TRUE;
     }
-    if ((s8)type == STATUS_ELECTRIC && unit->badgesEquipped.ZapTap) {
+    if (type == STATUS_ELECTRIC && unit->badgesEquipped.ZapTap) {
         return TRUE;
     }
     return FALSE;

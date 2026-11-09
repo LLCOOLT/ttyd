@@ -10,10 +10,6 @@
 #include "mario/mariost.h"
 #endif
 #include "battle/battle_unit.h"
-// FAKE: battle_status_icon.c calls BtlUnit_GetStatus through this prototype (the types it was compiled with) instead of the one in battle/battle_unit.h; same registers, behaviour-identical.
-typedef void (*BtlUnit_GetStatusS8Fn)(BattleUnit*, s8, s8*, s8*);
-// FAKE: battle_status_icon.c calls BtlUnit_CheckStatus through this prototype (the types it was compiled with) instead of the one in battle/battle_unit.h; same registers, behaviour-identical.
-typedef BOOL (*BtlUnit_CheckStatusS8Fn)(BattleUnit*, s8);
 
 typedef struct IconDispTableEntry IconDispTableEntry;
 struct IconDispTableEntry {
@@ -326,15 +322,15 @@ static BOOL _bsi_default_turn(BattleUnit* unit, IconDispTableEntry* disp, Battle
     s8 turns, strength;
     s32 kind;
     if (_battleWorkPointer->flags & BATTLE_FLAG_SHOW_ALL_STATUS_ICONS) {
-        if (type != 1 && !BtlUnit_CheckStatus(unit, (s8)disp->statusType))
+        if (type != 1 && !BtlUnit_CheckStatus(unit, type))
             return FALSE;
         kind = (s32)unit->currentKind;
         if (!((kind >= 1 && kind < 0xd8) || (kind >= 0xde && kind < 0xe0) || (kind >= 0xe0 && kind < 0xe7)))
             return FALSE;
-    } else if (!BtlUnit_CheckStatus(unit, (s8)disp->statusType)) {
+    } else if (!BtlUnit_CheckStatus(unit, type)) {
         return FALSE;
     }
-    ((BtlUnit_GetStatusS8Fn)BtlUnit_GetStatus)(unit, type, &turns, &strength);
+    BtlUnit_GetStatus(unit, type, &turns, &strength);
     entry->type = type;
     entry->turns = turns >= 0 ? turns : -turns;
     entry->icon = disp->icon;
@@ -356,12 +352,12 @@ static BOOL _bsi_guruguru(BattleUnit* unit, IconDispTableEntry* disp, BattleWork
     int type = disp->statusType;
     s8 turns, strength;
     Vec v;
-    if (!BtlUnit_CheckStatus(unit, (s8)type)) {
+    if (!BtlUnit_CheckStatus(unit, type)) {
         unit->statusIconWork.dizzyAngle = 0.0f;
         return FALSE;
     }
     unit->statusIconWork.dizzyAngle += 4.0f;
-    ((BtlUnit_GetStatusS8Fn)BtlUnit_GetStatus)(unit, type, &turns, &strength);
+    BtlUnit_GetStatus(unit, type, &turns, &strength);
     entry->type = type;
     entry->turns = turns >= 0 ? turns : -turns;
     entry->icon = disp->icon;
@@ -383,11 +379,11 @@ static BOOL _bsi_guruguru(BattleUnit* unit, IconDispTableEntry* disp, BattleWork
 static BOOL _bsi_allergy(BattleUnit* unit, IconDispTableEntry* disp, BattleWorkStatusIconEntry* entry) {
     int type = disp->statusType;
     s8 turns, strength;
-    if (!BtlUnit_CheckStatus(unit, (s8)type)) {
+    if (!BtlUnit_CheckStatus(unit, type)) {
         unit->statusIconWork.allergyBlinkTimer = 0;
         return FALSE;
     }
-    ((BtlUnit_GetStatusS8Fn)BtlUnit_GetStatus)(unit, type, &turns, &strength);
+    BtlUnit_GetStatus(unit, type, &turns, &strength);
     entry->type = type;
     entry->turns = turns >= 0 ? turns : -turns;
     entry->icon = disp->icon;
@@ -411,7 +407,7 @@ static BOOL _bsi_allergy(BattleUnit* unit, IconDispTableEntry* disp, BattleWorkS
 static BOOL _bsi_biribiri(BattleUnit* unit, IconDispTableEntry* disp, BattleWorkStatusIconEntry* entry) {
     s32 type = disp->statusType;
     s8 turns, strength;
-    if (!BtlUnit_CheckStatus(unit, (s8)disp->statusType)) {
+    if (!BtlUnit_CheckStatus(unit, type)) {
         unit->statusIconWork.elecState = 0;
         unit->statusIconWork.elecTimer = 0;
         return FALSE;
@@ -438,7 +434,7 @@ static BOOL _bsi_biribiri(BattleUnit* unit, IconDispTableEntry* disp, BattleWork
             }
             break;
     }
-    ((BtlUnit_GetStatusS8Fn)BtlUnit_GetStatus)(unit, type, &turns, &strength);
+    BtlUnit_GetStatus(unit, type, &turns, &strength);
     entry->type = type;
     entry->turns = turns >= 0 ? turns : -turns;
     entry->icon = disp->icon;
@@ -472,7 +468,7 @@ static BOOL _bsi_regeneration(BattleUnit* unit, IconDispTableEntry* disp, Battle
     } else {
         return FALSE;
     }
-    if (!((BtlUnit_CheckStatusS8Fn)BtlUnit_CheckStatus)(unit, disp->statusType)) {
+    if (!BtlUnit_CheckStatus(unit, type)) {
         *ctr = 0;
         return FALSE;
     }
@@ -480,7 +476,7 @@ static BOOL _bsi_regeneration(BattleUnit* unit, IconDispTableEntry* disp, Battle
     t = (*ctr * 12) % 720;
     if (t >= 360)
         t = 720 - t;
-    ((BtlUnit_GetStatusS8Fn)BtlUnit_GetStatus)(unit, type, &turns, &strength);
+    BtlUnit_GetStatus(unit, type, &turns, &strength);
     entry->type = type;
     entry->turns = turns >= 0 ? turns : -turns;
     entry->icon = disp->icon;
