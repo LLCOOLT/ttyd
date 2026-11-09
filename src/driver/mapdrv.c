@@ -1452,8 +1452,8 @@ void bmapLoad(const char* map, const char* map2) {
         }
     }
 
-    wp = (0, &mapWork[1]); // FAKE: the comma expression keeps the target register order for wp
     activeGroup = 1;
+    wp = mapGetWork();
     memset(wp, 0, sizeof(MapWork));
 #if VERSION <= VERSION_DEMO_JP
     // the demo reads the battle map archives itself
