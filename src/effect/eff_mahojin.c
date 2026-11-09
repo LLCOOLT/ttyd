@@ -11,7 +11,7 @@
 #include <dolphin/mtx.h>
 
 static void effMahojinMain(EffectEntry* effect);
-static void effMahojinDisp(CameraId cameraId, EffectEntry* effect);
+static void effMahojinDisp(CameraId cameraId, void* param);
 
 s32 mahojin_rate;
 
@@ -277,60 +277,59 @@ static void effMahojinMain(EffectEntry* effect) {
                 break;
         }
     }
-    dispEntry(CAMERA_3D, dispCalcZ(&position), 2, (DispCallback)effMahojinDisp, effect);
+    dispEntry(CAMERA_3D, dispCalcZ(&position), 2, effMahojinDisp, effect);
 }
 
 /**
  * Draws the magic circle's front and back animation poses at the effect position,
  * applying the purple tint callback.
  */
-static void effMahojinDisp(CameraId cameraId, EffectEntry* effect) {
+static void effMahojinDisp(CameraId cameraId, void* param) {
+    s32 j;
+    EffMahojinWork* work;
+    s32 pass;
+    MapWork* map;
+    s32 ti;
+    s32 alpha;
+    s32 i;
+    f32 tz;
+    EffectEntry* effect;
+    u16 flags;
+    s32 n;
+    EffMahojinWork* p;
     Mtx mtx;
     f32 z[16];
     s32 idx[16];
-    f32* zp;
-    MapWork* map;
-    s32* idxList; // FAKE: alias of idx forces z/idx base register order
-    s32 i;
-    s32 j;
-    s32 k;
-    s32 n;
-    EffMahojinWork* work = effect->userdata;
-    s32 pass;
-    s32 alpha;
-    u16 flags;
 
+    effect = param;
+    work = effect->userdata;
     camGetPtr(cameraId);
     alpha = work->alpha;
     map = mapGetWork();
-    zp = z;
     flags = map->entries[0].flags;
-
     for (pass = 0; pass < 2; pass++) {
         n = 0;
         if (pass == 0) {
-            zp[0] = -9999.0f;
+            z[n] = -9999.0f;
             idx[n++] = 0;
             z[n] = -10000.0f;
             idx[n++] = 1;
         } else {
-            zp[0] = -10000.0f;
+            z[n] = -10000.0f;
             idx[n++] = 0;
             z[n] = 10000.0f;
             idx[n++] = 1;
         }
         for (i = 2; i < effect->count; i++) {
-            f32 d = dispCalcZ(&pos_tbl[i - 2]);
-            z[n] = d;
+            z[n] = dispCalcZ(&pos_tbl[i - 2]);
             idx[n++] = i;
         }
-        idxList = idx; // FAKE
         for (i = 0; i < effect->count - 1; i++) {
             for (j = i + 1; j < effect->count; j++) {
-                if (zp[i] > z[j]) {
-                    s32 ti = idx[i];
-                    f32 tz = zp[i];
-                    zp[i] = z[j];
+                if (z[i] > z[j]) {
+                    tz = z[i];
+                    ti = idx[i];
+                    z[i] = z[j];
                     idx[i] = idx[j];
                     z[j] = tz;
                     idx[j] = ti;
@@ -339,8 +338,8 @@ static void effMahojinDisp(CameraId cameraId, EffectEntry* effect) {
         }
         map->entries[0].flags &= ~1;
         PSMTXTrans(mtx, work->position.x, work->position.y, work->position.z);
-        for (k = 0; k < effect->count; k++) {
-            EffMahojinWork* p = &work[idxList[k]];
+        for (i = 0; i < effect->count; i++) {
+            p = &work[idx[i]];
             if (pass == 1 && p->arg != NULL) {
                 p->func(cameraId, p->arg);
             }
