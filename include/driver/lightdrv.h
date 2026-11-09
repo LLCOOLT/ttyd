@@ -45,7 +45,7 @@ LightEntry* lightNumberToPtr(s32 index);
 LightEntry* lightGetPaperCraft(void);
 s32 lightGetEntryNum(void);
 LightEntry* lightGetAmbient(void);
-s32 lightGetNearObj(Vec position, LightEntry** out, s32 count, LightEntryFlags flags);
+s32 lightGetNearObj(Vec* position, LightEntry** out, s32 count, LightEntryFlags flags);
 
 LightEntry* lightGetCharaAmbient(void);
 s32 lightCheckCharaLight(void);

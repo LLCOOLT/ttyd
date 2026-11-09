@@ -237,35 +237,27 @@ static s32 _sort(const void* a, const void* b) {
  * keeping only lights with any of flags (0 = all); NULL-pads the rest and returns how many were found.
  * mapdrv uses it to light map parts and characters.
  */
-s32 lightGetNearObj(Vec position, LightEntry** out, s32 count, LightEntryFlags flags) {
-    s32 found;
+s32 lightGetNearObj(Vec* position, LightEntry** out, s32 count, LightEntryFlags flags) {
     LightWork* wp = lightGetWork();
-    NearWork tmp[32];
-    LightEntry** op;
-    NearWork* tp;
+    NearWork tmp[LIGHT_ENTRY_COUNT];
     LightEntry* entry;
-    s32 i;
     u32 n;
-    u32 mask;
+    s32 i;
+    s32 j;
 
     if (lightGetEntryNum() > 8) {
-        entry = wp->entries;
-        tp = tmp;
         n = 0;
-        for (i = 0; i < wp->count; i++, entry++) {
+        for (i = 0, entry = wp->entries; i < wp->count; i++, entry++) {
             if (entry->flags & LIGHT_ENABLED) {
-                tp->entry = entry;
-                tp->dist = VECDistance(&position, &entry->position);
-                tp++;
+                tmp[n].entry = entry;
+                tmp[n].dist = VECDistance(position, &entry->position);
                 n++;
             }
         }
-        qqsort(tmp, n, 8, _sort);
+        qqsort(tmp, n, sizeof(NearWork), _sort);
     } else {
-        entry = wp->entries;
-        tp = tmp;
         n = 0;
-        for (i = 0; i < wp->count; i++, entry++) {
+        for (j = 0, entry = wp->entries; j < wp->count; j++, entry++) {
             if (entry->flags & LIGHT_ENABLED) {
                 tmp[n].entry = entry;
                 n++;
@@ -273,26 +265,25 @@ s32 lightGetNearObj(Vec position, LightEntry** out, s32 count, LightEntryFlags f
         }
     }
 
-    op = out;
-    tp = tmp;
-    mask = flags;
-    found = 0;
-    for (i = 0; i < n; i++, tp++) {
-        u32 fl;
-        LightEntry* e = tp->entry;
-        fl = e->flags;
-        if (!(fl & LIGHT_AMBIENT) && (!mask || (mask & fl))) {
-            *op++ = e;
-            found++;
-            if (found >= count) {
-                break;
-            }
+    j = 0;
+    for (i = 0; i < n; i++) {
+        entry = tmp[i].entry;
+        if (entry->flags & LIGHT_AMBIENT) {
+            continue;
+        }
+        if (flags && !(flags & entry->flags)) {
+            continue;
+        }
+        out[j] = entry;
+        j++;
+        if (j >= count) {
+            break;
         }
     }
-    for (i = found; i < count; i++) {
+    for (i = j; i < count; i++) {
         out[i] = NULL;
     }
-    return found;
+    return j;
 }
 
 /** Returns the first enabled map (non-character) ambient light, or NULL. */

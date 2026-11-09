@@ -93,8 +93,6 @@ s32 activeGroup;
 MapWork* mapWork; // allocates two entries
 
 static void mapGetJointsSub(MapFileJoint* joint, s32* numJoints);
-// FAKE: calls lightGetNearObj with the Vec address instead of a by-value copy (FAKES.md)
-#define lightGetNearObj(pos, out, count, flags) ((s32 (*)(Vec*, LightEntry**, s32, LightEntryFlags))lightGetNearObj)(pos, out, count, flags)
 
 // local prototypes
 static void mapGetJointsSub(MapFileJoint* joint, s32* numJoints);
