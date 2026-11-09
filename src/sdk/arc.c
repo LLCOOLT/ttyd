@@ -164,18 +164,18 @@ static u32 myStrncpy(char* dest, char* src, u32 maxlen) {
     }
     return maxlen - i;
 }
-// FAKE: inline_depth(3) to the end of the file: without it entryToPath inlines deeper (169 instead of 136 instructions)
-#pragma inline_depth(3)
 /** Builds the path of an entry into path by walking up its parent directories; returns its length. */
 static u32 entryToPath(ARCHandle* handle, u32 entry, char* path, u32 maxlen) {
     char* name;
     u32 loc;
     FSTEntry* FstStart = (FSTEntry*)handle->FSTStart;
+    char* FstStringStart;
 
     if (entry == 0) {
         return 0;
     }
-    name = handle->FSTStringStart + stringOff(entry);
+    FstStringStart = handle->FSTStringStart;
+    name = FstStringStart + stringOff(entry);
     loc = entryToPath(handle, parentDir(entry), path, maxlen);
     if (loc == maxlen) {
         return loc;
