@@ -3327,7 +3327,7 @@ u8 BattleAudience_GetWaiting(s32 index) {
  * in its shell, fuse lit, in a Boo or Shy Guy event, in a demo-only status or already leaving.
  * Used when the crowd shrinks, the Punies flee and falling objects or blasts scatter the crowd.
  */
-BOOL BattleAudience_GetEscapeChangeOK(s32 index) {
+u8 BattleAudience_GetEscapeChangeOK(s32 index) {
     BattleAudience* audience;
     BattleAudienceMember* member;
 
@@ -3363,7 +3363,10 @@ BOOL BattleAudience_GetEscapeChangeOK(s32 index) {
     if (member->status == 22) {
         return FALSE;
     }
-    return member->status != 12;
+    if (member->status == 12) {
+        return FALSE;
+    }
+    return TRUE;
 }
 
 /**
@@ -3985,7 +3988,7 @@ s32 BattleAudienceAddAudienceNum(s32 num) {
         for (i = 0; i > num; i--) {
             count = 0;
             for (j = 0; j < 200; j++) {
-                if (AUD_U8CALL(BattleAudience_GetEscapeChangeOK, j)) {
+                if (BattleAudience_GetEscapeChangeOK(j)) {
                     list[count++] = j;
                 }
             }
@@ -4015,7 +4018,7 @@ void BattleAudiencePuniAllEscape(void) {
     count = 0;
     for (i = 0; i < AUDIENCE_MEMBER_MAX; i++) {
         member = BattleAudienceGetPtr(i);
-        if (AUD_U8CALL(BattleAudience_GetEscapeChangeOK, i) && member->type == 7) {
+        if (BattleAudience_GetEscapeChangeOK(i) && member->type == 7) {
             BattleAudience_ChangeStatus(i, 12);
 #if VERSION <= VERSION_DEMO_JP
             audience->targetAudienceCount -= 1.0f;
@@ -5382,7 +5385,7 @@ void BattleAudience_Case_FallObject_Aud(s32 index, u8 type) {
             }
             for (i = 0; i < 8; i++) {
                 no = BattleAudience_GetAudienceNoFromOffset(index, near[i][0], near[i][1]);
-                if (no != -1 && (u8)BattleAudience_GetEscapeChangeOK(no)) {
+                if (no != -1 && BattleAudience_GetEscapeChangeOK(no)) {
                     BattleAudience_ChangeStatus(no, 12);
                     audience->targetAudienceCount -= 1.0f;
                 }
@@ -5394,7 +5397,7 @@ void BattleAudience_Case_FallObject_Aud(s32 index, u8 type) {
             }
             for (i = 0; i < 24; i++) {
                 no = BattleAudience_GetAudienceNoFromOffset(index, far[i][0], far[i][1]);
-                if (no != -1 && (u8)BattleAudience_GetEscapeChangeOK(no)) {
+                if (no != -1 && BattleAudience_GetEscapeChangeOK(no)) {
                     BattleAudience_ChangeStatus(no, 12);
                     audience->targetAudienceCount -= 1.0f;
                 }
@@ -5405,7 +5408,7 @@ void BattleAudience_Case_FallObject_Aud(s32 index, u8 type) {
                 BattleAudience_ChangeStatus(index, 10);
             }
             for (i = 0; i < 200; i++) {
-                if ((u8)BattleAudience_GetEscapeChangeOK(i)) {
+                if (BattleAudience_GetEscapeChangeOK(i)) {
                     BattleAudience_ChangeStatus(i, 12);
                     audience->targetAudienceCount -= 1.0f;
                 }

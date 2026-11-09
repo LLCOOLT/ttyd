@@ -19,8 +19,6 @@
 #include "version.h"
 #include "libc_decls.h"
 #include "battle/battle_break_slot.h"
-// FAKE: battle_audience_kinopio.c calls BattleAudience_GetEscapeChangeOK through this prototype (the types it was compiled with) instead of the one in battle/battle_audience.h; same registers, behaviour-identical.
-typedef u8 (*BattleAudience_GetEscapeChangeOKNoProtoFn)();
 
 // this unit is size-optimised, as in the original (the object differs without it)
 #pragma optimize_for_size on
@@ -642,7 +640,7 @@ static void BattleAudienceCtrlProcessKinopioDamage(s32 index) {
             if (BattleAudience_GetAnimEnd(index) == 1) {
                 m->baseScale.y = 1.0f;
                 m->timer = 0;
-                if (((BattleAudience_GetEscapeChangeOKNoProtoFn)BattleAudience_GetEscapeChangeOK)(index) == 1) {
+                if (BattleAudience_GetEscapeChangeOK(index) == 1) {
                     BattleAudience_ChangeStatus(index, 12);
                     psndSFXOn_3D("SFX_AUDIENCE_PANIC_SCREAM2", &m->position);
                 } else {
