@@ -130,7 +130,7 @@ static const Vec decay_tbl[] = {
  * attenType picks the distance falloff from decay_tbl, flag 2 marks a character-only light.
  * A clashing name gets a _0000-style suffix. Returns the slot index.
  */
-s32 lightEntry(const char* name, s32 type, Vec* position, Vec* rotation, GXColor color, s32 attenType, s32 flags, f32 spotAngle, f32 attenAngle) {
+s32 lightEntry(const char* name, s32 type, Vec* position, Vec* rotation, GXColor color, f32 spotAngle, f32 attenAngle, s32 attenType, s32 flags) {
     LightWork* wp = lightGetWork();
     LightEntry* entry;
     s32 i, j, n;
