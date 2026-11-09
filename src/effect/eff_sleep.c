@@ -10,12 +10,17 @@
 #include "version.h"
 #include "libc_decls.h"
 
+/** Single-precision sine for this file, routed through the double sin() (as in mapdrv.c). */
+static inline f32 sinf(f32 x) {
+    return sin(x);
+}
+
 static void effSleepMain(EffectEntry* effect);
 // US effect texture ids are 0x1C lower for these entries.
 #define EFF_TEX(id) ((id) - VERSION_PICK(0, 0x1C))
 
 // local prototypes
-static void effSleepDisp(CameraId camId, EffectEntry* effect);
+static void effSleepDisp(CameraId camId, void* param);
 
 /**
  * Spawns the sleep marks at (x, y, z).
@@ -98,46 +103,24 @@ static void effSleepMain(EffectEntry* effect) {
             }
         }
     }
-    dispEntry(CAMERA_3D, dispCalcZ(&position), 2, (DispCallback)effSleepDisp, effect);
+    dispEntry(CAMERA_3D, dispCalcZ(&position), 2, effSleepDisp, effect);
 }
 
-// FAKE: match-forcing setting: the same code without it compiles differently (removal tried).
-#pragma push
-// FAKE: propagation optimisation off for sleepPos, effSleepDisp: the original register allocation and scheduling need it
-#pragma opt_propagation off
-
-// FAKE: same values as the plain form, written so the code generator sees the target's shapes:
-// - sin argument via `(t = tau * x, t *= 0.015625f)`: a compound assignment skips the front end's
-//   commutative swap (CExpr optimizecomm), so the constant stays the right operand;
-// - 0.5f / 0.015625f / 1.0f are literals (LICM-hoisted temps in first-use order), xh = x0 * 0.5f is
-//   computed in the inner loop body, and the y products go through sleepPos so `1.0f * y` is not
-//   folded away by the front end (CExpr_IsOne).
-static inline void sleepPos(f32 x, f32 one, f32 y) {
-    GXPosition3f32(x, one * y, 0.0f);
-}
 /**
  * Draws each visible mark as a camera-facing strip of 8 quads whose x offset follows a sine wave,
  * giving a wavy ribbon texture.
  */
-static void effSleepDisp(CameraId camId, EffectEntry* effect) {
-    s32 off;
-    f32 tau;
-    f32 x0;
-    Mtx mtx;
-    Mtx scale;
-    s32 base;
-    Mtx rot;
-    Mtx res;
-    GXTexObj texObj;
-    f32 w;
+static void effSleepDisp(CameraId camId, void* param) {
+    EffectEntry* effect = param;
     CameraEntry* cam;
+    s32 base;
     effSleepData* data;
-    int i;
+    s32 i;
     s32 j;
     s32 alpha;
-    f32 xh;
-    f32 s0, s1;
-    f32 t;
+    Mtx mtx, scale, rot, res;
+    GXTexObj texObj;
+    f32 w, s0, s1;
 
     data = effect->userdata;
     cam = camGetPtr(camId);
@@ -167,9 +150,8 @@ static void effSleepDisp(CameraId camId, EffectEntry* effect) {
     GXSetVtxAttrFmt(GX_VTXFMT0, GX_VA_TEX0, GX_TEX_ST, GX_F32, 0);
 
     w = 8.0f;
-    x0 = -w;
-
-    for (i = 1, data++, base = 50; i < effect->count; base += 50, i++, data++) {
+    data++;
+    for (i = 1, base = 50; i < effect->count; base += 50, i++, data++) {
         if (data->delay == 0) {
             GXSetChanMatColor(GX_COLOR0A0, (GXColor){0xFF, 0xFF, 0xFF, data->alpha * alpha / 255});
             PSMTXTrans(mtx, data->position.x, data->position.y, data->position.z);
@@ -178,30 +160,22 @@ static void effSleepDisp(CameraId camId, EffectEntry* effect) {
             PSMTXConcat(res, mtx, mtx);
             GXLoadPosMtxImm(mtx, GX_PNMTX0);
             GXSetCurrentMtx(GX_PNMTX0);
-            tau = 6.2831855f;
-            j = 0;
-            off = 0;
-            while (j < 8) {
-                s0 = 0.5f * (f32)sin((t = (tau * (f32)(u32)(gp->retraceCount + base + off)), t *= 0.015625f));
-                s1 = 0.5f * (f32)sin((t = (tau * (f32)(u32)(gp->retraceCount + base + (j + 1) * 10)), t *= 0.015625f));
-                xh = x0;
-                xh *= 0.5f;
+            for (j = 0; j < 8; j++) {
+                s0 = 0.5f * sinf(6.2831855f * (gp->retraceCount + base + j * 10) / 64);
+                s1 = 0.5f * sinf(6.2831855f * (gp->retraceCount + base + (j + 1) * 10) / 64);
                 GXBegin(GX_QUADS, GX_VTXFMT0, 4);
-                sleepPos(xh + s1, 1.0f, j + 1);
-                GXTexCoord2f32(0.0f, 0.125f * (f32)(7 - j));
-                sleepPos(4.0f + s1, 1.0f, j + 1);
-                GXTexCoord2f32(1.0f, 0.125f * (f32)(7 - j));
-                sleepPos(4.0f + s0, 1.0f, j);
-                GXTexCoord2f32(1.0f, 0.125f * (f32)(8 - j));
-                sleepPos(xh + s0, 1.0f, j);
-                GXTexCoord2f32(0.0f, 0.125f * (f32)(8 - j));
-                j++;
-                off += 10;
+                GXPosition3f32(-w / 2 + s1, w / 8 * (j + 1), 0.0f);
+                GXTexCoord2f32(0.0f, 0.125f * (7 - j));
+                GXPosition3f32(w / 2 + s1, w / 8 * (j + 1), 0.0f);
+                GXTexCoord2f32(1.0f, 0.125f * (7 - j));
+                GXPosition3f32(w / 2 + s0, w / 8 * j, 0.0f);
+                GXTexCoord2f32(1.0f, 0.125f * (8 - j));
+                GXPosition3f32(-w / 2 + s0, w / 8 * j, 0.0f);
+                GXTexCoord2f32(0.0f, 0.125f * (8 - j));
+                GXEnd();
             }
         }
     }
 }
-
-#pragma pop
 
 // target pad words (G5: section sizes must match or later DOL addresses shift)
