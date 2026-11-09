@@ -307,9 +307,9 @@ static void actionCommandDisp(f32 x, f32 y) {
     }
     disp->gaugeRatio = ratio;
     if (ac->acFlags & 2) {
-        BattleAcDrawGauge(x, y, 0xB2, ratio, 1, 100, 100, 100, 0);
+        BattleAcDrawGauge(x, y, ratio, 0xB2, 1, 100, 100, 100, 0);
     } else {
-        BattleAcDrawGauge(x, y, 0xB2, ratio, 2, ac->params[4], 100, 100, 0);
+        BattleAcDrawGauge(x, y, ratio, 0xB2, 2, ac->params[4], 100, 100, 0);
     }
     if (!(ac->acFlags & 4)) {
         iconDispGx(&(Vec){-288.0f + x + (f32)(ac->params[4] * 0xB0) / 100.0f, 45.0f + y, 0.0f}, ICON_DISP_2D, ICON_096, 1.0f);

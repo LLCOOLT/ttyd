@@ -84,4 +84,4 @@ void BattleAcGaugeSeUpdate(f32 value);
 void BattleAcGaugeSeDelete(void);
 s32 BattleActionCommandCheckDefence(BattleUnit* unit, BattleWeapon* weapon);
 u16 BattleACGetButtonIcon(s32 button, s32 pressed);
-void BattleAcDrawGauge(s32 x, s32 y, s32 width, f32 ratio, s32 level, s32 a, s32 b, s32 c, s32 flags);
+void BattleAcDrawGauge(s32 x, s32 y, f32 ratio, s32 width, s32 level, s32 a, s32 b, s32 c, s32 flags);

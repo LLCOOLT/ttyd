@@ -11,8 +11,6 @@
 #include <string.h>
 #include "icon_ids.h"
 #include <dolphin/si.h>
-// FAKE: ac_repeatedly.c calls BattleAcDrawGauge through this prototype (the types it was compiled with) instead of the one in battle/battle_ac.h; same registers, behaviour-identical.
-typedef void (*BattleAcDrawGaugeNoProtoFn)();
 
 typedef struct RepeatDisp {
     s32 frame;         // 0x0
@@ -486,7 +484,7 @@ static void actionCommandDisp(f32 x, f32 y) {
     if (r->done == -1) {
         flags |= 2;
     }
-    ((BattleAcDrawGaugeNoProtoFn)BattleAcDrawGauge)((s32)x, (s32)y, d->gauge, r->iconParam, 2, (acw->acFlags & 2) ? 100 : (s32)r->pos, 100, 100, flags);
+    BattleAcDrawGauge((s32)x, (s32)y, d->gauge, r->iconParam, 2, (acw->acFlags & 2) ? 100 : (s32)r->pos, 100, 100, flags);
     {
         Vec pos = {0.0f, 0.0f, 0.0f};
         pos.x = (-288.0f + x) + (176.0f * r->pos) / 100.0f;

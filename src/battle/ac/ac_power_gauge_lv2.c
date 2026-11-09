@@ -291,7 +291,7 @@ static void actionCommandDisp(f32 x, f32 y) {
             break;
         }
     }
-    BattleAcDrawGauge(x, y, 0xB2, ac->disp.gaugeRatio, count, levels[0], levels[1], levels[2], flash);
+    BattleAcDrawGauge(x, y, ac->disp.gaugeRatio, 0xB2, count, levels[0], levels[1], levels[2], flash);
     iconOn = BattleACGetButtonIcon(AC_WORK(ac)->button, 1);
     iconOff = BattleACGetButtonIcon(AC_WORK(ac)->button, 0);
     switch (ac->acState) {
