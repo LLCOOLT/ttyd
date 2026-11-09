@@ -178,28 +178,24 @@ void BattleAudienceCtrlProcessKinopio(s32 index) {
     }
 }
 
-// propagation optimisation off for BattleAudienceCtrlProcessKinopioWait: the original register allocation and scheduling need it
-#pragma opt_propagation off
-// lifetimes optimisation off for BattleAudienceCtrlProcessKinopioWait: the original register allocation and scheduling need it
-#pragma opt_lifetimes off
 /**
  * Status 0, idle: faces the stage (or away, for back-facing seats) and now and
  * then starts a fidget (turn around, tilt the head, hop) or a cheer,
  * more often the fuller the crowd is relative to its expected size. A member hit by Mario switches to status 10.
  */
 static void BattleAudienceCtrlProcessKinopioWait(s32 index, s32 front) {
-    BattleAudience* base;
-    BattleAudienceMember* m;
+    BattleAudience* base = BattleAudienceBaseGetPtr();
+    BattleAudienceMember* m = BattleAudienceGetPtr(index);
+    f32 r;
+    f32 speed;
     f32 a;
     f32 b;
     f32 scale;
-    f32 speed;
-    f32 r;
-    s32 th;
+    s32 flags;
     s32 rnd;
+    s32 th;
     s32 n;
-    base = BattleAudienceBaseGetPtr();
-    m = BattleAudienceGetPtr(index);
+
     pouchGetPtr();
     if ((u8)front == 1) {
         BattleAudience_SetAnim(index, 0, FALSE);
@@ -208,8 +204,7 @@ static void BattleAudienceCtrlProcessKinopioWait(s32 index, s32 front) {
     }
     r = (base->targetAudienceCount + base->addedAudienceCount) / base->audienceDeltaMultiplier;
     if (r >= 0.75f) {
-        speed = 1.0f;
-        scale = speed;
+        scale = speed = 1.0f;
     } else if (r >= 0.5f) {
         speed = 0.5f;
         scale = 2.0f;
@@ -232,7 +227,8 @@ static void BattleAudienceCtrlProcessKinopioWait(s32 index, s32 front) {
         a = 1.0f;
         b = 0.0f;
     } else {
-        b = a = 0.0f;
+        a = 0.0f;
+        b = 0.0f;
     }
     switch (m->type) {
         case 4:
@@ -307,56 +303,53 @@ static void BattleAudienceCtrlProcessKinopioWait(s32 index, s32 front) {
             m->timer++;
             break;
     }
-    if (m->flags & MEMBER_FLAG_ATTACKED) {
-        m->flags &= ~(MEMBER_FLAG_TARGETED | MEMBER_FLAG_ATTACKED);
+    flags = m->flags;
+    if (flags & MEMBER_FLAG_ATTACKED) {
+        m->flags = flags & ~(MEMBER_FLAG_TARGETED | MEMBER_FLAG_ATTACKED);
         BattleAudience_ChangeStatus(index, 10);
-        if (!(BattleAudienceItemGetPtr(0)->itemType >= ITEM_AUDIENCE_CAN && BattleAudienceItemGetPtr(0)->itemType < BADGE_MIN)) {
+        if (BattleAudienceItemGetPtr(0)->itemType < ITEM_AUDIENCE_CAN || BattleAudienceItemGetPtr(0)->itemType >= BADGE_MIN) {
             BattleAudienceAddTargetNum(-0.14999999f * BattleAudienceBaseGetPtr()->audienceDeltaMultiplier, 0.0f);
         }
-    } else if (!(m->flags & MEMBER_FLAG_TARGETED)) {
+    } else if (!(flags & MEMBER_FLAG_TARGETED)) {
         switch (m->itemId) {
-            case -1: {
-                rnd = irand(360000);
-                if (rnd < 10) {
-                    BattleAudience_ChangeStatus(index, 1);
-                } else {
-                    th = 20;
-                    if (rnd < th) {
-                        BattleAudience_ChangeStatus(index, 2);
-                    } else {
-                        th = (s32)(th + (f32)(10.0f * a));
-                        if (rnd < th) {
-                            BattleAudience_ChangeStatus(index, 4);
-                        } else if (BattleBreakSlot_GetBreakTurn() >= 1 || base->excited == 1) {
-                            if (rnd < th + 300) {
-                                if (m->type != 11) {
-                                    BattleAudience_ChangeStatus(index, 3);
-                                }
-                            }
-                        } else {
-                            th += (s32)(10.0f * b);
-                            if (rnd < th) {
-                                n = BattleAudience_GetAudienceNoFromOffset(index, 0, 1);
-                                if (n != -1) {
-                                    BattleAudienceGetPtr(n);
-                                    if (m->type != 11) {
-                                        if ((u8)BattleAudience_GetExist(n) == 1) {
-                                            BattleAudience_ChangeStatus(index, 3);
-                                        }
-                                    }
-                                }
-                            }
-                        }
+            case -1:
+                break;
+            default:
+                return;
+        }
+        rnd = irand(360000);
+        if (rnd < 10) {
+            BattleAudience_ChangeStatus(index, 1);
+            return;
+        }
+        if (rnd < (th = 20)) {
+            BattleAudience_ChangeStatus(index, 2);
+            return;
+        }
+        th += (f32)(10.0f * a); // FAKE: the (f32) cast of the f32 product is needed (without it kinopio.o differs)
+        if (rnd < th) {
+            BattleAudience_ChangeStatus(index, 4);
+            return;
+        }
+        if (BattleBreakSlot_GetBreakTurn() >= 1 || base->excited == 1) {
+            if (rnd < th + 300 && m->type != 11) {
+                BattleAudience_ChangeStatus(index, 3);
+            }
+        } else {
+            th += (s32)(10.0f * b);
+            if (rnd < th) {
+                n = BattleAudience_GetAudienceNoFromOffset(index, 0, 1);
+                if (n != -1) {
+                    BattleAudienceGetPtr(n);
+                    if (m->type != 11 && (u8)BattleAudience_GetExist(n) == 1) {
+                        BattleAudience_ChangeStatus(index, 3);
                     }
                 }
-                break;
             }
         }
     }
 }
 
-#pragma opt_propagation reset
-#pragma opt_lifetimes reset
 /** Status 1, "furimuki" (looking back): turns 180 degrees over 15 frames, holds, turns back, then idles again. */
 static void BattleAudienceCtrlProcessKinopioWaitHurimuki(s32 index, s32 front) {
     BattleAudienceMember* m = BattleAudienceGetPtr(index);
