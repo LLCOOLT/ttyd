@@ -495,7 +495,7 @@ static MapObject* mapEntrySub(MapFileJoint* joint, MapObject* parent, Mtx mtx, B
  * and builds the object tree from the root joint with world matrix mtx; returns the root object.
  */
 static MapObject* mapEntry(MapFileJoint* joint, Mtx mtx, s32 index) {
-    MapWork* wp = (0, &mapWork[activeGroup]); // FAKE: the comma expression gives wp the target register (r31, not r30)
+    MapWork* wp = mapGetWork();
     u32 size;
 
     wp->entries[index].numJoints = mapGetJoints(joint);
