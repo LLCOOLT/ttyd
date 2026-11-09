@@ -80,7 +80,7 @@ void envBlurOff(void);
 struct MapTevCallbackInfo;
 void envSetWater(struct MapTevCallbackInfo* info);
 
-void envGlareFilter(s32 type, s32 y0, s32 x0, s32 y1, s32 x1);
+void envGlareFilter(s32 type, s16 y0, s16 x0, s16 y1, s16 x1);
 void envGlareFilterZ(f32 zscale);
 void envAddTev(s32 type, MapTevCallbackInfo* info);
 void envSetYamiView(Mtx view);
