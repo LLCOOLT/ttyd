@@ -437,7 +437,7 @@ static void actionCommandDisp(f32 x, f32 y) {
             disp->gaugeRatio = ratio;
         }
     }
-    BattleAcDrawGauge((s32)x, (s32)y, 0xB2, disp->gaugeRatio, ac->params[2], ac->params[3], ac->params[4],
+    BattleAcDrawGauge((s32)x, (s32)y, disp->gaugeRatio, 0xB2, ac->params[2], ac->params[3], ac->params[4],
                       ac->params[5], 0);
     if (pw->flag) {
         Vec pos = {0.0f, 0.0f, 0.0f};

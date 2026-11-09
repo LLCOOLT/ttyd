@@ -23,8 +23,6 @@
 #include "evt/evt_story.h"
 
 static smartEntry* ind_lp;
-// FAKE: eki_03.c calls envGlareFilter through this prototype (the types it was compiled with) instead of the one in driver/envdrv.h; same registers, behaviour-identical.
-typedef void (*EnvGlareFilterS16Fn)(s32, s16, s16, s16, s16);
 
 static USER_FUNC(test_glare);
 static void sun_tev(MapTevCallbackInfo* info);
@@ -565,7 +563,7 @@ static USER_FUNC(test_glare) {
     } else if (rect[0] == 0 && rect[1] == 0 && rect[2] == 0 && rect[3] == 0) {
         envGlareFilter(0, 0, 0, 0, 0);
     } else {
-        ((EnvGlareFilterS16Fn)envGlareFilter)(1, rect[1] - 50, rect[0] - 50, rect[3] + 50, rect[2] + 50);
+        envGlareFilter(1, rect[1] - 50, rect[0] - 50, rect[3] + 50, rect[2] + 50);
 #if VERSION <= VERSION_DEMO_JP
         envGlareFilterZ(0.998f);
 #else

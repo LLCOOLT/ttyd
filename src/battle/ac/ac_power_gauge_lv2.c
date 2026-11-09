@@ -9,8 +9,6 @@
 #include "system.h"
 #include <string.h>
 #include "version.h"
-// FAKE: ac_power_gauge_lv2.c calls BattleACGetButtonIcon through this prototype (the types it was compiled with) instead of the one in battle/battle_ac.h; same registers, behaviour-identical.
-typedef s32 (*BattleACGetButtonIconRetS32Fn)(s32, s32);
 
 // this unit is size-optimised, as in the original (the object differs without it)
 #pragma optimize_for_size on
@@ -247,33 +245,24 @@ void battleAcDelete_PowerGaugeLv2(BattleWork* work) {
     }
 }
 
-#define ICON ((void (*)(Vec*, s32, s32, f32))iconDispGx)
 /**
  * Draws the gauge with level marks from gaugeParams (pulsing red once full), the A icon and a star,
  * both lit while holding A is safe.
  */
 static void actionCommandDisp(f32 x, f32 y) {
-    BattleWork* work = _battleWorkPointer;
-    BattleActions* ac = &work->actionCommands;
-    f32 ratio;
-    s32 full;
-    s32 tmp[4];
-    s32 cnt;
+    BattleActions* ac = &_battleWorkPointer->actionCommands;
+    s32 levels[4];
+    s32 count;
     s32 i;
-    s32 pressedIcon;
-    s32 icon;
-    f32 px;
-    f32 py;
+    s32 flash;
+    f32 ratio;
+    u16 iconOn;
+    u16 iconOff;
+    u16 icon;
+
     camGetPtr(CAMERA_2D);
-    px = -200.0f + x;
-    py = 25.0f + y;
-    {
-        Vec pos = {0.0f, 0.0f, 0.0f};
-        pos.x = px;
-        pos.y = py;
-        ICON(&pos, ICON_DISP_2D, ICON_08C, 1.0f);
-    }
-    full = 0;
+    iconDispGx(&(Vec){-200.0f + x, 25.0f + y, 0.0f}, ICON_DISP_2D, ICON_08C, 1.0f);
+    flash = 0;
     ratio = AC_WORK(ac)->gauge / 100.0f;
     if (ratio > 1.0f) {
         ratio = 1.0f;
@@ -283,7 +272,7 @@ static void actionCommandDisp(f32 x, f32 y) {
         ac->disp.color.g += ac->disp.colorStep[1];
         ac->disp.color.b += ac->disp.colorStep[2];
         if (ac->disp.gaugeRatio >= 1.0f) {
-            full |= 1;
+            flash |= 1;
         }
         if (ac->disp.color.g <= 0x80 && ac->disp.colorStep[1] < 0) {
             ac->disp.colorStep[1] = ac->disp.colorStep[2] = 0x10;
@@ -292,57 +281,38 @@ static void actionCommandDisp(f32 x, f32 y) {
             ac->disp.colorStep[1] = ac->disp.colorStep[2] = -0x10;
         }
     }
-    cnt = 0;
+    count = 0;
     for (i = 0; i < 4; i++) {
-        tmp[i] = 100;
+        levels[i] = 100;
     }
-    for (i = 0; i < 4; i++, cnt++) {
-        tmp[i] = ac->gaugeParams[i];
-        if (i != 0 && !(tmp[i] - tmp[i - 1] > 0)) {
+    for (i = 0; i < 4; i++, count++) {
+        levels[i] = ac->gaugeParams[i];
+        if (i != 0 && levels[i] - levels[i - 1] <= 0) {
             break;
         }
     }
-    BattleAcDrawGauge((s32)x, (s32)y, 0xB2, ac->disp.gaugeRatio, cnt, tmp[0], tmp[1], tmp[2], full);
-    pressedIcon = ((BattleACGetButtonIconRetS32Fn)BattleACGetButtonIcon)(AC_WORK(ac)->button, 1);
-    icon = ((BattleACGetButtonIconRetS32Fn)BattleACGetButtonIcon)(AC_WORK(ac)->button, 0);
+    BattleAcDrawGauge(x, y, ac->disp.gaugeRatio, 0xB2, count, levels[0], levels[1], levels[2], flash);
+    iconOn = BattleACGetButtonIcon(AC_WORK(ac)->button, 1);
+    iconOff = BattleACGetButtonIcon(AC_WORK(ac)->button, 0);
     switch (ac->acState) {
         case 99:
         case 100:
         case 1002:
         case 1003:
-        case 1004: {
-            Vec pos = {0.0f, 0.0f, 0.0f};
-            pos.x = px;
-            pos.y = 70.0f + y;
-            ICON(&pos, ICON_DISP_2D, icon, 1.0f);
+        case 1004:
+            iconDispGx(&(Vec){-200.0f + x, 70.0f + y, 0.0f}, ICON_DISP_2D, iconOff, 1.0f);
             break;
-        }
         case 1000:
             if (AC_WORK(ac)->inZone) {
-                Vec pos = {0.0f, 0.0f, 0.0f};
-                pos.x = px;
-                pos.y = 70.0f + y;
-                ICON(&pos, ICON_DISP_2D, pressedIcon, 1.0f);
+                iconDispGx(&(Vec){-200.0f + x, 70.0f + y, 0.0f}, ICON_DISP_2D, iconOn, 1.0f);
             } else {
-                Vec pos = {0.0f, 0.0f, 0.0f};
-                pos.x = px;
-                pos.y = 70.0f + y;
-                ICON(&pos, ICON_DISP_2D, icon, 1.0f);
+                iconDispGx(&(Vec){-200.0f + x, 70.0f + y, 0.0f}, ICON_DISP_2D, iconOff, 1.0f);
             }
             break;
     }
-    {
-        s32 id = ICON_091;
-        Vec pos;
-        if (AC_WORK(ac)->inZone) {
-            id = ICON_095;
-        }
-        {
-            Vec zero = {0.0f, 0.0f, 0.0f};
-            pos = zero;
-        }
-        pos.x = 120.0f + px;
-        pos.y = py;
-        ICON(&pos, ICON_DISP_2D, id, 1.0f);
+    icon = ICON_091;
+    if (AC_WORK(ac)->inZone) {
+        icon = ICON_095;
     }
+    iconDispGx(&(Vec){120.0f + (-200.0f + x), 25.0f + y, 0.0f}, ICON_DISP_2D, icon, 1.0f);
 }

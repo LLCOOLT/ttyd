@@ -1018,11 +1018,12 @@ void BtlUnit_SetMoveSpeed(BattleUnit* unit, f32 moveSpeedXZ);
 void BtlUnit_SetPartsMoveSpeed(BattleUnitPart* part, f32 moveSpeedXZ);
 void BtlUnit_SetJumpSpeed(BattleUnit* unit, f32 moveSpeedY);
 s8 BtlUnit_GetBelong(BattleUnit* unit);
-void BtlUnit_GetStatus(BattleUnit* unit, StatusEffectType type, s8* turns, s8* strength);
-BOOL BtlUnit_SetStatus(BattleUnit* unit, StatusEffectType type, s8 turns, s8 strength);
+// The status functions take the StatusEffectType as s8, so callers sign-extend a variable id.
+void BtlUnit_GetStatus(BattleUnit* unit, s8 type, s8* turns, s8* strength);
+BOOL BtlUnit_SetStatus(BattleUnit* unit, s8 type, s8 turns, s8 strength);
 void BtlUnit_ClearStatus(BattleUnit* unit);
-BOOL BtlUnit_CheckRecoveryStatus(BattleUnit* unit, StatusEffectType type);
-BOOL BtlUnit_CheckStatus(BattleUnit* unit, StatusEffectType type);
+BOOL BtlUnit_CheckRecoveryStatus(BattleUnit* unit, s8 type);
+BOOL BtlUnit_CheckStatus(BattleUnit* unit, s8 type);
 s32 BtlUnit_CheckStatusFlag(BattleUnit* unit, s32 flags);
 void BtlUnit_OnStatusFlag(BattleUnit* unit, s32 flags);
 void BtlUnit_OffStatusFlag(BattleUnit* unit, s32 flags);
@@ -1050,7 +1051,7 @@ BOOL BtlUnit_CheckData(BattleUnit* unit, s32 tag);
 BOOL BtlUnit_GetEnemyBelong(BattleUnit* unit);
 void BtlUnit_ReviseHpFp(BattleUnit* unit);
 void BtlUnit_SetParamFromPouch(BattleUnit* unit);
-s32 BtlUnit_snd_se(BattleUnit* unit, const char* sfxName, s32 volume, s32 pan);
+s32 BtlUnit_snd_se(BattleUnit* unit, const char* sfxName, s32 volume, s16 pitch);
 s32 BtlUnit_snd_se_pos(BattleUnit* unit, const char* sfxName, s32 volume, s16 pitch, Vec* pos);
 BattleUnit* BtlUnit_GetGuardKouraPtr(BattleUnit* unit);
 

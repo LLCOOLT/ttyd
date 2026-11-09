@@ -29,7 +29,7 @@ typedef struct PunidrvPose {
 } PunidrvPose;
 
 typedef struct PunidrvTex {
-    void** image;       // 0x0
+    void* image;        // 0x0
     GXTexObj obj;       // 0x4
     GXTexRegion region; // 0x24
 } PunidrvTex;

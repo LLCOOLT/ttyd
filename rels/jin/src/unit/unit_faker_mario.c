@@ -27,8 +27,6 @@ enum {
     UW_FAKER_MARIO_HP_50 = 2,   // 50% of his max HP: below it he complains (stg4_jin_26_01)
     UW_FAKER_MARIO_HP_25 = 3,   // 25% of his max HP: below it he is nearly beaten (stg4_jin_26_02)
 };
-// FAKE: unit_faker_mario.c calls BattlePartyAnimeLoad through this prototype (the types it was compiled with) instead of the one in battle/battle.h; same registers, behaviour-identical.
-typedef BOOL (*BattlePartyAnimeLoadRetBoolFn)(s32);
 
 typedef struct FakerStatus {
     s16 data[15];
@@ -110,7 +108,7 @@ static USER_FUNC(_anime_load_wait) {
             anime = UNIT_YOSHI;
             break;
     }
-    if (((BattlePartyAnimeLoadRetBoolFn)BattlePartyAnimeLoad)(anime)) {
+    if (BattlePartyAnimeLoad(anime)) {
         return EVT_RETURN_DONE;
     }
     return EVT_RETURN_BLOCK;
@@ -142,7 +140,7 @@ static USER_FUNC(_anime_load) {
             anime = UNIT_YOSHI;
             break;
     }
-    ((BattlePartyAnimeLoadRetBoolFn)BattlePartyAnimeLoad)(anime);
+    BattlePartyAnimeLoad(anime);
     return EVT_RETURN_DONE;
 }
 

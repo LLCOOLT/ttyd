@@ -131,117 +131,92 @@ BOOL marioSlitKeyDisable(void) {
  */
 BOOL U_marioSlitContinueChk(void) {
     MarioWork* mario = marioGetPtr();
-    Vec pos;
     if (marioSlitButton()) {
         return TRUE;
     }
     if (marioSlitChkWallAround()) {
         return TRUE;
     }
-    pos = mario->position;
-    return marioCreviceWallChk(&pos) != 0;
+    return marioCreviceWallChk(mario->position) != 0;
 }
 #endif
 
 /**
- * TRUE when position p is inside a narrow crack:
+ * TRUE when pos is inside a narrow crack:
  * rays 20 units to both sides (each tried from the centre and from points 10 units ahead and behind) hit walls
  * whose normals face each other within 10 degrees.
  */
-BOOL marioCreviceWallChk(const Vec* p) {
+BOOL marioCreviceWallChk(Vec pos) {
+    Vec start;
+    Vec dir;
+    Vec outPos;
+    Vec outNrm;
+    f32 s;
+    f32 c;
+    f32 dist;
     f32 offX;
     f32 offZ;
+    f32 h;
     f32 angA;
     f32 angB;
     HitEntry* hitA;
     HitEntry* hitB;
-    f32 s;
-    f32 c;
-    f32 dist;
-    f32 h = 10.0f;
-    Vec pos;
-    Vec dir;
-    Vec outPos;
-    Vec outNrm;
 
     marioGetPtr();
+    h = 10.0f;
     sincosf(&s, &c, toMovedirSimple(270.0f));
-    offX = 0.5f * (20.0f * s);
-    offZ = 0.5f * (20.0f * c);
     angA = 0.0f;
     angB = angA;
+    offX = 0.5f * (20.0f * s);
+    offZ = 0.5f * (20.0f * c);
+
     sincosf(&s, &c, toMovedirSimple(180.0f));
     dist = 20.0f;
-    pos = *p;
-    pos.y += 10.0f;
-    {
-        Vec t1 = {0, 0, 0};
-        t1.x = s;
-        t1.z = c;
-        dir = t1;
-    }
-    hitA = marioHitCheckVec(&pos, &dir, &outPos, &outNrm, &dist);
+    start = pos;
+    start.y += h;
+    dir = (Vec){s, 0.0f, c};
+    hitA = marioHitCheckVec(&start, &dir, &outPos, &outNrm, &dist);
     if (hitA) {
         angA = angleABf(0.0f, 0.0f, outNrm.x, outNrm.z);
     }
     if (!hitA) {
-        Vec t2 = {0, 0, 0};
         dist = 20.0f;
-        t2.x = p->x + offX;
-        t2.y = p->y + h;
-        t2.z = p->z + offZ;
-        pos = t2;
-        hitA = marioHitCheckVec(&pos, &dir, &outPos, &outNrm, &dist);
+        start = (Vec){pos.x + offX, pos.y + h, pos.z + offZ};
+        hitA = marioHitCheckVec(&start, &dir, &outPos, &outNrm, &dist);
         if (hitA) {
             angA = angleABf(0.0f, 0.0f, outNrm.x, outNrm.z);
         }
     }
     if (!hitA) {
-        Vec t3 = {0, 0, 0};
         dist = 20.0f;
-        t3.x = p->x - offX;
-        t3.y = p->y + h;
-        t3.z = p->z - offZ;
-        pos = t3;
-        hitA = marioHitCheckVec(&pos, &dir, &outPos, &outNrm, &dist);
+        start = (Vec){pos.x - offX, pos.y + h, pos.z - offZ};
+        hitA = marioHitCheckVec(&start, &dir, &outPos, &outNrm, &dist);
         if (hitA) {
             angA = angleABf(0.0f, 0.0f, outNrm.x, outNrm.z);
         }
     }
+
     sincosf(&s, &c, toMovedirSimple(0.0f));
     dist = 20.0f;
-    pos = *p;
-    pos.y += 10.0f;
-    {
-        Vec u1 = {0, 0, 0};
-        u1.x = s;
-        u1.z = c;
-        dir = u1;
-    }
-    hitB = marioHitCheckVec(&pos, &dir, &outPos, &outNrm, &dist);
+    start = pos;
+    start.y += h;
+    dir = (Vec){s, 0.0f, c};
+    hitB = marioHitCheckVec(&start, &dir, &outPos, &outNrm, &dist);
     if (hitB) {
         angB = angleABf(0.0f, 0.0f, outNrm.x, outNrm.z);
     }
     if (!hitB) {
-        Vec u2 = {0, 0, 0};
         dist = 20.0f;
-        u2.x = p->x + offX;
-        u2.y = p->y + h;
-        u2.z = p->z + offZ;
-        pos = u2;
-        hitB = marioHitCheckVec(&pos, &dir, &outPos, &outNrm, &dist);
+        start = (Vec){pos.x + offX, pos.y + h, pos.z + offZ};
+        hitB = marioHitCheckVec(&start, &dir, &outPos, &outNrm, &dist);
         if (hitB) {
             angB = angleABf(0.0f, 0.0f, outNrm.x, outNrm.z);
         }
     }
     if (!hitB) {
-        Vec u3 = {0, 0, 0};
         dist = 20.0f;
-        u3.x = p->x - offX;
-        u3.y = p->y + h;
-        u3.z = p->z - offZ;
-        pos = u3;
-        hitB = marioHitCheckVec(&pos, &dir, &outPos, &outNrm, &dist);
+        start = (Vec){pos.x - offX, pos.y + h, pos.z - offZ};
+        hitB = marioHitCheckVec(&start, &dir, &outPos, &outNrm, &dist);
         if (hitB) {
             angB = angleABf(0.0f, 0.0f, outNrm.x, outNrm.z);
         }
@@ -641,7 +616,6 @@ void marioReInit_slit(void) {
  */
 static inline BOOL slitContinueChk(void) {
     MarioWork* mario = marioGetPtr();
-    Vec pos;
 #if VERSION <= VERSION_DEMO_JP
     if (marioSlitButton() == 2) {
 #else
@@ -652,8 +626,7 @@ static inline BOOL slitContinueChk(void) {
     if (marioSlitChkWallAround()) {
         return TRUE;
     }
-    pos = mario->position;
-    if (marioCreviceWallChk(&pos)) {
+    if (marioCreviceWallChk(mario->position)) {
         return TRUE;
     }
     return FALSE;

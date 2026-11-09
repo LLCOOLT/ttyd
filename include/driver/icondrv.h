@@ -108,7 +108,7 @@ void iconChange(const char* name, u16 iconId);
 void iconDispGxAlpha(Vec* position, s16 flags, u16 iconId, u8 alpha, f32 scale);
 void iconDispGx(Vec* position, s16 flags, u16 iconId, f32 scale);
 void iconDispGx2(Mtx mtx, s16 flags, u16 iconId);
-void iconDispGxCol(Mtx pos, s16 flags, u16 iconId, GXColor color);
+void iconDispGxCol(Mtx pos, u16 flags, u16 iconId, GXColor color);
 #if VERSION >= VERSION_US
 void iconGetTexObj(GXTexObj* texObj, s32 iconId);
 #else

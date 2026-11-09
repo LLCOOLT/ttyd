@@ -34,8 +34,6 @@ typedef struct KinopioParty {
     s16 pad8[3];
 } KinopioParty;
 
-typedef s32 (*KinopioGetter)(void);
-
 typedef struct KinopioWork {
     s32 breakfastItem; // 0x0
     Vec breakfastPos;  // 0x4
@@ -100,7 +98,7 @@ static USER_FUNC(power_chk) {
             break;
         }
     }
-    if (((KinopioGetter)pouchGetHP)() == ((KinopioGetter)pouchGetMaxHP)() && ((KinopioGetter)pouchGetFP)() == ((KinopioGetter)pouchGetMaxFP)() && ((KinopioGetter)pouchGetAP)() == ((KinopioGetter)pouchGetMaxAP)() && ok) {
+    if (pouchGetHP() == pouchGetMaxHP() && pouchGetFP() == pouchGetMaxFP() && pouchGetAP() == pouchGetMaxAP() && ok) {
         evtSetValue(event, args[0], 1);
     } else {
         evtSetValue(event, args[0], 0);

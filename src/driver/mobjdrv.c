@@ -476,11 +476,9 @@ void mobjHitEntry(MapObjectEntry* entry, s32 type) {
     PSVECScale(&entry->translation, &entry->translation, 0.5f);
     PSVECScale(&entry->translation, &entry->translation, 10.0f);
     entry->translation.y = 0.0f;
-    // FAKE: the `(0, x)` comma expressions change MWCC's expression tree so the |max - min| loads get the
-    // target float registers; the values are the same
-    entry->scale2.x = 10.0f * (entry->scale.x * (f32)(0, __fabs((0, max.x - min.x))));
-    entry->scale2.y = 10.0f * (entry->scale.y * (f32)__fabs(max.y));
-    entry->scale2.z = 10.0f * (entry->scale.z * (f32)(0, __fabs((0, max.z - min.z))));
+    entry->scale2.x = 10.0f * (entry->scale.x * (f32)fabs(max.x - min.x));
+    entry->scale2.y = 10.0f * (entry->scale.y * (f32)fabs(max.y));
+    entry->scale2.z = 10.0f * (entry->scale.z * (f32)fabs(max.z - min.z));
     if (strncmp(pose->fileName, "HOBJ_", strlen("HOBJ_")) == 0) {
         entry->translation.z = 0.0f;
         entry->scale2.z = 10.0f * (2.5f * entry->scale.z);

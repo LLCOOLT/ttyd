@@ -7376,7 +7376,7 @@ static USER_FUNC(cook_chk) {
     }
     parsePop();
     fileFree(file);
-    // FAKE: volatile casts, see the retail cook_chk.
+    // FAKE: the (volatile u32) casts order the args[n] loads after the inlined itemNameToID as in the target.
     evtSetValue(event, (volatile u32)args[1], itemNameToID(result));
     evtSetValue(event, (volatile u32)args[2], itemNameToID(result2));
     return EVT_RETURN_DONE;
@@ -7401,7 +7401,7 @@ static USER_FUNC(cook_chk2) {
 
     if (item1 == 163 || item2 == 163) {
         item2 = naniga_okorukana_cook();
-        // FAKE: volatile cast, see the retail cook_chk.
+        // FAKE: volatile cast, as in cook_chk above.
         evtSetValue(event, (volatile u32)args[2], item2);
         return EVT_RETURN_DONE;
     }
@@ -7433,7 +7433,7 @@ static USER_FUNC(cook_chk2) {
     }
     parsePop();
     fileFree(file);
-    // FAKE: volatile cast, see the retail cook_chk.
+    // FAKE: volatile cast, as in cook_chk above.
     evtSetValue(event, (volatile u32)args[2], itemNameToID(out));
     return EVT_RETURN_DONE;
 }
@@ -7447,21 +7447,23 @@ static USER_FUNC(cook_chk2) {
 static USER_FUNC(cook_chk) {
     EvtWord* args = event->args;
     s32 item = evtGetValue(event, args[0]);
+    s32 cook;
     ItemData* data = &itemDataTable[item];
     u32 i;
+    ItemType id;
 
     if (item == 163) {
-        item = naniga_okorukana_cook();
-        evtSetValue(event, args[1], item);
-        evtSetValue(event, args[2], item);
+        cook = naniga_okorukana_cook();
+        evtSetValue(event, args[1], cook);
+        evtSetValue(event, args[2], cook);
         return EVT_RETURN_DONE;
     }
     for (i = 0; i < 26; i++) {
         if (strcmp(data->id, R_simple_recipe_table[i].ingredient) == 0) {
-            // FAKE: the (volatile u32) casts order the args[n] loads after the inlined itemNameToID as in the target
-            // (tried: a result local, a u32 cast of the result, event->args[n]).
-            evtSetValue(event, (volatile u32)args[1], itemNameToID(R_simple_recipe_table[i].result));
-            evtSetValue(event, (volatile u32)args[2], itemNameToID(R_simple_recipe_table[i].result2));
+            id = itemNameToID(R_simple_recipe_table[i].result);
+            evtSetValue(event, args[1], id);
+            id = itemNameToID(R_simple_recipe_table[i].result2);
+            evtSetValue(event, args[2], id);
             return EVT_RETURN_DONE;
         }
     }
@@ -7482,12 +7484,13 @@ static USER_FUNC(cook_chk2) {
     s32 item2 = evtGetValue(event, args[1]);
     ItemData* data1 = &itemDataTable[item1];
     ItemData* data2 = &itemDataTable[item2];
+    CookRecipe* recipe;
     u32 i;
+    ItemType id;
 
     if (item1 == 163 || item2 == 163) {
-        item2 = naniga_okorukana_cook();
-        // FAKE: volatile cast, see cook_chk.
-        evtSetValue(event, (volatile u32)args[2], item2);
+        id = naniga_okorukana_cook();
+        evtSetValue(event, args[2], id);
         return EVT_RETURN_DONE;
     }
 #if VERSION >= VERSION_US
@@ -7495,10 +7498,11 @@ static USER_FUNC(cook_chk2) {
 #else
     for (i = 0; i < 289; i++) {
 #endif
-        if ((strcmp(data1->id, R_cookbook_recipe_table[i].a) == 0 && strcmp(data2->id, R_cookbook_recipe_table[i].b) == 0) ||
-            (strcmp(data2->id, R_cookbook_recipe_table[i].a) == 0 && strcmp(data1->id, R_cookbook_recipe_table[i].b) == 0)) {
-            // FAKE: volatile cast, see cook_chk.
-            evtSetValue(event, (volatile u32)args[2], itemNameToID(R_cookbook_recipe_table[i].out));
+        recipe = &R_cookbook_recipe_table[i];
+        if ((strcmp(data1->id, recipe->a) == 0 && strcmp(data2->id, recipe->b) == 0) ||
+            (strcmp(data2->id, recipe->a) == 0 && strcmp(data1->id, recipe->b) == 0)) {
+            id = itemNameToID(R_cookbook_recipe_table[i].out);
+            evtSetValue(event, args[2], id);
             return EVT_RETURN_DONE;
         }
     }

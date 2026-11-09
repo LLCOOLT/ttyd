@@ -15,8 +15,6 @@
 #include "eff/eff_n64.h"
 #include "version.h"
 #include "libc_decls.h"
-// FAKE: extdrv.c calls animPoseDisp_MakeExtTexture through this prototype (the types it was compiled with) instead of the one in driver/animdrv.h; same registers, behaviour-identical.
-typedef void (*AnimPoseDisp_MakeExtTextureLocalFn)(const char*, const char*, f32, f32, GXTexObj*, void***, s32*, s32*, s32*, s32*);
 
 static ExtdrvWork work[2];
 static u8 shadow_dl[32];
@@ -168,7 +166,7 @@ static void extMakeTexture(CameraId camId, void* param) {
     queen_uv[3] = -1.0f / wp->texNum;
     for (i = 0; i < wp->texNum; i++, info++, tex++) {
         n = i * 12;
-        ((AnimPoseDisp_MakeExtTextureLocalFn)animPoseDisp_MakeExtTexture)(info->group, info->anim, info->frame, 4.0f, &tex->obj, &tex->image, &x0, &y0, &x1, &y1);
+        animPoseDisp_MakeExtTexture(info->group, info->anim, info->frame, 4.0f, &tex->obj, &tex->image, &x0, &y0, &x1, &y1);
         wp->vtx[n++] = x0 / 2.0f;
         wp->vtx[n++] = -y0 / 2.0f;
         wp->vtx[n++] = 0.0f;

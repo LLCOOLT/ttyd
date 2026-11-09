@@ -19,8 +19,6 @@
 #include "unit/unit_koura.h"
 #include "unit/party/unit_party_vivian.h"
 #include "battle/battle_actrecord.h"
-// FAKE: battle_unit.c calls BtlUnit_snd_se_pos through this prototype (the types it was compiled with) instead of the one in battle/battle_unit.h; same registers, behaviour-identical.
-typedef s32 (*BtlUnit_snd_se_posS32PitchFn)(BattleUnit*, const char*, s32, s32, Vec*);
 
 double pow(double, double);
 void BtlActRec_AddCount(u8* rec);
@@ -1000,11 +998,11 @@ void _CheckMoveCount(BattleUnit* unit) {
  * for statuses with no strength (sleep, stop, dizzy, ...) both get the turn count.
  * A size, attack or defense change of the other sign reads as 0.
  */
-void BtlUnit_GetStatus(BattleUnit* unit, StatusEffectType type, s8* turns, s8* strength) {
+void BtlUnit_GetStatus(BattleUnit* unit, s8 type, s8* turns, s8* strength) {
     s8 status_turns = 0;
     s8 status_strength = 0;
 
-    switch ((s8)type) {
+    switch (type) {
         case STATUS_SLEEP:
             status_strength = unit->sleepTurns;
             status_turns = status_strength;
@@ -1139,8 +1137,8 @@ void BtlUnit_GetStatus(BattleUnit* unit, StatusEffectType type, s8* turns, s8* s
  * Returns FALSE when nothing was applied; retail versions also return FALSE when Charge drops below 0
  * or Allergic or Payback is set to 0 turns, which the demos treat as set.
  */
-BOOL BtlUnit_SetStatus(BattleUnit* unit, StatusEffectType type, s8 turns, s8 strength) {
-    switch ((s8)type) {
+BOOL BtlUnit_SetStatus(BattleUnit* unit, s8 type, s8 turns, s8 strength) {
+    switch (type) {
         case STATUS_SLEEP:
             unit->sleepTurns = turns;
             unit->sleepStrength = 0;
@@ -1181,7 +1179,7 @@ BOOL BtlUnit_SetStatus(BattleUnit* unit, StatusEffectType type, s8 turns, s8 str
         case STATUS_HUGE:
         case STATUS_TINY:
             if (!strength) {
-                if ((s8)type == STATUS_HUGE) {
+                if (type == STATUS_HUGE) {
                     if (unit->sizeChangeStrength >= 0) {
                         unit->sizeChangeTurns = 0;
                         unit->sizeChangeStrength = 0;
@@ -1230,7 +1228,7 @@ BOOL BtlUnit_SetStatus(BattleUnit* unit, StatusEffectType type, s8 turns, s8 str
                 unit->defChangeTurns = turns;
                 unit->defChangeStrength = strength;
             } else if (strength == 0) {
-                if ((s8)type == STATUS_DEFENSE_DOWN) {
+                if (type == STATUS_DEFENSE_DOWN) {
                     if (unit->defChangeStrength <= 0) {
                         unit->defChangeTurns = 0;
                         unit->defChangeStrength = 0;
@@ -1358,7 +1356,7 @@ void BtlUnit_ClearStatus(BattleUnit* unit) {
  * attack and defense changes, poison and regen), clearing its strength when the turns run out.
  * Returns TRUE when the status just wore off; FALSE when it continues, was not active, or the unit is KO'd.
  */
-BOOL BtlUnit_CheckRecoveryStatus(BattleUnit* unit, StatusEffectType type) {
+BOOL BtlUnit_CheckRecoveryStatus(BattleUnit* unit, s8 type) {
     s8 turns, strength;
 
     if (!unit) {
@@ -1374,7 +1372,7 @@ BOOL BtlUnit_CheckRecoveryStatus(BattleUnit* unit, StatusEffectType type) {
     if (!turns) {
         return FALSE;
     }
-    switch ((s8)type) {
+    switch (type) {
         case STATUS_SLEEP:
             if (turns > 1) {
                 turns--;
@@ -1477,7 +1475,7 @@ BOOL BtlUnit_CheckRecoveryStatus(BattleUnit* unit, StatusEffectType type) {
 }
 
 /** Returns TRUE while the status effect has turns left; Electric also counts as active when the unit wears Zap Tap. */
-BOOL BtlUnit_CheckStatus(BattleUnit* unit, StatusEffectType type) {
+BOOL BtlUnit_CheckStatus(BattleUnit* unit, s8 type) {
     s8 turns, strength;
 
     if (!unit) {
@@ -1487,7 +1485,7 @@ BOOL BtlUnit_CheckStatus(BattleUnit* unit, StatusEffectType type) {
     if (turns) {
         return TRUE;
     }
-    if ((s8)type == STATUS_ELECTRIC && unit->badgesEquipped.ZapTap) {
+    if (type == STATUS_ELECTRIC && unit->badgesEquipped.ZapTap) {
         return TRUE;
     }
     return FALSE;
@@ -2207,9 +2205,6 @@ void BtlUnit_PoseSoundInit(BattleUnitPart* part) {
     PART_POSE_SOUND(part)->prevTime = 0.0f;
 }
 
-#pragma push
-// propagation optimisation off for BtlUnit_ControlPoseSoundMain, BtlUnit_snd_se, BtlUnit_snd_se_pos and 4 more: the original register allocation and scheduling need it
-#pragma opt_propagation off
 /**
  * Plays the sound effects tied to a part's current animation:
  * each frame, entries in the part's pose sound table whose time (in seconds of the animation) was just passed
@@ -2219,90 +2214,79 @@ void BtlUnit_PoseSoundInit(BattleUnitPart* part) {
 void BtlUnit_ControlPoseSoundMain(BattleUnitPart* part) {
     BattleWork* wp = _battleWorkPointer;
     BtlPartPoseSound* state;
-    AnimTableEntry* anim;
+    const char* anim;
     BtlPoseSoundData* entry;
     AnimationPose* pose;
     f32 time;
+    u32 loops;
     s32 id;
     u8 vol;
-    f64 dv;
 
-    if (!part) {
-        return;
-    }
-    state = PART_POSE_SOUND(part);
-    entry = state->table;
-    if (!entry) {
-        return;
-    }
-    if (part->poseId == -1) {
-        return;
-    }
-    pose = animPoseGetAnimPosePtr(part->poseId);
-    if (!pose) {
-        return;
-    }
-    time = pose->localFrame / 60.0f;
-    if (state->loopCount > (u32)pose->loopTime) {
-        state->time = time;
-        state->prevTime = -1.0f;
-        state->loopCount = (s32)pose->loopTime;
-        state->count = 0;
-        if (BattleGetSeq(wp, SEQ_PHASE) == BATTLE_PHASE_PLAYER || BattleGetSeq(wp, SEQ_PHASE) == BATTLE_PHASE_ENEMY) {
-            state->flag = 1;
-        }
-    } else if (state->loopCount == (u32)pose->loopTime && state->time > time) {
-        state->time = time;
-        state->prevTime = -1.0f;
-    } else if (state->loopCount < (u32)pose->loopTime) {
-        state->time = time;
-        state->prevTime = -1.0f;
-        state->loopCount = (s32)pose->loopTime;
-    } else {
-        state->prevTime = state->time;
-        state->time = time;
-    }
-    if (state->time == state->prevTime) {
-        return;
-    }
-    anim = animPoseGetCurrentAnim(part->poseId);
-    for (; entry->animName; entry++) {
-        if (strcmp(entry->animName, (const char*)anim)) {
-            continue;
-        }
-        if (entry->time <= state->time && entry->time > state->prevTime) {
-            if (entry->flags & 1) {
-                if (entry->callback) {
-                    id = entry->callback(part->owner, entry, state);
+    if (part) {
+        state = PART_POSE_SOUND(part);
+        entry = state->table;
+        if (entry && part->poseId != -1) {
+            pose = animPoseGetAnimPosePtr(part->poseId);
+            if (pose) {
+                time = pose->localFrame / 60.0f;
+                loops = pose->loopTime;
+                if (state->loopCount > loops) {
+                    state->time = time;
+                    state->prevTime = -1.0f;
+                    state->loopCount = (s32)pose->loopTime;
+                    state->count = 0;
+                    if (BattleGetSeq(wp, SEQ_PHASE) == BATTLE_PHASE_PLAYER || BattleGetSeq(wp, SEQ_PHASE) == BATTLE_PHASE_ENEMY) {
+                        state->flag = 1;
+                    }
+                } else if (state->loopCount == loops && state->time > time) {
+                    state->time = time;
+                    state->prevTime = -1.0f;
+                } else if (state->loopCount < loops) {
+                    state->time = time;
+                    state->prevTime = -1.0f;
+                    state->loopCount = (s32)pose->loopTime;
                 } else {
-                    id = BtlUnit_snd_se(part->owner, entry->sfxName, -250000000, entry->pitch);
+                    state->prevTime = state->time;
+                    state->time = time;
                 }
-                psndSFX_vol(id, vol = 0x7F);
-                state->count++;
-                if (part->owner->attackPhase != BattleGetSeq(wp, SEQ_PHASE)) {
-                    f64 k;
-                    dv = (f64)(u32)vol;
-                    vol = dv * (k = 0.7);
-                    psndSFX_vol(id, vol);
+                if (state->time != state->prevTime) {
+                    anim = (const char*)animPoseGetCurrentAnim(part->poseId);
+                    for (; entry->animName; entry++) {
+                        if (!strcmp(entry->animName, anim) && entry->time <= state->time && entry->time > state->prevTime) {
+                            if (entry->flags & 1) {
+                                if (entry->callback) {
+                                    id = entry->callback(part->owner, entry, state);
+                                } else {
+                                    id = BtlUnit_snd_se(part->owner, entry->sfxName, -250000000, entry->pitch);
+                                }
+                                vol = 0x7F;
+                                psndSFX_vol(id, vol);
+                                state->count++;
+                                if (part->owner->attackPhase != BattleGetSeq(wp, SEQ_PHASE)) {
+                                    vol *= 0.7;
+                                    psndSFX_vol(id, vol);
+                                }
+                            } else {
+                                if (entry->callback) {
+                                    entry->callback(part->owner, entry, state);
+                                } else {
+                                    BtlUnit_snd_se(part->owner, entry->sfxName, -250000000, entry->pitch);
+                                }
+                                state->count++;
+                            }
+                        }
+                    }
                 }
-            } else {
-                if (entry->callback) {
-                    entry->callback(part->owner, entry, state);
-                } else {
-                    BtlUnit_snd_se(part->owner, entry->sfxName, -250000000, entry->pitch);
-                }
-                state->count++;
             }
         }
     }
 }
-#pragma pop
 
 /** Plays a sound effect at the unit's position (BtlUnit_snd_se_pos). */
-s32 BtlUnit_snd_se(BattleUnit* unit, const char* sfxName, s32 volume, s32 pan) {
+s32 BtlUnit_snd_se(BattleUnit* unit, const char* sfxName, s32 volume, s16 pitch) {
     Vec pos;
     BtlUnit_GetPos(unit, &pos.x, &pos.y, &pos.z);
-    return ((BtlUnit_snd_se_posS32PitchFn)BtlUnit_snd_se_pos)(unit, sfxName, volume, pan, &pos);
+    return BtlUnit_snd_se_pos(unit, sfxName, volume, pitch, &pos);
 }
 
 /**

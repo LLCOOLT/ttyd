@@ -9,8 +9,6 @@
 #include "system.h"
 #include <string.h>
 #include "version.h"
-// FAKE: ac_power_gauge.c calls BattleACGetButtonIcon through this prototype (the types it was compiled with) instead of the one in battle/battle_ac.h; same registers, behaviour-identical.
-typedef s32 (*BattleACGetButtonIconRetS32Fn)(s32, s32);
 
 // this unit is size-optimised, as in the original (the object differs without it)
 #pragma optimize_for_size on
@@ -29,7 +27,6 @@ typedef struct PowerGaugeWork {
 
 #define PG_WORK(ac) ((PowerGaugeWork*)(ac)->work)
 
-#define ICONGX ((void (*)(Vec*, s32, s32, f32))iconDispGx)
 static void actionCommandDisp(f32 x, f32 y);
 
 /**
@@ -291,11 +288,16 @@ void battleAcDelete_PowerGauge(BattleWork* work) {
 static void actionCommandDisp(f32 x, f32 y) {
     BattleWork* work = _battleWorkPointer;
     BattleActions* ac = &work->actionCommands;
-    PowerGaugeWork* pw;
-    s32 a, b, c, d;
     BattleACDispParams* disp = (BattleACDispParams*)&ac->disp;
+    PowerGaugeWork* pw;
     f32 ratio;
-    u32 flags;
+    f32 px;
+    f32 py;
+    u16 icon;
+    u16 iconOn;
+    u16 iconOff;
+    u16 iconOn2;
+    u16 iconOff2;
 
     camGetPtr(CAMERA_2D);
     pw = PG_WORK(ac);
@@ -304,178 +306,102 @@ static void actionCommandDisp(f32 x, f32 y) {
         ratio = 1.0f;
     }
     disp->gaugeRatio = ratio;
-
     if (ac->acFlags & 2) {
-        BattleAcDrawGauge((s32)x, (s32)y, 0xB2, ratio, 1, 100, 100, 100, 0);
+        BattleAcDrawGauge(x, y, ratio, 0xB2, 1, 100, 100, 100, 0);
     } else {
-        BattleAcDrawGauge((s32)x, (s32)y, 0xB2, ratio, 2, ac->params[4], 100, 100, 0);
+        BattleAcDrawGauge(x, y, ratio, 0xB2, 2, ac->params[4], 100, 100, 0);
     }
-
-    flags = ac->acFlags;
-    if (!(flags & 4)) {
-        Vec pos = {0.0f, 0.0f, 0.0f};
-        pos.x = -288.0f + x + (f32)(ac->params[4] * 0xB0) / 100.0f;
-        pos.y = 45.0f + y;
-        ICONGX(&pos, ICON_DISP_2D, ICON_096, 1.0f);
+    if (!(ac->acFlags & 4)) {
+        iconDispGx(&(Vec){-288.0f + x + (f32)(ac->params[4] * 0xB0) / 100.0f, 45.0f + y, 0.0f}, ICON_DISP_2D, ICON_096, 1.0f);
     } else {
-        s32 icon;
-        if (pw->gauge >= (f32)ac->params[4] && pw->gauge <= 100.0f) {
+        if (pw->gauge >= ac->params[4] && pw->gauge <= 100.0f) {
             icon = ICON_095;
         } else {
             icon = ICON_091;
         }
-        if (flags & 8) {
-            Vec pos = {0.0f, 0.0f, 0.0f};
-            pos.x = 120.0f + (-200.0f + x) - 12.0f;
-            pos.y = 18.0f + y;
-            ICONGX(&pos, ICON_DISP_2D, icon, 1.0f);
+        if (ac->acFlags & 8) {
+            iconDispGx(&(Vec){120.0f + (-200.0f + x) - 12.0f, 18.0f + y, 0.0f}, ICON_DISP_2D, icon, 1.0f);
         } else {
-            Vec pos = {0.0f, 0.0f, 0.0f};
-            pos.x = 120.0f + (-200.0f + x);
-            pos.y = 18.0f + y;
-            ICONGX(&pos, ICON_DISP_2D, icon, 1.0f);
+            iconDispGx(&(Vec){120.0f + (-200.0f + x), 18.0f + y, 0.0f}, ICON_DISP_2D, icon, 1.0f);
         }
     }
-
     switch (ac->params[0]) {
         case 0:
-            a = ICON_07F;
-            b = ICON_07E;
-            c = ICON_081;
-            d = ICON_080;
+            iconOn = ICON_07F;
+            iconOff = ICON_07E;
+            iconOn2 = ICON_081;
+            iconOff2 = ICON_080;
             break;
         case 1:
-            a = ((BattleACGetButtonIconRetS32Fn)BattleACGetButtonIcon)(PAD_BUTTON_A, 1);
-            b = ((BattleACGetButtonIconRetS32Fn)BattleACGetButtonIcon)(PAD_BUTTON_A, 0);
-            c = 0;
-            d = 0;
+            iconOn = BattleACGetButtonIcon(PAD_BUTTON_A, 1);
+            iconOff = BattleACGetButtonIcon(PAD_BUTTON_A, 0);
+            iconOn2 = 0;
+            iconOff2 = 0;
             break;
         case 2:
-            a = ((BattleACGetButtonIconRetS32Fn)BattleACGetButtonIcon)(PAD_BUTTON_A, 1);
-            b = ((BattleACGetButtonIconRetS32Fn)BattleACGetButtonIcon)(PAD_BUTTON_A, 0);
-            c = 0;
-            d = 0;
+            iconOn = BattleACGetButtonIcon(PAD_BUTTON_A, 1);
+            iconOff = BattleACGetButtonIcon(PAD_BUTTON_A, 0);
+            iconOn2 = 0;
+            iconOff2 = 0;
             break;
         case 3:
-            a = ((BattleACGetButtonIconRetS32Fn)BattleACGetButtonIcon)(PAD_TRIGGER_R, 1);
-            b = ((BattleACGetButtonIconRetS32Fn)BattleACGetButtonIcon)(PAD_TRIGGER_R, 0);
-            c = 0;
-            d = 0;
+            iconOn = BattleACGetButtonIcon(PAD_TRIGGER_R, 1);
+            iconOff = BattleACGetButtonIcon(PAD_TRIGGER_R, 0);
+            iconOn2 = 0;
+            iconOff2 = 0;
             break;
     }
-
     switch (ac->acState) {
         case 99:
         case 100:
         case 1003:
         case 1004:
         case 1005:
-            if ((u16)c) {
-                Vec pos = {0.0f, 0.0f, 0.0f};
-                f32 px = -225.0f + x;
-                f32 py = 80.0f + y;
-                pos.x = px;
-                pos.y = py;
-                ICONGX(&pos, ICON_DISP_2D, b, 1.0f);
-                {
-                    Vec pos2 = {0.0f, 0.0f, 0.0f};
-                    pos2.x = 56.0f + px;
-                    pos2.y = py;
-                    ICONGX(&pos2, ICON_DISP_2D, d, 1.0f);
-                }
+            if (iconOn2) {
+                px = -225.0f + x;
+                py = 80.0f + y;
+                iconDispGx(&(Vec){px, py, 0.0f}, ICON_DISP_2D, iconOff, 1.0f);
+                iconDispGx(&(Vec){56.0f + px, py, 0.0f}, ICON_DISP_2D, iconOff2, 1.0f);
             } else {
-                Vec pos = {0.0f, 0.0f, 0.0f};
-                pos.x = 28.0f + (-225.0f + x);
-                pos.y = 80.0f + y;
-                ICONGX(&pos, ICON_DISP_2D, b, 1.0f);
+                iconDispGx(&(Vec){28.0f + (-225.0f + x), 80.0f + y, 0.0f}, ICON_DISP_2D, iconOff, 1.0f);
             }
             break;
         case 1000:
         case 1001:
             if (pw->mode) {
-                if (pw->gauge >= (f32)ac->params[4] && pw->gauge <= 100.0f) {
-                    if ((u16)c) {
-                        Vec pos = {0.0f, 0.0f, 0.0f};
-                        f32 px = -225.0f + x;
-                        f32 py = 80.0f + y;
-                        pos.x = px;
-                        pos.y = py;
-                        ICONGX(&pos, ICON_DISP_2D, a, 1.0f);
-                        {
-                            Vec pos2 = {0.0f, 0.0f, 0.0f};
-                            pos2.x = 56.0f + px;
-                            pos2.y = py;
-                            ICONGX(&pos2, ICON_DISP_2D, c, 1.0f);
-                        }
+                if (pw->gauge >= ac->params[4] && pw->gauge <= 100.0f) {
+                    if (iconOn2) {
+                        px = -225.0f + x;
+                        py = 80.0f + y;
+                        iconDispGx(&(Vec){px, py, 0.0f}, ICON_DISP_2D, iconOn, 1.0f);
+                        iconDispGx(&(Vec){56.0f + px, py, 0.0f}, ICON_DISP_2D, iconOn2, 1.0f);
                     } else {
-                        Vec pos = {0.0f, 0.0f, 0.0f};
-                        pos.x = 28.0f + (-225.0f + x);
-                        pos.y = 80.0f + y;
-                        ICONGX(&pos, ICON_DISP_2D, a, 1.0f);
+                        iconDispGx(&(Vec){28.0f + (-225.0f + x), 80.0f + y, 0.0f}, ICON_DISP_2D, iconOn, 1.0f);
                     }
+                } else if (iconOn2) {
+                    px = -225.0f + x;
+                    py = 80.0f + y;
+                    iconDispGx(&(Vec){px, py, 0.0f}, ICON_DISP_2D, iconOff, 1.0f);
+                    iconDispGx(&(Vec){56.0f + px, py, 0.0f}, ICON_DISP_2D, iconOff2, 1.0f);
                 } else {
-                    if ((u16)c) {
-                        Vec pos = {0.0f, 0.0f, 0.0f};
-                        f32 px = -225.0f + x;
-                        f32 py = 80.0f + y;
-                        pos.x = px;
-                        pos.y = py;
-                        ICONGX(&pos, ICON_DISP_2D, b, 1.0f);
-                        {
-                            Vec pos2 = {0.0f, 0.0f, 0.0f};
-                            pos2.x = 56.0f + px;
-                            pos2.y = py;
-                            ICONGX(&pos2, ICON_DISP_2D, d, 1.0f);
-                        }
-                    } else {
-                        Vec pos = {0.0f, 0.0f, 0.0f};
-                        pos.x = 28.0f + (-225.0f + x);
-                        pos.y = 80.0f + y;
-                        ICONGX(&pos, ICON_DISP_2D, b, 1.0f);
-                    }
+                    iconDispGx(&(Vec){28.0f + (-225.0f + x), 80.0f + y, 0.0f}, ICON_DISP_2D, iconOff, 1.0f);
                 }
+            } else if ((pw->gauge >= ac->params[4] && pw->gauge <= 100.0f) || ac->outputParams[0] == 0) {
+                if (iconOn2) {
+                    px = -225.0f + x;
+                    py = 80.0f + y;
+                    iconDispGx(&(Vec){px, py, 0.0f}, ICON_DISP_2D, iconOff, 1.0f);
+                    iconDispGx(&(Vec){56.0f + px, py, 0.0f}, ICON_DISP_2D, iconOff2, 1.0f);
+                } else {
+                    iconDispGx(&(Vec){28.0f + (-225.0f + x), 80.0f + y, 0.0f}, ICON_DISP_2D, iconOff, 1.0f);
+                }
+            } else if (iconOn2) {
+                px = -225.0f + x;
+                py = 80.0f + y;
+                iconDispGx(&(Vec){px, py, 0.0f}, ICON_DISP_2D, iconOn, 1.0f);
+                iconDispGx(&(Vec){56.0f + px, py, 0.0f}, ICON_DISP_2D, iconOn2, 1.0f);
             } else {
-                if ((pw->gauge >= (f32)ac->params[4] && pw->gauge <= 100.0f) || (s32)ac->outputParams[0] == 0) {
-                    if ((u16)c) {
-                        Vec pos = {0.0f, 0.0f, 0.0f};
-                        f32 px = -225.0f + x;
-                        f32 py = 80.0f + y;
-                        pos.x = px;
-                        pos.y = py;
-                        ICONGX(&pos, ICON_DISP_2D, b, 1.0f);
-                        {
-                            Vec pos2 = {0.0f, 0.0f, 0.0f};
-                            pos2.x = 56.0f + px;
-                            pos2.y = py;
-                            ICONGX(&pos2, ICON_DISP_2D, d, 1.0f);
-                        }
-                    } else {
-                        Vec pos = {0.0f, 0.0f, 0.0f};
-                        pos.x = 28.0f + (-225.0f + x);
-                        pos.y = 80.0f + y;
-                        ICONGX(&pos, ICON_DISP_2D, b, 1.0f);
-                    }
-                } else {
-                    if ((u16)c) {
-                        Vec pos = {0.0f, 0.0f, 0.0f};
-                        f32 px = -225.0f + x;
-                        f32 py = 80.0f + y;
-                        pos.x = px;
-                        pos.y = py;
-                        ICONGX(&pos, ICON_DISP_2D, a, 1.0f);
-                        {
-                            Vec pos2 = {0.0f, 0.0f, 0.0f};
-                            pos2.x = 56.0f + px;
-                            pos2.y = py;
-                            ICONGX(&pos2, ICON_DISP_2D, c, 1.0f);
-                        }
-                    } else {
-                        Vec pos = {0.0f, 0.0f, 0.0f};
-                        pos.x = 28.0f + (-225.0f + x);
-                        pos.y = 80.0f + y;
-                        ICONGX(&pos, ICON_DISP_2D, a, 1.0f);
-                    }
-                }
+                iconDispGx(&(Vec){28.0f + (-225.0f + x), 80.0f + y, 0.0f}, ICON_DISP_2D, iconOn, 1.0f);
             }
             break;
     }
