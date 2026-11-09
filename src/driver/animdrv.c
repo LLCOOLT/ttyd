@@ -6612,7 +6612,7 @@ inline s32 animPoseSearchName(const char* name, s32 type) {
  * The clamp of the bottom edge tests top instead of bottom, as in the original.
  */
 void animPoseDisp_MakeExtTexture(const char* group, const char* anim, f32 frame, f32 scale, GXTexObj* obj,
-                                 smartEntry** image, s32* x0, s32* y0, s32* x1, s32* y1) {
+                                 void** image, s32* x0, s32* y0, s32* x1, s32* y1) {
     AnimationPose* pose;
     AnimationPose backup;
     Mtx m;
@@ -6688,9 +6688,9 @@ void animPoseDisp_MakeExtTexture(const char* group, const char* anim, f32 frame,
     GXSetTexCopyDst(w, h, GX_TF_RGB5A3, GX_FALSE);
     anim_ext_tex_size += GXGetTexBufferSize(w, h, GX_TF_RGB5A3, GX_FALSE, 0);
     *image = smartAlloc(GXGetTexBufferSize(w, h, GX_TF_RGB5A3, GX_FALSE, 0), 1);
-    GXCopyTex((*image)->address, GX_TRUE);
+    GXCopyTex(((smartEntry*)*image)->address, GX_TRUE);
     GXPixModeSync();
-    GXInitTexObj(obj, (*image)->address, w, h, GX_TF_RGB5A3, GX_CLAMP, GX_CLAMP, GX_FALSE);
+    GXInitTexObj(obj, ((smartEntry*)*image)->address, w, h, GX_TF_RGB5A3, GX_CLAMP, GX_CLAMP, GX_FALSE);
     *x0 = left - (s32)hw;
     *y0 = top - (s32)hh;
     *x1 = right - (s32)hw;

@@ -13,8 +13,6 @@
 #include "libc_decls.h"
 
 static void puniMakeTexture(CameraId camId, void* param);
-// FAKE: punidrv.c calls animPoseDisp_MakeExtTexture through this prototype (the types it was compiled with) instead of the one in driver/animdrv.h; same registers, behaviour-identical.
-typedef void (*AnimPoseDisp_MakeExtTextureLocalFn)(const char*, const char*, f32, f32, GXTexObj*, void***, s32*, s32*, s32*, s32*);
 
 static f32 camGetRy(void);
 static s32 compare(const void* a, const void* b);
@@ -175,7 +173,7 @@ static void puniMakeTexture(CameraId camId, void* param) {
     anim_ext_tex_size = 0;
     for (i = 0; i < wp->texNum; i++, info++, tex++) {
         n = i * 12;
-        ((AnimPoseDisp_MakeExtTextureLocalFn)animPoseDisp_MakeExtTexture)(info->group, info->anim, info->frame, 5.84f, &tex->obj, &tex->image, &x0, &y0, &x1, &y1);
+        animPoseDisp_MakeExtTexture(info->group, info->anim, info->frame, 5.84f, &tex->obj, &tex->image, &x0, &y0, &x1, &y1);
         wp->vtx[n++] = x0 * scale;
         wp->vtx[n++] = -y0 * scale;
         wp->vtx[n++] = 0.0f;

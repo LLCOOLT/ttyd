@@ -433,4 +433,4 @@ void L_animPoseWorldPositionEvalOff(s32 poseId);
 void animPoseDrawShape(s32 poseId, s32 shapeId);
 void animPoseSetDispCallBack(s32 poseId, void* callback, void* userData);
 void animPoseVivianMain(s32 poseId, Vec* pos);
-void animPoseDisp_MakeExtTexture(const char* group, const char* anim, f32 frame, f32 scale, GXTexObj* obj, struct smartEntry** image, s32* x0, s32* y0, s32* x1, s32* y1);
+void animPoseDisp_MakeExtTexture(const char* group, const char* anim, f32 frame, f32 scale, GXTexObj* obj, void** image, s32* x0, s32* y0, s32* x1, s32* y1);
