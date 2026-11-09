@@ -182,7 +182,7 @@ static void evtEntryRunCheck(EventEntry* entry) {
  * type 0xEF (stopped by every system level). Its LW/LF variables start at 0.
  * Started during evtmgrMain with EVENT_START_NOW, it also runs this frame. Does not check that a slot is free.
  */
-EventEntry* evtEntry(void* evtCode, u8 priority, u8 flags) {
+EventEntry* evtEntry(void* evtCode, s32 priority, u8 flags) {
     EventWork* wp = evtGetWork();
     EventEntry* entry;
     int i, id;

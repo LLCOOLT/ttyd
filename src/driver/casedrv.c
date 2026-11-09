@@ -18,10 +18,6 @@
 #include <dolphin/pad.h>
 #include <demo/DEMOPad.h>
 
-// FAKE: casedrv.c calls evtEntry through the prototype it was compiled with (an s32 priority, passed without
-// the u8 truncation) instead of the one in manager/evtmgr.h; same registers
-typedef EventEntry* (*EvtEntryS32PriorityFn)(void* evtCode, s32 priority, u8 flags);
-
 typedef struct CaseWork {
     s32 count;          // 0x0
     CaseEntry* entries; // 0x4
@@ -257,7 +253,7 @@ void caseMain(void) {
                 if (!evtCheckID(entry->evtId))
                     entry->evtId = 0;
                 if (entry->evtId == 0) {
-                    evt = ((EvtEntryS32PriorityFn)evtEntry)(entry->evtCode, entry->priority, 0x20);
+                    evt = evtEntry(entry->evtCode, entry->priority, 0x20);
                     evt->caseId = entry->caseId;
                     entry->evtId = evt->eventId;
                     memcpy(evt->lwData, entry->lwData, sizeof(entry->lwData));
