@@ -543,7 +543,7 @@ void iconDispGx2(Mtx mtx, s16 flags, u16 iconId) {
  * Immediately draws icon iconId with a caller-built matrix, tinted by color;
  * used for the digit icons of iconNumberDispGx.
  */
-void iconDispGxCol(Mtx pos, s16 flags, u16 iconId, GXColor color) {
+void iconDispGxCol(Mtx pos, u16 flags, u16 iconId, GXColor color) {
     IconEntry entry;
     Mtx m;
     CameraEntry* camera;
