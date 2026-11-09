@@ -3223,14 +3223,14 @@ static BOOL BattleCommandAttackAudienceCheck(void) {
  * or can't pick it now).
  */
 static USER_FUNC(_get_msg) {
-    s32 index = event->args[0];
     BattleWork* wp = _battleWorkPointer;
+    EvtWord* args = event->args;
+    s32 index = *args++;
     const char* msg;
 
     switch (wp->commandMenu.disableReason) {
         case 1:
             msg = "btl_msg_cmderror_no_fp";
-            if (!event->args && !event->args) {}
             break;
         case 2:
             msg = "btl_msg_cmderror_no_ap";
