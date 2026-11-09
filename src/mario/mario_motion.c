@@ -1131,8 +1131,6 @@ s32 marioChkRub(void) {
     return 0;
 }
 
-typedef BOOL (*MarioCreviceWallChkByValueFn)(Vec pos);
-
 /**
  * From the slit motion: rolls Mario into a tube when R is held, the stick-rub gesture counts 3,
  * he has the Tube Curse and no wall or crevice is around him. Not in 8-bit mode.
@@ -1158,9 +1156,7 @@ s32 marioRollChgChk(void) {
     if (!PCHK(3)) {
         return 0;
     }
-    // FAKE: the Vec goes by value (the ABI passes a pointer to a copy, which is what the real `const Vec*`
-    // receives); copying it into a local first changes the code of this function and of its inlined callers
-    if (marioSlitChkWallAround() || ((MarioCreviceWallChkByValueFn)marioCreviceWallChk)(mario->position)) {
+    if (marioSlitChkWallAround() || marioCreviceWallChk(mario->position)) {
         return 0;
     }
     if (mario->buttonHold & PAD_TRIGGER_R) {
