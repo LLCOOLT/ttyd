@@ -2312,7 +2312,7 @@ USER_FUNC(btl_yoshi_yoroyoro_jump_move) {
  * plays the footstep sound at volume UW_YOSHI_SLIDE_SOUND_POWER * UW_YOSHI_SLIDE_SOUND_PERCENT / 100.
  */
 static void _yoshi_slide_move_sound(BattleUnit* unit, PoseSoundTiming* s) {
-    BtlUnit_snd_se(unit, s->sfxName, -250000000, (s16)(unit->work[UW_YOSHI_SLIDE_SOUND_POWER] * unit->work[UW_YOSHI_SLIDE_SOUND_PERCENT] / 100)); // slide sound volume
+    BtlUnit_snd_se(unit, s->sfxName, -250000000, unit->work[UW_YOSHI_SLIDE_SOUND_POWER] * unit->work[UW_YOSHI_SLIDE_SOUND_PERCENT] / 100); // slide sound volume
 }
 
 /**

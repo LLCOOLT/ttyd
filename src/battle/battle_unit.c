@@ -19,8 +19,6 @@
 #include "unit/unit_koura.h"
 #include "unit/party/unit_party_vivian.h"
 #include "battle/battle_actrecord.h"
-// FAKE: battle_unit.c calls BtlUnit_snd_se_pos through this prototype (the types it was compiled with) instead of the one in battle/battle_unit.h; same registers, behaviour-identical.
-typedef s32 (*BtlUnit_snd_se_posS32PitchFn)(BattleUnit*, const char*, s32, s32, Vec*);
 
 double pow(double, double);
 void BtlActRec_AddCount(u8* rec);
@@ -2299,10 +2297,10 @@ void BtlUnit_ControlPoseSoundMain(BattleUnitPart* part) {
 #pragma pop
 
 /** Plays a sound effect at the unit's position (BtlUnit_snd_se_pos). */
-s32 BtlUnit_snd_se(BattleUnit* unit, const char* sfxName, s32 volume, s32 pan) {
+s32 BtlUnit_snd_se(BattleUnit* unit, const char* sfxName, s32 volume, s16 pitch) {
     Vec pos;
     BtlUnit_GetPos(unit, &pos.x, &pos.y, &pos.z);
-    return ((BtlUnit_snd_se_posS32PitchFn)BtlUnit_snd_se_pos)(unit, sfxName, volume, pan, &pos);
+    return BtlUnit_snd_se_pos(unit, sfxName, volume, pitch, &pos);
 }
 
 /**
