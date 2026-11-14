@@ -950,32 +950,29 @@ static void _btlcmd_MakeOperationTable(BattleWork* wp) {
     }
 }
 
-// propagation optimisation off for _btlcmd_MakeMultiItemTable: the original register allocation and scheduling need it
-#pragma opt_propagation off
 /**
  * Builds the menu shown before the item list when Double Dip or Triple Dip is equipped:
  * a single item, then Double Dip and Triple Dip with their FP cost (the P versions' names and icons for a
  * partner).
  */
 static void _btlcmd_MakeMultiItemTable(BattleWork* wp) {
-    BattleUnit* unit;
-    BattleCommand* cmd;
+    BattleUnit* unit = BattleGetUnitPtr(wp, wp->activeUnitId);
+    BattleCommand* cmd = &wp->commandMenu;
     BattleCursor* cursor;
     s32 num;
 
-    unit = BattleGetUnitPtr(wp, wp->activeUnitId);
-    cmd = &wp->commandMenu;
     if (cmd == NULL) {
         return;
     }
     _btlcmd_GetCursorPtr(cmd, 3, &cursor);
-    cmd->multiItem[0].dipCount = 1;
-    cmd->multiItem[0].enabled = 1;
-    cmd->multiItem[0].name = msgSearch("btl_cmd_act_item");
-    cmd->multiItem[0].icon = ICON_14C;
-    cmd->multiItem[0].help = NULL;
-    cmd->multiItem[0].cost = 0;
-    num = 1;
+    num = 0;
+    cmd->multiItem[num].dipCount = 1;
+    cmd->multiItem[num].enabled = 1;
+    cmd->multiItem[num].name = msgSearch("btl_cmd_act_item");
+    cmd->multiItem[num].icon = ICON_14C;
+    cmd->multiItem[num].help = NULL;
+    cmd->multiItem[num].cost = 0;
+    num++;
     if (unit->badgesEquipped.DoubleDip) {
         cmd->multiItem[num].dipCount = 2;
         if (unit->currentKind == UNIT_MARIO) {
@@ -1025,7 +1022,6 @@ static void _btlcmd_MakeMultiItemTable(BattleWork* wp) {
         cursor->absPos = cursor->count - 1;
     }
 }
-#pragma opt_propagation reset
 
 // FAKE: inlining off (FAKES.md); without it _battleGetPartyIcon is inlined into _btlcmd_MakeOperationTable (274 -> 315 instructions; one other caller grows)
 #pragma dont_inline on
@@ -3223,14 +3219,14 @@ static BOOL BattleCommandAttackAudienceCheck(void) {
  * or can't pick it now).
  */
 static USER_FUNC(_get_msg) {
-    s32 index = event->args[0];
     BattleWork* wp = _battleWorkPointer;
+    EvtWord* args = event->args;
+    s32 index = *args++;
     const char* msg;
 
     switch (wp->commandMenu.disableReason) {
         case 1:
             msg = "btl_msg_cmderror_no_fp";
-            if (!event->args && !event->args) {}
             break;
         case 2:
             msg = "btl_msg_cmderror_no_ap";

@@ -3836,7 +3836,7 @@ void party_motion_homing_fly(PartyEntry* party) {
 
 /**
  * Makes the next behind-Mario walk stand at direction dir (degrees, relative to the camera) from Mario instead
- * of behind his facing; partyMoveBehindMario3 calls it without passing dir.
+ * of behind his facing (partyMoveBehindMario3).
  */
 void party_set_behind_dir(PartyEntry* party, f32 dir) {
     party->homeDir = revise360(dir + camGetPtr((CameraId)4)->viewYaw);

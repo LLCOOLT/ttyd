@@ -1362,17 +1362,15 @@ void partyMoveBehindMario(PartyEntry* party, s32 arg) {
 
 /**
  * partyMoveBehindMario for evt_mario.c's scripted moves:
- * also keeps a set homeDir (party_set_behind_dir) and uses the smaller push box around Mario.
+ * also sets homeDir to dir (party_set_behind_dir) and uses the smaller push box around Mario.
  */
-void partyMoveBehindMario3(PartyEntry* party, s32 arg) {
+void partyMoveBehindMario3(PartyEntry* party, s32 arg, f32 dir) {
     if (party->currentMemberId == PARTY_MEMBER_YOSHI && party->runMode == 3) {
         return;
     }
     party->trigFlags |= PARTY_TRIG_FLAG_HOME_DIR_SET;
     party->trigFlags |= PARTY_TRIG_FLAG_SMALL_HOSEI;
-    // FAKE: BUG: the call passes no direction, so homeDir gets whatever is left in f1; the cast keeps
-    // the call without the argument.
-    ((void (*)(PartyEntry*))party_set_behind_dir)(party);
+    party_set_behind_dir(party, dir);
     party->moveArg = arg;
     partyChgMoveMode(party, 2);
     partyChgMot(party, 1);

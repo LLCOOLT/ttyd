@@ -1017,7 +1017,7 @@ static void zubastar_disp2D(CameraId cam, void* param) {
         pos.x = w->gaugePos.x - 200.0f;
         pos.y = 60.0f + w->gaugePos.y;
         ((IconDispGxS32Fn)iconDispGx)(&pos, ICON_DISP_2D, icon, 1.0f);
-        BattleAcDrawGauge(w->gaugePos.x, w->gaugePos.y, 0xb1, 0.01f * w->gauge, 4, 0x1a, 0x34, 0x4e, 0);
+        BattleAcDrawGauge(w->gaugePos.x, w->gaugePos.y, 0.01f * w->gauge, 0xb1, 4, 0x1a, 0x34, 0x4e, 0);
     }
     GXSetCullMode(GX_CULL_NONE);
     GXClearVtxDesc();

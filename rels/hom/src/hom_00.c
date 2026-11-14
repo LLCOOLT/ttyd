@@ -35,8 +35,6 @@
 #include "version.h"
 #include "evt/evt_story.h"
 #include "driver/casedrv.h"
-// FAKE: hom_00.c calls envGlareFilter through this prototype (the types it was compiled with) instead of the one in driver/envdrv.h; same registers, behaviour-identical.
-typedef void (*EnvGlareFilterS16Fn)(s32, s16, s16, s16, s16);
 
 static smartEntry* ind_lp;
 
@@ -989,7 +987,7 @@ static USER_FUNC(test_glare) {
         envGlareFilter(0, 0, 0, 0, 0);
     } else {
         // The glare box is the sun's screen rectangle grown by 50 on each side.
-        ((EnvGlareFilterS16Fn)envGlareFilter)(1, rect[1] - 50, rect[0] - 50, rect[3] + 50, rect[2] + 50);
+        envGlareFilter(1, rect[1] - 50, rect[0] - 50, rect[3] + 50, rect[2] + 50);
     }
     return EVT_RETURN_BLOCK;
 }

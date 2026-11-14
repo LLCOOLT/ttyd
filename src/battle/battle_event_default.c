@@ -22,8 +22,6 @@
 
 #include "battle/battle_damage.h"
 #include "version.h"
-// FAKE: battle_event_default.c calls BattlePartyAnimeLoad through this prototype (the types it was compiled with) instead of the one in battle/battle.h; same registers, behaviour-identical.
-typedef BOOL (*BattlePartyAnimeLoadRetBoolFn)(s32);
 
 static USER_FUNC(_anime_load);
 static USER_FUNC(_anime_load_wait);
@@ -1064,13 +1062,13 @@ static USER_FUNC(_backfire) {
 
 /** Script: starts loading the animations of the partner chosen in the command menu. */
 static USER_FUNC(_anime_load) {
-    ((BattlePartyAnimeLoadRetBoolFn)BattlePartyAnimeLoad)(_battleWorkPointer->commandMenu.partyKind);
+    BattlePartyAnimeLoad(_battleWorkPointer->commandMenu.partyKind);
     return EVT_RETURN_DONE;
 }
 
 /** Script: blocks until the chosen partner's animations are loaded. */
 static USER_FUNC(_anime_load_wait) {
-    return ((BattlePartyAnimeLoadRetBoolFn)BattlePartyAnimeLoad)(_battleWorkPointer->commandMenu.partyKind) ? EVT_RETURN_DONE : EVT_RETURN_BLOCK;
+    return BattlePartyAnimeLoad(_battleWorkPointer->commandMenu.partyKind) ? EVT_RETURN_DONE : EVT_RETURN_BLOCK;
 }
 
 /**

@@ -11,10 +11,6 @@
 #include <string.h>
 #include "version.h"
 
-// FAKE: ac_monosiri_target.c calls iconDispGx through this prototype (the types it was compiled with) instead of the one in driver/icondrv.h; same registers, behaviour-identical.
-typedef void (*IconDispGxS32S32Fn)(Vec*, s32, s32, f32);
-// FAKE: ac_monosiri_target.c calls BattleACGetButtonIcon through this prototype (the types it was compiled with) instead of the one in battle/battle_ac.h; same registers, behaviour-identical.
-typedef s32 (*BattleACGetButtonIconRetS32Fn)(s32, s32);
 // US battle texture ids are 0x16 higher for these entries.
 #define BTL_TEX(id) ((id) + VERSION_PICK(0, 0x16))
 
@@ -177,13 +173,12 @@ void battleAcDelete_MonosiriTarget(BattleWork* work) {
  */
 static void actionCommandDisp(f32 x, f32 y) {
     BattleWork* work = _battleWorkPointer;
-    BattleActions* ac = &work->actionCommands;
-    MonosiriTargetWork* cw = (MonosiriTargetWork*)ac->work;
+    MonosiriTargetWork* cw = (MonosiriTargetWork*)work->actionCommands.work;
     f32 alpha = 0.0f;
     Vec screen;
     Vec screen2;
-    s32 icon;
-    s32 pressedIcon;
+    u16 iconOn;
+    u16 iconOff;
 
     btlGetScreenPoint(&cw->pos, &screen);
     btlDispTex4(BTL_TEX(0x42), screen, (Vec){1.0f, 1.0f, 1.0f}, (Vec){0.0f, 0.0f, 0.0f}, (GXColor){255, 255, 255, 255});
@@ -191,14 +186,9 @@ static void actionCommandDisp(f32 x, f32 y) {
     screen.y -= 4.0f;
     screen.z -= 2.0f;
     btlDispTex4(BTL_TEX(0x42), screen, (Vec){1.0f, 1.0f, 1.0f}, (Vec){0.0f, 0.0f, 0.0f}, (GXColor){128, 128, 128, 255});
-
-    if (cw->inRange) {
-        s32 t = cw->inRangeCnt % 30;
-        if (t < 20) {
-            alpha = 0.01f * intplGetValue(5, 100.0f, 0.0f, t, 20);
-        }
+    if (cw->inRange && cw->inRangeCnt % 30 < 20) {
+        alpha = 0.01f * intplGetValue(5, 100.0f, 0.0f, cw->inRangeCnt % 30, 20);
     }
-
     btlGetScreenPoint(&cw->targetPos, &screen2);
     btlDispTex4(BTL_TEX(0x41), screen2, (Vec){1.0f, 1.0f, 1.0f}, (Vec){0.0f, 0.0f, cw->angle}, (GXColor){255, 255, 255, 255});
     if (alpha > 0.0f) {
@@ -209,12 +199,8 @@ static void actionCommandDisp(f32 x, f32 y) {
     screen2.z -= 2.0f;
     btlDispTex4(BTL_TEX(0x41), screen2, (Vec){1.0f, 1.0f, 1.0f}, (Vec){0.0f, 0.0f, cw->angle}, (GXColor){128, 128, 128, 255});
     cw->angle += 2.0f;
-
-    pressedIcon = ((BattleACGetButtonIconRetS32Fn)BattleACGetButtonIcon)(PAD_BUTTON_A, 1);
-    icon = ((BattleACGetButtonIconRetS32Fn)BattleACGetButtonIcon)(PAD_BUTTON_A, 0);
-    if (__fabs(cw->pos.x - cw->targetPos.x) < 15.0) {
-        icon = pressedIcon;
-    }
-    ((IconDispGxS32S32Fn)iconDispGx)(&(Vec){-200.0f + x, 50.0f + y, 0.0f}, ICON_DISP_2D, icon, 1.0f);
+    iconOn = BattleACGetButtonIcon(PAD_BUTTON_A, 1);
+    iconOff = BattleACGetButtonIcon(PAD_BUTTON_A, 0);
+    iconDispGx(&(Vec){-200.0f + x, 50.0f + y, 0.0f}, ICON_DISP_2D, __fabs(cw->pos.x - cw->targetPos.x) < 15.0 ? iconOn : iconOff, 1.0f);
 }
 #pragma dont_inline reset

@@ -23,15 +23,9 @@
 #include "evt/evt_story.h"
 #include <dolphin/pad.h>
 #include <demo/DEMOPad.h>
-// FAKE: win_item.c calls pouchSetHP through this prototype (the types it was compiled with) instead of the one in mario/mario_pouch.h; same registers, behaviour-identical.
-typedef void (*PouchSetHPS32Fn)(s32);
-// FAKE: win_item.c calls pouchSetFP through this prototype (the types it was compiled with) instead of the one in mario/mario_pouch.h; same registers, behaviour-identical.
-typedef void (*PouchSetFPS32Fn)(s32);
-// FAKE: win_item.c calls pouchSetAP through this prototype (the types it was compiled with) instead of the one in mario/mario_pouch.h; same registers, behaviour-identical.
-typedef void (*PouchSetAPS32Fn)(s32);
-// FAKE: win_item.c calls pouchGetMaxHP through this prototype (the types it was compiled with) instead of the one in mario/mario_pouch.h; same registers, behaviour-identical.
+// FAKE: PAL's itemUseDisp still calls pouchGetMaxHP and pouchGetMaxFP through these s32 prototypes. They are now the
+// header's own types, so the plain call should build the same, but it has not been checked against a PAL build.
 typedef s32 (*PouchGetMaxHPRetS32Fn)(void);
-// FAKE: win_item.c calls pouchGetMaxFP through this prototype (the types it was compiled with) instead of the one in mario/mario_pouch.h; same registers, behaviour-identical.
 typedef s32 (*PouchGetMaxFPRetS32Fn)(void);
 
 static void itemUseDisp(WinMgrEntry* entry);
@@ -672,17 +666,17 @@ s32 winItemMain(WindowWork* w) {
                     }
                 }
                 if (w->item.useTarget < 1) {
-                    ((PouchSetHPS32Fn)pouchSetHP)(pouchGetHP() + itemDataTable[w->item.useItem].hp_restored);
+                    pouchSetHP(pouchGetHP() + itemDataTable[w->item.useItem].hp_restored);
 #if VERSION >= VERSION_JP
-                    ((PouchSetFPS32Fn)pouchSetFP)(pouchGetFP() + itemDataTable[w->item.useItem].fp_restored);
-                    ((PouchSetAPS32Fn)pouchSetAP)(pouchGetAP() + itemDataTable[w->item.useItem].sp_restored);
+                    pouchSetFP(pouchGetFP() + itemDataTable[w->item.useItem].fp_restored);
+                    pouchSetAP(pouchGetAP() + itemDataTable[w->item.useItem].sp_restored);
 #endif
                 } else {
                     party = list[w->item.useTarget - 1]->partyId;
                     pouchSetPartyHP(party, pouchGetPartyHP(party) + itemDataTable[w->item.useItem].hp_restored);
 #if VERSION >= VERSION_JP
-                    ((PouchSetFPS32Fn)pouchSetFP)(pouchGetFP() + itemDataTable[w->item.useItem].fp_restored);
-                    ((PouchSetAPS32Fn)pouchSetAP)(pouchGetAP() + itemDataTable[w->item.useItem].sp_restored);
+                    pouchSetFP(pouchGetFP() + itemDataTable[w->item.useItem].fp_restored);
+                    pouchSetAP(pouchGetAP() + itemDataTable[w->item.useItem].sp_restored);
 #endif
                 }
                 w->item.blink = 0;
@@ -1009,7 +1003,7 @@ static void itemUseDisp(WinMgrEntry* entry) {
 #if VERSION >= VERSION_DEMO_EU
                 winFontSetWidth((Vec){entry->x + 310, entry->y - 10 - off, 0.0f}, (Vec){0.8f, 0.8f, 0.8f}, black, 30.0f, "%d", ((PouchGetMaxHPRetS32Fn)pouchGetMaxHP)());
 #else
-                winFontSet((Vec){entry->x + 310, entry->y - 10 - off, 0.0f}, (Vec){0.8f, 0.8f, 0.8f}, black, "%d", ((PouchGetMaxHPRetS32Fn)pouchGetMaxHP)());
+                winFontSet((Vec){entry->x + 310, entry->y - 10 - off, 0.0f}, (Vec){0.8f, 0.8f, 0.8f}, black, "%d", pouchGetMaxHP());
 #endif
 #if VERSION >= VERSION_JP
                 if (itemDataTable[w->item.useItem].fp_restored) {
@@ -1030,7 +1024,7 @@ static void itemUseDisp(WinMgrEntry* entry) {
 #if VERSION >= VERSION_DEMO_EU
                 winFontSetWidth((Vec){entry->x + 310, entry->y - 10 - off3, 0.0f}, (Vec){0.8f, 0.8f, 0.8f}, black, 30.0f, "%d", ((PouchGetMaxFPRetS32Fn)pouchGetMaxFP)());
 #else
-                winFontSet((Vec){entry->x + 310, entry->y - 10 - off3, 0.0f}, (Vec){0.8f, 0.8f, 0.8f}, black, "%d", ((PouchGetMaxFPRetS32Fn)pouchGetMaxFP)());
+                winFontSet((Vec){entry->x + 310, entry->y - 10 - off3, 0.0f}, (Vec){0.8f, 0.8f, 0.8f}, black, "%d", pouchGetMaxFP());
 #endif
             } else {
                 name = list[i - 1]->partyId != 4 ? msgSearch(list[i - 1]->name) : pouchGetYoshiName();

@@ -29,10 +29,6 @@
 #include "battle/battle_status_effect.h"
 #include "eff/eff_updown.h"
 #include "battle/battle_actrecord.h"
-// FAKE: battle_damage.c calls BtlUnit_GetStatus through this prototype (the types it was compiled with) instead of the one in battle/battle_unit.h; same registers, behaviour-identical.
-typedef void (*BtlUnit_GetStatusS8Fn)(BattleUnit*, s8, s8*, s8*);
-// FAKE: battle_damage.c calls BtlUnit_SetStatus through this prototype (the types it was compiled with) instead of the one in battle/battle_unit.h; same registers, behaviour-identical.
-typedef BOOL (*BtlUnit_SetStatusS8Fn)(BattleUnit*, s8, s8, s8);
 
 static void _getSickStatusParam(BattleUnit* unit, BattleWeapon* weapon, u32 type, s8* outTime, s8* outStrength);
 static s32 BattleSetStatusDamage(u32* result, BattleUnit* unit, BattleUnitPart* part, u32 special, s32 type, s32 rate, s32 levelDiff, s8 time, s8 strength);
@@ -1200,7 +1196,7 @@ static s32 BattleSetStatusDamage(u32* result, BattleUnit* unit, BattleUnitPart* 
         if ((u32)type == STATUS_INSTANT_KILL) {
             *result |= STATUS_RESULT_INSTANT_KILL;
         }
-        ok = ((BtlUnit_SetStatusS8Fn)BtlUnit_SetStatus)(unit, type, time, strength);
+        ok = BtlUnit_SetStatus(unit, type, time, strength);
     }
     switch (type) {
         case 6:
@@ -1412,7 +1408,7 @@ static s32 BattleSetStatusDamage(u32* result, BattleUnit* unit, BattleUnitPart* 
 
     announce = 0;
     if (ok) {
-        ((BtlUnit_GetStatusS8Fn)BtlUnit_GetStatus)(unit, type, &curTurns, &curStrength);
+        BtlUnit_GetStatus(unit, type, &curTurns, &curStrength);
         switch (type) {
             case 0x10:
                 if (curStrength > 0) {

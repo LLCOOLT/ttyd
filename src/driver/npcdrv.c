@@ -1354,37 +1354,41 @@ void npcSetMarioAutoTalkPose(const char* stayPose, const char* talkPose) {
     strcpy(MarioTalkPose, talkPose);
 }
 
-// FAKE: turns off copy propagation so the temporaries and registers match the target; removing it changes the code
-#pragma opt_propagation off
-#pragma opt_lifetimes off
 /**
  * name is non-const as in the original: through a const char* the scheduler moves the first load up into the
  * register saves (MWCC treats const loads as not aliasing the stores).
  */
 void npcSetTalkPose(char* name) {
     PartyEntry* party;
+    NpcWork* wp;
     NpcEntry* npc;
+    s32 total;
+    int i;
 
-    if (*(s8*)name == 0)
-        return;
-    if (!strcmp(name, "(^x^)party"))
-        return;
-    if (!strcmp(name, "party")) {
-        party = partyGetPtr(marioGetPartyId());
-        if (party) {
-            partyChgPoseId(party, 7);
-        }
-    } else if (!strcmp(name, "extparty")) {
-        party = partyGetPtr(marioGetExtraPartyId());
-        if (party) {
-            partyChgPoseId(party, 7);
-        }
-    } else if (!strcmp(name, "mario")) {
-        marioChgPose(MarioTalkPose);
-    } else {
-        npc = npcNameToPtr(name);
-        if (npc->flags & NPC_FLAG_TALK_ANIM) {
-            animPoseSetAnim(npc->poseId, npc->talkAnim, TRUE);
+    if ((s8)name[0] != '\0' && strcmp(name, "(^x^)party")) {
+        if (!strcmp(name, "party")) {
+            party = partyGetPtr(marioGetPartyId());
+            if (party != NULL) {
+                partyChgPoseId(party, 7);
+            }
+        } else if (!strcmp(name, "extparty")) {
+            party = partyGetPtr(marioGetExtraPartyId());
+            if (party != NULL) {
+                partyChgPoseId(party, 7);
+            }
+        } else if (!strcmp(name, "mario")) {
+            marioChgPose(MarioTalkPose);
+        } else {
+            wp = npcGetWorkPtrInline();
+            total = wp->total;
+            for (i = 0, npc = wp->entries; i < total; i++, npc++) {
+                if (npc->flags & NPC_FLAG_USED && !strcmp(npc->description, name)) {
+                    break;
+                }
+            }
+            if (npc->flags & NPC_FLAG_TALK_ANIM) {
+                animPoseSetAnim(npc->poseId, npc->talkAnim, TRUE);
+            }
         }
     }
 }
@@ -1397,32 +1401,42 @@ void npcSetTalkPose(char* name) {
  */
 void npcSetStayPose(char* name) {
     PartyEntry* party;
+    NpcWork* wp;
     NpcEntry* npc;
+    s32 total;
+    int i;
 
-    if (*(s8*)name == 0)
-        return;
-    if (!strcmp(name, "(^x^)party"))
-        return;
-    if (!strcmp(name, "party")) {
-        party = partyGetPtr(marioGetPartyId());
-        if (party) {
-            partyChgPoseId(party, 1);
-        }
-    } else if (!strcmp(name, "extparty")) {
-        party = partyGetPtr(marioGetExtraPartyId());
-        if (party) {
-            partyChgPoseId(party, 1);
-        }
-    } else if (!strcmp(name, "mario")) {
-        marioChgPose(MarioStayPose);
-    } else {
-        npc = npcNameToPtr(name);
-        if (npc->flags & NPC_FLAG_TALK_ANIM) {
-            animPoseSetAnim(npc->poseId, npc->stayAnim, TRUE);
+    if ((s8)name[0] != '\0' && strcmp(name, "(^x^)party")) {
+        if (!strcmp(name, "party")) {
+            party = partyGetPtr(marioGetPartyId());
+            if (party != NULL) {
+                partyChgPoseId(party, 1);
+            }
+        } else if (!strcmp(name, "extparty")) {
+            party = partyGetPtr(marioGetExtraPartyId());
+            if (party != NULL) {
+                partyChgPoseId(party, 1);
+            }
+        } else if (!strcmp(name, "mario")) {
+            marioChgPose(MarioStayPose);
+        } else {
+            wp = npcGetWorkPtrInline();
+            total = wp->total;
+            for (i = 0, npc = wp->entries; i < total; i++, npc++) {
+                if (npc->flags & NPC_FLAG_USED && !strcmp(npc->description, name)) {
+                    break;
+                }
+            }
+            if (npc->flags & NPC_FLAG_TALK_ANIM) {
+                animPoseSetAnim(npc->poseId, npc->stayAnim, TRUE);
+            }
         }
     }
 }
 
+// FAKE: turns off copy propagation so the temporaries and registers match the target; removing it changes the code
+#pragma opt_propagation off
+#pragma opt_lifetimes off
 /**
  * Keeps a friendly NPC from walking through Mario:
  * if they overlap side-on and vertically, the NPC goes back to its previous X/Z
@@ -2070,7 +2084,6 @@ void fbatEncountCheck(void) {
                 f32 dir;
                 f32 a;
                 f32 yaw;
-                s32 k;
                 pos.x = mario->position.x;
                 pos.z = mario->position.z;
                 pos.y = npc->position.y;
@@ -2082,24 +2095,15 @@ void fbatEncountCheck(void) {
                 yaw = camGetPtr(CAMERA_3D)->viewYaw;
                 dir = reviseAngle(marioGetDispDir() - yaw);
                 for (j = 0; j < 3; j++) {
-                    // FAKE: dead int-guarded re-definition inside the loop keeps dir a named web (COLOURING M; no code, no preheader split)
-                    k = 0;
-                    if (k != 0)
-                        dir = 0.0f;
                     switch (j) {
                         case 0:
-                            yaw = camGetPtr(CAMERA_3D)->viewYaw;
-                            a = reviseAngle(angleABf(mario->position.x, mario->position.z, npc->position.x, npc->position.z) - yaw);
+                            a = reviseAngle(angleABf(mario->position.x, mario->position.z, npc->position.x, npc->position.z) - camGetPtr(CAMERA_3D)->viewYaw);
                             break;
-
                         case 1:
-                            yaw = camGetPtr(CAMERA_3D)->viewYaw;
-                            a = reviseAngle(angleABf(mario->position.x, mario->position.z, npc->position.x + (0.5f * npc->width), npc->position.z) - yaw);
+                            a = reviseAngle(angleABf(mario->position.x, mario->position.z, npc->position.x + 0.5f * npc->width, npc->position.z) - camGetPtr(CAMERA_3D)->viewYaw);
                             break;
-
                         default:
-                            yaw = camGetPtr(CAMERA_3D)->viewYaw;
-                            a = reviseAngle(angleABf(mario->position.x, mario->position.z, npc->position.x - (0.5f * npc->width), npc->position.z) - yaw);
+                            a = reviseAngle(angleABf(mario->position.x, mario->position.z, npc->position.x - 0.5f * npc->width, npc->position.z) - camGetPtr(CAMERA_3D)->viewYaw);
                             break;
                     }
 

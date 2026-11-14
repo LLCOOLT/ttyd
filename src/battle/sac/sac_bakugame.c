@@ -1427,7 +1427,7 @@ static void bakuGameDisp2D(CameraId cam, void* param) {
             disp->colorStep[1] = disp->colorStep[2] = -0x10;
         }
     }
-    BattleAcDrawGauge(w->dc, w->e0, 0xB1, w->rate, 3, 0x21, 0x42, 0x64, full);
+    BattleAcDrawGauge(w->dc, w->e0, w->rate, 0xB1, 3, 0x21, 0x42, 0x64, full);
 }
 
 #pragma dont_inline reset

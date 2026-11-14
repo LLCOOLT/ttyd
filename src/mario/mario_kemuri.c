@@ -44,48 +44,46 @@ void mario_kemuri(void) {
 
     attr = 0;
 
-    if ((u32)marioStGetSystemLevel() == 0) {
-        if (!(mario->flags & MARIO_FLAG_TUBE_MODE)) {
-            if (mario->currMotionId == MARIO_MOTION_DOKAN) {
-                // no dust while going through a pipe
-                // FAKE: an empty branch is one instruction short; the self-assignment keeps the original's branch layout
-                s = s;
-            } else {
-                if (mario->currMotionId != MARIO_MOTION_JUMP) {
-                    if (mario->hitobjStandOn != NULL) {
-                        attr = hitGetAttr(mario->hitobjStandOn);
-                    }
-                } else if (mario->hitobjJumpFrom != NULL) {
-                    attr = hitGetAttr(mario->hitobjJumpFrom);
-                }
-                {
-                    if (attr & HIT_ATTR_GRASS) {
-                        kemuri_mugi();
-                    } else if (attr & HIT_ATTR_SHALLOW_WATER) {
-                        mario_kemuri_landon();
-                    } else if (attr & 0x100000) {
-                        mario = marioGetPtr();
-                        if (mario->currMotionId != MARIO_MOTION_DASH && mario->currMotionId != MARIO_MOTION_WALK) {
-                            ct = 8;
-                        } else if (ct++ > 8) {
-                            ct = 0;
-                            sincosf(&s, &c, 6.2831855f * reviseAngle(-mario->directionView) / 360.0f);
-                            effKemuri7N64Entry(mario->position.x + 0.2f * (mario->wPlayerCollisionBox.x * s),
-                                               0.5f + mario->position.y,
-                                               mario->position.z + 0.2f * (mario->wPlayerCollisionBox.x * c),
-                                               -mario->directionView, (f32)left_or_right);
-                            left_or_right = left_or_right == 0;
-                        }
-                    } else if (!(mario->flags & MARIO_FLAG_TUBE_MODE)) {
-                        if (kpaGetBodyStatus() <= 0 && mario->characterId != 1) {
-                            kemuri();
-                        }
-                    }
-                }
-            }
-        }
+    // no dust at a raised system level, in tube mode or while going through a pipe
+    if ((u32)marioStGetSystemLevel() != 0 || (mario->flags & MARIO_FLAG_TUBE_MODE) ||
+        mario->currMotionId == MARIO_MOTION_DOKAN) {
+        return;
     }
-out:;
+    if (mario->currMotionId != MARIO_MOTION_JUMP) {
+        if (mario->hitobjStandOn != NULL) {
+            attr = hitGetAttr(mario->hitobjStandOn);
+        }
+    } else if (mario->hitobjJumpFrom != NULL) {
+        attr = hitGetAttr(mario->hitobjJumpFrom);
+    }
+    if (attr & HIT_ATTR_GRASS) {
+        kemuri_mugi();
+        return;
+    }
+    if (attr & HIT_ATTR_SHALLOW_WATER) {
+        mario_kemuri_landon();
+        return;
+    }
+    if (attr & 0x100000) {
+        mario = marioGetPtr();
+        if (mario->currMotionId != MARIO_MOTION_DASH && mario->currMotionId != MARIO_MOTION_WALK) {
+            ct = 8;
+            return;
+        }
+        if (ct++ > 8) {
+            ct = 0;
+            sincosf(&s, &c, 6.2831855f * reviseAngle(-mario->directionView) / 360.0f);
+            effKemuri7N64Entry(mario->position.x + 0.2f * (mario->wPlayerCollisionBox.x * s),
+                               0.5f + mario->position.y,
+                               mario->position.z + 0.2f * (mario->wPlayerCollisionBox.x * c),
+                               -mario->directionView, (f32)left_or_right);
+            left_or_right = left_or_right == 0;
+        }
+        return;
+    }
+    if (!(mario->flags & MARIO_FLAG_TUBE_MODE) && kpaGetBodyStatus() <= 0 && mario->characterId != 1) {
+        kemuri();
+    }
 }
 
 /**

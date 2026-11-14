@@ -1754,14 +1754,12 @@ void L_getStick(PartyEntry* party, f32* angle, f32* speed) {
             dist = 1.5f * (mario->baseWalkSpeed * marioGetMoveRate(ang));
         }
 #else
-    *angle = revise360(ang + party->camDir);
+    *angle = ang = revise360(ang + party->camDir);
     if (dist > 0.0f) {
         if (x * x + y * y > 3025) {
-            // FAKE: BUG: the retail code (JP/US/PAL) calls marioGetMoveRate without the direction (it reads whatever
-            // is in f1, here the angle just stored); the cast keeps the call without the argument.
-            dist = 1.5f * (mario->baseDashSpeed * ((f32 (*)(void))marioGetMoveRate)());
+            dist = 1.5f * (mario->baseDashSpeed * marioGetMoveRate(ang));
         } else {
-            dist = 1.5f * (mario->baseWalkSpeed * ((f32 (*)(void))marioGetMoveRate)()); // FAKE: as above
+            dist = 1.5f * (mario->baseWalkSpeed * marioGetMoveRate(ang));
         }
 #endif
         if (hitGetAttr(mario->hitobjStandOn) & HIT_ATTR_SHALLOW_WATER) {

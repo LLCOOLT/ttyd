@@ -26,6 +26,7 @@
 #include "mot/mot_plane.h"
 #include "mot/mot_slit.h"
 #include "party/party_motion.h"
+#include "party/party_move.h"
 #include "party/party_yoshi.h"
 #include "peach.h"
 #include "version.h"
@@ -152,9 +153,6 @@ static inline BOOL marioLandChk(f32 vy) {
     return FALSE;
 }
 
-// FAKE: the calls pass a direction that partyMoveBehindMario3 (party_move.c) does not take;
-// the extra f32 argument is computed and ignored, so it goes through this wider prototype.
-void partyMoveBehindMario3(PartyEntry* party, s32 a, f32 dir);
 void partySetDispDirToMario(PartyEntry* party);
 
 /**

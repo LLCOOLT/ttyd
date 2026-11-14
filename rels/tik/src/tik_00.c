@@ -486,16 +486,10 @@ static USER_FUNC(setmertn) {
 
 /** Script helper. Stores the module-level flag ssf (set by ss_set) into the variable args[0]. */
 static USER_FUNC(ss_check) {
-    s32 a;
-    s32 z;
+    EvtWord* args = event->args;
+    s32 dest = *args++;
 
-    // FAKE: the dead condition moves the ssf load ahead of event->args; casts, temps and
-    // u32 index variants do not reproduce it
-    a = event->args[0];
-    z = !ssf;
-    if ((z && !ssf) != 0) {
-    }
-    evtSetFloat(event, a, ssf);
+    evtSetFloat(event, dest, ssf);
     return EVT_RETURN_DONE;
 }
 

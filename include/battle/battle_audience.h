@@ -414,4 +414,4 @@ void BattleAudience_Case_FirstAttack_Bad(void);
 s32 BattleAudienceAddAudienceNum(s32 num);
 void BattleAudienceSoundSetVol(s32 index, u8 a2, s32 a3);
 s32 BattleAudienceSoundCheck(s32 index);
-BOOL BattleAudience_GetEscapeChangeOK(s32 index);
+u8 BattleAudience_GetEscapeChangeOK(s32 index);

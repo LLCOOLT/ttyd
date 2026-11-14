@@ -26,8 +26,6 @@
 
 // FAKE: battle_disp.c calls iconDispGx through this prototype (the types it was compiled with) instead of the one in driver/icondrv.h; same registers, behaviour-identical.
 typedef void (*IconDispGxArgOrderFn)(f32, Vec*, s16, u16);
-// FAKE: battle_disp.c calls BtlUnit_CheckStatus through this prototype (the types it was compiled with) instead of the one in battle/battle_unit.h; same registers, behaviour-identical.
-typedef BOOL (*BtlUnit_CheckStatusS8Fn)(BattleUnit*, s8);
 
 #define PART_GRAVITY(p) ((p)->gravityTimer)
 #define PART_FLOAT(p) ((p)->floatTimer)
@@ -328,7 +326,7 @@ BattlePoseType _GetStatusPoseType(BattleUnit* unit) {
         type = *table;
         if (*table == -1)
             break;
-        if (((BtlUnit_CheckStatusS8Fn)BtlUnit_CheckStatus)(unit, type)) {
+        if (BtlUnit_CheckStatus(unit, type)) {
             return (BattlePoseType)type;
         }
         table++;

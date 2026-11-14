@@ -59,7 +59,7 @@ BOOL partyChkNoStandMobj(struct HitEntry* hit);
 void partyChgMoveMode(PartyEntry* party, s32 mode);
 void partySetDir(PartyEntry* party, f32 x, f32 z);
 void partyMoveBehindMario(PartyEntry* party, s32 arg);
-void partyMoveBehindMario3(PartyEntry* party, s32 arg);
+void partyMoveBehindMario3(PartyEntry* party, s32 arg, f32 dir);
 void partyMoveBesideMario(PartyEntry* party, s32 arg);
 void partyMoveCheckWall(PartyEntry* party);
 void partyChkWall(PartyEntry* party);

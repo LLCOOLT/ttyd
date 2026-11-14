@@ -12,7 +12,7 @@ BOOL marioChkSlitEnd(void);
 BOOL marioChkSlitThrouh(void);
 BOOL marioGetMotSlitCancel3(void);
 
-BOOL marioCreviceWallChk(const Vec* p);
+BOOL marioCreviceWallChk(Vec pos);
 void marioSlitReenter(void);
 void N_marioSlitSetAfterLand(void);
 BOOL marioSlitKeyDisable(void);

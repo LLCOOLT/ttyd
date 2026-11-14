@@ -28,7 +28,7 @@ typedef struct ExtdrvPose {
 } ExtdrvPose;
 
 typedef struct ExtdrvTex {
-    void** image;       // 0x0
+    void* image;        // 0x0
     GXTexObj obj;       // 0x4
     GXTexRegion region; // 0x24
 } ExtdrvTex;

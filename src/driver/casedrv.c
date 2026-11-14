@@ -18,10 +18,6 @@
 #include <dolphin/pad.h>
 #include <demo/DEMOPad.h>
 
-// FAKE: casedrv.c calls evtEntry through the prototype it was compiled with (an s32 priority, passed without
-// the u8 truncation) instead of the one in manager/evtmgr.h; same registers
-typedef EventEntry* (*EvtEntryS32PriorityFn)(void* evtCode, s32 priority, u8 flags);
-
 typedef struct CaseWork {
     s32 count;          // 0x0
     CaseEntry* entries; // 0x4
@@ -56,8 +52,9 @@ void caseReInit(void) {
  */
 s32 caseEntry(CaseSetup* setup) {
     CaseEntry* entry;
-    int i = 0;
-    for (entry = wp->entries; i < wp->count; i++, entry++) {
+    s32 i;
+
+    for (i = 0, entry = wp->entries; i < wp->count; i++, entry++) {
         if (!(entry->flags & CASE_ENTRY_FLAG_IN_USE)) {
             break; // unused entry
         }
@@ -77,7 +74,7 @@ s32 caseEntry(CaseSetup* setup) {
     entry->priority = setup->priority;
     entry->evtId = 0;
     memcpy(entry->lwData, setup->lwData, sizeof(entry->lwData));
-    return i & 0xFFFFFFFFFFFFFFFFu; // FAKE: the no-op 64-bit mask swaps the i and entry registers as in the target; see FAKES.md
+    return i;
 }
 
 /** Releases case entry caseId so it no longer fires. */
@@ -256,7 +253,7 @@ void caseMain(void) {
                 if (!evtCheckID(entry->evtId))
                     entry->evtId = 0;
                 if (entry->evtId == 0) {
-                    evt = ((EvtEntryS32PriorityFn)evtEntry)(entry->evtCode, entry->priority, 0x20);
+                    evt = evtEntry(entry->evtCode, entry->priority, 0x20);
                     evt->caseId = entry->caseId;
                     entry->evtId = evt->eventId;
                     memcpy(evt->lwData, entry->lwData, sizeof(entry->lwData));

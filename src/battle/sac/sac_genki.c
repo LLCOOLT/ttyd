@@ -39,8 +39,6 @@
 static void weapon_entry(void);
 // FAKE: sac_genki.c calls weapon_entry through this prototype (the types it was compiled with) instead of the one in battle/sac/sac_genki.h; same registers, behaviour-identical.
 typedef void (*Weapon_entryLocalFn)(void);
-// FAKE: sac_genki.c calls iconDispGxCol through this prototype (the types it was compiled with) instead of the one in driver/icondrv.h; same registers, behaviour-identical.
-typedef void (*IconDispGxColU16S32Fn)(Mtx, u16, s32, GXColor);
 // US battle texture ids are 0x16 higher for these entries.
 #define BTL_TEX(id) ((id) + VERSION_PICK(0, 0x16))
 
@@ -1027,7 +1025,7 @@ static void disp_3D(CameraId cam, void* param) {
     BattleUnit* party;
     u16 flags;
     s32 i;
-    s32 icon;
+    u16 icon;
     f32 ang;
     f32 mx, my, mz;
     f32 px, py, pz;
@@ -1200,7 +1198,7 @@ static void disp_3D(CameraId cam, void* param) {
             }
             PSMTXScale(m, s, s, 1.0f);
             PSMTXTransApply(m, m, o->pos.x, o->pos.y - 20.0f * s, o->pos.z);
-            ((IconDispGxColU16S32Fn)iconDispGxCol)(m, flags, icon, (GXColor){255, 255, 255, 255});
+            iconDispGxCol(m, flags, icon, (GXColor){255, 255, 255, 255});
         }
     }
 

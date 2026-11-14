@@ -21,8 +21,6 @@
 #include "gxsub.h"
 #include <math.h>
 #include "driver/hitdrv.h"
-// FAKE: mapdrv.c calls lightEntry through this prototype (the types it was compiled with) instead of the one in driver/lightdrv.h; same registers, behaviour-identical.
-typedef s32 (*LightEntryArgOrderFn)(const char*, s32, Vec*, Vec*, GXColor*, f32, f32, s32, s32);
 /** Single-precision sine for this file, routed through the double sin() of math.h. */
 static inline f32 sinf(f32 x) {
     return sin(x);
@@ -93,8 +91,6 @@ s32 activeGroup;
 MapWork* mapWork; // allocates two entries
 
 static void mapGetJointsSub(MapFileJoint* joint, s32* numJoints);
-// FAKE: calls lightGetNearObj with the Vec address instead of a by-value copy (FAKES.md)
-#define lightGetNearObj(pos, out, count, flags) ((s32 (*)(Vec*, LightEntry**, s32, LightEntryFlags))lightGetNearObj)(pos, out, count, flags)
 
 // local prototypes
 static void mapGetJointsSub(MapFileJoint* joint, s32* numJoints);
@@ -495,7 +491,7 @@ static MapObject* mapEntrySub(MapFileJoint* joint, MapObject* parent, Mtx mtx, B
  * and builds the object tree from the root joint with world matrix mtx; returns the root object.
  */
 static MapObject* mapEntry(MapFileJoint* joint, Mtx mtx, s32 index) {
-    MapWork* wp = (0, &mapWork[activeGroup]); // FAKE: the comma expression gives wp the target register (r31, not r30)
+    MapWork* wp = mapGetWork();
     u32 size;
 
     wp->entries[index].numJoints = mapGetJoints(joint);
@@ -996,7 +992,6 @@ static void _mapLoad(MapWork* wp, BOOL group, const char* map) {
             for (i = 0; i < wp->entries[group].lightTable->count; i++) {
                 MapFileLight* light = wp->entries[group].lightTable->lights[i];
                 Vec pos;
-                GXColor lcolor;
                 s32 type = 1;
                 s32 lflags = 0;
                 PSVECScale(&light->position, &pos, 10.0f);
@@ -1012,8 +1007,7 @@ static void _mapLoad(MapWork* wp, BOOL group, const char* map) {
                 if (light->magic == 0x12D60D8) {
                     lflags = light->lflags;
                 }
-                lcolor = light->color;
-                ((LightEntryArgOrderFn)lightEntry)(light->name, type, &pos, &light->rotation, &lcolor, light->spotAngle, light->attenAngle, light->attenType, lflags);
+                lightEntry(light->name, type, &pos, &light->rotation, light->color, light->spotAngle, light->attenAngle, light->attenType, lflags);
             }
         }
         mapResetPaperAmbColor();
@@ -1452,8 +1446,8 @@ void bmapLoad(const char* map, const char* map2) {
         }
     }
 
-    wp = (0, &mapWork[1]); // FAKE: the comma expression keeps the target register order for wp
     activeGroup = 1;
+    wp = mapGetWork();
     memset(wp, 0, sizeof(MapWork));
 #if VERSION <= VERSION_DEMO_JP
     // the demo reads the battle map archives itself

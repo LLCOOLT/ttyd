@@ -339,8 +339,7 @@ static void effSplashGetCol(CameraId cameraId, EffectEntry* effect) {
     GXProject(work->position.x, work->position.y, work->position.z, cam->view, proj, vp, &sx, &sy, &sz);
     if (sx > 0.0f && sx < 608.0f && sy > 0.0f && sy < 480.0f) {
         sysWaitDrawSync();
-        // FAKE: unprototyped call: the SDK u16 parameters would add two narrowings (FAKES.md)
-        ((void (*)())GXPeekARGB)((s32)sx, (s32)sy, argb);
+        GXPeekARGB(sx, sy, (u32*)argb);
         work->color.r = argb[1];
         work->color.g = argb[2];
         work->color.b = argb[3];

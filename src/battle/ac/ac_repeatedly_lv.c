@@ -9,11 +9,6 @@
 #include "system.h"
 #include <string.h>
 
-// FAKE: ac_repeatedly_lv.c calls BattleAcDrawGauge through this prototype (the types it was compiled with) instead of the one in battle/battle_ac.h; same registers, behaviour-identical.
-typedef void (*BattleAcDrawGaugeArgOrderFn)(f32, s32, s32, u8, s32, s32, s32, s32, s32);
-// FAKE: ac_repeatedly_lv.c calls BattleACGetButtonIcon through this prototype (the types it was compiled with) instead of the one in battle/battle_ac.h; same registers, behaviour-identical.
-typedef s32 (*BattleACGetButtonIconRetS32Fn)(s32, s32);
-
 // this unit is size-optimised, as in the original (the object differs without it)
 #pragma optimize_for_size on
 
@@ -49,7 +44,7 @@ typedef struct RepeatedlyLvWork {
     s32 endTimer;      // 0x30
 } RepeatedlyLvWork;
 
-#define RL_IconDisp ((void (*)(Vec*, s16, s32, f32))iconDispGx)
+#define RL_WORK(ac) ((RepeatedlyLvWork*)(ac)->work)
 
 /**
  * Reads the script parameters: params[0] picks the input (A by default; 2 B, 3 X, 4 Y, 5 R, 6 stick left,
@@ -382,153 +377,131 @@ void battleAcDelete_RepeatedlyLv(BattleWork* work) {
  * and per acFlags the params[6] target marker and the level number.
  */
 static void actionCommandDisp(f32 x, f32 y) {
-    BattleWork* work = _battleWorkPointer;
-    BattleActions* ac = &work->actionCommands;
-    RepeatedlyLvWork* p = (RepeatedlyLvWork*)ac->work;
-    BattleACDispParams* disp = &ac->disp;
-    s32 arr[4];
-    s32 i, count, flags, phase;
+    BattleActions* ac = &_battleWorkPointer->actionCommands;
+    u16 iconOn;
+    s32 buttons;
+    u16 iconOff;
+    u16 iconOn2;
+    u16 iconOff2;
+    s32 dx1;
+    s32 dx2;
+    s32 blink;
+    s32 levels[4];
+    s32 count;
+    s32 i;
+    s32 flash;
+    s32 number;
     f32 target;
+    f32 numberX;
+    Mtx mtx;
+    Mtx trans;
+    Mtx scale;
+
     camGetPtr(CAMERA_2D);
-    {
-        s32 numIcons;
-        s32 pressedA, idleA, pressedB, idleB;
-        s32 off0, off1;
-        idleB = 0;
-        pressedB = 0;
-        numIcons = 1;
-        ac->disp.blinkTimer++;
-        off1 = 0;
-        off0 = 0;
-        pressedA = ((BattleACGetButtonIconRetS32Fn)BattleACGetButtonIcon)(p->mask, 1);
-        idleA = ((BattleACGetButtonIconRetS32Fn)BattleACGetButtonIcon)(p->mask, 0);
-        switch (ac->params[0]) {
-            case 15:
-                off0 = -10;
-                off1 = 10;
-            case 11:
-            case 12:
-                pressedA = ((BattleACGetButtonIconRetS32Fn)BattleACGetButtonIcon)(p->maskA, 1);
-                idleA = ((BattleACGetButtonIconRetS32Fn)BattleACGetButtonIcon)(p->maskA, 0);
-                pressedB = ((BattleACGetButtonIconRetS32Fn)BattleACGetButtonIcon)(p->maskB, 1);
-                idleB = ((BattleACGetButtonIconRetS32Fn)BattleACGetButtonIcon)(p->maskB, 0);
-                numIcons = 2;
-                break;
-            case 13:
-                pressedA = ICON_07C;
-                idleA = ICON_076;
-                break;
-            case 14:
-                pressedA = ICON_078;
-                idleA = ICON_07A;
-                break;
-        }
-        phase = ac->disp.blinkTimer / 7;
-        if (numIcons == 1) {
-            if ((phase & 1) == 1) {
-                Vec pos = {0.0f, 0.0f, 0.0f};
-                pos.x = -200.0f + x;
-                pos.y = 70.0f + y;
-                RL_IconDisp(&pos, ICON_DISP_2D, idleA, 1.0f);
-            } else {
-                Vec pos = {0.0f, 0.0f, 0.0f};
-                pos.x = -200.0f + x;
-                pos.y = 70.0f + y;
-                RL_IconDisp(&pos, ICON_DISP_2D, pressedA, 1.0f);
-            }
-        } else {
-            if ((phase & 1) == 1) {
-                Vec pos = {0.0f, 0.0f, 0.0f};
-                pos.x = -225.0f + x + off0;
-                pos.y = 70.0f + y;
-                RL_IconDisp(&pos, ICON_DISP_2D, idleA, 1.0f);
-                {
-                    Vec pos2 = {0.0f, 0.0f, 0.0f};
-                    pos2.x = -175.0f + x + off1;
-                    pos2.y = 70.0f + y;
-                    RL_IconDisp(&pos2, ICON_DISP_2D, pressedB, 1.0f);
-                }
-            } else {
-                Vec pos = {0.0f, 0.0f, 0.0f};
-                pos.x = -225.0f + x + off0;
-                pos.y = 70.0f + y;
-                RL_IconDisp(&pos, ICON_DISP_2D, pressedA, 1.0f);
-                {
-                    Vec pos2 = {0.0f, 0.0f, 0.0f};
-                    pos2.x = -175.0f + x + off1;
-                    pos2.y = 70.0f + y;
-                    RL_IconDisp(&pos2, ICON_DISP_2D, idleB, 1.0f);
-                }
-            }
-        }
+    ac->disp.blinkTimer++;
+    iconOff2 = 0;
+    iconOn2 = 0;
+    buttons = 1;
+    dx2 = 0;
+    dx1 = 0;
+    iconOn = BattleACGetButtonIcon(RL_WORK(ac)->mask, 1);
+    iconOff = BattleACGetButtonIcon(RL_WORK(ac)->mask, 0);
+    switch (ac->params[0]) {
+        case 15:
+            dx1 = -10;
+            dx2 = 10;
+        case 11:
+        case 12:
+            iconOn = BattleACGetButtonIcon(RL_WORK(ac)->maskA, 1);
+            iconOff = BattleACGetButtonIcon(RL_WORK(ac)->maskA, 0);
+            iconOn2 = BattleACGetButtonIcon(RL_WORK(ac)->maskB, 1);
+            iconOff2 = BattleACGetButtonIcon(RL_WORK(ac)->maskB, 0);
+            buttons = 2;
+            break;
+        case 13:
+            iconOn = ICON_07C;
+            iconOff = ICON_076;
+            break;
+        case 14:
+            iconOn = ICON_078;
+            iconOff = ICON_07A;
+            break;
     }
-    target = p->gauge / 100.0f;
-    if (disp->gaugeRatio <= target) {
-        if (ac->acFlags & REPEATEDLY_LV_FAST_GAUGE) {
-            disp->gaugeRatio += 0.02f;
+    blink = ac->disp.blinkTimer / 7;
+    if (buttons == 1) {
+        if ((blink & 1) == 1) {
+            iconDispGx(&(Vec){-200.0f + x, 70.0f + y, 0.0f}, ICON_DISP_2D, iconOff, 1.0f);
         } else {
-            disp->gaugeRatio += 0.01f;
+            iconDispGx(&(Vec){-200.0f + x, 70.0f + y, 0.0f}, ICON_DISP_2D, iconOn, 1.0f);
+        }
+    } else if ((blink & 1) == 1) {
+        iconDispGx(&(Vec){-225.0f + x + dx1, 70.0f + y, 0.0f}, ICON_DISP_2D, iconOff, 1.0f);
+        iconDispGx(&(Vec){-175.0f + x + dx2, 70.0f + y, 0.0f}, ICON_DISP_2D, iconOn2, 1.0f);
+    } else {
+        iconDispGx(&(Vec){-225.0f + x + dx1, 70.0f + y, 0.0f}, ICON_DISP_2D, iconOn, 1.0f);
+        iconDispGx(&(Vec){-175.0f + x + dx2, 70.0f + y, 0.0f}, ICON_DISP_2D, iconOff2, 1.0f);
+    }
+    target = RL_WORK(ac)->gauge / 100.0f;
+    if (ac->disp.gaugeRatio <= target) {
+        if (ac->acFlags & REPEATEDLY_LV_FAST_GAUGE) {
+            ac->disp.gaugeRatio += 0.02f;
+        } else {
+            ac->disp.gaugeRatio += 0.01f;
         }
         if (ac->acFlags & REPEATEDLY_LV_INSTANT_GAUGE) {
-            disp->gaugeRatio = target;
+            ac->disp.gaugeRatio = target;
         }
-        if (disp->gaugeRatio > target) {
-            disp->gaugeRatio = target;
+        if (ac->disp.gaugeRatio > target) {
+            ac->disp.gaugeRatio = target;
         }
     } else {
         if (ac->acFlags & REPEATEDLY_LV_FAST_GAUGE) {
-            disp->gaugeRatio -= 0.02f;
+            ac->disp.gaugeRatio -= 0.02f;
         } else {
-            disp->gaugeRatio -= 0.01f;
+            ac->disp.gaugeRatio -= 0.01f;
         }
         if (ac->acFlags & REPEATEDLY_LV_INSTANT_GAUGE) {
-            disp->gaugeRatio = target;
+            ac->disp.gaugeRatio = target;
         }
-        if (disp->gaugeRatio < target) {
-            disp->gaugeRatio = target;
+        if (ac->disp.gaugeRatio < target) {
+            ac->disp.gaugeRatio = target;
         }
     }
     count = 0;
-    flags = 0;
-    if (p->state == 1 && disp->gaugeRatio >= 1.0f) {
-        flags |= 1;
-        disp->color.g += disp->colorStep[1];
-        disp->color.b += disp->colorStep[2];
-        if (disp->color.g <= 0x80 && disp->colorStep[1] < 0) {
-            disp->colorStep[1] = disp->colorStep[2] = 0x10;
+    flash = 0;
+    if (RL_WORK(ac)->state == 1 && ac->disp.gaugeRatio >= 1.0f) {
+        flash |= 1;
+        ac->disp.color.g += ac->disp.colorStep[1];
+        ac->disp.color.b += ac->disp.colorStep[2];
+        if (ac->disp.color.g <= 0x80 && ac->disp.colorStep[1] < 0) {
+            ac->disp.colorStep[1] = ac->disp.colorStep[2] = 0x10;
         }
-        if (disp->color.g >= 0xF5 && disp->colorStep[1] > 0) {
-            disp->colorStep[1] = disp->colorStep[2] = -0x10;
+        if (ac->disp.color.g >= 0xF5 && ac->disp.colorStep[1] > 0) {
+            ac->disp.colorStep[1] = ac->disp.colorStep[2] = -0x10;
         }
     }
-    if ((s8)p->state == -1) {
-        flags |= 2;
+    if (RL_WORK(ac)->state == -1) {
+        flash |= 2;
     }
     for (i = 0; i < 4; i++) {
-        arr[i] = 100;
+        levels[i] = 100;
     }
     for (i = 0; i < 4; i++, count++) {
-        arr[i] = ac->gaugeParams[i];
-        if (i != 0 && arr[i] - arr[i - 1] <= 0) {
+        levels[i] = ac->gaugeParams[i];
+        if (i != 0 && levels[i] - levels[i - 1] <= 0) {
             break;
         }
     }
-    ((BattleAcDrawGaugeArgOrderFn)BattleAcDrawGauge)(disp->gaugeRatio, (s32)x, (s32)y, p->u24, count, arr[0], arr[1], arr[2], flags);
+    BattleAcDrawGauge(x, y, ac->disp.gaugeRatio, RL_WORK(ac)->u24, count, levels[0], levels[1], levels[2], flash);
     if (ac->acFlags & REPEATEDLY_LV_SHOW_MARK) {
-        Vec pos = {0.0f, 0.0f, 0.0f};
-        pos.x = -288.0f + x + (f32)(ac->params[6] * 0xB0) / 100.0f;
-        pos.y = 45.0f + y;
-        RL_IconDisp(&pos, ICON_DISP_2D, ICON_096, 1.0f);
+        iconDispGx(&(Vec){-288.0f + x + (f32)(ac->params[6] * 0xB0) / 100.0f, 45.0f + y, 0.0f}, ICON_DISP_2D, ICON_096, 1.0f);
     }
     if (ac->acFlags & REPEATEDLY_LV_SHOW_LEVEL) {
-        Mtx m3, m1, m2;
-        s32 number = (s32)ac->outputParams[2] + ac->params[7];
-        {
-            f32 w = 108.0f;
-            PSMTXTrans(m1, -200.0f + x + w, 25.0f + y, 0.0f);
-        }
-        PSMTXScale(m2, 1.0f, 1.0f, 1.0f);
-        PSMTXConcat(m1, m2, m3);
-        iconNumberDispGx(m3, number, FALSE, (GXColor){255, 255, 255, 255});
+        number = ac->outputParams[2] + ac->params[7];
+        numberX = 108.0f;
+        PSMTXTrans(trans, -200.0f + x + numberX, 25.0f + y, 0.0f);
+        PSMTXScale(scale, 1.0f, 1.0f, 1.0f);
+        PSMTXConcat(trans, scale, mtx);
+        iconNumberDispGx(mtx, number, FALSE, (GXColor){255, 255, 255, 255});
     }
 }

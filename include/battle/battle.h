@@ -365,4 +365,4 @@ void BattleStatusWindowAPRecoveryOn(void);
 void BattleStatusWindowEventOff(void);
 u8 BattleMajinaiCheck(void);
 BOOL BattleStatusWindowCheck(void);
-void BattlePartyAnimeLoad(s32 partyId);
+BOOL BattlePartyAnimeLoad(s32 partyId);
