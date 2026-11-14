@@ -7341,6 +7341,7 @@ static USER_FUNC(cook_chk) {
     char ingredient[128];
     char result[128];
     char result2[128];
+    ItemType id;
 
     if (item == 163) {
         item = naniga_okorukana_cook();
@@ -7376,9 +7377,10 @@ static USER_FUNC(cook_chk) {
     }
     parsePop();
     fileFree(file);
-    // FAKE: the (volatile u32) casts order the args[n] loads after the inlined itemNameToID as in the target.
-    evtSetValue(event, (volatile u32)args[1], itemNameToID(result));
-    evtSetValue(event, (volatile u32)args[2], itemNameToID(result2));
+    id = itemNameToID(result);
+    evtSetValue(event, args[1], id);
+    id = itemNameToID(result2);
+    evtSetValue(event, args[2], id);
     return EVT_RETURN_DONE;
 }
 
@@ -7398,11 +7400,11 @@ static USER_FUNC(cook_chk2) {
     char a[128];
     char b[128];
     char out[128];
+    ItemType id;
 
     if (item1 == 163 || item2 == 163) {
-        item2 = naniga_okorukana_cook();
-        // FAKE: volatile cast, as in cook_chk above.
-        evtSetValue(event, (volatile u32)args[2], item2);
+        id = naniga_okorukana_cook();
+        evtSetValue(event, args[2], id);
         return EVT_RETURN_DONE;
     }
     file = fileAsyncf(0, NULL, "%s/cooking.xml", getMarioStDvdRoot());
@@ -7433,8 +7435,8 @@ static USER_FUNC(cook_chk2) {
     }
     parsePop();
     fileFree(file);
-    // FAKE: volatile cast, as in cook_chk above.
-    evtSetValue(event, (volatile u32)args[2], itemNameToID(out));
+    id = itemNameToID(out);
+    evtSetValue(event, args[2], id);
     return EVT_RETURN_DONE;
 }
 #else

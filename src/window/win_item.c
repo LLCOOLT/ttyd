@@ -23,10 +23,6 @@
 #include "evt/evt_story.h"
 #include <dolphin/pad.h>
 #include <demo/DEMOPad.h>
-// FAKE: PAL's itemUseDisp still calls pouchGetMaxHP and pouchGetMaxFP through these s32 prototypes. They are now the
-// header's own types, so the plain call should build the same, but it has not been checked against a PAL build.
-typedef s32 (*PouchGetMaxHPRetS32Fn)(void);
-typedef s32 (*PouchGetMaxFPRetS32Fn)(void);
 
 static void itemUseDisp(WinMgrEntry* entry);
 static void itemUseDisp2(WinMgrEntry* entry);
@@ -1001,7 +997,7 @@ static void itemUseDisp(WinMgrEntry* entry) {
 #endif
                 winFontSetR((Vec){entry->x + 267, entry->y - 8 - off, 0.0f}, (Vec){0.8f, 0.8f, 0.8f}, black, WI_SLASH);
 #if VERSION >= VERSION_DEMO_EU
-                winFontSetWidth((Vec){entry->x + 310, entry->y - 10 - off, 0.0f}, (Vec){0.8f, 0.8f, 0.8f}, black, 30.0f, "%d", ((PouchGetMaxHPRetS32Fn)pouchGetMaxHP)());
+                winFontSetWidth((Vec){entry->x + 310, entry->y - 10 - off, 0.0f}, (Vec){0.8f, 0.8f, 0.8f}, black, 30.0f, "%d", pouchGetMaxHP());
 #else
                 winFontSet((Vec){entry->x + 310, entry->y - 10 - off, 0.0f}, (Vec){0.8f, 0.8f, 0.8f}, black, "%d", pouchGetMaxHP());
 #endif
@@ -1022,7 +1018,7 @@ static void itemUseDisp(WinMgrEntry* entry) {
 #endif
                 winFontSetR((Vec){entry->x + 267, entry->y - 8 - off3, 0.0f}, (Vec){0.8f, 0.8f, 0.8f}, black, WI_SLASH);
 #if VERSION >= VERSION_DEMO_EU
-                winFontSetWidth((Vec){entry->x + 310, entry->y - 10 - off3, 0.0f}, (Vec){0.8f, 0.8f, 0.8f}, black, 30.0f, "%d", ((PouchGetMaxFPRetS32Fn)pouchGetMaxFP)());
+                winFontSetWidth((Vec){entry->x + 310, entry->y - 10 - off3, 0.0f}, (Vec){0.8f, 0.8f, 0.8f}, black, 30.0f, "%d", pouchGetMaxFP());
 #else
                 winFontSet((Vec){entry->x + 310, entry->y - 10 - off3, 0.0f}, (Vec){0.8f, 0.8f, 0.8f}, black, "%d", pouchGetMaxFP());
 #endif
